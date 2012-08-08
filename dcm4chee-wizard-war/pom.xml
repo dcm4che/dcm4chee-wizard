@@ -317,10 +317,6 @@
             			<configuration>
 	              			<target>
     	          				<move file="${project.build.directory}/dcm4chee-wizard-war-${version}-${project-classifier}/META-INF/ejb-jar.xml" tofile="${project.build.directory}/dcm4chee-wizard-war-${version}-${project-classifier}/WEB-INF/ejb-jar.xml" />
-								<jar destfile="${project.build.directory}/dcm4chee-wizard-war-${version}-${project-classifier}/WEB-INF/lib/dcm4chee-proxy-${dcm4chee.proxy.version}-${dcm4chee.proxy.type}.tmp">
-    								<zipfileset src="${project.build.directory}/dcm4chee-wizard-war-${version}-${project-classifier}/WEB-INF/lib/dcm4chee-proxy-${dcm4chee.proxy.version}-${dcm4chee.proxy.type}.jar" excludes="META-INF/ejb-jar.xml"/>
-								</jar>
-								<move file="${project.build.directory}/dcm4chee-wizard-war-${version}-${project-classifier}/WEB-INF/lib/dcm4chee-proxy-${dcm4chee.proxy.version}-${dcm4chee.proxy.type}.tmp" tofile="${project.build.directory}/dcm4chee-wizard-war-${version}-${project-classifier}/WEB-INF/lib/dcm4chee-proxy-${dcm4chee.proxy.version}-${dcm4chee.proxy.type}.jar" />
 								<jar update="true" 
 									basedir="${project.build.directory}/dcm4chee-wizard-war-${version}-${project-classifier}" 
 									includes="WEB-INF/ejb-jar.xml,WEB-INF/lib/dcm4chee-proxy-${dcm4chee.proxy.version}-${dcm4chee.proxy.type}.jar"
