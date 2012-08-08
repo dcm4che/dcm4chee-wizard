@@ -1,0 +1,20 @@
+# ExportPage.properties
+export.destinationAETsLabel=Destination AET: 
+export.selectedItems=Selected Items: 
+export.selectedPats=Patients: 
+export.selectedStudies=Studies: 
+export.selectedSeries=Series: 
+export.selectedInstances=Instances: 
+export.totInstances=Total number of instances to export: 
+export.exportResultLabel=Export Results: 
+
+export.message.noSelectionForExport=Nothing selected for export
+export.message.exportNotStarted=Export not started
+export.message.exportStarted=Export started
+export.message.exportDone=Export done
+
+export.exportBtn.text=Export
+export.closeBtn.text=Close
+export.closeOnFinishedLabel=Close after export has finished successfully
+export.downloadBtn.text=Download
+export.download.missingFile=Missing file!

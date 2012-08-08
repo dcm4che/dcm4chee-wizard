@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/2002/08/xhtml/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.w3.org/1999/xhtml
+                          http://www.w3.org/2002/08/xhtml/xhtml1-strict.xsd">
+	<head>
+		<title>Browse Archive</title>
+    	<link href="folder-style.css" rel="stylesheet" />
+	</head>
+	<body>
+		<table border="1">
+		  <thead align="left" valign="top">
+		  <wicket:panel>
+			<tr class="study">
+		      	<td class="expand">
+					<input wicket:id="autoExpand" type="checkbox" />
+				</td>
+				<td colspan="18">Show column titles</td>
+			</tr>
+		    <tr wicket:id="patient" class="patient">
+		      <td wicket:id="cell" rowspan="6" class="expand">
+		        <a wicket:id="expand" href="#"><img wicket:id="expandImg" alt="" /></a>
+		      </td>
+		      <th colspan="5">Patient Name</th>
+		      <th>Patient ID/Issuer</th>
+		      <th>Birth Date</th>
+		      <th>Sex</th>
+		      <th colspan="3">Comments</th>
+		      <th colspan="5"></th>
+		      <th>
+		          <a wicket:id="selectAll" />
+              </th>
+              <th>
+				  <a wicket:id="deselectAll" />
+			  </th>
+		    </tr>
+		    <tr wicket:id="study" class="study">
+		      <td wicket:id=cell rowspan="5" class="expand">
+		        <a wicket:id="expand" href="#"><img wicket:id="expandImg" alt="" /></a>
+		      </td>
+		      <th colspan="4">Study Date/Time</th>
+		      <th>Study ID</th>
+		      <th>Accession No</th>
+		      <th>Modality</th>
+		      <th>Description</th>
+		      <th>#S/#I</th>
+		      <th>Availability</th>
+		      <th colspan="5"></th>
+		      <th>
+		          <a wicket:id="selectAll" />
+              </th>
+              <th>
+				  <a wicket:id="deselectAll" />
+			  </th>
+		    </tr>
+		    <tr wicket:id="pps" class="pps">
+		      <td wicket:id="cell" rowspan="4" class="expand">
+		        <a wicket:id="expand" href="#"><img wicket:id="expandImg" alt="" /></a>
+		      </td>
+		      <th colspan="3">PPS Start Date/Time</th>
+		      <th>PPS ID</th>
+		      <th>SPS ID</th>
+		      <th>Modality</th>
+		      <th>Description</th>
+		      <th>#S/#I</th>
+		      <th>Status</th>
+		      <th colspan="7"></th>
+		    </tr>
+		    <tr wicket:id="series" class="series">
+		      <td wicket:id="cell" rowspan="3" class="expand">
+		        <a wicket:id="expand" href="#"><img wicket:id="expandImg" alt="" /></a>
+		      </td>
+		      <th colspan="2">Series Date/Time</th>
+		      <th>Series No</th>
+		      <th>Source AET</th>
+		      <th>Modality</th>
+		      <th>Description</th>
+		      <th>#I</th>
+		      <th>Availability</th>
+		      <th colspan="5"></th>
+		      <th>
+		          <a wicket:id="selectAll" />
+              </th>
+              <th>
+				  <a wicket:id="deselectAll" />
+			  </th>
+		    </tr>
+		    <tr wicket:id="instance" class="instance">
+		      <td wicket:id="cell" rowspan="2" class="expand">
+		        <a wicket:id="expand" href="#"><img wicket:id="expandImg" alt="" /></a>
+		      </td>
+		      <th>Instance Date/Time</th>
+		      <th>Instance No</th>
+		      <th colspan="2">SOP Class UID</th>
+		      <th colspan="2">Description</th>
+		      <th>Availability</th>
+		      <th colspan="7"></th>
+		    </tr>
+		    <tr wicket:id="file" class="file">
+		      <th colspan="1">File Date/Time</th>
+		      <th>Size</th>
+		      <th colspan="2">Transfer Syntax UID</th>
+		      <th colspan="2">File Path</th>
+		      <th>Availability</th>
+		      <th colspan="7"></th>
+		    </tr>
+		  </wicket:panel>
+		  </thead>
+		</table>
+	</body>
+</html>

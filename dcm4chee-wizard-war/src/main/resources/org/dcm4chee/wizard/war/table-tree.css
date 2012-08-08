@@ -1,0 +1,133 @@
+table.tree { 
+	table-layout: auto;
+	border: thin; 
+	border-width: 1px; 
+	border-style: solid; 
+	border-color: #000000; 
+	width:100%; 
+	white-space: nowrap; 
+	background-color: #FFFFFF;
+	font-size: 12px; 
+}
+
+table.left { width: 49%; float: left; margin-right: 2%; }
+table.right { width: 49%; }
+
+table.tree tr td, table.tree tr th {
+	height: 25px;
+	padding-left: 10px;
+}
+
+table.tree tr.headers { 
+	background-color: #446666; 
+	color: white; 
+/*	width: 20px; 
+	height: 20px; */
+	text-align: left; 
+}
+
+table.tree tr.odd { background-color: #FFFFFF; }
+table.tree tr.even { background-color: #E1E0DE; }
+
+
+/* JUNCTIONS */
+
+a.tree-junction-collapsed, a.tree-junction {
+	background-image: url("../org.dcm4chee.icons.ImageManager/common/GREEN_expand.png") !important;
+}
+
+a.tree-junction-expanded {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.icons.ImageManager/common/GREEN_collapse.png") !important;
+}
+
+span.tree-content {
+}
+
+/* FOLDERS */
+
+span.tree-content a {
+	color: black;
+}
+
+span.tree-content a:hover {}
+
+.device .tree-folder-open, .device .tree-folder-closed, .device .tree-folder-other {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.icons.ImageManager/wizard/device.png") !important;
+}
+
+.connection .tree-folder-open, .connection .tree-folder-closed, .connection .tree-folder-other {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.icons.ImageManager/wizard/connection.png") !important;
+}
+
+.application-entity .tree-folder-other, .application-entity .tree-folder-open, .application-entity .tree-folder-closed {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.icons.ImageManager/wizard/application_entity.png") !important;
+}
+
+.transfer-capability .tree-folder-other {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.icons.ImageManager/wizard/transfer_capability.png") !important;
+}
+
+.forward_rule .tree-folder-other, .forward_rule .tree-folder-open, .forward_rule .tree-folder-closed {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.icons.ImageManager/wizard/forward_rule.png") !important;
+}
+
+.forward_schedule .tree-folder-other, .forward_schedule .tree-folder-open, .forward_schedule .tree-folder-closed {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.icons.ImageManager/wizard/forward_schedule.png") !important;
+}
+
+.retry .tree-folder-other, .retry .tree-folder-open, .retry .tree-folder-closed {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.icons.ImageManager/wizard/retry.png") !important;
+}
+
+.coercion .tree-folder-other, .coercion .tree-folder-open, .coercion .tree-folder-closed {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.icons.ImageManager/wizard/coercion.png") !important;
+}
+
+.folder_connections .tree-folder-other, .folder_connections .tree-folder-open, .folder_connections .tree-folder-closed {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.icons.ImageManager/wizard/folder_connections.png") !important;
+}
+
+.folder_application_entities .tree-folder-other, .folder_application_entities .tree-folder-open, .folder_application_entities .tree-folder-closed {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.icons.ImageManager/wizard/folder_application_entities.png") !important;
+}
+
+.folder_transfer_capabilities .tree-folder-other, .folder_transfer_capabilities .tree-folder-open, .folder_transfer_capabilities .tree-folder-closed {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.icons.ImageManager/wizard/folder_transfer_capabilities.png") !important;
+}
+
+.folder_transfer_capability_type .tree-folder-other, .folder_transfer_capability_type .tree-folder-open, .folder_transfer_capability_type .tree-folder-closed {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.icons.ImageManager/wizard/folder_transfer_capability_type.png") !important;
+}
+
+.folder_forward_rules .tree-folder-other, .folder_forward_rules .tree-folder-open, .folder_forward_rules .tree-folder-closed {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.icons.ImageManager/wizard/folder_proxy_rules.png") !important;
+}
+
+.folder_forward_schedules .tree-folder-other, .folder_forward_schedules .tree-folder-open, .folder_forward_schedules .tree-folder-closed {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.icons.ImageManager/wizard/folder_proxy_rules.png") !important;
+}
+
+.folder_retries .tree-folder-other, .folder_retries .tree-folder-open, .folder_retries .tree-folder-closed {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.icons.ImageManager/wizard/folder_proxy_rules.png") !important;
+}
+
+.folder_coercions .tree-folder-other, .folder_coercions .tree-folder-open, .folder_coercions .tree-folder-closed {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.icons.ImageManager/wizard/folder_proxy_rules.png") !important;
+}

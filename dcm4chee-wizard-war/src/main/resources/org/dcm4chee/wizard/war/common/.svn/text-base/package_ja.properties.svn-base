@@ -1,0 +1,33 @@
+#Dicom Object Editor
+dicom.edit.title.PatientModel=\u60a3\u8005\u5c5e\u6027\u306e\u7de8\u96c6
+dicom.edit.title.StudyModel=\u30b9\u30bf\u30c7\u30a3\u5c5e\u6027\u306e\u7de8\u96c6
+dicom.edit.title.PPSModel=PPS\u5c5e\u6027\u306e\u7de8\u96c6
+dicom.edit.title.SeriesModel=\u30b7\u30ea\u30fc\u30ba\u5c5e\u6027\u306e\u7de8\u96c6
+dicom.edit.title.InstanceModel=\u30a4\u30f3\u30b9\u30bf\u30f3\u30b9\u5c5e\u6027\u306e\u7de8\u96c6
+dicom.edit.title.MWLItemModel=SPS\u5c5e\u6027\u306e\u7de8\u96c6
+dicom.nameHdr=\u5c5e\u6027\u540d
+dicom.nameHdr.tooltip=DICOM\u5c5e\u6027\u306e\u540d\u79f0
+dicom.tagHdr=\u30bf\u30b0
+dicom.tagHdr.tooltip=(gggg,eeee)\u8868\u8a18\u6cd5\u306b\u3088\u308bDICOM\u30bf\u30b0
+dicom.vrHdr=VR
+dicom.vrHdr.tooltip=DICOM Value Representation
+dicom.lenHdr=\u9577\u3055
+dicom.lenHdr.tooltip=\u9577\u3055
+dicom.valueHdr=\u5024
+dicom.valueHdr.tooltip=DICOM\u5c5e\u6027\u306e\u5024
+
+#Dicom Tag mappings
+(0020,000D)=\u30b9\u30bf\u30c7\u30a3\u30a4\u30f3\u30b9\u30bf\u30f3\u30b9UID
+(0020,0010)=\u30b9\u30bf\u30c7\u30a3ID
+(0008,0050)=\u767b\u9332\u756a\u53f7
+(0008,0020)=\u691c\u67fb\u65e5
+(0008,0030)=\u691c\u67fb\u6642\u9593
+
+(0020,000E)=\u30b7\u30ea\u30fc\u30ba\u30a4\u30f3\u30b9\u30bf\u30f3\u30b9UID
+(0008,103E)=\u30b7\u30ea\u30fc\u30ba\u6982\u8981
+(0020,0011)=\u30b7\u30ea\u30fc\u30ba\u756a\u53f7
+(0008,0021)=\u30b7\u30ea\u30fc\u30ba\u65e5
+(0008,0031)=\u30b7\u30ea\u30fc\u30ba\u6642\u9593
+(0008,0060)=\u30e2\u30c0\u30ea\u30c6\u30a3
+(0018,0015)=\u691c\u67fb\u90e8\u4f4d
+(0020,0060)=\u65b9\u5411

@@ -1,0 +1,35 @@
+# MoveEntitiesPage.properties
+move.pageTitle=Move selected Entities: 
+move.pageTitle_toPatient=Move selected Entities to patient ${name} (${id}): 
+move.pageTitle_toStudy=Move selected Entities to study. Accession Number:${accessionNumber} Patient:${patient.name} (${patient.id})
+move.pageTitle_toSeries=Move selected Entities to series. Series Instance UID:${seriesInstanceUID} Patient:${pPS.study.patient.name} (${pPS.study.patient.id}) 
+
+move.newStudyForMove.text=Create new Study as destination of 'Move entities'
+move.newSeriesForMove.text=Create new Series as destination of 'Move entities'
+
+# Available parameter for formatting message
+# {0}..count
+# For substitution on each level is the corresponding Model (StudyModel, SeriesModel, InstanceModel) attached.
+# e.g.:
+# Study level: ${patient.name}, ${patient.id}, ${patient.birthdate} 
+# Series level: ${pPS.study.patient.name}, ${pPS.study.patient.id}, ${pPS.study.patient.birthdate} 
+# Instance level: ${series.pPS.study.patient.name}, ${series.pPS.study.patient.id}, ${series.pPS.study.patient.birthdate}
+move.selectedToMove_study.text={0} Studies of patient: ${patient.name} (${patient.id}))
+move.selectedToMove_series.text={0} Series of patient: ${pPS.study.patient.name} (${pPS.study.patient.id})), Accession Number: ${pPS.study.accessionNumber}
+move.selectedToMove_instance.text={0} Instances of patient: ${series.pPS.study.patient.name} (${series.pPS.study.patient.id})), Accession Number: ${series.pPS.study.accessionNumber}
+
+#confirmation messages
+move.message.confirmMove=Are you sure you wish to move selected entities? Selected: {0}
+move.message.move.running=Executing move ...
+move.message.moveDone=Move of selected entities done
+move.message.removeEmpty=Move of selected entities done. Do you want to delete objects without child objects?
+move.message.moveFailed=Move of selected entities failed
+move.message.moveNothing=Selected entities cannot be moved! Either they are already moved/deleted or doesn't contain any instance.
+move.message.error.moveSelectionSrcLevel=Selection wrong to move entities. Sources found on different levels
+move.message.error.moveSelectionDest=Selection wrong to move entities. Only one Destination is allowed
+move.message.error.moveNoSelection=No selection to move entities
+move.message.error.moveNoSource=Missing sources to move entities
+move.message.error.movePPS=PPS entities cannot be moved
+move.message.error.moveNotOnline=All selected entities for 'Move Entities' must have ONLINE availability
+move.message.error.moveSameParent=Selected entities are already in target.
+

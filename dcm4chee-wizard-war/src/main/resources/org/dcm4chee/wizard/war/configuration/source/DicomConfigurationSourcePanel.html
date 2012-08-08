@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/2002/08/xhtml/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.w3.org/1999/xhtml
+                          http://www.w3.org/2002/08/xhtml/xhtml1-strict.xsd">
+	<head>
+	<title>Dicom configuration</title>
+	</head>
+	<wicket:panel>
+				<table rules="groups" class="content-table" style="clear: both; margin-top: 9px;">
+				<thead>
+				  <tr>
+				    <th wicket:id="nameHdr.label" />
+                    <th wicket:id="typeHdr.label" />
+				    <th wicket:id="hostHdr.label" />
+				    <th wicket:id="portHdr.label" />
+					<th wicket:id="cnHdr.label" />
+					<th wicket:id="dcHdr.label" />
+				    <th wicket:id="descriptionHdr.label" />
+				    <th colspan="3" />
+				  </tr>
+				</thead>
+				<tbody>
+			  <tr wicket:id="list">
+			    <td wicket:id="name"></td>
+                <td wicket:id="type"></td>
+                <td wicket:id="host"></td>
+                <td wicket:id="port"></td>
+                <td wicket:id="cn"></td>
+                <td wicket:id="dc"></td>
+                <td wicket:id="description"></td>
+                <td colspan="3" />
+                <!-- 
+			    <td style="text-align: center; width: 20px;">
+			        <a wicket:id="editAET" href="#">
+			        	<img wicket:id="ae.editAET.image" />
+			        </a>
+			    </td>
+			    <td style="text-align: center; width: 20px;">
+			        <a wicket:id="removeAET" href="#">
+			        	<img wicket:id="ae.removeAET.image" />
+					</a>
+			    </td>
+			    <td style="text-align: center; width: 20px;">
+			        <a wicket:id="echo" href="#">
+			        	<img wicket:id="ae.echoAET.image" />
+			        </a>
+			    </td>
+			     -->
+			  </tr>
+			  </tbody>
+			</table>
+	
+	<!-- 
+			<table rules="groups" class="search-table" style="margin-top: 20px;">
+				<thead>
+					<tr class="search-table">
+						<th class="search-table"></th>
+						<th class="search-table">
+							<wicket:message key="ldap.connect.title" />
+						</th>
+						<th class="search-table" colspan="7"/>
+						<th class="search-table" style="text-align: right;">
+							<a wicket:id="connectToggle">
+								<img wicket:id="connectToggleImg" />
+							</a>
+						</th>
+						<th class="search-table"></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr wicket:id="connectFields" class="search-table">
+						<td></td>
+						<td colspan="2">
+							<div wicket:id="hostname.label" class="search-header">hostname</div>
+							<input wicket:id="hostname" type="text" />
+						</td>
+						<td>
+							<div  wicket:id="port.label" class="search-header">port</div>
+							<input wicket:id="hostname" type="text" />
+						</td>
+						<td colspan="2">
+							<div wicket:id="userDN.label" class="search-header">userDN</div>
+							<input wicket:id="hostname" type="text" />
+						</td>
+						<td colspan="2">
+							<div wicket:id="password.label" class="search-header">password</div>
+							<input wicket:id="hostname" type="password" />
+						</td>
+						<td colspan="2">
+							<div wicket:id="DC.label" class="search-header">DC</div>
+							<input wicket:id="hostname" type="text" />
+						</td>
+						<td></td>
+					</tr>
+				</tbody>
+				</table>
+				 -->
+	</wicket:panel>	
+</html>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/2002/08/xhtml/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.w3.org/1999/xhtml
+                          http://www.w3.org/2002/08/xhtml/xhtml1-strict.xsd">
+	<head>
+    	<title>File</title>
+	   <link href="folder-style.css" rel="stylesheet" />
+	</head>
+	<body>
+		<wicket:panel>
+		 	<span class="pkInfo" wicket:id="pkInfo">pk</span>
+		  	<table class="dicomobject">
+		    <colgroup>
+		      <col class="attrname" />
+		      <col class="val" />
+		    </colgroup>
+		    <tbody>
+		      <tr>
+		        <td>File Date/Time</td>
+		        <td wicket:id="fileObject.createdTime">[File Date/Time]</td>
+		      </tr>
+		      <tr>
+		        <td>Size</td>
+		        <td wicket:id="fileObject.fileSize">[Size]</td>
+		      </tr>
+		      <tr>
+		        <td>Transfer Syntax UID</td>
+		        <td wicket:id="fileObject.transferSyntaxUID">[Transfer Syntax UID]</td>
+		      </tr>
+		      <tr>
+		        <td>MD5 sum</td>
+		        <td wicket:id="fileObject.md5Sum">[MD5 sum]</td>
+		      </tr>
+		      <tr>
+		        <td>Time Of last MD5 sum check</td>
+		        <td wicket:id="fileObject.timeOfLastMD5SumCheck">[Time Of last MD5 sum check]</td>
+		      </tr>
+		      <tr>
+		        <td>File Status</td>
+		        <td wicket:id="fileObject.fileStatus">[File Status]</td>
+		      </tr>
+		      <tr>
+		        <td>File Path</td>
+		        <td wicket:id="fileObject.filePath">[File Path]</td>
+		      </tr>
+		      <tr>
+		        <td>File System Path/URL</td>
+		        <td wicket:id="fileObject.fileSystem.directoryPath">[File System Path/URL]</td>
+		      </tr>
+              <tr>
+                <td>Absolute File System Path/URL</td>
+                <td wicket:id="absoluteDirectoryPath">[Absolute File System Path/URL]</td>
+              </tr>
+		      <tr>
+		        <td>File System Group ID</td>
+		        <td wicket:id="fileObject.fileSystem.groupID">[File System Group ID]</td>
+		      </tr>
+		      <tr>
+		        <td>Retrieve AET</td>
+		        <td wicket:id="fileObject.fileSystem.retrieveAET">[Retrieve AET]</td>
+		      </tr>
+		      <tr>
+		        <td>Availability</td>
+		        <td wicket:id="fileObject.fileSystem.availability">[Availability]</td>
+		      </tr>
+		      <tr>
+		        <td>File System Status</td>
+		        <td wicket:id="fileObject.fileSystem.status">[File System Status]</td>
+		      </tr>
+		      <tr>
+		        <td>File System User Info</td>
+		        <td wicket:id="fileObject.fileSystem.userInfo">[File System User Info]</td>
+		      </tr>
+		    </tbody>
+		  </table>
+		</wicket:panel>
+	</body>
+</html>

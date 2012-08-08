@@ -1,0 +1,30 @@
+# Mpps2MwlLinkPage_de.properties
+mpps2mwl.tabTitle=Verknüpfung von MPPS mit MWL
+#
+#MppsToMwl link
+link.ppsInfoTitle=MPPS Info
+link.patNameLabel=Patienten Name: 
+link.patIdLabel=Patienten ID: 
+link.patIssuerLabel=Aussteller: 
+link.birthdateLabel=Geburtsdatum: 
+link.accNrLabel=Auftragsnummer: 
+link.modalityLabel=Modalität: 
+link.startDateLabel=Ausführungsdatum: 
+link.studyDescriptionLabel=Beschreibung: 
+#
+mpps2mwl.content.header.patientName=Patienten Name
+mpps2mwl.content.header.birthDate=Geburtstag
+mpps2mwl.content.header.SPSDescription=SPS Beschreibung
+mpps2mwl.content.header.SPSModality=Modalität
+mpps2mwl.content.header.startDate=Ausführungsdatum
+mpps2mwl.content.header.stationAET=Station AET
+mpps2mwl.content.header.stationName=Station Name
+mpps2mwl.content.header.accessionNumber=Auftragsnummer
+mpps2mwl.content.header.SPSStatus=SPS Status
+#
+mpps2mwl.link.tooltip=Verknüpfen
+
+link.message.linked=Verknüpfung von MPPS mit MWL abgeschlossen!
+link.message.linkFailed=Verknüpfung von MPPS mit MWL fehlgeschlagen!
+linkPatSelectInfo=Patient kann nicht eindeutig bestimmt werden!
+

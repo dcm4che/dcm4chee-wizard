@@ -1,0 +1,20 @@
+# ExportPage_de.properties
+export.destinationAETsLabel=Ziel AET: 
+export.selectedItems=Ausgewählte Objekte: 
+export.selectedPats=Patienten: 
+export.selectedStudies=Studien: 
+export.selectedSeries=Serien: 
+export.selectedInstances=Instances: 
+export.totInstances=Anzahl von Instances zum Exportieren: 
+export.exportResultLabel=Export Ergebnis: 
+
+export.message.noSelectionForExport=Keine Auswahl für Export vorhanden
+export.message.exportNotStarted=Export nicht gestartet
+export.message.exportStarted=Export gestartet
+export.message.exportDone=Export durchgeführt
+
+export.exportBtn.text=Export
+export.closeBtn.text=Schließen
+export.closeOnFinishedLabel=Fenster nach erfolgreichem Export schließen
+export.downloadBtn.text=Download
+export.download.missingFile=Datei für download fehlt!

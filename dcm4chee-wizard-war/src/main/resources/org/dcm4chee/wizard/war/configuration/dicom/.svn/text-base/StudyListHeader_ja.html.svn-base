@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/2002/08/xhtml/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.w3.org/1999/xhtml
+                          http://www.w3.org/2002/08/xhtml/xhtml1-strict.xsd">
+	<head>
+		<title>Browse Archive</title>
+		<link href="folder-style.css" rel="stylesheet" />
+	</head>
+	<body>
+		<table border="1">
+		  <thead align="left" valign="top">
+		  <wicket:panel>
+			<tr class="study">
+		      	<td class="expand">
+					<input wicket:id="autoExpand" type="checkbox" />
+				</td>
+				<td colspan="18">カラムタイトル表示</td>
+			</tr>
+		    <tr wicket:id="patient" class="patient">
+		      <td wicket:id="cell" rowspan="6" class="expand">
+		        <a wicket:id="expand" href="#"><img wicket:id="expandImg" alt="" /></a>
+		      </td>
+		      <th colspan="5">患者氏名</th>
+		      <th>患者ID/発行者</th>
+		      <th>誕生日</th>
+		      <th>性別</th>
+		      <th colspan="3">コメント</th>
+		      <th colspan="5"></th>
+		      <th>
+		          <a wicket:id="selectAll" />
+              </th>
+              <th>
+				  <a wicket:id="deselectAll" />
+		      </th>
+		    </tr>
+		    <tr wicket:id="study" class="study">
+		      <td wicket:id=cell rowspan="5" class="expand">
+		        <a wicket:id="expand" href="#"><img wicket:id="expandImg" alt="" /></a>
+		      </td>
+		      <th colspan="4">検査日/時間</th>
+		      <th>検査ID</th>
+		      <th>登録番号</th>
+		      <th>モダリティ</th>
+		      <th>概要</th>
+		      <th>シリーズ数/イメージ数</th>
+		      <th>可用性</th>
+		      <th colspan="5"></th>
+		      <th>
+		          <a wicket:id="selectAll" />
+              </th>
+              <th>
+				  <a wicket:id="deselectAll" />
+		      </th>
+		    </tr>
+		    <tr wicket:id="pps" class="pps">
+		      <td wicket:id="cell" rowspan="4" class="expand">
+		        <a wicket:id="expand" href="#"><img wicket:id="expandImg" alt="" /></a>
+		      </td>
+		      <th colspan="3">PPS 開始日/時間</th>
+		      <th>PPS ID</th>
+		      <th>SPS ID</th>
+		      <th>モダリティ</th>
+		      <th>概要</th>
+		      <th>シリーズ数/イメージ数</th>
+		      <th>ステータス</th>
+		      <th colspan="7"></th>
+		    </tr>
+		    <tr wicket:id="series" class="series">
+		      <td wicket:id="cell" rowspan="3" class="expand">
+		        <a wicket:id="expand" href="#"><img wicket:id="expandImg" alt="" /></a>
+		      </td>
+		      <th colspan="2">シリーズ日/時間</th>
+		      <th>シリーズ番号</th>
+		      <th>送信元AET</th>
+		      <th>モダリティ</th>
+		      <th>概要</th>
+		      <th>イメージ数</th>
+		      <th>可用性</th>
+		      <th colspan="5"></th>
+		      <th>
+		        <a wicket:id="selectAll" />
+              </th>
+              <th>
+		        <a wicket:id="deselectAll" />
+		      </th>
+		    </tr>
+		    <tr wicket:id="instance" class="instance">
+		      <td wicket:id="cell" rowspan="2" class="expand">
+		        <a wicket:id="expand" href="#"><img wicket:id="expandImg" alt="" /></a>
+		      </td>
+		      <th>インスタンス日/時間</th>
+		      <th>インスタンス番号</th>
+		      <th colspan="2">SOPクラスUID</th>
+		      <th colspan="2">概要</th>
+		      <th>可用性</th>
+		      <th colspan="7"></th>
+		    </tr>
+		    <tr wicket:id="file" class="file">
+		      <th colspan="1">ファイル日/時間</th>
+		      <th>Size</th>
+		      <th colspan="2">トランスファーシンタックスUID</th>
+		      <th colspan="2">ファイルパス</th>
+		      <th>可用性</th>
+		      <th colspan="7"></th>
+		    </tr>
+		  </wicket:panel>
+		  </thead>
+		</table>
+	</body>
+</html>

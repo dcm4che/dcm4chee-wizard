@@ -1,0 +1,8 @@
+/*
+    Move Entities CSS
+*/
+
+div.movePage div.movePage-content { height: 100%; width: 90%; }
+div.movePage div.movePage-content div.movePage-title { padding: 10px; }
+div.movePage div.movePage-content div.movePage-msg { text-align: left; padding: 10px; background-color: white;}
+div.movePage div.movePage-button { width: 90%; padding: 10px; }

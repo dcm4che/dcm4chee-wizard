@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/2002/08/xhtml/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemalocation="http://www.w3.org/1999/xhtml
+                          http://www.w3.org/2002/08/xhtml/xhtml1-strict.xsd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+	<div wicket:id="msgWin">MessageWindow</div>
+	<div class="msgWindow">
+		<div wicket:id="create-device-title" class="edit-title">
+			<wicket:message key="dicom.edit.device.createDevice.title" />
+		</div>
+		<div wicket:id="edit-device-title" class="edit-title">
+			<wicket:message key="dicom.edit.device.editDevice.title" />
+		</div>
+		<form wicket:id="form">
+			<div class="edit-table-panel">
+				<div class="edit-table-row">
+					<span class="edit-desc" wicket:id="type.label" />
+					<select class="edit-value" wicket:id="type" />
+				</div>
+				<div class="edit-table-row">
+					<span class="edit-desc" wicket:id="title.label" />
+					<input class="edit-value" wicket:id="title" type="text" />
+				</div>
+				<div class="edit-table-row">
+					<span class="edit-desc" wicket:id="installed.label" />
+					<input class="edit-value" wicket:id="installed" type="checkbox" />
+				</div>
+				<div class="edit-table-row">
+					<span class="edit-desc" wicket:id="schedulerInterval.label" />
+					<input class="edit-value" wicket:id="schedulerInterval" type="text" />
+				</div>
+				<div  class="edit-buttons">
+					<span class="edit-desc" wicket:id="optional.label" />
+					<input class="edit-value" wicket:id="optional" type="checkbox" />
+				</div>
+				<div wicket:id="optionalContainer">
+					<div class="edit-table-row">
+						<span class="edit-desc" wicket:id="description.label" />
+						<input class="edit-value" wicket:id="description" type="text" />
+					</div>		
+					<div class="edit-table-row">
+						<span class="edit-desc" wicket:id="deviceSerialNumber.label" />
+						<input class="edit-value" wicket:id="deviceSerialNumber" type="text" />
+					</div>		
+					<div class="edit-table-row" style="height: 45px;">
+						<span class="edit-desc" wicket:id="institutionAddress.label" />
+						<textarea class="edit-value" wicket:id="institutionAddress" rows="1" />
+					</div>
+					<div class="edit-table-row">
+						<span class="edit-desc" wicket:id="institutionCodeValue.label" />
+						<input class="edit-value" wicket:id="institutionCodeValue" type="text" />
+					</div>		
+					<div class="edit-table-row">
+						<span class="edit-desc" wicket:id="institutionCodingSchemeDesignator.label" />
+						<input class="edit-value" wicket:id="institutionCodingSchemeDesignator" type="text" />
+					</div>		
+					<div class="edit-table-row">
+						<span class="edit-desc" wicket:id="institutionCodingSchemeVersion.label" />
+						<input class="edit-value" wicket:id="institutionCodingSchemeVersion" type="text" />
+					</div>		
+					<div class="edit-table-row">
+						<span class="edit-desc" wicket:id="institutionCodeMeaning.label" />
+						<input class="edit-value" wicket:id="institutionCodeMeaning" type="text" />
+					</div>		
+					<div class="edit-table-row" style="height: 45px;">
+						<span class="edit-desc" wicket:id="institutionalDepartmentName.label" />
+						<textarea class="edit-value" wicket:id="institutionalDepartmentName" rows="1" />
+					</div>
+					<div class="edit-table-row" style="height: 45px;">
+						<span class="edit-desc" wicket:id="institutionName.label" />
+						<textarea class="edit-value" wicket:id="institutionName" rows="1" />
+					</div>
+					<div class="edit-table-row">
+						<span class="edit-desc" wicket:id="issuerOfAccessionNumber.label" />
+						<input class="edit-value" wicket:id="issuerOfAccessionNumber" type="text" />
+					</div>
+					<div class="edit-table-row">
+						<span class="edit-desc" wicket:id="issuerOfAdmissionID.label" />
+						<input class="edit-value" wicket:id="issuerOfAdmissionID" type="text" />
+					</div>
+					<div class="edit-table-row">
+						<span class="edit-desc" wicket:id="issuerOfContainerIdentifier.label" />
+						<input class="edit-value" wicket:id="issuerOfContainerIdentifier" type="text" />
+					</div>
+					<div class="edit-table-row">
+						<span class="edit-desc" wicket:id="issuerOfPatientID.label" />
+						<input class="edit-value" wicket:id="issuerOfPatientID" type="text" />
+					</div>
+					<div class="edit-table-row">
+						<span class="edit-desc" wicket:id="issuerOfServiceEpisodeID.label" />
+						<input class="edit-value" wicket:id="issuerOfServiceEpisodeID" type="text" />
+					</div>
+					<div class="edit-table-row">
+						<span class="edit-desc" wicket:id="issuerOfSpecimenIdentifier.label" />
+						<input class="edit-value" wicket:id="issuerOfSpecimenIdentifier" type="text" />
+					</div>
+					<div class="edit-table-row">
+						<span class="edit-desc" wicket:id="manufacturer.label" />
+						<input class="edit-value" wicket:id="manufacturer" type="text" />
+					</div>
+					<div class="edit-table-row">
+						<span class="edit-desc" wicket:id="manufacturerModelName.label" />
+						<input class="edit-value" wicket:id="manufacturerModelName" type="text" />
+					</div>
+					<div class="edit-table-row">
+						<span class="edit-desc" wicket:id="orderFillerIdentifier.label" />
+						<input class="edit-value" wicket:id="orderFillerIdentifier" type="text" />
+					</div>
+					<div class="edit-table-row">
+						<span class="edit-desc" wicket:id="orderPlacerIdentifier.label" />
+						<input class="edit-value" wicket:id="orderPlacerIdentifier" type="text" />
+					</div>
+					<div class="edit-table-row" style="height: 45px;">
+						<span class="edit-desc" wicket:id="primaryDeviceTypes.label" />
+						<textarea class="edit-value" wicket:id="primaryDeviceTypes" rows="1" />
+					</div>
+					<div class="edit-table-row" style="height: 45px;">
+						<span class="edit-desc" wicket:id="softwareVersions.label" />
+						<textarea class="edit-value" wicket:id="softwareVersions" rows="1" />
+					</div>
+					<div class="edit-table-row">
+						<span class="edit-desc" wicket:id="stationName.label" />
+						<input class="edit-value" wicket:id="stationName" type="text" />
+					</div>
+					<div class="edit-table-row">
+						<span class="edit-desc" wicket:id="forwardThreads.label" />
+						<input class="edit-value" wicket:id="forwardThreads" type="text" />
+					</div>
+					<div class="edit-table-row" style="height: 45px;" wicket:id="relatedDeviceRefsContainer">
+						<span class="edit-desc" wicket:id="relatedDeviceRefs.label" />
+						<textarea class="edit-value" wicket:id="relatedDeviceRefs" rows="1" />
+					</div>
+					<div class="edit-table-row" wicket:id="vendorDataContainer">
+						<span class="edit-desc" wicket:id="vendorData.label" />
+						<span class="edit-value" wicket:id="vendorData" />
+					</div>
+				</div>
+				<div class="edit-buttons">
+					<input type="submit" wicket:id="submit" />
+					<input type="submit" wicket:id="cancel" />
+				</div>
+			</div>
+		</form>
+	</div>
+</body>
+</html>

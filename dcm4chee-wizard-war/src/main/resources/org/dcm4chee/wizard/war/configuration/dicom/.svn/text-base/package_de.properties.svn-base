@@ -1,0 +1,301 @@
+folder.tabTitle=Folder
+
+#search section
+folder.search.title=Suchen
+folder.searchToggleImg.hide.tooltip=Suche ausblenden
+folder.searchToggleImg.show.tooltip=Suche einblenden
+#
+folder.searchLabels.patientName.label=Patienten Name
+folder.searchLabels.patientIDDescr.label=Patienten ID
+folder.searchLabels.studyDate.label=Ausführungsdatum
+folder.searchLabels.accessionNumber.label=Auftragsnummer
+#
+folder.searchFields.patientName.pnField.tooltip=Suche nach Patienten Name. Format: Familienname^Vorname
+folder.searchFields.patientName.fnField.tooltip=Suche nach Familienname
+folder.searchFields.patientName.gnField.tooltip=Suche nach Vorname
+folder.searchFields.patientID.label=ID
+folder.searchFields.patientID.tooltip=Suche nach Patienten ID
+folder.searchFields.issuerOfPatientID.label=Aussteller
+folder.searchFields.issuerOfPatientID.tooltip=Suche nach Aussteller der Patienten ID
+folder.searchFields.studyDateMin.label=von
+folder.searchFields.studyDateMin.date.tooltip=Suche nach Studien Datum. (Format: ${})
+folder.searchFields.studyDateMin.time.tooltip=Studien Datum Beginnzeit. (Format: hh:mm)
+folder.searchFields.studyDateMax.label=bis
+folder.searchFields.studyDateMax.date.tooltip=Suche nach Studien Datum (Format: ${})
+folder.searchFields.studyDateMax.time.tooltip=Studien Datum Endzeit. (Format: hh:mm)
+folder.searchFields.accessionNumber.tooltip=Suche nach Auftragsnummer
+#
+folder.searchFuzzy.fuzzyPN.label=Phonetisch
+folder.searchFuzzy.fuzzyPN.tooltip=Phonetische Suche (Fuzzy) aktivieren
+#
+folder.extendedFilter.birthDate.label=Geburtstag
+folder.extendedFilter.birthDateMin.label=von
+folder.extendedFilter.birthDateMin.date.tooltip=Suche nach Geburtstag. (Format: ${})
+folder.extendedFilter.birthDateMax.label=bis
+folder.extendedFilter.birthDateMax.date.tooltip=Suche nach Geburtstag. (Format: ${})
+folder.extendedFilter.studyInstanceUID.label=Study Instance UID
+folder.extendedFilter.studyInstanceUID.tooltip=Suche nach Study Instance UID
+folder.extendedFilter.seriesInstanceUID.label=Series Instance UID
+folder.extendedFilter.seriesInstanceUID.tooltip=Suche nach Series Instance UID
+folder.extendedFilter.exactSeriesIuid.label=Nur diese Serie
+folder.extendedFilter.exactSeriesIuid.tooltip=Schränkt Ergebnis auf die Serie mit gegebener Series Instance UID ein (Zeigt nicht die gesamte Studie)
+#
+folder.searchDropdowns.modality.label=Modalität
+folder.searchDropdowns.modality.tooltip=Suche nach Modalität
+folder.searchDropdowns.sourceAET.label=Source AET
+folder.searchDropdowns.sourceAET.tooltip=Suche nach AET von dem DICOM Objekte empfangen wurden
+folder.exactModalities.exactModalitiesInStudy.label=Genaue Suche
+folder.exactModalities.exactModalitiesInStudy.tooltip=Suche nach Studien mit genau dem ausgewählten Modalitätstyp
+#
+folder.searchOptions.patient=Patient
+folder.searchOptions.study=Studie
+folder.searchOptions.pps=PPS
+folder.searchOptions.series=Serie
+folder.searchOptions.instance=Instanz
+folder.searchOptions.ppsWithoutMwl=Studien mit nicht verknüpften PPS
+folder.searchOptions.withoutPps=Studien ohne PPS
+folder.searchOptions.withoutMwl=Studien ohne Worklist
+#
+folder.searchFooter.autoExpandLevel.label=Erweitern auf
+folder.searchFooter.autoExpandLevel.tooltip=Suchergebnisse bis zur angegebenen Ebene aufklappen.
+folder.searchFooter.queryType.label=Suche nach
+folder.searchFooter.queryType.tooltip=Auswahl der Suchmethode (Patienten oder Studien)
+folder.searchFooter.latestStudiesFirst.label=Letzte Studien zuerst
+folder.searchFooter.latestStudiesFirst.tooltip=Listet letzte Studien zuerst
+folder.searchFooter.resetBtn.text=Zurücksetzen
+folder.searchFooter.resetBtn.tooltip=Suchfelder zurücksetzen
+folder.searchFooter.searchBtn.text=Suchen
+folder.searchFooter.searchBtn.tooltip=Suche nach angegebenen Kriterien durchführen
+#
+folder.search.prevImg.tooltip=Vorhergehende Suchergebnisse
+folder.search.nextImg.tooltip=Nächste Suchergebnisse
+#
+folder.search.notSearched=
+folder.search.noMatchingPatientsFound=Keine passenden Patienten gefunden
+folder.search.patientsFound=Patient <b>{0}</b> bis <b>{1}</b> von <b>{2}</b>
+folder.search.noMatchingStudiesFound=Keine passenden Studien gefunden
+folder.search.studiesFound=Studie <b>{0}</b> bis <b>{1}</b> von <b>{2}</b>
+#
+folder.search.autoExpand.tooltip=Aktiviert / Deaktiviert automatisches Aufklappen / Zuklappen
+folder.search.showExtendedFilterImg.hide.tooltip=Erweiterte Suche ausblenden
+folder.search.showExtendedFilterImg.show.tooltip=Erweiterte Suche einblenden
+#
+folder.deleteBtn.text=Löschen
+folder.deleteBtn.tooltip=In den Papierkorb verschieben
+folder.moveBtn.text=Verschieben
+folder.moveBtn.tooltip=Ausgewählte Objekte in der Hierarchie verschieben
+folder.moveFinishedBtn.text=Ok
+folder.moveFinishedBtn.tooltip=Zurück zum Folder.
+folder.exportBtn.text=Exportieren
+folder.exportBtn.tooltip=Exportieren
+#
+folder.pagesize.label=Seitengröße
+
+#patient values
+folder.content.data.patient.name.tooltip=Patienten Name
+folder.content.data.patient.id.tooltip=Patienten ID / Aussteller
+folder.content.data.patient.birthdate.tooltip=Geburtstag des Patienten
+folder.content.data.patient.sex.tooltip=Geschlecht
+folder.content.data.patient.comments.tooltip=Patienten Kommentare
+#
+folder.content.data.patient.detailImg.tooltip=Patient Details
+folder.content.data.patient.editImg.tooltip=Patientenattribute bearbeiten
+folder.content.data.patient.studyPermissionsImg.tooltip=Studienberechtigungen bearbeiten
+folder.content.data.patient.addImg.tooltip=Neue Studie hinzufügen
+folder.content.data.patient.webviewImg.tooltip=Web Viewer mit diesem Patienten öffnen
+folder.content.data.patient.selected.tooltip=Patient für Bearbeitung auswählen
+
+#study values
+folder.content.data.study.datetime.tooltip=Studien Datum / Zeit
+folder.content.data.study.id.tooltip=Studien ID
+folder.content.data.study.accessionNumber.tooltip=Auftragsnummer
+folder.content.data.study.modalities.tooltip=Modalität
+folder.content.data.study.description.tooltip=Studienbeschreibung
+folder.content.data.study.numberOfSeries.tooltip=Anzahl der Serien
+folder.content.data.study.numberOfInstances.tooltip=Anzahl der Instanzen (Objekte)
+folder.content.data.study.availability.tooltip=Verfügbarkeit der Studie
+#
+folder.content.data.study.detailImg.tooltip=Studie Details
+folder.content.data.study.editImg.tooltip=Studienattribute bearbeiten
+folder.content.data.study.studyPermissionsImg.tooltip=Studienberechtigungen bearbeiten
+folder.content.data.study.selectImg.tooltip=Auswahlfenster öffnen
+folder.content.data.study.addImg.tooltip=Neue Serie hinzufügen
+folder.content.data.study.webviewImg.tooltip=Web Viewer mit dieser Studie öffnen
+folder.content.data.study.selected.tooltip=Studie für Bearbeitung auswählen
+
+#PPS values
+folder.content.data.pps.datetime.tooltip=Performed Procedure Step Datum / Zeit
+folder.content.data.pps.id.tooltip=Performed Procedure Step ID
+folder.content.data.pps.spsid.tooltip=Scheduled Step Procedure Step ID
+folder.content.data.pps.modality.tooltip=Modalität
+folder.content.data.pps.description.tooltip=Performed Procedure Step Beschreibung
+folder.content.data.pps.numberOfSeries.tooltip=Anzahl der Serien
+folder.content.data.pps.numberOfInstances.tooltip=Anzahl der Instanzen (Objekte)
+folder.content.data.pps.status.tooltip=Performed Procedure Step Status
+#
+folder.content.data.pps.detailImg.tooltip=Performed Procedure Step Details
+folder.content.data.pps.editImg.tooltip=Performed Procedure Step Attribute bearbeiten
+folder.content.data.pps.linkImg.tooltip=Diesen MPPS mit einem Modality Worklist Eintrag verknüpfen
+folder.content.data.pps.unlinkImg.tooltip=Verknüpfung des MPPS mit dem Modality Worklist Eintrag aufheben
+folder.content.data.pps.emulateImg.tooltip=Emulation einer MPPS für alle Serien dieser Studie ohne PPS Info.
+folder.content.data.pps.selected.tooltip=Performed Procedure Step für Bearbeitung auswählen
+
+#Series values
+folder.content.data.series.datetime.tooltip=Serie Datum / Zeit
+folder.content.data.series.seriesNumber.tooltip=Serie Nummer
+folder.content.data.series.sourceAET.tooltip=Source AET
+folder.content.data.series.modality.tooltip=Modalität
+folder.content.data.series.description.tooltip=Serie Beschreibung
+folder.content.data.series.numberOfInstances.tooltip=Anzahl der Instanzen
+folder.content.data.series.availability.tooltip=Verfügbarkeit der Serie
+#
+folder.content.data.series.detailImg.tooltip=Serie Details
+folder.content.data.series.editImg.tooltip=Serienattribute bearbeiten
+folder.content.data.series.selectImg.tooltip=Auswahlfenster öffnen
+folder.content.data.series.webviewImg.tooltip=Web Viewer mit dieser Serie öffnen
+folder.content.data.series.selected.tooltip=Serie für Bearbeitung auswählen
+
+#Instance values
+folder.content.data.instance.datetime.tooltip=Instanz Datum / Zeit
+folder.content.data.instance.instanceNumber.tooltip=Instanz Nummer
+folder.content.data.instance.sopClassUID.tooltip=SOP Class UID
+folder.content.data.instance.description.tooltip=Instanz Beschreibung
+folder.content.data.instance.availability.tooltip=Verfügbarkeit der Instanz
+#
+folder.content.data.instance.detailImg.tooltip=Instanz Details
+folder.content.data.instance.editImg.tooltip=Instanzattribute bearbeiten
+folder.content.data.instance.webviewImg.tooltip=Web Viewer mit dieser Instanz öffnen
+folder.content.data.instance.wadoImg.tooltip=Dieses DICOM Objekt anzeigen
+folder.content.data.instance.selected.tooltip=Instanz für Bearbeitung auswählen
+
+#File values
+folder.content.data.file.fileObject.createdTime.tooltip=Datei Erzeugungsdatum
+folder.content.data.file.fileObject.fileSize.tooltip=Dateigröße
+folder.content.data.file.fileObject.transferSyntaxUID.tooltip=Transfer Syntax UID
+folder.content.data.file.fileObject.fileSystem.directoryPath.tooltip=Dateisystem Verzeichnispfad
+folder.content.data.file.fileObject.filePath.tooltip=Verzeichnispfad
+folder.content.data.file.fileObject.fileSystem.availability.tooltip=Dateisystem Verfügbarkeit
+#
+folder.content.data.file.detailImg.tooltip=Datei Details
+folder.content.data.file.displayFileImg.tooltip=Dicom Attribute aus der Datei anzeigen
+folder.content.data.file.selected.tooltip=Datei für Bearbeitung auswählen
+
+#confirmation messages
+folder.message.noSelection=Keine Auswahl vorhanden
+folder.message.confirmDelete=Wollen Sie die gewählten Einträge löschen? <br/> Ausgewählt: <br/> {0}
+folder.message.confirmPpsDelete=Gewählte PPS löschen. Möchten Sie auch die referenzierten Serien löschen?
+folder.message.delete.running=Löschen wird durchgeführt ...
+folder.message.deleteDone=Die gewählten Einträge wurden erfolgreich gelöscht
+folder.message.deleteFailed=Die gewählten Einträge konnten nicht gelöscht werden
+folder.message.confirmUnlink=Möchten Sie die Verknüpfung der MPPS mit Aufträgen aufheben?
+folder.message.unlink.running=Verknüpfung der MPPS mit Aufträgen werden entfernt ...
+folder.message.unlinkDone=Verknüpfung der MPPS mit Aufträgen wurde entfernt
+folder.message.unlinkFailed=Die Verknüpfung der MPPS mit Aufträgen konnte nicht entfernt werden
+folder.message.confirmEmulate=Möchten Sie eine MPPS für diese Studie emulieren?
+folder.message.confirmForcedEmulate=Möchten Sie eine MPPS für diese Studie emulieren? Die Studie enthält Serien mit vorhandenen PPS Informationen welche dabei entfernt werden!
+folder.message.emulateDone={0} MPPS wurden emuliert.
+folder.message.emulateFailed=MPPS konnte nicht emuliert werden!
+folder.message.deleteNotAllowed=Ihre Auswahl enthält Objekte, für die Sie keine Löschberechtigung haben. Diese werden nicht gelöscht. 
+folder.message.moveNotAllowed=Ihre Auswahl enthält Objekte, für die Sie keine Bearbeitungsberechtigung haben.
+folder.message.dcmFileError=Dicom File konnte nicht gelesen werden!
+folder.message.tooOld.edit.tooltip=Das Objekt ist zu alt. Es darf nicht mehr editiert werden.
+folder.message.tooOld.link.tooltip=Das Objekt ist zu alt. Es darf nicht mehr verknüpft werden.
+folder.message.tooOld.unlink.tooltip=Das Objekt ist zu alt. Die Verknüpfung darf nicht mehr aufgehoben werden.
+folder.message.tooOld.delete.denied=Mindestens eines der ausgewählten Objekte ist zu alt. Es darf nicht mehr gelöscht werden.
+folder.message.tooOld.edit=Das Objekt ist zu alt. Es dürfte nicht mehr editiert werden. <br/> \
+Sie haben das Recht, diese Einschränkung zu umgehen. <br/> \
+Wollen sie es tatsächlich editieren? <br/>
+folder.message.tooOld.link=Das Objekt ist zu alt. Es dürfte nicht mehr verknüpft werden. <br/> \
+Sie haben das Recht, diese Einschränkung zu umgehen. <br/> \
+Wollen sie es tatsächlich verknüpfen? <br/>
+folder.message.tooOld.unlink=Das Objekt ist zu alt. Die Verknüpfung dürfte nicht mehr aufgehoben werden. <br/> \
+Sie haben das Recht, diese Einschränkung zu umgehen. <br/> \
+Möchten Sie die Verknüpfung der MPPS mit Aufträgen tatsächlich aufheben?
+folder.message.tooOld.delete=Mindestens ein ausgewähltes Objekt ist zu alt. <br/> \
+Es dürfte nicht mehr editiert werden. <br/> \
+Sie haben das Recht, diese Einschränkung zu umgehen. <br/> \
+Wollen sie tatsächlich die ausgewählten Objekte löschen? <br/> \
+Ausgewählt: {0}
+folder.message.tooOld.confirmPpsDelete=Mindestens ein ausgewähltes Objekt ist zu alt. <br/> \
+Es sollte nicht mehr gelöscht werden! <br/> \
+Gewählte PPS löschen. Möchten Sie auch die referenzierten Serien löschen? <br/> \
+Ausgewählt: {0}
+
+folder.message.searcherror=Suche ist fehlgeschlagen! Ursache:${}
+
+# add study window
+folder.add.study.text=Studie hinzufügen
+
+# add series window
+folder.add.series.text=Serie hinzufügen
+
+# wadoImage window
+folder.wadoImage.window.title=Wado Bild
+folder.wadoImage.alt.text=Kein Bild vorhanden
+# Instance info string.  0..PatName, 1..PatID, 2..Issuer, 3..Birthdate, 4..StudyIuid, 5..StudyDescr, 6..SeriesIuid, 
+# 7..SeriesDescr, 8..SopIuid, 9..InstanceDescr
+folder.instanceview.info=Patient:{0} Beschreibung:{9}
+folder.instanceview.prevImg.tooltip=Zeige vorherigen Frame
+folder.instanceview.nextImg.tooltip=Zeige nächsten Frame
+folder.instanceview.origLabel=Originalgröße
+folder.instanceview.orig.tooltip=Aktivieren der Originalgröße von großen Bildern.
+folder.instanceview.contentTypeLabel=Content Type:
+
+#Pk Info header of DicomObjectPanel, FilePanel
+pkInfo=Datenbank Pk: 
+
+#modal window titles
+folder.deleteConfirmation.window.title=Löschen
+folder.moveConfirmation.window.title=Verschieben
+folder.exportConfirmation.window.title=Exportieren
+folder.unlinkConfirmation.window.title=Verknüpfung aufheben
+folder.emulateConfirmation.window.title=MPPS Emulation
+folder.imageSelection.window.title=Bildauswahl
+folder.noSelection.window.title=Auswahl
+folder.studyPermissions.window.title=Studienberechtigungen
+
+# study permissions
+folder.studyPermissions.description.patient=für Patient {0}
+folder.studyPermissions.description.study=für Studie {0}
+folder.studyPermissions.add.tooltip=Diese Rolle erlauben
+folder.studyPermissions.remove.tooltip=Dieser Rolle verweigern
+
+studypermission.table.rolename.title=DICOM-Rolle
+studypermission.table.type.title=Typ
+#
+studypermission.has-study-permission-checkbox.add.tooltip=Studienberechtigung zuweisen
+studypermission.has-study-permission-checkbox.remove.tooltip=Studienberechtigung entfernen
+#
+studypermission.action.Q=Abfragen
+studypermission.action.R=Anzeigen
+studypermission.action.E=Exportieren
+studypermission.action.A=Anfügen
+studypermission.action.U=Editieren
+studypermission.action.D=Löschen
+
+#image selection window
+folder.imageselect.dateTimeLabel=Serien Datum:
+folder.imageselect.seriesDescrLabel=Beschreibung:
+folder.imageselect.modalityLabel=Modality:
+folder.imageselect.selectInAllSeries.tooltip=Auswahl aller Instanzen (in alle Serien)
+folder.imageselect.selectAllInstances.tooltip=Auswahl aller Instanzen dieser Serie
+folder.imageselect.deselectInAllSeries.tooltip=Auswahl aller Instanzen aufheben
+folder.imageselect.deselectAllInstances.tooltip=Auswahl aller Instanzen dieser Serie aufheben
+folder.imageselect.SeriesFound=Serie <b>{0}</b> bis <b>{1}</b> von <b>{2}</b>
+folder.imageselect.InstancesFound=Instanz <b>{0}</b> bis <b>{1}</b> von <b>{2}</b>
+folder.imageselect.okBtn.label=Ok
+folder.imageselect.cancelBtn.label=Abbrechen
+
+folder.studyview.selectAllPatients.tooltip=Auswahl aller Patienten
+folder.studyview.deselectAllPatients.tooltip=Auswahl aller Patienten aufheben
+folder.studyview.selectAllStudies.tooltip=Auswahl aller Studien
+folder.studyview.deselectAllStudies.tooltip=Auswahl aller Studien aufheben
+folder.studyview.selectAllSeries.tooltip=Auswahl aller Serien
+folder.studyview.deselectAllSeries.tooltip=Auswahl aller Serien aufheben
+
+folder.dcmfileview.title=DICOM Datei
+
+# WicketExceptionWithMsgKey msgKeys
+fuzzyError=Wildcard wird von Fuzzy Suche nicht unterstützt!
+
+PatternValidator=Falsches Format für UID - uid:${input}

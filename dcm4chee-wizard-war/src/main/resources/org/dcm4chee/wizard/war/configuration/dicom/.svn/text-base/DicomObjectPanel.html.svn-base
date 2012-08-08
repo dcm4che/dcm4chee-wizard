@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/2002/08/xhtml/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.w3.org/1999/xhtml
+                          http://www.w3.org/2002/08/xhtml/xhtml1-strict.xsd">
+	<head>
+    	<title>Dicom Object</title>
+	   <link href="folder-style.css" rel="stylesheet" />
+	</head>
+	<body>
+		<wicket:panel>
+		<div class="dicomobjectpanel">
+		  <span class="pkInfo" wicket:id="pkInfo">pk</span>
+		  <table class="dicomobject">
+		    <colgroup>
+		      <col class="attrname" />
+		      <col class="tag" />
+		      <col class="vr" />
+		      <col class="len" />
+		      <col class="val" />
+		    </colgroup>
+		    <thead wicket:id="header">
+		      <tr>
+		        <th class="attrname">Attribute Name</th>
+		        <th class="tag">Tag</th>
+		        <th class="vr">VR</th>
+		        <th class="len">Length</th>
+		        <th class="val">Value</th>
+		      </tr>
+		    </thead>
+		    <tbody>
+		      <tr wicket:id="elements">
+		        <wicket:container wicket:id="fragment" />
+		        <wicket:fragment wicket:id="element">
+		          <td wicket:id="name" class="attrname">[Attribute Name]</td>
+		          <td wicket:id="tag" class="tag">[Tag]</td>
+		          <td wicket:id="vr" class="vr">[VR]</td>
+		          <td wicket:id="length" class="len">[Length]</td>
+		          <td wicket:id="value" class="val">[Value]</td>
+		        </wicket:fragment>
+		      </tr>
+		      <wicket:fragment wicket:id="item">
+		        <td wicket:id="name" colspan="5" class="item">[Item #]</td>
+		      </wicket:fragment>
+		    </tbody>
+		  </table>
+		  </div>
+		</wicket:panel>
+	</body>
+</html>

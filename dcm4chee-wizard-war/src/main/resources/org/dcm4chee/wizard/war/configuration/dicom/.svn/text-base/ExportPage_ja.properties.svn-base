@@ -1,0 +1,17 @@
+# ExportPage.properties
+export.destinationAETsLabel=\u9001\u4fe1\u5148AET: 
+export.selectedItems=\u9078\u629e\u6e08\u307f\u30a2\u30a4\u30c6\u30e0: 
+export.selectedPats=\u60a3\u8005: 
+export.selectedStudies=\u30b9\u30bf\u30c7\u30a3: 
+export.selectedSeries=\u30b7\u30ea\u30fc\u30ba: 
+export.selectedInstances=\u30a4\u30f3\u30b9\u30bf\u30f3\u30b9: 
+export.exportResultLabel=\u9001\u4fe1\u7d50\u679c: 
+
+export.message.noSelectionForExport=\u9001\u4fe1\u5148\u304c\u9078\u629e\u3055\u308c\u3066\u3044\u307e\u305b\u3093
+export.message.exportNotStarted=\u9001\u4fe1\u3057\u3066\u307e\u305b\u3093
+export.message.exportStarted=\u9001\u4fe1\u958b\u59cb\u3057\u307e\u3057\u305f
+export.message.exportDone=\u9001\u4fe1\u5b8c\u4e86
+
+export.exportBtn.text=\u9001\u4fe1
+export.closeBtn.text=\u9589\u3058\u308b
+export.closeOnFinishedLabel=\u9001\u4fe1\u5b8c\u4e86\u304c\u6210\u529f\u3057\u305f\u5f8c\u306b\u9589\u3058\u308b

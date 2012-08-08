@@ -1,0 +1,25 @@
+# Mpps2MwlLinkPage_de.properties
+mpps2mwl.tabTitle=MPPS\u304b\u3089MWL\u3078\u30ea\u30f3\u30af
+#
+#MppsToMwl link
+link.ppsInfoTitle=MPPS\u60c5\u5831
+link.patNameLabel=\u60a3\u8005\u6c0f\u540d:
+link.patIdLabel=\u60a3\u8005ID:
+link.patIssuerLabel=\u767a\u884c\u8005:
+link.birthdateLabel=\u8a95\u751f\u65e5:
+link.accNrLabel=\u767b\u9332\u756a\u53f7:
+link.modalityLabel=\u30e2\u30c0\u30ea\u30c6\u30a3:
+link.startDateLabel=\u958b\u59cb\u65e5:
+link.studyDescriptionLabel=\u691c\u67fb\u6982\u8981:
+#
+mpps2mwl.content.header.patientName=\u60a3\u8005\u6c0f\u540d
+mpps2mwl.content.header.birthDate=\u8a95\u751f\u65e5
+mpps2mwl.content.header.SPSDescription=SPS\u6982\u8981
+mpps2mwl.content.header.SPSModality=\u30e2\u30c0\u30ea\u30c6\u30a3
+mpps2mwl.content.header.startDate=\u958b\u59cb\u65e5
+mpps2mwl.content.header.stationAET=\u30b9\u30c6\u30fc\u30b7\u30e7\u30f3AET
+mpps2mwl.content.header.stationName=\u30b9\u30c6\u30fc\u30b7\u30e7\u30f3\u540d
+mpps2mwl.content.header.accessionNumber=\u767b\u9332\u756a\u53f7
+mpps2mwl.content.header.SPSStatus=SPS\u30b9\u30c6\u30fc\u30bf\u30b9
+#
+mpps2mwl.link.tooltip=\u30ea\u30f3\u30af
