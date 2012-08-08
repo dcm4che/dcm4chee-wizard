@@ -308,12 +308,6 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
                     		.setAcceptDataOnFailedNegotiation(acceptDataOnFailedNegotiationModel.getObject());
                     	proxyApplicationEntity.setEnableAuditLog(enableAuditLogModel.getObject());
                     	proxyApplicationEntity.setSpoolDirectory(spoolDirectoryModel.getObject());
-                    	
-                    	// TODO: workaround because if not set will throw a null pointer exception on persisting
-                    	proxyApplicationEntity.setForwardSchedules(new HashMap<String,Schedule>());
-                    	
-                    	List<ForwardRule> forwardRules = new ArrayList<ForwardRule>();
-						proxyApplicationEntity.setForwardRules(forwardRules);
                 	}
 
                     if (aeModel == null)
