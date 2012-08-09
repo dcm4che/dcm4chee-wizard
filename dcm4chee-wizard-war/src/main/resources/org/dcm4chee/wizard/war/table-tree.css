@@ -119,7 +119,7 @@ span.tree-content a:hover {}
 
 .folder_forward_schedules .tree-folder-other, .folder_forward_schedules .tree-folder-open, .folder_forward_schedules .tree-folder-closed {
 	background-position: 0px center !important;
-	background-image: url("../org.dcm4chee.icons.ImageManager/wizard/folder_proxy_rules.png") !important;
+	background-image: url("../org.dcm4chee.icons.ImageManager/wizard/proxy/folder_proxy_rules.png") !important;
 }
 
 .folder_retries .tree-folder-other, .folder_retries .tree-folder-open, .folder_retries .tree-folder-closed {
