@@ -317,8 +317,7 @@ public class DicomConfigurationPanel extends Panel {
         
         List<IColumn<ConfigurationTreeNode>> deviceColumns = new ArrayList<IColumn<ConfigurationTreeNode>>();
 		deviceColumns.add(new CustomTreeColumn(Model.of("Devices"))); 
-		
-//		TableTree<ConfigurationTreeNode> 
+
 		configTree = new TableTree<ConfigurationTreeNode>("configTree", deviceColumns,
 				DeviceTreeProvider.set(DicomConfigurationPanel.this), 
 				Integer.MAX_VALUE) {
@@ -453,7 +452,6 @@ public class DicomConfigurationPanel extends Panel {
 					                });
 			            	}
 			            	echoWindow
-//			            		.setTitle(new ResourceModel("ae.echoPanelTitle"))
 			            		.setWindowClosedCallback(windowClosedCallback)
 			            		.show(target);
 			            }

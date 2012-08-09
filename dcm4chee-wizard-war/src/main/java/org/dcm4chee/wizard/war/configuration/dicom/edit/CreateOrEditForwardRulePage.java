@@ -154,7 +154,7 @@ public class CreateOrEditForwardRulePage extends SecureWebPage {
 
         form.add(new Label("destinationURI.label", new ResourceModel("dicom.edit.forwardRule.destinationURI.label")))
         .add(new TextField<String>("destinationURI", destinationURIModel).setRequired(true)
-        		.add(new DestinationURIValidator(destinationURIModel.getObject())));
+        		.add(new DestinationURIValidator()));
 
         final WebMarkupContainer optionalContainer = new WebMarkupContainer("optionalContainer");
         form.add(optionalContainer

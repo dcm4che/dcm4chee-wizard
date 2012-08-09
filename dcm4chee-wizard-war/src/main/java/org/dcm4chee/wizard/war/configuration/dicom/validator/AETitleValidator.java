@@ -39,10 +39,10 @@
 package org.dcm4chee.wizard.war.configuration.dicom.validator;
 
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.validator.StringValidator;
+import org.dcm4chee.wizard.war.configuration.dicom.DeviceTreeProvider;
 
 /**
  * @author Franz Willer <franz.willer@gmail.com>
@@ -54,12 +54,10 @@ public class AETitleValidator extends StringValidator {
     private static final int MAX_AET_LEN = 16;
     private static final int MAX_HL7_LEN = 250;
 
-	private String ignore;
-	private Set<String> uniqueAETitles;
+	String ignore;
     
-    public AETitleValidator(String ignore, Set<String> uniqueAETitles) {
+    public AETitleValidator(String ignore) {
     	this.ignore = ignore;
-    	this.uniqueAETitles = uniqueAETitles;
     }
     
     /**
@@ -89,7 +87,7 @@ public class AETitleValidator extends StringValidator {
         }
         
         if (!s.equals(ignore))
-			if (uniqueAETitles.contains(s))
+			if (DeviceTreeProvider.get().getUniqueAETitles().contains(s))
 				error(v, "AETitleValidator.alreadyExists");
     }
     /*

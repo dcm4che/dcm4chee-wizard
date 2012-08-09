@@ -39,24 +39,23 @@
 package org.dcm4chee.wizard.war.configuration.dicom.validator;
 
 import org.apache.wicket.validation.IValidatable;
-import org.apache.wicket.validation.Validatable;
+import org.apache.wicket.validation.validator.StringValidator;
+import org.dcm4chee.wizard.war.configuration.dicom.DeviceTreeProvider;
 
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-public class DestinationURIValidator extends AETitleValidator {
+public class DestinationURIValidator extends StringValidator {
 
     private static final long serialVersionUID = 1L;
 
-    public DestinationURIValidator(String ignore) {
-    	super(ignore, null);
-    }
-    
     @Override
     protected void onValidate(IValidatable<String> uri) {
-    	if (uri.getValue().startsWith("aet:"))
-    		super.onValidate(new Validatable<String>(uri.getValue().substring(4)));
-    	else
+    	if (uri.getValue().startsWith("aet:")) {
+    		String aet = uri.getValue().substring(4);
+			if (!DeviceTreeProvider.get().getUniqueAETitles().contains(aet))
+				error(uri, "DestinationURIValidator.aetDoesNotExists");
+    	} else
     		// TODO: validate template
     		System.out.println("Not implemented yet");
     }

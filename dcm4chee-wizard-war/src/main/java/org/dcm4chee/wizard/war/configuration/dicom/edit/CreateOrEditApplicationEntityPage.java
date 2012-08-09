@@ -39,8 +39,6 @@
 package org.dcm4chee.wizard.war.configuration.dicom.edit;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
@@ -59,13 +57,12 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.resource.CssResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
+import org.apache.wicket.validation.IValidatable;
 import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.net.ApplicationEntity;
 import org.dcm4che.net.Connection;
-import org.dcm4chee.proxy.conf.ForwardRule;
 import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
 import org.dcm4chee.proxy.conf.ProxyDevice;
-import org.dcm4chee.proxy.conf.Schedule;
 import org.dcm4chee.web.common.base.BaseWicketPage;
 import org.dcm4chee.web.common.behaviours.FocusOnLoadBehaviour;
 import org.dcm4chee.web.common.markup.BaseForm;
@@ -188,7 +185,7 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
 		
         form.add(new Label("aeTitle.label", new ResourceModel("dicom.edit.applicationEntity.aeTitle.label")))
         .add(new TextField<String>("aeTitle", aeTitleModel)
-        		.add(new AETitleValidator(aeTitleModel.getObject(), DeviceTreeProvider.get().getUniqueAETitles()))
+        		.add(new AETitleValidator(aeTitleModel.getObject()))
                 .setRequired(true).add(FocusOnLoadBehaviour.newFocusAndSelectBehaviour()));
 
         form.add(new Label("associationAcceptor.label", new ResourceModel("dicom.edit.applicationEntity.associationAcceptor.label")))
