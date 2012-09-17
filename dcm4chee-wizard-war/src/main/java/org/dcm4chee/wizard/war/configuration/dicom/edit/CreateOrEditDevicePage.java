@@ -36,7 +36,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.wizard.war.configuration.basic.edit;
+package org.dcm4chee.wizard.war.configuration.dicom.edit;
 
 import java.util.ArrayList;
 
@@ -68,12 +68,12 @@ import org.dcm4chee.web.common.base.BaseWicketPage;
 import org.dcm4chee.web.common.behaviours.FocusOnLoadBehaviour;
 import org.dcm4chee.web.common.markup.BaseForm;
 import org.dcm4chee.web.common.markup.modal.MessageWindow;
-import org.dcm4chee.wizard.war.configuration.basic.model.DeviceModel;
-import org.dcm4chee.wizard.war.configuration.basic.model.InstitutionCodeModel;
-import org.dcm4chee.wizard.war.configuration.basic.model.StringArrayModel;
-import org.dcm4chee.wizard.war.configuration.basic.tree.DeviceTreeProvider;
-import org.dcm4chee.wizard.war.configuration.basic.tree.DeviceTreeProvider.ConfigurationType;
-import org.dcm4chee.wizard.war.configuration.basic.validator.DeviceNameValidator;
+import org.dcm4chee.wizard.war.configuration.dicom.model.DeviceModel;
+import org.dcm4chee.wizard.war.configuration.dicom.model.InstitutionCodeModel;
+import org.dcm4chee.wizard.war.configuration.dicom.model.StringArrayModel;
+import org.dcm4chee.wizard.war.configuration.dicom.DeviceTreeProvider;
+import org.dcm4chee.wizard.war.configuration.dicom.DeviceTreeProvider.ConfigurationType;
+import org.dcm4chee.wizard.war.configuration.dicom.validator.DeviceNameValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wicketstuff.security.components.SecureWebPage;
