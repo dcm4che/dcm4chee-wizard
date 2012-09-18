@@ -68,15 +68,17 @@ import org.dcm4chee.web.common.base.BaseWicketPage;
 import org.dcm4chee.web.common.behaviours.FocusOnLoadBehaviour;
 import org.dcm4chee.web.common.markup.BaseForm;
 import org.dcm4chee.web.common.markup.modal.MessageWindow;
+import org.dcm4chee.wizard.war.configuration.dicom.DeviceTreeProvider;
+import org.dcm4chee.wizard.war.configuration.dicom.DeviceTreeProvider.ConfigurationType;
 import org.dcm4chee.wizard.war.configuration.dicom.model.DeviceModel;
 import org.dcm4chee.wizard.war.configuration.dicom.model.InstitutionCodeModel;
 import org.dcm4chee.wizard.war.configuration.dicom.model.StringArrayModel;
-import org.dcm4chee.wizard.war.configuration.dicom.DeviceTreeProvider;
-import org.dcm4chee.wizard.war.configuration.dicom.DeviceTreeProvider.ConfigurationType;
+import org.dcm4chee.wizard.war.configuration.dicom.validator.CodeValidator;
 import org.dcm4chee.wizard.war.configuration.dicom.validator.DeviceNameValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wicketstuff.security.components.SecureWebPage;
+
 
 /**
  * @author Robert David <robert.david@agfa.com>
@@ -319,25 +321,29 @@ public class CreateOrEditDevicePage extends SecureWebPage {
         		new ResourceModel("dicom.edit.device.institutionAddress.label")))
         .add(new TextArea<String>("institutionAddress", institutionAddressModel));
 // ******************
+        
+        TextField<String> codeValueTextField = new TextField<String>("institutionCodeValue", institutionCodeModel.getCodeFieldModel(0));
         optionalContainer.add(new Label("institutionCodeValue.label", 
         		new ResourceModel("dicom.edit.device.institutionCodeValue.label")))
-        .add(new TextField<String>("institutionCodeValue", institutionCodeModel.getCodeFieldModel(0))
-        		.setRequired(true));
+        .add(codeValueTextField);
 
+        TextField<String> codingSchemeDesignatorTextField = new TextField<String>("institutionCodingSchemeDesignator", institutionCodeModel.getCodeFieldModel(1));
         optionalContainer.add(new Label("institutionCodingSchemeDesignator.label", 
         		new ResourceModel("dicom.edit.device.institutionCodingSchemeDesignator.label")))
-        .add(new TextField<String>("institutionCodingSchemeDesignator", institutionCodeModel.getCodeFieldModel(1))
-        		.setRequired(true));
+        .add(codingSchemeDesignatorTextField);
 
         optionalContainer.add(new Label("institutionCodingSchemeVersion.label", 
         		new ResourceModel("dicom.edit.device.institutionCodingSchemeVersion.label")))
         .add(new TextField<String>("institutionCodingSchemeVersion", institutionCodeModel.getCodeFieldModel(2)));
         
+        TextField<String> codeMeaningTextField = new TextField<String>("institutionCodeMeaning", institutionCodeModel.getCodeFieldModel(3));
         optionalContainer.add(new Label("institutionCodeMeaning.label", 
         		new ResourceModel("dicom.edit.device.institutionCodeMeaning.label")))
-        .add(new TextField<String>("institutionCodeMeaning", institutionCodeModel.getCodeFieldModel(3))
-        		.setRequired(true));
-// ******************
+        .add(codeMeaningTextField);
+        
+        form.add(new CodeValidator(codeValueTextField, 
+        		codingSchemeDesignatorTextField, codeMeaningTextField));
+// ******************       
         optionalContainer.add(new Label("institutionalDepartmentName.label", 
         		new ResourceModel("dicom.edit.device.institutionalDepartmentName.label")))
         .add(new TextArea<String>("institutionalDepartmentName", institutionalDepartmentNameModel));
@@ -471,7 +477,8 @@ public class CreateOrEditDevicePage extends SecureWebPage {
 	    				device.setDescription(descriptionModel.getObject());
 	    				device.setDeviceSerialNumber(deviceSerialNumberModel.getObject());
 	    				device.setInstitutionAddresses(institutionAddressModel.getArray());
-	    				device.setInstitutionCodes(new Code[] {institutionCodeModel.getCode()});
+	    				device.setInstitutionCodes(institutionCodeModel.getCode() == null ? 
+	    						new Code[] {} : new Code[] {institutionCodeModel.getCode()});
 		    			device.setInstitutionalDepartmentNames(institutionalDepartmentNameModel.getArray());
 	    				device.setInstitutionNames(institutionNameModel.getArray());    				
 	    				device.setIssuerOfAccessionNumber(issuerOfAccessionNumberModel.getObject() == null ? 
