@@ -62,7 +62,8 @@ public class InstitutionCodeModel implements Serializable {
     }
     
     public Code getCode() {
-    	return new Code(fields[0], fields[1], fields[2], fields[3]);
+    	return (fields[0] != null && fields[1] != null && fields[3] != null) ?
+    			new Code(fields[0], fields[1], fields[2], fields[3]) : null;
     }
     
     public CodeFieldModel getCodeFieldModel(int idx) {

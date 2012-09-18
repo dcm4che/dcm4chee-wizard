@@ -320,7 +320,6 @@ public class CreateOrEditDevicePage extends SecureWebPage {
         optionalContainer.add(new Label("institutionAddress.label", 
         		new ResourceModel("dicom.edit.device.institutionAddress.label")))
         .add(new TextArea<String>("institutionAddress", institutionAddressModel));
-// ******************
         
         TextField<String> codeValueTextField = new TextField<String>("institutionCodeValue", institutionCodeModel.getCodeFieldModel(0));
         optionalContainer.add(new Label("institutionCodeValue.label", 
@@ -332,18 +331,19 @@ public class CreateOrEditDevicePage extends SecureWebPage {
         		new ResourceModel("dicom.edit.device.institutionCodingSchemeDesignator.label")))
         .add(codingSchemeDesignatorTextField);
 
+        TextField<String> codingSchemeVersionTextField = new TextField<String>("institutionCodingSchemeVersion", institutionCodeModel.getCodeFieldModel(2));
         optionalContainer.add(new Label("institutionCodingSchemeVersion.label", 
         		new ResourceModel("dicom.edit.device.institutionCodingSchemeVersion.label")))
-        .add(new TextField<String>("institutionCodingSchemeVersion", institutionCodeModel.getCodeFieldModel(2)));
+        .add(codingSchemeVersionTextField);
         
         TextField<String> codeMeaningTextField = new TextField<String>("institutionCodeMeaning", institutionCodeModel.getCodeFieldModel(3));
         optionalContainer.add(new Label("institutionCodeMeaning.label", 
         		new ResourceModel("dicom.edit.device.institutionCodeMeaning.label")))
         .add(codeMeaningTextField);
         
-        form.add(new CodeValidator(codeValueTextField, 
-        		codingSchemeDesignatorTextField, codeMeaningTextField));
-// ******************       
+        form.add(new CodeValidator(codeValueTextField, codingSchemeDesignatorTextField, 
+        		codingSchemeVersionTextField, codeMeaningTextField));
+       
         optionalContainer.add(new Label("institutionalDepartmentName.label", 
         		new ResourceModel("dicom.edit.device.institutionalDepartmentName.label")))
         .add(new TextArea<String>("institutionalDepartmentName", institutionalDepartmentNameModel));

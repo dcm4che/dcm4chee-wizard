@@ -54,8 +54,11 @@ public class CodeValidator extends AbstractFormValidator {
     
     @SuppressWarnings("unchecked")
 	public CodeValidator(FormComponent<String> codeValue,
-    		FormComponent<String> codingSchemeDesignator, FormComponent<String> codeMeaning) {
-    	components = new FormComponent[] { codeValue, codingSchemeDesignator, codeMeaning };
+    		FormComponent<String> codingSchemeDesignator, 
+    		FormComponent<String> codingSchemeVersion,
+    		FormComponent<String> codeMeaning) {
+    	components = new FormComponent[] 
+    			{ codeValue, codingSchemeDesignator, codingSchemeVersion, codeMeaning };
     }
     
 	public FormComponent<?>[] getDependentFormComponents() {
@@ -66,7 +69,8 @@ public class CodeValidator extends AbstractFormValidator {
 
 		final FormComponent<String> codeValue = components[0];
 		final FormComponent<String> codingSchemeDesignator = components[1];
-		final FormComponent<String> codeMeaning = components[2];
+		final FormComponent<String> codingSchemeVersion = components[2];
+		final FormComponent<String> codeMeaning = components[3];
 
 		ValidationError validationError = new ValidationError();
 		validationError.addMessageKey("CodeValidator.invalid");
@@ -90,6 +94,15 @@ public class CodeValidator extends AbstractFormValidator {
 				codeValue.error(validationError);
 			if (codingSchemeDesignator.getInput().isEmpty())
 				codingSchemeDesignator.error(validationError);
+			return;
+		}
+		if (!codingSchemeVersion.getInput().isEmpty()) {
+			if (codeValue.getInput().isEmpty())
+				codeValue.error(validationError);
+			if (codingSchemeDesignator.getInput().isEmpty())
+				codingSchemeDesignator.error(validationError);
+			if (codeMeaning.getInput().isEmpty())
+				codeMeaning.error(validationError);
 			return;
 		}
 	}
