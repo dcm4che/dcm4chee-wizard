@@ -372,7 +372,7 @@ public class DeviceTreeProvider extends SortableTreeProvider<ConfigurationTreeNo
         
 		connectionsNode.getChildren().clear();
 		for (Connection currentConnection : connection.getDevice().listConnections())
-			new ConfigurationTreeNode(connectionsNode, currentConnection.getCommonName() + " - " + (connectionsNode.getChildren().size() - 1), 
+			new ConfigurationTreeNode(connectionsNode, currentConnection.getCommonName(), 
 					ConfigurationTreeNode.TreeNodeType.CONNECTION, new ConnectionModel(currentConnection, connectionsNode.getChildren().size()));
 		Collections.sort(connectionsNode.getChildren());
 	}

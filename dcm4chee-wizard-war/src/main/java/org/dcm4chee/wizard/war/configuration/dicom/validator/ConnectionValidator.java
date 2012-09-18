@@ -59,15 +59,20 @@ public class ConnectionValidator extends AbstractFormValidator {
 	private FormComponent<String> hostname;
 	private FormComponent<Integer> port;
 
+	private String ignore;
+	
 	public ConnectionValidator(List<ConnectionModel> connections,
 			FormComponent<String> commonName,
 			FormComponent<String> hostname,
-			FormComponent<Integer> port) {
+			FormComponent<Integer> port, 
+			String ignore) {
 
 			this.connections = connections;
 			this.commonName = commonName;
 			this.hostname = hostname;
 			this.port = port;
+			
+			this.ignore = ignore;
 	}
 
 	public FormComponent<?>[] getDependentFormComponents() {
@@ -80,7 +85,7 @@ public class ConnectionValidator extends AbstractFormValidator {
 		if (port.getValue() != null)
 			portNumber = Integer.parseInt(port.getValue());
 		
-		if (!commonName.getValue().equals("")) {
+		if (!commonName.getValue().equals("") && !commonName.getValue().equals(ignore)) {
 			for (ConnectionModel connection : connections) 
 				if (commonName.getValue().equals(connection.getCommonName()))
 					commonName.error(new StringResourceModel("ConnectionValidator.commonName.alreadyExists", hostname, null, new Object[0]).getObject());

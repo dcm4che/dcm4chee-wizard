@@ -173,7 +173,7 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
         });
 
 		form.add(new ConnectionValidator(((DeviceModel) connectionsNode.getParent().getModel()).getConnections(), 
-				commonNameTextField, hostnameTextField, portTextField));
+				commonNameTextField, hostnameTextField, portTextField, commonNameTextField.getModelObject()));
         
         form.add(new AjaxFallbackButton("submit", new ResourceModel("saveBtn"), form) {
 
