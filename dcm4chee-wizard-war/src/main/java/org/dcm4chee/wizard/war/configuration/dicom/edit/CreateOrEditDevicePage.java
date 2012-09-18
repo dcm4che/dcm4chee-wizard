@@ -7,7 +7,7 @@
  * http://www.mozilla.org/MPL/
  *
  * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * WITHOUT WARRANTY OF ANY KIND, either expresqs or implied. See the License
  * for the specific language governing rights and limitations under the
  * License.
  *
@@ -61,17 +61,18 @@ import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.validation.validator.RangeValidator;
 import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.data.Code;
+import org.dcm4che.data.Issuer;
 import org.dcm4che.net.Device;
 import org.dcm4chee.proxy.conf.ProxyDevice;
 import org.dcm4chee.web.common.base.BaseWicketPage;
 import org.dcm4chee.web.common.behaviours.FocusOnLoadBehaviour;
 import org.dcm4chee.web.common.markup.BaseForm;
 import org.dcm4chee.web.common.markup.modal.MessageWindow;
-import org.dcm4chee.wizard.war.configuration.basic.tree.DeviceTreeProvider;
-import org.dcm4chee.wizard.war.configuration.dicom.DeviceTreeProvider.ConfigurationType;
 import org.dcm4chee.wizard.war.configuration.dicom.model.DeviceModel;
 import org.dcm4chee.wizard.war.configuration.dicom.model.InstitutionCodeModel;
 import org.dcm4chee.wizard.war.configuration.dicom.model.StringArrayModel;
+import org.dcm4chee.wizard.war.configuration.dicom.DeviceTreeProvider;
+import org.dcm4chee.wizard.war.configuration.dicom.DeviceTreeProvider.ConfigurationType;
 import org.dcm4chee.wizard.war.configuration.dicom.validator.DeviceNameValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
