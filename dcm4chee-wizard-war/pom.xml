@@ -30,7 +30,7 @@
 			</activation>
 			<properties>
 				<project-classifier>prefs</project-classifier>
-				<dcm4chee.proxy.type>prefs-jdbc</dcm4chee.proxy.type>
+				<dcm4chee.proxy.type>lib-prefs</dcm4chee.proxy.type>
 			</properties>
 			<dependencies>
 				<dependency>
