@@ -60,7 +60,7 @@ import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.dcm4chee.web.common.ajax.MaskingAjaxCallBehavior;
-import org.dcm4chee.wizard.war.configuration.dicom.model.DicomConfigurationSourceModel;
+import org.dcm4chee.wizard.war.configuration.basic.model.DicomConfigurationSourceModel;
 import org.jboss.bootstrap.api.as.config.JBossASBasedServerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

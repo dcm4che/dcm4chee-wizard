@@ -49,7 +49,7 @@ import org.dcm4chee.web.common.base.BaseWicketApplication;
 import org.dcm4chee.web.common.base.ModuleSelectorPanel;
 import org.dcm4chee.web.common.secure.SecureWicketPage;
 import org.dcm4chee.wizard.war.configuration.advanced.AdvancedConfigurationPanel;
-import org.dcm4chee.wizard.war.configuration.dicom.DicomConfigurationPanel;
+import org.dcm4chee.wizard.war.configuration.basic.tree.BasicConfigurationPanel;
 import org.dcm4chee.wizard.war.configuration.profile.ProfilePanel;
 import org.dcm4chee.wizard.war.configuration.source.DicomConfigurationSourcePanel;
 import org.dcm4chee.wizard.war.configuration.wizard.WizardPanel;
@@ -84,7 +84,7 @@ public class MainPage extends SecureWicketPage {
 
     private void addModules(ModuleSelectorPanel selectorPanel) {
         
-        selectorPanel.addModule(DicomConfigurationPanel.class);
+        selectorPanel.addModule(BasicConfigurationPanel.class);
         selectorPanel.addModule(AdvancedConfigurationPanel.class);
         selectorPanel.addModule(WizardPanel.class);
         selectorPanel.addModule(ProfilePanel.class);

@@ -121,6 +121,7 @@
       <groupId>org.dcm4che</groupId>
       <artifactId>dcm4che-core</artifactId>
       <version>3.0.0-SNAPSHOT</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>dcm4che.dcm4chee</groupId>
@@ -304,8 +305,7 @@
               <Implementation-Title>DCM4CHEE-WIZARD</Implementation-Title>
               <Implementation-Build>${pom.version}</Implementation-Build>
               <SCM-Revision>${buildNumber}</SCM-Revision>
-              <Dependencies>org.slf4j.impl export,org.jboss.logmanager
-                export</Dependencies>
+              <Dependencies>org.slf4j.impl export,org.jboss.logmanager export,org.dcm4che.core export</Dependencies>
             </manifestEntries>
           </archive>
         </configuration>
