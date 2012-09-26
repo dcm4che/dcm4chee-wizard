@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/2002/08/xhtml/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.w3.org/1999/xhtml
+                          http://www.w3.org/2002/08/xhtml/xhtml1-strict.xsd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+	<div wicket:id="msgWin">MessageWindow</div>
+	<div class="msgWindow">
+		<div wicket:id="create-applicationEntity-title" class="edit-title">
+			<wicket:message key="dicom.edit.applicationEntity.createAE.title" />
+		</div>
+		<div wicket:id="edit-applicationEntity-title" class="edit-title">
+			<wicket:message key="dicom.edit.applicationEntity.editAE.title" />
+		</div>
+		<form wicket:id="form">
+			<div class="edit-table-panel">
+				<div class="edit-content">
+					<div class="edit-table-row">
+						<span class="edit-desc" wicket:id="aeTitle.label" /> 
+						<input class="edit-value" wicket:id="aeTitle" type="text" />
+					</div>
+					<div class="edit-table-row">
+						<span class="edit-desc" wicket:id="associationAcceptor.label" /> 
+						<input class="edit-value" wicket:id="associationAcceptor" type="checkbox" />
+					</div>
+					<div class="edit-table-row">
+						<span class="edit-desc" wicket:id="associationInitiator.label" /> 
+						<input class="edit-value" wicket:id="associationInitiator" type="checkbox" />
+					</div>
+					<div class="edit-table-row" style="height: 100%;" >
+						<wicket:message key="dicom.edit.applicationEntity.connections.title" />
+						<div style="margin-top: 10px;" wicket:id="connections" />
+						<br />
+					</div>
+					<div class="edit-table-row">
+						<span class="edit-desc" wicket:id="acceptDataOnFailedNegotiation.label" /> 
+						<input class="edit-value" wicket:id="acceptDataOnFailedNegotiation" type="checkbox" />
+					</div>
+					<div class="edit-table-row">
+						<span class="edit-desc" wicket:id="enableAuditLog.label" /> 
+						<input class="edit-value" wicket:id="enableAuditLog" type="checkbox" />
+					</div>
+					<div class="edit-table-row">
+						<span class="edit-desc" wicket:id="spoolDirectory.label" /> 
+						<input class="edit-value" wicket:id="spoolDirectory" type="text" />
+					</div>
+					<div  class="edit-buttons">
+						<span class="edit-desc" wicket:id="optional.label" />
+						<input class="edit-value" wicket:id="optional" type="checkbox" />
+					</div>
+					<div wicket:id="optionalContainer">
+						<div class="edit-table-row">
+							<span class="edit-desc" wicket:id="applicationClusters.label" />
+							<textarea class="edit-value" wicket:id="applicationClusters" />
+						</div>
+						<div class="edit-table-row">
+							<span class="edit-desc" wicket:id="description.label" />
+							<input class="edit-value" wicket:id="description" type="text" />
+						</div>
+						<div class="edit-table-row">
+							<span class="edit-desc" wicket:id="installed.label" />
+							<input class="edit-value" wicket:id="installed" type="checkbox" />
+						</div>
+						<div class="edit-table-row">
+							<span class="edit-desc" wicket:id="calledAETitles.label" />
+							<textarea class="edit-value" wicket:id="calledAETitles" />
+						</div>
+						<div class="edit-table-row">
+							<span class="edit-desc" wicket:id="callingAETitles.label" />
+							<textarea class="edit-value" wicket:id="callingAETitles" />
+						</div>
+						<div class="edit-table-row">
+							<span class="edit-desc" wicket:id="supportedCharacterSets.label" />
+							<textarea class="edit-value" wicket:id="supportedCharacterSets" />
+						</div>
+						<div class="edit-table-row">
+							<span class="edit-desc" wicket:id="vendorData.label" />
+							<span class="edit-value" wicket:id="vendorData" />
+						</div>
+					</div>
+						<div class="edit-buttons">
+							<input type="submit" wicket:id="submit" />
+							<input type="submit" wicket:id="cancel" />
+						</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</body>
+</html>
