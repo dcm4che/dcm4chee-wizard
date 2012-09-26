@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>dcm4che.dcm4chee</groupId>
     <artifactId>dcm4chee-wizard-icons</artifactId>
-    <version>3.0.1-1.5</version>
+    <version>0.0.1</version>
     <packaging>jar</packaging>
     <description>Icon theme for dcm4chee web application modules</description>
     <properties>
