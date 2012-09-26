@@ -49,8 +49,8 @@ import org.dcm4chee.web.common.base.BaseWicketApplication;
 import org.dcm4chee.web.common.base.ModuleSelectorPanel;
 import org.dcm4chee.web.common.secure.SecureWicketPage;
 import org.dcm4chee.wizard.war.configuration.advanced.AdvancedConfigurationPanel;
-import org.dcm4chee.wizard.war.configuration.basic.tree.BasicConfigurationPanel;
 import org.dcm4chee.wizard.war.configuration.profile.ProfilePanel;
+import org.dcm4chee.wizard.war.configuration.simple.tree.BasicConfigurationPanel;
 import org.dcm4chee.wizard.war.configuration.source.DicomConfigurationSourcePanel;
 import org.dcm4chee.wizard.war.configuration.wizard.WizardPanel;
 import org.slf4j.Logger;
@@ -70,7 +70,6 @@ public class MainPage extends SecureWicketPage {
 
     public MainPage() {
         super();
-        
         addModules(getModuleSelectorPanel());
     }
 

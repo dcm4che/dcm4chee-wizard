@@ -11,6 +11,10 @@
 			<param-name>applicationClassName</param-name>
 			<param-value>org.dcm4chee.wizard.war.WicketApplication</param-value>
  		</init-param>
+		<init-param>
+			<param-name>dicomConfigurationClass</param-name>
+			<param-value>${config-class}</param-value>
+		</init-param>
 	    <init-param>
 			<param-name>WebCfgServiceName</param-name>
 			<param-value>dcm4chee.web:service=WebConfig</param-value>

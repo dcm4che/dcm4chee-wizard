@@ -38,12 +38,7 @@
 
 package org.dcm4chee.wizard.war;
 
-import javax.enterprise.inject.spi.BeanManager;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.security.auth.Subject;
-
-import net.ftlines.wicket.cdi.CdiConfiguration;
 
 import org.apache.wicket.Page;
 import org.apache.wicket.request.Request;
@@ -54,8 +49,9 @@ import org.dcm4chee.web.common.login.SSOLoginContext;
 import org.dcm4chee.web.common.secure.SecureSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wicketstuff.javaee.injection.JavaEEComponentInjector;
 import org.wicketstuff.security.authentication.LoginException;
+import org.wicketstuff.security.strategies.StrategyFactory;
+import org.wicketstuff.security.strategies.WaspAuthorizationStrategy;
 
 /**
  * @author Robert David <robert.david@agfa.com>
@@ -63,26 +59,23 @@ import org.wicketstuff.security.authentication.LoginException;
 public class WicketApplication extends BaseWicketApplication {
 
 	protected static Logger log = LoggerFactory.getLogger(WicketApplication.class);
-
+	
+	private DicomConfigurationManager dicomConfigurationManager;
+	
     @Override
     protected void init() {
-
-    	// TODO: make version independent
-		getComponentInstantiationListeners()
-			.add(new JavaEEComponentInjector(this, 
-					new Jboss7JndiNamingStrategy("dcm4chee-wizard-war-3.0.1")));
-
-		super.init();
-        
-        BeanManager beanManager = null;
-		try {
-			beanManager = (BeanManager) new InitialContext().lookup("java:comp/BeanManager");
-		} catch (NamingException e) {
-			throw new IllegalStateException("Error obtaining CDI BeanManager", e);
-		}
-		new CdiConfiguration(beanManager).configure(this);
+    	super.init();
+		getDicomConfigurationManager();
     }
     
+    public DicomConfigurationManager getDicomConfigurationManager() {
+
+    	if (dicomConfigurationManager == null)
+    		dicomConfigurationManager = 
+    			new DicomConfigurationManager(getInitParameter("dicomConfigurationClass"));
+    	return dicomConfigurationManager;
+    }
+
 	@Override
 	public Class<? extends Page> getHomePage() {
 		return MainPage.class;

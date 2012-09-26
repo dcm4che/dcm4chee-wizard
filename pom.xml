@@ -10,8 +10,8 @@
     <name>Dcm4chee Wizard Components</name>
     <description>Wizard Application for DCM4CHEE Archive</description>
     <modules>
-		<module>dcm4chee-wizard-icons</module>
-		<module>dcm4chee-wizard-war</module>
+        <module>dcm4chee-wizard-icons</module>
+        <module>dcm4chee-wizard-war</module>
     </modules>
     <build>
         <defaultGoal>package</defaultGoal>
