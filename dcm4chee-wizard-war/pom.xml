@@ -114,7 +114,7 @@
 		</dependency>
 		<!-- DCM4CHEE COMPONENTS -->
 		<dependency>
-			<groupId>org.dcm4che.dcm4chee-proxy</groupId>
+			<groupId>org.dcm4che</groupId>
 			<artifactId>dcm4chee-proxy</artifactId>
 			<version>${dcm4chee.proxy.version}</version>
 			<classifier>${dcm4chee.proxy.type}</classifier>
@@ -282,7 +282,7 @@
 						<configuration>
 							<artifactItems>
 								<artifactItem>
-									<groupId>org.dcm4che.dcm4chee-proxy</groupId>
+									<groupId>org.dcm4che</groupId>
 									<artifactId>dcm4chee-proxy</artifactId>
 									<version>${dcm4chee.proxy.version}</version>
 									<classifier>${dcm4chee.proxy.type}</classifier>
