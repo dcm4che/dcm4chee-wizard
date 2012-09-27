@@ -159,9 +159,9 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}
-			    			Utils.prettyPrintln("Reloading " + deviceNode.getName() + " on close");
+//			    			Utils.prettyPrintln("Reloading " + deviceNode.getName() + " on close");
 			    			} else {
-			    				Utils.prettyPrintln("No Reload of " + deviceNode.getName() + ", model is " + deviceNode.getModel());
+	//		    				Utils.prettyPrintln("No Reload of " + deviceNode.getName() + ", model is " + deviceNode.getModel());
 			    			}
 			    		}
 			    		if (refresh || ConfigTreeProvider.get().resync())
@@ -278,9 +278,10 @@ public class BasicConfigurationPanel extends ExtendedPanel {
                 	if (configTreeNode.getNodeType().equals(ConfigTreeNode.TreeNodeType.DEVICE)) {                	
                 		ConfigTreeProvider.get()
                 			.removeDevice(configTreeNode);
-                		
+
                 	} else if (configTreeNode.getNodeType().equals(ConfigTreeNode.TreeNodeType.CONNECTION)) {
-                		ConfigTreeProvider.get().removeConnection(configTreeNode);
+//                		ConfigTreeProvider.get().removeConnection(configTreeNode);
+                		
                 		
                 	} else if (configTreeNode.getNodeType().equals(ConfigTreeNode.TreeNodeType.APPLICATION_ENTITY)) {
                 		ConfigTreeProvider.get().removeApplicationEntity(configTreeNode);
@@ -393,7 +394,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
     }
 
     public void createColumns() {
-		
+
     	deviceColumns = new ArrayList<IColumn<ConfigTreeNode>>();
 		
     	deviceColumns.add(new CustomTreeColumn(Model.of("Devices")));
@@ -523,7 +524,6 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 					                    	return new CreateOrEditConnectionPage(
 					                    			editWindow, 
 					                    			null, 
-//					                    			rowModel.getObject());
 					                    			rowModel.getObject().getParent());
 					                    }
 					                });
@@ -539,7 +539,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 				                    		 return new CreateOrEditApplicationEntityPage(
 				                    				 editWindow, 
 				                    				 null,  
-				                    				 rowModel.getObject());
+				                    				 rowModel.getObject().getParent());
 					                    }
 					                });
 							} else if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_TRANSFER_CAPABILITIES)) {
@@ -625,20 +625,26 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 					                      
 					                    @Override
 					                    public Page createPage() {
+					                    	Utils.prettyPrintln(type);
 					        				if (type.equals(ConfigTreeNode.TreeNodeType.DEVICE)) {
-					        	                return new CreateOrEditDevicePage(editWindow, 
-					        	                		(DeviceModel) rowModel.getObject().getModel());			        				
+					        					try {
+						        					ConfigTreeProvider.get().loadDevice(rowModel.getObject());
+						        	                return new CreateOrEditDevicePage(editWindow, 
+						        	                		(DeviceModel) rowModel.getObject().getModel());
+					        					} catch (Exception e) {
+					        						log.error("Error loading device on edit", e);
+					        						return null;
+					        					}
 					        				} else if (type.equals(ConfigTreeNode.TreeNodeType.CONNECTION)) {
 					        					return new CreateOrEditConnectionPage(
 					        							editWindow, 
 					        							(ConnectionModel) rowModel.getObject().getModel(), 
-//					        		            		rowModel.getObject().getParent());
 					        							rowModel.getObject().getParent().getParent());
 					        				} else if (type.equals(ConfigTreeNode.TreeNodeType.APPLICATION_ENTITY)) {
 					        					return new CreateOrEditApplicationEntityPage(
 					        							editWindow, 
 					        							(ApplicationEntityModel) rowModel.getObject().getModel(), 
-					        		            		rowModel.getObject().getParent()); 
+					        		            		rowModel.getObject().getParent().getParent()); 
 					        				} else if (type.equals(ConfigTreeNode.TreeNodeType.TRANSFER_CAPABILITY)) {
 					        		            return new CreateOrEditTransferCapabilityPage(editWindow, 
 					        		            		(TransferCapabilityModel) rowModel.getObject().getModel(), 
@@ -761,6 +767,8 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 //				preserveState(currentState, newNode);
 
 		configTree.setModel(currentState);
+//		form.addOrReplace(configTree);
+		
 		form.addOrReplace(configTree);
 	}
 	

@@ -66,6 +66,7 @@ import org.dcm4chee.web.common.base.BaseWicketPage;
 import org.dcm4chee.web.common.behaviours.FocusOnLoadBehaviour;
 import org.dcm4chee.web.common.markup.BaseForm;
 import org.dcm4chee.web.common.markup.modal.MessageWindow;
+import org.dcm4chee.wizard.war.Utils;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ApplicationEntityModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ConnectionReferenceModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.DeviceModel;
@@ -114,7 +115,7 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
 	private Model<String> vendorDataModel;
     
     public CreateOrEditApplicationEntityPage(final ModalWindow window, final ApplicationEntityModel aeModel, 
-    		final ConfigTreeNode aesNode) {
+    		final ConfigTreeNode deviceNode) {
     	super();
 
         msgWin.setTitle("");
@@ -133,11 +134,11 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
 	        oldAETitle = aeModel == null ? 
 	        		null : aeModel.getApplicationEntity().getAETitle();
 
-	        isProxy = (((DeviceModel) aesNode.getParent().getModel()).getDevice() instanceof ProxyDevice);
-	        
+	        isProxy = (((DeviceModel) deviceNode.getModel()).getDevice() instanceof ProxyDevice);
+
 	        connectionReferencesModel = new Model<ArrayList<ConnectionReferenceModel>>();
 	        connectionReferencesModel.setObject(new ArrayList<ConnectionReferenceModel>());
-			for (Connection connection : ((DeviceModel) aesNode.getParent().getModel()).getDevice().listConnections()) {
+			for (Connection connection : ((DeviceModel) deviceNode.getModel()).getDevice().listConnections()) {
 				ConnectionReferenceModel connectionReference = 
 						new ConnectionReferenceModel(connection.getCommonName(), connection.getHostname(), connection.getPort());
 				connectionReferences.add(connectionReference);
@@ -288,7 +289,7 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
                     applicationEntity.setAssociationInitiator(associationInitiatorModel.getObject());
                 	applicationEntity.getConnections().clear();
                 	for (ConnectionReferenceModel connectionReference : connectionReferencesModel.getObject()) 
-                		for (Connection connection : ((DeviceModel) aesNode.getParent().getModel()).getDevice().listConnections()) 
+                		for (Connection connection : ((DeviceModel) deviceNode.getModel()).getDevice().listConnections()) 
                 			if (connectionReference.getHostname().equals(connection.getHostname())
                     				&& connectionReference.getPort().equals(connection.getPort()))
                     			applicationEntity.addConnection(connection);
@@ -309,11 +310,13 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
                     	proxyApplicationEntity.setSpoolDirectory(spoolDirectoryModel.getObject());
                 	}
 
-                    if (aeModel == null)
-                    	ConfigTreeProvider.get().addApplicationEntity(aesNode, applicationEntity);
+                    if (aeModel != null)
+                    	ConfigTreeProvider.get().unregisterAETitle(oldAETitle);
                     else
-                    	ConfigTreeProvider.get().editApplicationEntity(aesNode, applicationEntity, oldAETitle);
-                	
+                    	((DeviceModel) deviceNode.getModel()).getDevice().addApplicationEntity(applicationEntity);
+                    ConfigTreeProvider.get().mergeDevice(applicationEntity.getDevice());
+                    ConfigTreeProvider.get().registerAETitle(applicationEntity.getAETitle());
+                    deviceNode.setModel(null);
 
                     window.close(target);
                 } catch (Exception e) {

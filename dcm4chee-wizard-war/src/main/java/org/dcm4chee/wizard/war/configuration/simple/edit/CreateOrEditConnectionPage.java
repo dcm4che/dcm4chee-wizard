@@ -194,7 +194,7 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
                     
                     if (connectionModel == null) 
                         ((DeviceModel) deviceNode.getModel()).getDevice().addConnection(connection);
-                    ConfigTreeProvider.get().persistDevice(connection.getDevice());
+                    ConfigTreeProvider.get().mergeDevice(connection.getDevice());
                     deviceNode.setModel(null);
                     window.close(target);
                 } catch (Exception e) {

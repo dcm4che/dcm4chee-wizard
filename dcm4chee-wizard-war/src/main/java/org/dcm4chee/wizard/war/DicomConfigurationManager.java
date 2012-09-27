@@ -87,11 +87,6 @@ public class DicomConfigurationManager implements Serializable {
     	return dicomConfiguration;
     }
 
-//    public HashMap<String,Device> loadDeviceMap() {
-//    	deviceMap = null;
-//    	return getDeviceMap();
-//    }
-
     public HashMap<String,Device> getDeviceMap() {
     	if (deviceMap == null)
     		try {
@@ -151,7 +146,7 @@ public class DicomConfigurationManager implements Serializable {
 		return device;
 	}
 	
-	public void persist(Device device) throws ConfigurationException {
+	public void save(Device device) throws ConfigurationException {
 		if (getDeviceMap().containsKey(device.getDeviceName()))
 			dicomConfiguration.merge(device);
 		else
