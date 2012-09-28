@@ -95,7 +95,6 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
 	private StringArrayModel tlsCipherSuitesModel;
     
     public CreateOrEditConnectionPage(final ModalWindow window, final ConnectionModel connectionModel, 
-//    		final ConfigTreeNode connectionsNode) {
 			final ConfigTreeNode deviceNode) {
         super();
         

@@ -54,6 +54,7 @@ import net.sf.json.JSONObject;
 import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.conf.api.DicomConfiguration;
 import org.dcm4che.net.Device;
+import org.dcm4chee.proxy.conf.ProxyDevice;
 import org.jboss.bootstrap.api.as.config.JBossASBasedServerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,7 +100,7 @@ public class DicomConfigurationManager implements Serializable {
 		return deviceMap;
     }
 	
-    public static Map<String,String> getTransferCapabilityTypes() {
+    public Map<String,String> getTransferCapabilityTypes() {
     	
 		if (sopClassTypeMap == null) {
 	        String configPath = System.getProperty("dcm4chee-wizard.cfg.path", "conf/dcm4chee-wizard/");

@@ -62,6 +62,7 @@ import org.dcm4chee.web.common.base.BaseWicketPage;
 import org.dcm4chee.web.common.markup.BaseForm;
 import org.dcm4chee.web.common.markup.modal.MessageWindow;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ApplicationEntityModel;
+import org.dcm4chee.wizard.war.configuration.simple.model.basic.DeviceModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.StringArrayModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.TransferCapabilityModel;
 import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider;
@@ -184,16 +185,21 @@ public class CreateOrEditTransferCapabilityPage extends SecureWebPage {
                     				transferSyntaxModel.getArray()) : 
                     			transferCapabilityModel.getTransferCapability();
 
-                    if (transferCapabilityModel == null)
-                    	ConfigTreeProvider.get().addTransferCapability(tcsNode, transferCapability);
-                    else {
-                		transferCapability.setSopClass(sopClassModel.getObject());
-                		transferCapability.setRole(roleModel.getObject());
-                		transferCapability.setTransferSyntaxes(transferSyntaxModel.getArray());
-                    	ConfigTreeProvider.get()
-                    		.editTransferCapability(tcsNode, tcNode, transferCapability);
-                		transferCapability.setCommonName(commonNameModel.getObject());
-                    }
+//                    if (transferCapabilityModel == null)
+//                    	((DeviceModel) deviceNode.getModel()).getDevice().
+//
+//                		applicationEntity.addTransferCapability(transferCapability);
+
+
+//                    	ConfigTreeProvider.get().addTransferCapability(tcsNode, transferCapability);
+//                    else {
+//                		transferCapability.setSopClass(sopClassModel.getObject());
+//                		transferCapability.setRole(roleModel.getObject());
+//                		transferCapability.setTransferSyntaxes(transferSyntaxModel.getArray());
+//                    	ConfigTreeProvider.get()
+//                    		.editTransferCapability(tcsNode, tcNode, transferCapability);
+//                		transferCapability.setCommonName(commonNameModel.getObject());
+//                    }
 
                     window.close(target);
                 } catch (Exception e) {

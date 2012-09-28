@@ -76,8 +76,12 @@ import org.apache.wicket.request.resource.ResourceReference;
 import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.net.ApplicationEntity;
 import org.dcm4che.net.Connection;
+import org.dcm4che.net.Device;
 import org.dcm4chee.icons.ImageManager;
 import org.dcm4chee.icons.behaviours.ImageSizeBehaviour;
+import org.dcm4chee.proxy.conf.ForwardRule;
+import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
+import org.dcm4chee.proxy.conf.Retry;
 import org.dcm4chee.web.common.ajax.MaskingAjaxCallBehavior;
 import org.dcm4chee.web.common.behaviours.TooltipBehaviour;
 import org.dcm4chee.web.common.markup.BaseForm;
@@ -150,7 +154,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 				    	boolean refresh = false;
 			    		for (ConfigTreeNode deviceNode : ConfigTreeProvider.get().getNodeList()) {
 			    			
-			    			Utils.prettyPrintln("Checking " + deviceNode.getName() + " for reload");
+//			    			Utils.prettyPrintln("Checking " + deviceNode.getName() + " for reload");
 			    			if (deviceNode.getModel() == null) {
 								try {
 									ConfigTreeProvider.get().loadDevice(deviceNode);
@@ -166,6 +170,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 			    		}
 			    		if (refresh || ConfigTreeProvider.get().resync())
 							try {
+//								BasicConfigurationPanel.this.createColumns();
 								BasicConfigurationPanel.this.refreshTree();
 							} catch (ConfigurationException e) {
 								// TODO Auto-generated catch block
@@ -271,39 +276,76 @@ public class BasicConfigurationPanel extends ExtendedPanel {
                 private static final long serialVersionUID = 1L;
                 
                 @Override
-                public void onConfirmation(AjaxRequestTarget target, ConfigTreeNode configTreeNode) {
+                public void onConfirmation(AjaxRequestTarget target, ConfigTreeNode node) {
                 	
             		try {
             			
-                	if (configTreeNode.getNodeType().equals(ConfigTreeNode.TreeNodeType.DEVICE)) {                	
+                	if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.DEVICE)) {                	
                 		ConfigTreeProvider.get()
-                			.removeDevice(configTreeNode);
+                			.removeDevice(node);
 
-                	} else if (configTreeNode.getNodeType().equals(ConfigTreeNode.TreeNodeType.CONNECTION)) {
-//                		ConfigTreeProvider.get().removeConnection(configTreeNode);
+                	} else {
                 		
+                		Device device = null;
                 		
-                	} else if (configTreeNode.getNodeType().equals(ConfigTreeNode.TreeNodeType.APPLICATION_ENTITY)) {
-                		ConfigTreeProvider.get().removeApplicationEntity(configTreeNode);
+                		if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.CONNECTION)) {
+	                		(device = ((DeviceModel) node.getParent().getParent().getModel()).getDevice())
+	                        	.removeConnection(((ConnectionModel) node.getModel())
+	                        			.getConnection());
+	
+                		} else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.APPLICATION_ENTITY)) {
+	                		(device = ((DeviceModel) node.getParent().getParent().getModel()).getDevice())
+	                			.removeApplicationEntity(((ApplicationEntityModel) node.getModel())
+	                				.getApplicationEntity());
+
+                		} else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.TRANSFER_CAPABILITY)) {
+	                		ApplicationEntity applicationEntity = 
+	                				((ApplicationEntityModel) node.getParent().getParent().getParent().getModel())
+	                				.getApplicationEntity();
+	                		applicationEntity.removeTransferCapability(((TransferCapabilityModel) node.getModel())
+	                				.getTransferCapability());
+	                		device = applicationEntity.getDevice();
+
+                		} else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.FORWARD_RULE)) {
+	                		ProxyApplicationEntity proxyApplicationEntity = (ProxyApplicationEntity)
+	                				((ApplicationEntityModel) node.getParent().getParent().getModel())
+	                				.getApplicationEntity();
+	                		proxyApplicationEntity.getForwardRules().remove(((ForwardRuleModel) node.getModel())
+	                				.getForwardRule());
+	                		 device = proxyApplicationEntity.getDevice();
+	
+	                	} else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.FORWARD_SCHEDULE)) {
+	                		ProxyApplicationEntity proxyApplicationEntity = (ProxyApplicationEntity)
+	                				((ApplicationEntityModel) node.getParent().getParent().getModel())
+	                				.getApplicationEntity();
+	                		proxyApplicationEntity.getForwardSchedules()
+	                			.remove(((ForwardScheduleModel) node.getModel())
+	                					.getDestinationAETitle());
+	                		device = proxyApplicationEntity.getDevice();
+	
+	                	} else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.RETRY)) {
+	                		ProxyApplicationEntity proxyApplicationEntity = (ProxyApplicationEntity)
+	                				((ApplicationEntityModel) node.getParent().getParent().getModel())
+	                				.getApplicationEntity();
+	                		proxyApplicationEntity.getRetries().remove(((RetryModel) node.getModel())
+	                				.getRetry());
+	                		device = proxyApplicationEntity.getDevice();
+	
+	                	} else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.COERCION)) {
+	                		ProxyApplicationEntity proxyApplicationEntity = (ProxyApplicationEntity)
+	                				((ApplicationEntityModel) node.getParent().getParent().getModel())
+	                				.getApplicationEntity();
+	                		proxyApplicationEntity.getAttributeCoercions().remove(((CoercionModel) node.getModel())
+	                				.getCoercion());
+	                		device = proxyApplicationEntity.getDevice();
+	                		
+	                	} else { 
+	                		log.error("Missing type of ConfigurationTreeNode");
+	                		return;
+	                	}
+                		ConfigTreeProvider.get().mergeDevice(device);
+                	}
                 	
-                	} else if (configTreeNode.getNodeType().equals(ConfigTreeNode.TreeNodeType.TRANSFER_CAPABILITY)) {
-                		ConfigTreeProvider.get().removeTransferCapability(configTreeNode);
- 
-                	} else if (configTreeNode.getNodeType().equals(ConfigTreeNode.TreeNodeType.FORWARD_RULE)) {
-                		ConfigTreeProvider.get().removeForwardRule(configTreeNode);
-
-                	} else if (configTreeNode.getNodeType().equals(ConfigTreeNode.TreeNodeType.FORWARD_SCHEDULE)) {
-                		ConfigTreeProvider.get().removeForwardSchedule(configTreeNode);
-
-                	} else if (configTreeNode.getNodeType().equals(ConfigTreeNode.TreeNodeType.RETRY)) {
-                		ConfigTreeProvider.get().removeRetry(configTreeNode);
-
-                	} else if (configTreeNode.getNodeType().equals(ConfigTreeNode.TreeNodeType.COERCION)) {
-                		ConfigTreeProvider.get().removeCoercion(configTreeNode);
-
-                	} else 
-                		log.error("Missing type of ConfigurationTreeNode");
-
             		getSession().setAttribute("deviceTreeProvider", configTree.getProvider());
 
                 	connected = true;
@@ -398,7 +440,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
     	deviceColumns = new ArrayList<IColumn<ConfigTreeNode>>();
 		
     	deviceColumns.add(new CustomTreeColumn(Model.of("Devices")));
-		
+
 		deviceColumns.add(new AbstractColumn<ConfigTreeNode>(Model.of("ConfigurationType")) {
 
 			private static final long serialVersionUID = 1L;
@@ -755,6 +797,21 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 //			return;
 		
 			Utils.prettyPrintln("REFRESH");
+			
+//			deviceColumns.set(1, 
+//				new AbstractColumn<ConfigTreeNode>(Model.of("ConfigurationType")) {
+//	
+//					private static final long serialVersionUID = 1L;
+//	
+//					public void populateItem(final Item<ICellPopulator<ConfigTreeNode>> cellItem, final String componentId, 
+//							final IModel<ConfigTreeNode> rowModel) {
+//						
+//						final ConfigurationType configurationType = rowModel.getObject().getConfigurationType();
+//						cellItem.add(new Label(componentId, 
+//								Model.of(configurationType == null ? "" : configurationType.toString())));
+//					}
+//				}
+//			);
 			
 		IModel<Set<ConfigTreeNode>> currentState = configTree.getModel();
 
