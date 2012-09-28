@@ -7,7 +7,7 @@
 		<version>0.0.1</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>dcm4che.dcm4chee</groupId>
+	<groupId>org.dcm4chee</groupId>
 	<artifactId>dcm4chee-wizard-war</artifactId>
 	<packaging>war</packaging>
 	<version>0.0.1</version>
@@ -30,7 +30,6 @@
 			<properties>
 				<config-class>org.dcm4che.conf.prefs.PreferencesDicomConfiguration</config-class>
 				<project-classifier>prefs</project-classifier>
-				<dcm4chee.proxy.type>prefs-jdbc</dcm4chee.proxy.type>
 			</properties>
 			<dependencies>
 				<dependency>
@@ -114,11 +113,15 @@
 		</dependency>
 		<!-- DCM4CHEE COMPONENTS -->
 		<dependency>
-			<groupId>org.dcm4che</groupId>
-			<artifactId>dcm4chee-proxy</artifactId>
+			<groupId>org.dcm4che.dcm4chee-proxy</groupId>
+			<artifactId>dcm4chee-proxy-conf</artifactId>
 			<version>${dcm4chee.proxy.version}</version>
-			<classifier>${dcm4chee.proxy.type}</classifier>
 		</dependency>
+			<dependency>
+				<groupId>org.dcm4che.dcm4chee-proxy</groupId>
+				<artifactId>dcm4chee-proxy-service</artifactId>
+				<version>${dcm4chee.proxy.version}</version>
+			</dependency>
 		<dependency>
 			<groupId>org.dcm4che</groupId>
 			<artifactId>dcm4che-core</artifactId>
@@ -128,7 +131,7 @@
 		<dependency>
 			<groupId>dcm4che.dcm4chee</groupId>
 			<artifactId>dcm4chee-wizard-icons</artifactId>
-			<version>3.0.1-1.5</version>
+			<version>0.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>dcm4che.dcm4chee</groupId>
@@ -214,13 +217,6 @@
 			<name>jboss Repository</name>
 			<url>http://repository.jboss.org/nexus/content/groups/public</url>
 		</repository>
-		<!-- 
-		<repository>
-			<id>wicket-dnd</id>
-			<name>Wicket-dnd Repository</name>
-			<url>http://wicket-dnd.googlecode.com/svn/repo</url>
-		</repository>
-		 -->
 		<repository>
 			<id>wicket-tree</id>
 			<name>Wicket-tree Repository</name>
@@ -270,34 +266,6 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.4</version>
-				<executions>
-					<execution>
-						<id>unpack</id>
-						<phase>package</phase>
-						<goals>
-							<goal>unpack</goal>
-						</goals>
-						<configuration>
-							<artifactItems>
-								<artifactItem>
-									<groupId>org.dcm4che</groupId>
-									<artifactId>dcm4chee-proxy</artifactId>
-									<version>${dcm4chee.proxy.version}</version>
-									<classifier>${dcm4chee.proxy.type}</classifier>
-									<type>jar</type>
-									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/dcm4chee-wizard-war-${version}-${project-classifier}</outputDirectory>
-									<includes>**/ejb-jar.xml</includes>
-								</artifactItem>
-							</artifactItems>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
 				<version>2.0.2</version>
 				<configuration>
@@ -323,39 +291,6 @@
 						</webResource>
 					</webResources>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<version>1.7</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<target>
-								<move
-									file="${project.build.directory}/dcm4chee-wizard-war-${version}-${project-classifier}/META-INF/ejb-jar.xml"
-									tofile="${project.build.directory}/dcm4chee-wizard-war-${version}-${project-classifier}/WEB-INF/ejb-jar.xml" />
-								<jar
-									destfile="${project.build.directory}/dcm4chee-wizard-war-${version}-${project-classifier}/WEB-INF/lib/dcm4chee-proxy-${dcm4chee.proxy.version}-${dcm4chee.proxy.type}.tmp">
-									<zipfileset
-										src="${project.build.directory}/dcm4chee-wizard-war-${version}-${project-classifier}/WEB-INF/lib/dcm4chee-proxy-${dcm4chee.proxy.version}-${dcm4chee.proxy.type}.jar"
-										excludes="META-INF/ejb-jar.xml" />
-								</jar>
-								<move
-									file="${project.build.directory}/dcm4chee-wizard-war-${version}-${project-classifier}/WEB-INF/lib/dcm4chee-proxy-${dcm4chee.proxy.version}-${dcm4chee.proxy.type}.tmp"
-									tofile="${project.build.directory}/dcm4chee-wizard-war-${version}-${project-classifier}/WEB-INF/lib/dcm4chee-proxy-${dcm4chee.proxy.version}-${dcm4chee.proxy.type}.jar" />
-								<jar update="true"
-									basedir="${project.build.directory}/dcm4chee-wizard-war-${version}-${project-classifier}"
-									includes="WEB-INF/ejb-jar.xml,WEB-INF/lib/dcm4chee-proxy-${dcm4chee.proxy.version}-${dcm4chee.proxy.type}.jar"
-									destfile="${project.build.directory}/dcm4chee-wizard-war-${version}-${project-classifier}.war" />
-							</target>
-						</configuration>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
 	</build>

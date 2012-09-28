@@ -3,7 +3,7 @@
 		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>dcm4che.dcm4chee</groupId>
+    <groupId>org.dcm4chee</groupId>
     <artifactId>dcm4chee-wizard-icons</artifactId>
     <version>0.0.1</version>
     <packaging>jar</packaging>
