@@ -50,51 +50,47 @@ import org.dcm4chee.web.common.secure.SecureSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wicketstuff.security.authentication.LoginException;
-import org.wicketstuff.security.strategies.StrategyFactory;
-import org.wicketstuff.security.strategies.WaspAuthorizationStrategy;
 
 /**
  * @author Robert David <robert.david@agfa.com>
  */
 public class WicketApplication extends BaseWicketApplication {
 
-	protected static Logger log = LoggerFactory.getLogger(WicketApplication.class);
-	
-	private DicomConfigurationManager dicomConfigurationManager;
-	
+    protected static Logger log = LoggerFactory.getLogger(WicketApplication.class);
+
+    private DicomConfigurationManager dicomConfigurationManager;
+
     @Override
     protected void init() {
-    	super.init();
-		getDicomConfigurationManager();
+        super.init();
+        getDicomConfigurationManager();
     }
-    
+
     public DicomConfigurationManager getDicomConfigurationManager() {
 
-    	if (dicomConfigurationManager == null)
-    		dicomConfigurationManager = 
-    			new DicomConfigurationManager(getInitParameter("dicomConfigurationClass"));
-    	return dicomConfigurationManager;
+        if (dicomConfigurationManager == null)
+            dicomConfigurationManager = new DicomConfigurationManager(getInitParameter("dicomConfigurationClass"));
+        return dicomConfigurationManager;
     }
 
-	@Override
-	public Class<? extends Page> getHomePage() {
-		return MainPage.class;
-	}
+    @Override
+    public Class<? extends Page> getHomePage() {
+        return MainPage.class;
+    }
 
-	@Override
-	public SecureSession newSession(Request request, Response response) {
-		Subject jaasSubject = LoginContextSecurityHelper.getJaasSubject();
-		SecureSession session = new SecureSession(this, request);
-		if (jaasSubject != null) {
-			try {
-				session.login(new SSOLoginContext(session, jaasSubject));
-				log.debug(
-						"Container authenticated session login done! Unbind session '{}' from SessionStore!",
-						session.getId());
-			} catch (LoginException x) {
-				log.error(getClass().getName() + ": Failed login", x);
-			}
-		}
-		return session;
-	}
+    @Override
+    public SecureSession newSession(Request request, Response response) {
+        Subject jaasSubject = LoginContextSecurityHelper.getJaasSubject();
+        SecureSession session = new SecureSession(this, request);
+        if (jaasSubject != null) {
+            try {
+                session.login(new SSOLoginContext(session, jaasSubject));
+                log.debug("Container authenticated session login done! Unbind session '{}' from SessionStore!",
+                        session.getId());
+            } catch (LoginException x) {
+                log.error(getClass().getName() + ": Failed login", x);
+            }
+        }
+        return session;
+    }
 }

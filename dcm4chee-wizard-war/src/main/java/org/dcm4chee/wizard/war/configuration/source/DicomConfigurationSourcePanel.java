@@ -61,7 +61,6 @@ import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.dcm4chee.web.common.ajax.MaskingAjaxCallBehavior;
 import org.dcm4chee.wizard.war.configuration.model.source.DicomConfigurationSourceModel;
-import org.jboss.bootstrap.api.as.config.JBossASBasedServerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,55 +70,55 @@ import org.slf4j.LoggerFactory;
 public class DicomConfigurationSourcePanel extends Panel {
 
     private static final long serialVersionUID = 1L;
-    
-    private static final ResourceReference CSS = new PackageResourceReference(DicomConfigurationSourcePanel.class, "folder-style.css");
-    
+
+    private static final ResourceReference CSS = new PackageResourceReference(DicomConfigurationSourcePanel.class,
+            "folder-style.css");
+
     private static final String MODULE_NAME = "source";
 
     private static Logger log = LoggerFactory.getLogger(DicomConfigurationSourcePanel.class);
 
     final MaskingAjaxCallBehavior macb = new MaskingAjaxCallBehavior();
 
-	private PropertyListView<DicomConfigurationSourceModel> list;
+    private PropertyListView<DicomConfigurationSourceModel> list;
 
     public DicomConfigurationSourcePanel(final String id) {
         super(id);
 
         add(macb);
-        
+
         // name
         // type
-        // 
-//        LdapEnv env = new LdapEnv();
-        
+        //
+        // LdapEnv env = new LdapEnv();
+
         // host
         // port
         // cn
         // dc
-        //password
-        
-//        env.setUrl("ldap://localhost:1389");
-        
-        
-//        env.setUserDN("cn=admin,dc=nodomain"); //slapd
-//        env.setUserDN("cn=Directory Manager"); //OpenDJ
-//        env.setPassword("#trebor33");
-//        config = new LdapProxyConfiguration(env, "dc=nodomain");
+        // password
 
-        
-        
+        // env.setUrl("ldap://localhost:1389");
+
+        // env.setUserDN("cn=admin,dc=nodomain"); //slapd
+        // env.setUserDN("cn=Directory Manager"); //OpenDJ
+        // env.setPassword("#trebor33");
+        // config = new LdapProxyConfiguration(env, "dc=nodomain");
+
         add(new Label("nameHdr.label", new ResourceModel("source.nameHdr.label")));
         add(new Label("typeHdr.label", new ResourceModel("source.typeHdr.label")));
         add(new Label("hostHdr.label", new ResourceModel("source.hostHdr.label")));
-        add(new Label("portHdr.label", new ResourceModel("source.portHdr.label")));       
+        add(new Label("portHdr.label", new ResourceModel("source.portHdr.label")));
         add(new Label("cnHdr.label", new ResourceModel("source.cnHdr.label")));
         add(new Label("dcHdr.label", new ResourceModel("source.dcHdr.label")));
         add(new Label("passwordHdr.label", new ResourceModel("source.passwordHdr.label")));
         add(new Label("descriptionHdr.label", new ResourceModel("source.descriptionHdr.label")));
-        
-//        final List<ConfigSource> configSourceList = ((UserAccess) JNDIUtils.lookup(UserAccess.JNDI_NAME)).getAllAETGroups();
 
-        add((list = new PropertyListView<DicomConfigurationSourceModel>("list", new Model<ArrayList<DicomConfigurationSourceModel>>()) {
+        // final List<ConfigSource> configSourceList = ((UserAccess)
+        // JNDIUtils.lookup(UserAccess.JNDI_NAME)).getAllAETGroups();
+
+        add((list = new PropertyListView<DicomConfigurationSourceModel>("list",
+                new Model<ArrayList<DicomConfigurationSourceModel>>()) {
 
             private static final long serialVersionUID = 1L;
 
@@ -128,14 +127,14 @@ public class DicomConfigurationSourcePanel extends Panel {
             }
 
             @Override
-			protected void populateItem(ListItem<DicomConfigurationSourceModel> item) {
-//                StringBuffer tooltip = new StringBuffer();
-//                String name = item.getModelObject().getTitle();
-//                for (AETGroup aetGroup : aetGroups)
-//                    if (aetGroup.getAets().contains(name))
-//                        tooltip.append(aetGroup.getGroupname()).append(" ");
-                item.add(new Label("name")
-                	.add(new AttributeModifier("title", new Model<String>(item.getModelObject().getDescription()))));
+            protected void populateItem(ListItem<DicomConfigurationSourceModel> item) {
+                // StringBuffer tooltip = new StringBuffer();
+                // String name = item.getModelObject().getTitle();
+                // for (AETGroup aetGroup : aetGroups)
+                // if (aetGroup.getAets().contains(name))
+                // tooltip.append(aetGroup.getGroupname()).append(" ");
+                item.add(new Label("name").add(new AttributeModifier("title", new Model<String>(item.getModelObject()
+                        .getDescription()))));
                 item.add(new Label("type"));
                 item.add(new Label("host"));
                 item.add(new Label("port"));
@@ -143,104 +142,118 @@ public class DicomConfigurationSourcePanel extends Panel {
                 item.add(new Label("dc"));
                 item.add(new Label("description"));
 
-//                int[] winSize = WebCfgDelegate.getInstance().getWindowSize("aeEdit");
-//                item.add(new ModalWindowLink("editAET", modalWindow, winSize[0], winSize[1]) {
-//                    private static final long serialVersionUID = 1L;
-//    
-//                    @Override
-//                    public void onClick(AjaxRequestTarget target) {
-//                        modalWindow
-//                        .setPageCreator(new ModalWindow.PageCreator() {
-//                            
-//                            private static final long serialVersionUID = 1L;
-//                              
-//                            @Override
-//                            public Page createPage() {
-//                                return new CreateOrEditAETPage(modalWindow, item.getModelObject(), AEListPanel.this);
-//                            }
-//                        });
-//                        super.onClick(target);
-//                    }
-//                }
-//                    .add(new Image("ae.editAET.image", ImageManager.IMAGE_AE_EDIT)
-//                    .add(new ImageSizeBehaviour("vertical-align: middle;")))
-//                    .add(new TooltipBehaviour("ae."))
-//                    .add(new SecurityBehavior(getModuleName() + ":editAETLink"))
-//                );
-//                
-//                AjaxLink<?> removeAET = new AjaxLink<Object>("removeAET") {
-//    
-//                    private static final long serialVersionUID = 1L;
-//    
-//                    @Override
-//                    public void onClick(AjaxRequestTarget target) {
-//                        confirm.confirm(target, new StringResourceModel("ae.confirmDelete", AEListPanel.this, null, new Object[]{item.getModelObject()}), item.getModelObject());
-//                    }
-//                };
-//                removeAET.add(new Image("ae.removeAET.image", ImageManager.IMAGE_COMMON_REMOVE)
-//                .add(new ImageSizeBehaviour()));
-//                removeAET.add(new TooltipBehaviour("ae."));
-//                item.add(removeAET);
-//                removeAET.add(new SecurityBehavior(getModuleName() + ":removeAETLink"));
-//                
-//                item.add(new AjaxLink<Object>("echo") {
-//
-//                    private static final long serialVersionUID = 1L;
-//
-//                    @Override
-//                    public void onClick(AjaxRequestTarget target) {
-//                        dicomEchoWindow.show(target, item.getModelObject());
-//                    }
-//                }
-//                    .add(new Image("ae.echoAET.image", ImageManager.IMAGE_AE_ECHO)
-//                    .add(new ImageSizeBehaviour()))
-//                    .add(new TooltipBehaviour("ae."))
-//                    .add(new SecurityBehavior(getModuleName() + ":dicomEchoLink"))
-//                );
+                // int[] winSize =
+                // WebCfgDelegate.getInstance().getWindowSize("aeEdit");
+                // item.add(new ModalWindowLink("editAET", modalWindow,
+                // winSize[0], winSize[1]) {
+                // private static final long serialVersionUID = 1L;
+                //
+                // @Override
+                // public void onClick(AjaxRequestTarget target) {
+                // modalWindow
+                // .setPageCreator(new ModalWindow.PageCreator() {
+                //
+                // private static final long serialVersionUID = 1L;
+                //
+                // @Override
+                // public Page createPage() {
+                // return new CreateOrEditAETPage(modalWindow,
+                // item.getModelObject(), AEListPanel.this);
+                // }
+                // });
+                // super.onClick(target);
+                // }
+                // }
+                // .add(new Image("ae.editAET.image",
+                // ImageManager.IMAGE_AE_EDIT)
+                // .add(new ImageSizeBehaviour("vertical-align: middle;")))
+                // .add(new TooltipBehaviour("ae."))
+                // .add(new SecurityBehavior(getModuleName() + ":editAETLink"))
+                // );
+                //
+                // AjaxLink<?> removeAET = new AjaxLink<Object>("removeAET") {
+                //
+                // private static final long serialVersionUID = 1L;
+                //
+                // @Override
+                // public void onClick(AjaxRequestTarget target) {
+                // confirm.confirm(target, new
+                // StringResourceModel("ae.confirmDelete", AEListPanel.this,
+                // null, new Object[]{item.getModelObject()}),
+                // item.getModelObject());
+                // }
+                // };
+                // removeAET.add(new Image("ae.removeAET.image",
+                // ImageManager.IMAGE_COMMON_REMOVE)
+                // .add(new ImageSizeBehaviour()));
+                // removeAET.add(new TooltipBehaviour("ae."));
+                // item.add(removeAET);
+                // removeAET.add(new SecurityBehavior(getModuleName() +
+                // ":removeAETLink"));
+                //
+                // item.add(new AjaxLink<Object>("echo") {
+                //
+                // private static final long serialVersionUID = 1L;
+                //
+                // @Override
+                // public void onClick(AjaxRequestTarget target) {
+                // dicomEchoWindow.show(target, item.getModelObject());
+                // }
+                // }
+                // .add(new Image("ae.echoAET.image",
+                // ImageManager.IMAGE_AE_ECHO)
+                // .add(new ImageSizeBehaviour()))
+                // .add(new TooltipBehaviour("ae."))
+                // .add(new SecurityBehavior(getModuleName() +
+                // ":dicomEchoLink"))
+                // );
             }
         }));
         updateDicomConfigurationList();
     }
-    
+
     @Override
     public void renderHead(IHeaderResponse response) {
-    	if (DicomConfigurationSourcePanel.CSS != null)
-    		response.renderCSSReference(DicomConfigurationSourcePanel.CSS);
+        if (DicomConfigurationSourcePanel.CSS != null)
+            response.renderCSSReference(DicomConfigurationSourcePanel.CSS);
     }
-    
+
     @Override
     public void onBeforeRender() {
-    	super.onBeforeRender();
-    	updateDicomConfigurationList();
+        super.onBeforeRender();
+        updateDicomConfigurationList();
     }
 
     protected void updateDicomConfigurationList() {
         String line;
         BufferedReader reader = null;
         try {
-    	    List<DicomConfigurationSourceModel> updatedList = new ArrayList<DicomConfigurationSourceModel>();
-        	String fn = System.getProperty("dcm4chee-web3.cfg.path", "conf/dcm4chee-web3/");
-        	if (fn == null)
-				throw new FileNotFoundException("Web config path not found! Not specified with System property 'dcm4chee-web3.cfg.path'");
-	        File configFile = new File(fn + "dicom-configuration.json");
-	        if (!configFile.isAbsolute())
-	            configFile = new File(System.getProperty(JBossASBasedServerConfig.PROP_KEY_JBOSSAS_SERVER_HOME_DIR), configFile.getPath());
+            List<DicomConfigurationSourceModel> updatedList = new ArrayList<DicomConfigurationSourceModel>();
+            String fn = System.getProperty("dcm4chee-web3.cfg.path", "conf/dcm4chee-web3/");
+            if (fn == null)
+                throw new FileNotFoundException(
+                        "Web config path not found! Not specified with System property 'dcm4chee-web3.cfg.path'");
+            File configFile = new File(fn + "dicom-configuration.json");
+            if (!configFile.isAbsolute())
+                configFile = new File(System.getProperty("jboss.server.home.dir"), configFile.getPath());
 
-        	reader = new BufferedReader(new FileReader(configFile));
-            while ((line = reader.readLine()) != null) 
-            	updatedList.add((DicomConfigurationSourceModel) JSONObject.toBean(JSONObject.fromObject(line), DicomConfigurationSourceModel.class));
+            reader = new BufferedReader(new FileReader(configFile));
+            while ((line = reader.readLine()) != null)
+                updatedList.add((DicomConfigurationSourceModel) JSONObject.toBean(JSONObject.fromObject(line),
+                        DicomConfigurationSourceModel.class));
             list.setModelObject(updatedList);
-		} catch (IOException ioe) {
-			log.error("Error updating dicom configuration list", ioe);
+        } catch (IOException ioe) {
+            log.error("Error updating dicom configuration list", ioe);
         } finally {
             if (reader != null) {
                 try {
                     reader.close();
-                } catch (IOException ignore) {}
+                } catch (IOException ignore) {
+                }
             }
         }
     }
-    
+
     public static String getModuleName() {
         return MODULE_NAME;
     }

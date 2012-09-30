@@ -9,7 +9,6 @@ import java.util.Map;
 
 import net.sf.json.JSONObject;
 
-import org.jboss.bootstrap.api.as.config.JBossASBasedServerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +23,7 @@ public class SopClassManager {
         String configPath = System.getProperty("dcm4chee-wizard.cfg.path", "conf/dcm4chee-wizard/");
         File typesFile = new File(configPath + "transfer-capability-types.json");
         if (!typesFile.isAbsolute())
-            typesFile = new File(System.getProperty(JBossASBasedServerConfig.PROP_KEY_JBOSSAS_SERVER_HOME_DIR), typesFile.getPath());
+            typesFile = new File(System.getProperty("jboss.server.home.dir"), typesFile.getPath());
 
         sopClassTypeMap = new HashMap<String, String>();
         String line;

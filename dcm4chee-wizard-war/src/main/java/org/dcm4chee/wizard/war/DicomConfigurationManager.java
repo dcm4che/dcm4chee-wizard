@@ -54,8 +54,6 @@ import net.sf.json.JSONObject;
 import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.conf.api.DicomConfiguration;
 import org.dcm4che.net.Device;
-import org.dcm4chee.proxy.conf.ProxyDevice;
-import org.jboss.bootstrap.api.as.config.JBossASBasedServerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,147 +62,155 @@ import org.slf4j.LoggerFactory;
  */
 public class DicomConfigurationManager implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private static Logger log = LoggerFactory.getLogger(DicomConfigurationManager.class);
+    private static Logger log = LoggerFactory.getLogger(DicomConfigurationManager.class);
 
-	private DicomConfiguration dicomConfiguration;
-	private HashMap<String,Device> deviceMap;
-	private static Map<String, String> sopClassTypeMap;
+    private DicomConfiguration dicomConfiguration;
+    private HashMap<String, Device> deviceMap;
+    private static Map<String, String> sopClassTypeMap;
 
-	public DicomConfigurationManager(String dicomConfigurationClass) {
+    public DicomConfigurationManager(String dicomConfigurationClass) {
         try {
-			dicomConfiguration = (DicomConfiguration) Class.forName(
-                    dicomConfigurationClass, false,
+            dicomConfiguration = (DicomConfiguration) Class.forName(dicomConfigurationClass, false,
                     Thread.currentThread().getContextClassLoader()).newInstance();
         } catch (Exception e) {
-        	log.error("Error instanciating DicomConfigurationManager", e);
+            log.error("Error instanciating DicomConfigurationManager", e);
             throw new RuntimeException(e);
         }
-		getDeviceMap();
+        getDeviceMap();
     }
-    
+
     public DicomConfiguration getDicomConfiguration() {
-    	return dicomConfiguration;
+        return dicomConfiguration;
     }
 
-    public HashMap<String,Device> getDeviceMap() {
-    	if (deviceMap == null)
-    		try {
-		    	deviceMap = new HashMap<String,Device>();
-				for (String deviceName : Arrays.asList(dicomConfiguration.listDeviceNames())) 
-	    			deviceMap.put(deviceName, null);//dicomConfiguration.findDevice(deviceName));
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		return deviceMap;
+    public HashMap<String, Device> getDeviceMap() {
+        if (deviceMap == null)
+            try {
+                deviceMap = new HashMap<String, Device>();
+                for (String deviceName : Arrays.asList(dicomConfiguration.listDeviceNames()))
+                    deviceMap.put(deviceName, null);// dicomConfiguration.findDevice(deviceName));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        return deviceMap;
     }
-	
-    public Map<String,String> getTransferCapabilityTypes() {
-    	
-		if (sopClassTypeMap == null) {
-	        String configPath = System.getProperty("dcm4chee-wizard.cfg.path", "conf/dcm4chee-wizard/");
-	        File typesFile = new File(configPath + "transfer-capability-types.json");
-	        if (!typesFile.isAbsolute())
-	            typesFile = new File(System.getProperty(JBossASBasedServerConfig.PROP_KEY_JBOSSAS_SERVER_HOME_DIR), typesFile.getPath());
-	
-	        sopClassTypeMap = new HashMap<String, String>();
-	        String line;
-	        BufferedReader reader = null;
-	        try {
-	            reader = new BufferedReader(new FileReader(typesFile));
-	            while ((line = reader.readLine()) != null) {
-	                JSONObject jsonObject = JSONObject.fromObject(line);
-	                sopClassTypeMap.put(jsonObject.getString("sopClass"), jsonObject.getString("type"));
-	            }
-	        } catch (IOException e) {
-				log.error("Error processing transfer capability type mapping file", e);
-			} finally {
-	            if (reader != null) {
-	                try {
-	                    reader.close();
-	                } catch (IOException ignore) {}
-	            }
-	        }
-		}
-		return sopClassTypeMap;
-	}
 
-	public ArrayList<String> listDevices() throws ConfigurationException {
-		deviceMap = null;
-		ArrayList<String> deviceNameList = 
-				new ArrayList<String>(getDeviceMap().keySet());
-		Collections.sort(deviceNameList);
-		return deviceNameList;
-	}
+    public Map<String, String> getTransferCapabilityTypes() {
 
-	public Device getDevice(String deviceName) throws ConfigurationException {
-		Device device = getDeviceMap().get(deviceName);
-		if (device == null) {
-			device = dicomConfiguration.findDevice(deviceName);
-			getDeviceMap().put(deviceName, device);
-		}
-		return device;
-	}
-	
-	public void save(Device device) throws ConfigurationException {
-		if (getDeviceMap().containsKey(device.getDeviceName()))
-			dicomConfiguration.merge(device);
-		else
-			dicomConfiguration.persist(device);	
-	}
+        if (sopClassTypeMap == null) {
+            String configPath = System.getProperty("dcm4chee-wizard.cfg.path", "conf/dcm4chee-wizard/");
+            File typesFile = new File(configPath + "transfer-capability-types.json");
+            if (!typesFile.isAbsolute())
+                typesFile = new File(System.getProperty("jboss.server.home.dir"), typesFile.getPath());
 
-	public void remove(String deviceName) throws ConfigurationException {
-		dicomConfiguration.removeDevice(deviceName);
-		getDeviceMap().remove(deviceName);
-	}
+            sopClassTypeMap = new HashMap<String, String>();
+            String line;
+            BufferedReader reader = null;
+            try {
+                reader = new BufferedReader(new FileReader(typesFile));
+                while ((line = reader.readLine()) != null) {
+                    JSONObject jsonObject = JSONObject.fromObject(line);
+                    sopClassTypeMap.put(jsonObject.getString("sopClass"), jsonObject.getString("type"));
+                }
+            } catch (IOException e) {
+                log.error("Error processing transfer capability type mapping file", e);
+            } finally {
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (IOException ignore) {
+                    }
+                }
+            }
+        }
+        return sopClassTypeMap;
+    }
 
-//	public ApplicationEntity getApplicationEntity(String aeTitle) throws ConfigurationException {
-//		return dicomConfiguration.findApplicationEntity(aeTitle);
-//	}
-//
-//	public void removeApplicationEntity(String aeTitle) throws ConfigurationException {
-//		Device device = dicomConfiguration.findApplicationEntity(aeTitle).getDevice();
-//		device.removeApplicationEntity(aeTitle);
-//		dicomConfiguration.merge(device);
-//		getDeviceMap().put(device.getDeviceName(), device);
-//	}
-//	
-//	public void removeTransferCapability(String deviceName, String aeTitle, int identityHashcode) 
-//			throws ConfigurationException {		
-//		boolean found = false;
-//		Device device = getDeviceMap().get(deviceName);
-//		ApplicationEntity ae = device.getApplicationEntity(aeTitle);
-//		Iterator<TransferCapability> iterator = ae.getTransferCapabilities().iterator();
-//		while (iterator.hasNext()) {
-//			TransferCapability tc = iterator.next();
-//			if (System.identityHashCode(tc) == identityHashcode) {
-//				ae.removeTransferCapability(tc);
-//				dicomConfiguration.merge(device);
-//				getDeviceMap().put(device.getDeviceName(), device);
-//				found = true;
-//				break;
-//			}
-//		}
-//		if (!found) 
-//			throw new ConfigurationException("Error: Failed to locate transfer capability for deletion");
-//	}
-//
-//	public void removeConnection(Device device, Connection connection) throws ConfigurationException {
-//		device.removeConnection(connection);
-//		dicomConfiguration.merge(device);
-//		getDeviceMap().put(device.getDeviceName(), device);
-//	}
-	
-//	public Map<String,String> getTransferCapabilityTypes() {
-//		return sopClassTypeMap;
-//	}
-	
-//	public boolean registerAETitle(String aeTitle) throws ConfigurationException {
-//		return dicomConfiguration.registerAETitle(aeTitle);
-//	}
-//	
-//	public void unregisterAETitle(String aeTitle) throws ConfigurationException {
-//		dicomConfiguration.unregisterAETitle(aeTitle);
-//	}
+    public ArrayList<String> listDevices() throws ConfigurationException {
+        deviceMap = null;
+        ArrayList<String> deviceNameList = new ArrayList<String>(getDeviceMap().keySet());
+        Collections.sort(deviceNameList);
+        return deviceNameList;
+    }
+
+    public Device getDevice(String deviceName) throws ConfigurationException {
+        Device device = getDeviceMap().get(deviceName);
+        if (device == null) {
+            device = dicomConfiguration.findDevice(deviceName);
+            getDeviceMap().put(deviceName, device);
+        }
+        return device;
+    }
+
+    public void save(Device device) throws ConfigurationException {
+        if (getDeviceMap().containsKey(device.getDeviceName()))
+            dicomConfiguration.merge(device);
+        else
+            dicomConfiguration.persist(device);
+    }
+
+    public void remove(String deviceName) throws ConfigurationException {
+        dicomConfiguration.removeDevice(deviceName);
+        getDeviceMap().remove(deviceName);
+    }
+
+    // public ApplicationEntity getApplicationEntity(String aeTitle) throws
+    // ConfigurationException {
+    // return dicomConfiguration.findApplicationEntity(aeTitle);
+    // }
+    //
+    // public void removeApplicationEntity(String aeTitle) throws
+    // ConfigurationException {
+    // Device device =
+    // dicomConfiguration.findApplicationEntity(aeTitle).getDevice();
+    // device.removeApplicationEntity(aeTitle);
+    // dicomConfiguration.merge(device);
+    // getDeviceMap().put(device.getDeviceName(), device);
+    // }
+    //
+    // public void removeTransferCapability(String deviceName, String aeTitle,
+    // int identityHashcode)
+    // throws ConfigurationException {
+    // boolean found = false;
+    // Device device = getDeviceMap().get(deviceName);
+    // ApplicationEntity ae = device.getApplicationEntity(aeTitle);
+    // Iterator<TransferCapability> iterator =
+    // ae.getTransferCapabilities().iterator();
+    // while (iterator.hasNext()) {
+    // TransferCapability tc = iterator.next();
+    // if (System.identityHashCode(tc) == identityHashcode) {
+    // ae.removeTransferCapability(tc);
+    // dicomConfiguration.merge(device);
+    // getDeviceMap().put(device.getDeviceName(), device);
+    // found = true;
+    // break;
+    // }
+    // }
+    // if (!found)
+    // throw new
+    // ConfigurationException("Error: Failed to locate transfer capability for deletion");
+    // }
+    //
+    // public void removeConnection(Device device, Connection connection) throws
+    // ConfigurationException {
+    // device.removeConnection(connection);
+    // dicomConfiguration.merge(device);
+    // getDeviceMap().put(device.getDeviceName(), device);
+    // }
+
+    // public Map<String,String> getTransferCapabilityTypes() {
+    // return sopClassTypeMap;
+    // }
+
+    // public boolean registerAETitle(String aeTitle) throws
+    // ConfigurationException {
+    // return dicomConfiguration.registerAETitle(aeTitle);
+    // }
+    //
+    // public void unregisterAETitle(String aeTitle) throws
+    // ConfigurationException {
+    // dicomConfiguration.unregisterAETitle(aeTitle);
+    // }
 }
