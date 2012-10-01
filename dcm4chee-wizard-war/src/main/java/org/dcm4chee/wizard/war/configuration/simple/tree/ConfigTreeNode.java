@@ -129,7 +129,11 @@ public class ConfigTreeNode implements Serializable, Comparable<ConfigTreeNode> 
 	public ConfigTreeNode getParent() {
 		return parent;
 	}
-	
+
+	public ConfigTreeNode getAncestor(int hops) {
+		return (hops < 0) ? null : (hops == 0) ? this : parent.getAncestor(hops - 1);
+	}
+
 	public boolean hasChildren() {
 		return !children.isEmpty();
 	}

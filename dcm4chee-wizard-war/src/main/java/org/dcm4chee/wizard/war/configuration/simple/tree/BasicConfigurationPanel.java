@@ -266,64 +266,63 @@ public class BasicConfigurationPanel extends ExtendedPanel {
             public void onConfirmation(AjaxRequestTarget target, ConfigTreeNode node) {
 
                 try {
-
                     if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.DEVICE)) {
                         ConfigTreeProvider.get().removeDevice(node);
-
                     } else {
-
-                        Device device = null;
+                    	ConfigTreeNode deviceNode = null;
 
                         if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.CONNECTION)) {
-                            (device = ((DeviceModel) node.getParent().getParent().getModel()).getDevice())
+                        	deviceNode = node.getAncestor(2);
+                            ((DeviceModel) deviceNode.getModel()).getDevice()
                                     .removeConnection(((ConnectionModel) node.getModel()).getConnection());
 
                         } else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.APPLICATION_ENTITY)) {
-                            (device = ((DeviceModel) node.getParent().getParent().getModel()).getDevice())
+                        	deviceNode = node.getAncestor(2);
+                        	((DeviceModel) deviceNode.getModel()).getDevice()
                                     .removeApplicationEntity(((ApplicationEntityModel) node.getModel())
                                             .getApplicationEntity());
 
                         } else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.TRANSFER_CAPABILITY)) {
-                            ApplicationEntity applicationEntity = ((ApplicationEntityModel) node.getParent()
-                                    .getParent().getParent().getModel()).getApplicationEntity();
-                            applicationEntity.removeTransferCapability(((TransferCapabilityModel) node.getModel())
-                                    .getTransferCapability());
-                            device = applicationEntity.getDevice();
+                        	deviceNode = node.getAncestor(5);
+                        	((ApplicationEntityModel) node.getAncestor(3).getModel()).getApplicationEntity()
+                            	.removeTransferCapability(((TransferCapabilityModel) node.getModel())
+                            			.getTransferCapability());
 
                         } else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.FORWARD_RULE)) {
-                            ProxyApplicationEntity proxyApplicationEntity = (ProxyApplicationEntity) ((ApplicationEntityModel) node
-                                    .getParent().getParent().getModel()).getApplicationEntity();
-                            proxyApplicationEntity.getForwardRules().remove(
-                                    ((ForwardRuleModel) node.getModel()).getForwardRule());
-                            device = proxyApplicationEntity.getDevice();
+                        	deviceNode = node.getAncestor(4);
+                        	((ProxyApplicationEntity) 
+                        			((ApplicationEntityModel) node.getAncestor(2).getModel()).getApplicationEntity())
+                        			.getForwardRules().remove(((ForwardRuleModel) node.getModel())
+                        					.getForwardRule());
 
                         } else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.FORWARD_SCHEDULE)) {
-                            ProxyApplicationEntity proxyApplicationEntity = (ProxyApplicationEntity) ((ApplicationEntityModel) node
-                                    .getParent().getParent().getModel()).getApplicationEntity();
-                            proxyApplicationEntity.getForwardSchedules().remove(
-                                    ((ForwardScheduleModel) node.getModel()).getDestinationAETitle());
-                            device = proxyApplicationEntity.getDevice();
+                        	deviceNode = node.getAncestor(4);
+                        	((ProxyApplicationEntity) 
+                        			((ApplicationEntityModel) node.getAncestor(2).getModel()).getApplicationEntity())
+                        			.getForwardSchedules().remove(((ForwardScheduleModel) node.getModel())
+                        					.getDestinationAETitle());
 
                         } else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.RETRY)) {
-                            ProxyApplicationEntity proxyApplicationEntity = (ProxyApplicationEntity) ((ApplicationEntityModel) node
-                                    .getParent().getParent().getModel()).getApplicationEntity();
-                            proxyApplicationEntity.getRetries().remove(((RetryModel) node.getModel()).getRetry());
-                            device = proxyApplicationEntity.getDevice();
+                        	deviceNode = node.getAncestor(4);
+                        	((ProxyApplicationEntity) 
+                        			((ApplicationEntityModel) node.getAncestor(2).getModel()).getApplicationEntity())
+                        				.getRetries().remove(((RetryModel) node.getModel())
+                        						.getRetry());
 
                         } else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.COERCION)) {
-                            ProxyApplicationEntity proxyApplicationEntity = (ProxyApplicationEntity) ((ApplicationEntityModel) node
-                                    .getParent().getParent().getModel()).getApplicationEntity();
-                            proxyApplicationEntity.getAttributeCoercions().remove(
-                                    ((CoercionModel) node.getModel()).getCoercion());
-                            device = proxyApplicationEntity.getDevice();
+                        	deviceNode = node.getAncestor(4);
+                        	((ProxyApplicationEntity) 
+                        			((ApplicationEntityModel) node.getAncestor(2).getModel()).getApplicationEntity())
+                        				.getAttributeCoercions().remove(((CoercionModel) node.getModel())
+                        						.getCoercion());
 
                         } else {
                             log.error("Missing type of ConfigurationTreeNode");
                             return;
                         }
-                        ConfigTreeProvider.get().mergeDevice(device);
+                        ConfigTreeProvider.get().mergeDevice(((DeviceModel) deviceNode.getModel()).getDevice());
+                        deviceNode.setModel(null);
                     }
-
                     getSession().setAttribute("deviceTreeProvider", configTree.getProvider());
 
                     connected = true;
@@ -417,364 +416,385 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 
     public void createColumns() {
 
-        deviceColumns = new ArrayList<IColumn<ConfigTreeNode>>();
+    	deviceColumns = new ArrayList<IColumn<ConfigTreeNode>>();
+		
+    	deviceColumns.add(new CustomTreeColumn(Model.of("Devices")));
 
-        deviceColumns.add(new CustomTreeColumn(Model.of("Devices")));
+		deviceColumns.add(new AbstractColumn<ConfigTreeNode>(Model.of("ConfigurationType")) {
 
-        deviceColumns.add(new AbstractColumn<ConfigTreeNode>(Model.of("ConfigurationType")) {
+			private static final long serialVersionUID = 1L;
 
-            private static final long serialVersionUID = 1L;
+			public void populateItem(final Item<ICellPopulator<ConfigTreeNode>> cellItem, final String componentId, 
+					final IModel<ConfigTreeNode> rowModel) {
+				
+				final ConfigurationType configurationType = rowModel.getObject().getConfigurationType();
+				cellItem.add(new Label(componentId, 
+						Model.of(configurationType == null ? "" : configurationType.toString())));
+			}
+		});
 
-            public void populateItem(final Item<ICellPopulator<ConfigTreeNode>> cellItem, final String componentId,
-                    final IModel<ConfigTreeNode> rowModel) {
+		deviceColumns.add(new AbstractColumn<ConfigTreeNode>(Model.of("Connections")) {
+			
+			private static final long serialVersionUID = 1L;
 
-                final ConfigurationType configurationType = rowModel.getObject().getConfigurationType();
-                cellItem.add(new Label(componentId, Model.of(configurationType == null ? "" : configurationType
-                        .toString())));
-            }
-        });
+			public void populateItem(Item<ICellPopulator<ConfigTreeNode>> cellItem, String componentId, 
+					IModel<ConfigTreeNode> rowModel) {
+				ConfigTreeNode configTreeNode = (ConfigTreeNode) rowModel.getObject();
+				RepeatingView connectionsView = new RepeatingView(componentId);
+				cellItem.add(connectionsView);
+				try {
+					if (configTreeNode.getNodeType().equals(ConfigTreeNode.TreeNodeType.APPLICATION_ENTITY)) {
+						ApplicationEntity applicationEntity = 
+								((ApplicationEntityModel) configTreeNode.getModel()).getApplicationEntity();
+						if (applicationEntity != null) 							
+							for (Connection connection : applicationEntity.getConnections())
+								connectionsView.add(new ConnectionPanel(connectionsView.newChildId(), 
+										ImageManager.IMAGE_WIZARD_CONNECTION, 
+										Model.of(connection.getCommonName()), 
+										Model.of(connection.toString()))
+								);
+					}
+				} catch (ConfigurationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
 
-        deviceColumns.add(new AbstractColumn<ConfigTreeNode>(Model.of("Connections")) {
+		deviceColumns.add(new AbstractColumn<ConfigTreeNode>(Model.of("Echo")) {
 
-            private static final long serialVersionUID = 1L;
+			private static final long serialVersionUID = 1L;
 
-            public void populateItem(Item<ICellPopulator<ConfigTreeNode>> cellItem, String componentId,
-                    IModel<ConfigTreeNode> rowModel) {
-                ConfigTreeNode configurationTreeNode = (ConfigTreeNode) rowModel.getObject();
-                RepeatingView connectionsView = new RepeatingView(componentId);
-                cellItem.add(connectionsView);
-                try {
-                    if (configurationTreeNode.getNodeType().equals(ConfigTreeNode.TreeNodeType.APPLICATION_ENTITY)) {
-                        ApplicationEntity applicationEntity = getDicomConfigurationManager().getDicomConfiguration()
-                                .findApplicationEntity(configurationTreeNode.getName());
-                        // ConfigurationTreeProvider.get().getDicomConfigurationProxy()
-                        // .getApplicationEntity(configurationTreeNode.getName());
-                        if (applicationEntity != null)
-                            for (Connection connection : applicationEntity.getConnections())
-                                connectionsView.add(new ConnectionPanel(connectionsView.newChildId(),
-                                        ImageManager.IMAGE_WIZARD_CONNECTION, Model.of(connection.getCommonName()),
-                                        Model.of(connection.toString())));
-                    }
-                } catch (ConfigurationException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-        });
+			public void populateItem(final Item<ICellPopulator<ConfigTreeNode>> cellItem, final String componentId, 
+					final IModel<ConfigTreeNode> rowModel) {
+				
+				final TreeNodeType type = rowModel.getObject().getNodeType();
+				if (type == null)
+					throw new RuntimeException("Error: Unknown node type, cannot create edit modal window");
 
-        deviceColumns.add(new AbstractColumn<ConfigTreeNode>(Model.of("Echo")) {
+				AjaxLink<Object> ajaxLink = 
+						new AjaxLink<Object>("wickettree.link") { 
 
-            private static final long serialVersionUID = 1L;
+			            private static final long serialVersionUID = 1L;
 
-            public void populateItem(final Item<ICellPopulator<ConfigTreeNode>> cellItem, final String componentId,
-                    final IModel<ConfigTreeNode> rowModel) {
+			            @Override
+			            public void onClick(AjaxRequestTarget target) {
+			            	
+			            	if (type.equals(ConfigTreeNode.TreeNodeType.APPLICATION_ENTITY)) {
+								echoWindow
+					                .setPageCreator(new ModalWindow.PageCreator() {
+					                    
+					                    private static final long serialVersionUID = 1L;
+					                      
+					                    @Override
+					                    public Page createPage() {
+					                    	try {
+					                    	return new DicomEchoPage(echoWindow, 
+					                    			((ApplicationEntityModel) rowModel.getObject().getModel()).getApplicationEntity());
+					                    	} catch (Exception e) {
+					                    		e.printStackTrace();
+					                    		return null;
+					                    	}
+					                    }
+					                });
+			            	}
+			            	echoWindow
+			            		.setWindowClosedCallback(windowClosedCallback)
+			            		.show(target);
+			            }
+				};
+				if (type.equals(ConfigTreeNode.TreeNodeType.APPLICATION_ENTITY))
+					cellItem.add(new LinkPanel(componentId, ajaxLink, ImageManager.IMAGE_WIZARD_ECHO, removeConfirmation))
+						.add(new AttributeAppender("style", Model.of("width: 50px; text-align: center;")));
+				else
+					cellItem.add(new Label(componentId));
 
-                final TreeNodeType type = rowModel.getObject().getNodeType();
-                if (type == null)
-                    throw new RuntimeException("Error: Unknown node type, cannot create edit modal window");
+			}
+		});
+		
+		deviceColumns.add(new AbstractColumn<ConfigTreeNode>(Model.of("Edit")) {
+			
+			private static final long serialVersionUID = 1L;
 
-                AjaxLink<Object> ajaxLink = new AjaxLink<Object>("wickettree.link") {
+			public void populateItem(final Item<ICellPopulator<ConfigTreeNode>> cellItem, final String componentId, 
+					final IModel<ConfigTreeNode> rowModel) {
+				
+				final TreeNodeType type = rowModel.getObject().getNodeType();
+				if (type == null)
+					throw new RuntimeException("Error: Unknown node type, cannot create edit modal window");
 
-                    private static final long serialVersionUID = 1L;
+				AjaxLink<Object> ajaxLink = 
+						new AjaxLink<Object>("wickettree.link") { 
 
-                    @Override
-                    public void onClick(AjaxRequestTarget target) {
+			            private static final long serialVersionUID = 1L;
 
-                        if (type.equals(ConfigTreeNode.TreeNodeType.APPLICATION_ENTITY)) {
-                            echoWindow.setPageCreator(new ModalWindow.PageCreator() {
+			            @Override
+			            public void onClick(AjaxRequestTarget target) {
+			            	
+			            	if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_CONNECTIONS)) {
+								editWindow
+					                .setPageCreator(new ModalWindow.PageCreator() {
+					                    
+					                    private static final long serialVersionUID = 1L;
 
-                                private static final long serialVersionUID = 1L;
+					                    @Override
+					                    public Page createPage() {
+					                    	return new CreateOrEditConnectionPage(
+					                    			editWindow, 
+					                    			null, 
+					                    			rowModel.getObject().getParent());
+					                    }
+					                });
+			            	}
+							else if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_APPLICATION_ENTITIES)) {
+								editWindow
+					                .setPageCreator(new ModalWindow.PageCreator() {
+					                    
+					                    private static final long serialVersionUID = 1L;
+					                      
+					                    @Override
+					                    public Page createPage() {
+				                    		 return new CreateOrEditApplicationEntityPage(
+				                    				 editWindow, 
+				                    				 null,  
+				                    				 rowModel.getObject().getParent());
+					                    }
+					                });
+							} else if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_TRANSFER_CAPABILITIES)) {
+								editWindow
+					                .setPageCreator(new ModalWindow.PageCreator() {
+					                    
+					                    private static final long serialVersionUID = 1L;
+					                      
+					                    @Override
+					                    public Page createPage() {
+					                    	return new CreateOrEditTransferCapabilityPage(
+					                    			editWindow, 
+					                    			null, 
+					                    			rowModel.getObject().getParent()); 
+					                    }
+					                });
+							} else if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_FORWARD_RULES)) {
+								editWindow
+					                .setPageCreator(new ModalWindow.PageCreator() {
+					                    
+					                    private static final long serialVersionUID = 1L;
+					                      
+					                    @Override
+					                    public Page createPage() {
+					                    	return new CreateOrEditForwardRulePage(
+					                    			editWindow, 
+					                    			null, 
+					                    			rowModel.getObject(), 
+					                    			null); 
+					                    }
+					                });
+							} else if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_FORWARD_SCHEDULES)) {
+								editWindow
+					                .setPageCreator(new ModalWindow.PageCreator() {
+					                    
+					                    private static final long serialVersionUID = 1L;
+					                      
+					                    @Override
+					                    public Page createPage() {
+					                    	return new CreateOrEditForwardSchedulePage(
+					                    			editWindow, 
+					                    			null, 
+					                    			rowModel.getObject(), 
+					                    			null); 
+					                    }
+					                });
+							} else if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_RETRIES)) {
+								editWindow
+					                .setPageCreator(new ModalWindow.PageCreator() {
+					                    
+					                    private static final long serialVersionUID = 1L;
+					                      
+					                    @Override
+					                    public Page createPage() {
+					                    	return new CreateOrEditRetryPage(
+					                    			editWindow, 
+					                    			null, 
+					                    			rowModel.getObject(), 
+					                    			null); 
+					                    }
+					                });
+							} else if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_COERCIONS)) {
+								editWindow
+					                .setPageCreator(new ModalWindow.PageCreator() {
+					                    
+					                    private static final long serialVersionUID = 1L;
+					                      
+					                    @Override
+					                    public Page createPage() {
+					                    	return new CreateOrEditCoercionPage(
+					                    			editWindow, 
+					                    			null, 
+					                    			rowModel.getObject(), 
+					                    			null); 
+					                    }
+					                });
+							} else {
+								editWindow
+					                .setPageCreator(new ModalWindow.PageCreator() {
+					                    
+					                    private static final long serialVersionUID = 1L;
+					                      
+					                    @Override
+					                    public Page createPage() {
+					                    	Utils.prettyPrintln(type);
+					        				if (type.equals(ConfigTreeNode.TreeNodeType.DEVICE)) {
+					        					try {
+						        					ConfigTreeProvider.get().loadDevice(rowModel.getObject());
+						        	                return new CreateOrEditDevicePage(editWindow, 
+						        	                		(DeviceModel) rowModel.getObject().getModel());
+					        					} catch (Exception e) {
+					        						log.error("Error loading device on edit", e);
+					        						return null;
+					        					}
+					        				} else if (type.equals(ConfigTreeNode.TreeNodeType.CONNECTION)) {
+					        					return new CreateOrEditConnectionPage(
+					        							editWindow, 
+					        							(ConnectionModel) rowModel.getObject().getModel(), 
+					        							rowModel.getObject().getParent().getParent());
+					        				} else if (type.equals(ConfigTreeNode.TreeNodeType.APPLICATION_ENTITY)) {
+					        					return new CreateOrEditApplicationEntityPage(
+					        							editWindow, 
+					        							(ApplicationEntityModel) rowModel.getObject().getModel(), 
+					        		            		rowModel.getObject().getParent().getParent()); 
+					        				} else if (type.equals(ConfigTreeNode.TreeNodeType.TRANSFER_CAPABILITY)) {
+					        		            return new CreateOrEditTransferCapabilityPage(editWindow, 
+					        		            		(TransferCapabilityModel) rowModel.getObject().getModel(), 
+					        		            		rowModel.getObject().getParent().getParent());
+					        				} else if (type.equals(ConfigTreeNode.TreeNodeType.FORWARD_RULE)) {
+					        		            return new CreateOrEditForwardRulePage(editWindow, 
+					        		            		(ForwardRuleModel) rowModel.getObject().getModel(), 
+					        		            		rowModel.getObject().getParent(), 
+					        		            		rowModel.getObject());
+					        				} else if (type.equals(ConfigTreeNode.TreeNodeType.FORWARD_SCHEDULE)) {
+					        		            return new CreateOrEditForwardSchedulePage(editWindow, 
+					        		            		(ForwardScheduleModel) rowModel.getObject().getModel(), 
+					        		            		rowModel.getObject().getParent(), 
+					        		            		rowModel.getObject());
+					        				} else if (type.equals(ConfigTreeNode.TreeNodeType.RETRY)) {
+					        		            return new CreateOrEditRetryPage(editWindow, 
+					        		            		(RetryModel) rowModel.getObject().getModel(), 
+					        		            		rowModel.getObject().getParent(), 
+					        		            		rowModel.getObject());
+					        				} else if (type.equals(ConfigTreeNode.TreeNodeType.COERCION)) {
+					        		            return new CreateOrEditCoercionPage(editWindow, 
+					        		            		(CoercionModel) rowModel.getObject().getModel(), 
+					        		            		rowModel.getObject().getParent(), 
+					        		            		rowModel.getObject());
+					        				} else 
+					        					return null;
+					                    }
+					                });
+							}
+			            	editWindow
+			            		.setWindowClosedCallback(windowClosedCallback)
+			            		.show(target);
+			            }
+				};
+				ajaxLink.setVisible(!type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_APPLICATION_ENTITIES)
+						|| rowModel.getObject().getParent().getChildren().get(0).hasChildren());
+				
+				if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_FORWARD_SCHEDULES))
+					ajaxLink.setVisible(ConfigTreeProvider.get().getUniqueAETitles().size() > 0);
+					
+				ResourceReference image;
+				if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_CONNECTIONS)
+						|| type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_APPLICATION_ENTITIES)
+						|| type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_TRANSFER_CAPABILITIES)
+						|| type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_FORWARD_RULES)
+						|| type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_FORWARD_SCHEDULES)
+						|| type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_RETRIES)
+						|| type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_COERCIONS))
+					image = ImageManager.IMAGE_WIZARD_COMMON_ADD;
+				else
+					image = ImageManager.IMAGE_WIZARD_COMMON_EDIT;
 
-                                @Override
-                                public Page createPage() {
-                                    try {
-                                        return new DicomEchoPage(echoWindow, ((ApplicationEntityModel) rowModel
-                                                .getObject().getModel()).getApplicationEntity());
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                        return null;
-                                    }
-                                }
-                            });
-                        }
-                        echoWindow.setWindowClosedCallback(windowClosedCallback).show(target);
-                    }
-                };
-                if (type.equals(ConfigTreeNode.TreeNodeType.APPLICATION_ENTITY))
-                    cellItem.add(
-                            new LinkPanel(componentId, ajaxLink, ImageManager.IMAGE_WIZARD_ECHO, removeConfirmation))
-                            .add(new AttributeAppender("style", Model.of("width: 50px; text-align: center;")));
-                else
-                    cellItem.add(new Label(componentId));
+				if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_TRANSFER_CAPABILITY_TYPE))
+					cellItem.add(new Label(componentId));
+				else
+					cellItem.add(new LinkPanel(componentId, ajaxLink, image, removeConfirmation))
+						.add(new AttributeAppender("style", Model.of("width: 50px; text-align: center;")));
+			}
+		});
+		
+		deviceColumns.add(new AbstractColumn<ConfigTreeNode>(Model.of("Delete")) {
+			
+			private static final long serialVersionUID = 1L;
 
-            }
-        });
+			public void populateItem(Item<ICellPopulator<ConfigTreeNode>> cellItem, String componentId, 
+					final IModel<ConfigTreeNode> rowModel) {
 
-        deviceColumns.add(new AbstractColumn<ConfigTreeNode>(Model.of("Edit")) {
+				final TreeNodeType type = rowModel.getObject().getNodeType();
+				if (type == null)
+					throw new RuntimeException("Error: Unknown node type, cannot create delete modal window");
+				else if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_CONNECTIONS)
+						|| type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_APPLICATION_ENTITIES)
+						|| type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_TRANSFER_CAPABILITIES)
+						|| type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_TRANSFER_CAPABILITY_TYPE)
+						|| type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_FORWARD_RULES)
+						|| type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_FORWARD_SCHEDULES)
+						|| type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_RETRIES)
+						|| type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_COERCIONS)) {
+					cellItem.add(new Label(componentId));
+					return;
+				}
 
-            private static final long serialVersionUID = 1L;
+				AjaxLink<Object> ajaxLink = 
+						new AjaxLink<Object>("wickettree.link") { 
 
-            public void populateItem(final Item<ICellPopulator<ConfigTreeNode>> cellItem, final String componentId,
-                    final IModel<ConfigTreeNode> rowModel) {
+				            private static final long serialVersionUID = 1L;
 
-                final TreeNodeType type = rowModel.getObject().getNodeType();
-                if (type == null)
-                    throw new RuntimeException("Error: Unknown node type, cannot create edit modal window");
-
-                AjaxLink<Object> ajaxLink = new AjaxLink<Object>("wickettree.link") {
-
-                    private static final long serialVersionUID = 1L;
-
-                    @Override
-                    public void onClick(AjaxRequestTarget target) {
-
-                        if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_CONNECTIONS)) {
-                            editWindow.setPageCreator(new ModalWindow.PageCreator() {
-
-                                private static final long serialVersionUID = 1L;
-
-                                @Override
-                                public Page createPage() {
-                                    return new CreateOrEditConnectionPage(editWindow, null, rowModel.getObject()
-                                            .getParent());
-                                }
-                            });
-                        } else if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_APPLICATION_ENTITIES)) {
-                            editWindow.setPageCreator(new ModalWindow.PageCreator() {
-
-                                private static final long serialVersionUID = 1L;
-
-                                @Override
-                                public Page createPage() {
-                                    return new CreateOrEditApplicationEntityPage(editWindow, null, rowModel.getObject()
-                                            .getParent());
-                                }
-                            });
-                        } else if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_TRANSFER_CAPABILITIES)) {
-                            editWindow.setPageCreator(new ModalWindow.PageCreator() {
-
-                                private static final long serialVersionUID = 1L;
-
-                                @Override
-                                public Page createPage() {
-                                    return new CreateOrEditTransferCapabilityPage(editWindow, null, rowModel
-                                            .getObject(), null);
-                                }
-                            });
-                        } else if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_FORWARD_RULES)) {
-                            editWindow.setPageCreator(new ModalWindow.PageCreator() {
-
-                                private static final long serialVersionUID = 1L;
-
-                                @Override
-                                public Page createPage() {
-                                    return new CreateOrEditForwardRulePage(editWindow, null, rowModel.getObject(), null);
-                                }
-                            });
-                        } else if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_FORWARD_SCHEDULES)) {
-                            editWindow.setPageCreator(new ModalWindow.PageCreator() {
-
-                                private static final long serialVersionUID = 1L;
-
-                                @Override
-                                public Page createPage() {
-                                    return new CreateOrEditForwardSchedulePage(editWindow, null, rowModel.getObject(),
-                                            null);
-                                }
-                            });
-                        } else if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_RETRIES)) {
-                            editWindow.setPageCreator(new ModalWindow.PageCreator() {
-
-                                private static final long serialVersionUID = 1L;
-
-                                @Override
-                                public Page createPage() {
-                                    return new CreateOrEditRetryPage(editWindow, null, rowModel.getObject(), null);
-                                }
-                            });
-                        } else if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_COERCIONS)) {
-                            editWindow.setPageCreator(new ModalWindow.PageCreator() {
-
-                                private static final long serialVersionUID = 1L;
-
-                                @Override
-                                public Page createPage() {
-                                    return new CreateOrEditCoercionPage(editWindow, null, rowModel.getObject(), null);
-                                }
-                            });
-                        } else {
-                            editWindow.setPageCreator(new ModalWindow.PageCreator() {
-
-                                private static final long serialVersionUID = 1L;
-
-                                @Override
-                                public Page createPage() {
-                                    Utils.prettyPrintln(type);
-                                    if (type.equals(ConfigTreeNode.TreeNodeType.DEVICE)) {
-                                        try {
-                                            ConfigTreeProvider.get().loadDevice(rowModel.getObject());
-                                            return new CreateOrEditDevicePage(editWindow, (DeviceModel) rowModel
-                                                    .getObject().getModel());
-                                        } catch (Exception e) {
-                                            log.error("Error loading device on edit", e);
-                                            return null;
-                                        }
-                                    } else if (type.equals(ConfigTreeNode.TreeNodeType.CONNECTION)) {
-                                        return new CreateOrEditConnectionPage(editWindow, (ConnectionModel) rowModel
-                                                .getObject().getModel(), rowModel.getObject().getParent().getParent());
-                                    } else if (type.equals(ConfigTreeNode.TreeNodeType.APPLICATION_ENTITY)) {
-                                        return new CreateOrEditApplicationEntityPage(editWindow,
-                                                (ApplicationEntityModel) rowModel.getObject().getModel(), rowModel
-                                                        .getObject().getParent().getParent());
-                                    } else if (type.equals(ConfigTreeNode.TreeNodeType.TRANSFER_CAPABILITY)) {
-                                        return new CreateOrEditTransferCapabilityPage(editWindow,
-                                                (TransferCapabilityModel) rowModel.getObject().getModel(), rowModel
-                                                        .getObject().getParent().getParent(), rowModel.getObject());
-                                    } else if (type.equals(ConfigTreeNode.TreeNodeType.FORWARD_RULE)) {
-                                        return new CreateOrEditForwardRulePage(editWindow, (ForwardRuleModel) rowModel
-                                                .getObject().getModel(), rowModel.getObject().getParent(), rowModel
-                                                .getObject());
-                                    } else if (type.equals(ConfigTreeNode.TreeNodeType.FORWARD_SCHEDULE)) {
-                                        return new CreateOrEditForwardSchedulePage(editWindow,
-                                                (ForwardScheduleModel) rowModel.getObject().getModel(), rowModel
-                                                        .getObject().getParent(), rowModel.getObject());
-                                    } else if (type.equals(ConfigTreeNode.TreeNodeType.RETRY)) {
-                                        return new CreateOrEditRetryPage(editWindow, (RetryModel) rowModel.getObject()
-                                                .getModel(), rowModel.getObject().getParent(), rowModel.getObject());
-                                    } else if (type.equals(ConfigTreeNode.TreeNodeType.COERCION)) {
-                                        return new CreateOrEditCoercionPage(editWindow, (CoercionModel) rowModel
-                                                .getObject().getModel(), rowModel.getObject().getParent(), rowModel
-                                                .getObject());
-                                    } else
-                                        return null;
-                                }
-                            });
-                        }
-                        editWindow.setWindowClosedCallback(windowClosedCallback).show(target);
-                    }
-                };
-                ajaxLink.setVisible(!type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_APPLICATION_ENTITIES)
-                        || rowModel.getObject().getParent().getChildren().get(0).hasChildren());
-
-                if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_FORWARD_SCHEDULES))
-                    ajaxLink.setVisible(ConfigTreeProvider.get().getUniqueAETitles().size() > 0);
-
-                ResourceReference image;
-                if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_CONNECTIONS)
-                        || type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_APPLICATION_ENTITIES)
-                        || type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_TRANSFER_CAPABILITIES)
-                        || type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_FORWARD_RULES)
-                        || type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_FORWARD_SCHEDULES)
-                        || type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_RETRIES)
-                        || type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_COERCIONS))
-                    image = ImageManager.IMAGE_WIZARD_COMMON_ADD;
-                else
-                    image = ImageManager.IMAGE_WIZARD_COMMON_EDIT;
-
-                if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_TRANSFER_CAPABILITY_TYPE))
-                    cellItem.add(new Label(componentId));
-                else
-                    cellItem.add(new LinkPanel(componentId, ajaxLink, image, removeConfirmation)).add(
-                            new AttributeAppender("style", Model.of("width: 50px; text-align: center;")));
-            }
-        });
-
-        deviceColumns.add(new AbstractColumn<ConfigTreeNode>(Model.of("Delete")) {
-
-            private static final long serialVersionUID = 1L;
-
-            public void populateItem(Item<ICellPopulator<ConfigTreeNode>> cellItem, String componentId,
-                    final IModel<ConfigTreeNode> rowModel) {
-
-                final TreeNodeType type = rowModel.getObject().getNodeType();
-                if (type == null)
-                    throw new RuntimeException("Error: Unknown node type, cannot create delete modal window");
-                else if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_CONNECTIONS)
-                        || type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_APPLICATION_ENTITIES)
-                        || type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_TRANSFER_CAPABILITIES)
-                        || type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_TRANSFER_CAPABILITY_TYPE)
-                        || type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_FORWARD_RULES)
-                        || type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_FORWARD_SCHEDULES)
-                        || type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_RETRIES)
-                        || type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_COERCIONS)) {
-                    cellItem.add(new Label(componentId));
-                    return;
-                }
-
-                AjaxLink<Object> ajaxLink = new AjaxLink<Object>("wickettree.link") {
-
-                    private static final long serialVersionUID = 1L;
-
-                    @Override
-                    public void onClick(AjaxRequestTarget target) {
-                        removeConfirmation.confirm(target, new StringResourceModel("dicom.confirmDelete",
-                                BasicConfigurationPanel.this, null), rowModel.getObject());
-                    }
-                };
-                cellItem.add(
-                        new LinkPanel(componentId, ajaxLink, ImageManager.IMAGE_WIZARD_COMMON_REMOVE,
-                                removeConfirmation)).add(
-                        new AttributeAppender("style", Model.of("width: 50px; text-align: center;")));
-            }
-        });
+				            @Override
+				            public void onClick(AjaxRequestTarget target) {
+				                removeConfirmation
+				                	.confirm(target, 
+				                			new StringResourceModel("dicom.confirmDelete", BasicConfigurationPanel.this, null), 
+				                					rowModel.getObject());
+				            }
+				        };
+				        cellItem.add(new LinkPanel(componentId, ajaxLink, ImageManager.IMAGE_WIZARD_COMMON_REMOVE, removeConfirmation))
+							.add(new AttributeAppender("style", Model.of("width: 50px; text-align: center;")));
+			}
+		});
 
     }
-
-    // public void refreshTree(AjaxRequestTarget target) throws
-    // ConfigurationException {
+    
     public void refreshTree() throws ConfigurationException {
+		
+		IModel<Set<ConfigTreeNode>> currentState = configTree.getModel();
 
-        // if (true)
-        // return;
+		configTree = new ConfigTableTree("configTree", deviceColumns,
+				ConfigTreeProvider.get(), 
+				Integer.MAX_VALUE);
 
-        Utils.prettyPrintln("REFRESH");
+//		if (currentState != null) 
+//			for (ConfigTreeNode newNode : ConfigTreeProvider.get().getNodeList()) 
+//				preserveState(currentState, newNode);
 
-        // deviceColumns.set(1,
-        // new AbstractColumn<ConfigTreeNode>(Model.of("ConfigurationType")) {
-        //
-        // private static final long serialVersionUID = 1L;
-        //
-        // public void populateItem(final Item<ICellPopulator<ConfigTreeNode>>
-        // cellItem, final String componentId,
-        // final IModel<ConfigTreeNode> rowModel) {
-        //
-        // final ConfigurationType configurationType =
-        // rowModel.getObject().getConfigurationType();
-        // cellItem.add(new Label(componentId,
-        // Model.of(configurationType == null ? "" :
-        // configurationType.toString())));
-        // }
-        // }
-        // );
+		configTree.setModel(currentState);
+//		form.addOrReplace(configTree);
+		
+		form.addOrReplace(configTree);
+	}
 
-        IModel<Set<ConfigTreeNode>> currentState = configTree.getModel();
-
-        configTree = new ConfigTableTree("configTree", deviceColumns, ConfigTreeProvider.get(), Integer.MAX_VALUE);
-
-        // if (currentState != null)
-        // for (ConfigTreeNode newNode : ConfigTreeProvider.get().getNodeList())
-        // preserveState(currentState, newNode);
-
-        configTree.setModel(currentState);
-        // form.addOrReplace(configTree);
-
-        form.addOrReplace(configTree);
-    }
-
-    // private void preserveState(IModel<Set<ConfigTreeNode>> currentState,
-    // ConfigTreeNode newNode) {
-    // if (newNode.hasChildren()) {
-    // Iterator<ConfigTreeNode> iterator = currentState.getObject().iterator();
-    // while (iterator.hasNext()) {
-    // ConfigTreeNode currentNode = iterator.next();
-    // if (currentNode.equals(newNode)) {
-    // configTree.expand(newNode);
-    // for (ConfigTreeNode child : newNode.getChildren())
-    // preserveState(currentState, child);
-    // }
-    // }
-    // }
-    // }
+//	private void preserveState(IModel<Set<ConfigTreeNode>> currentState, ConfigTreeNode newNode) {
+//		if (newNode.hasChildren()) {
+//			Iterator<ConfigTreeNode> iterator = currentState.getObject().iterator();
+//			while (iterator.hasNext()) {
+//				ConfigTreeNode currentNode = iterator.next();
+//				if (currentNode.equals(newNode)) {
+//					configTree.expand(newNode);
+//					for (ConfigTreeNode child : newNode.getChildren()) 
+//							preserveState(currentState, child);
+//				}
+//			}
+//		}
+//	}
 
     public static String getModuleName() {
         return MODULE_NAME;

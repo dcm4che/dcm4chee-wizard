@@ -56,7 +56,7 @@ public class ProxyDeviceModel extends DeviceModel {
 	
 	private static final long serialVersionUID = 1L;
 
-	transient ProxyDevice device;
+//	private ProxyDevice device;
 	
 	LinkedHashMap<String, ApplicationEntityModel> applicationEntities;
 
@@ -71,7 +71,6 @@ public class ProxyDeviceModel extends DeviceModel {
 		return applicationEntities;
 	}
 
-//	@Override
 	private void setApplicationEntities(Collection<ApplicationEntity> applicationEntities) throws ConfigurationException {
 		this.applicationEntities = new LinkedHashMap<String,ApplicationEntityModel>();
 		Iterator<ApplicationEntity> i = applicationEntities.iterator();

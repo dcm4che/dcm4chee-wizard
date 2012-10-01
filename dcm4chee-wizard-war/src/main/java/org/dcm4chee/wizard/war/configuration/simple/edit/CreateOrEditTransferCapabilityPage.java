@@ -56,17 +56,17 @@ import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.resource.CssResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.dcm4che.conf.api.ConfigurationException;
+import org.dcm4che.net.ApplicationEntity;
 import org.dcm4che.net.TransferCapability;
 import org.dcm4che.net.TransferCapability.Role;
 import org.dcm4chee.web.common.base.BaseWicketPage;
 import org.dcm4chee.web.common.markup.BaseForm;
 import org.dcm4chee.web.common.markup.modal.MessageWindow;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ApplicationEntityModel;
-import org.dcm4chee.wizard.war.configuration.simple.model.basic.DeviceModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.StringArrayModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.TransferCapabilityModel;
-import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider;
 import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeNode;
+import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider;
 import org.dcm4chee.wizard.war.configuration.simple.validator.SOPClassValidator;
 import org.dcm4chee.wizard.war.configuration.simple.validator.TransferCapabilityValidator;
 import org.dcm4chee.wizard.war.configuration.simple.validator.TransferSyntaxValidator;
@@ -96,9 +96,13 @@ public class CreateOrEditTransferCapabilityPage extends SecureWebPage {
     private Model<String> commonNameModel;
     
     public CreateOrEditTransferCapabilityPage(final ModalWindow window, final TransferCapabilityModel transferCapabilityModel, 
-    		final ConfigTreeNode tcsNode, final ConfigTreeNode tcNode) {
+    		final ConfigTreeNode aeNode) {
     	super();
 
+		try {
+			final ApplicationEntity applicationEntity = 
+					((ApplicationEntityModel) aeNode.getModel()).getApplicationEntity();
+    	
         msgWin.setTitle("");
         add(msgWin);
         add(new WebMarkupContainer("create-transferCapability-title").setVisible(transferCapabilityModel == null));
@@ -143,14 +147,10 @@ public class CreateOrEditTransferCapabilityPage extends SecureWebPage {
         		.add(new TransferSyntaxValidator())
         		.setRequired(true));
 
-        try {
-			form
-				.add(new TransferCapabilityValidator(
-						((ApplicationEntityModel) tcsNode.getParent().getModel()).getApplicationEntity(), 
-						sopClassTextField, roleDropDown));
-		} catch (ConfigurationException e) {
-			log.error("Error creating TransferCapabilityValidator for sopClass TextField", e);
-		}
+		form
+			.add(new TransferCapabilityValidator(
+					applicationEntity, 
+					sopClassTextField, roleDropDown));
 
         final WebMarkupContainer optionalContainer = new WebMarkupContainer("optionalContainer");
         form.add(optionalContainer
@@ -185,22 +185,18 @@ public class CreateOrEditTransferCapabilityPage extends SecureWebPage {
                     				transferSyntaxModel.getArray()) : 
                     			transferCapabilityModel.getTransferCapability();
 
-//                    if (transferCapabilityModel == null)
-//                    	((DeviceModel) deviceNode.getModel()).getDevice().
-//
-//                		applicationEntity.addTransferCapability(transferCapability);
+                    if (transferCapabilityModel == null) {
+                    	((ApplicationEntityModel) aeNode.getModel())
+                    		.getApplicationEntity().addTransferCapability(transferCapability);
+                    } else {
+                		transferCapability.setSopClass(sopClassModel.getObject());
+                		transferCapability.setRole(roleModel.getObject());
+                		transferCapability.setTransferSyntaxes(transferSyntaxModel.getArray());
+                		transferCapability.setCommonName(commonNameModel.getObject());
+                    }
 
-
-//                    	ConfigTreeProvider.get().addTransferCapability(tcsNode, transferCapability);
-//                    else {
-//                		transferCapability.setSopClass(sopClassModel.getObject());
-//                		transferCapability.setRole(roleModel.getObject());
-//                		transferCapability.setTransferSyntaxes(transferSyntaxModel.getArray());
-//                    	ConfigTreeProvider.get()
-//                    		.editTransferCapability(tcsNode, tcNode, transferCapability);
-//                		transferCapability.setCommonName(commonNameModel.getObject());
-//                    }
-
+                    ConfigTreeProvider.get().mergeDevice(applicationEntity.getDevice());
+                    aeNode.getParent().getParent().setModel(null);
                     window.close(target);
                 } catch (Exception e) {
                 	log.error("Error modifying transfer capability", e);
@@ -228,6 +224,9 @@ public class CreateOrEditTransferCapabilityPage extends SecureWebPage {
 			@Override
 			protected void onError(AjaxRequestTarget arg0, Form<?> arg1) {
 			}}.setDefaultFormProcessing(false));
+		} catch (ConfigurationException e) {
+			log.error("Error creating TransferCapabilityValidator for sopClass TextField", e);
+		}
     }
 
     @Override

@@ -41,7 +41,10 @@
     <profile>
       <id>prefs-jdbc</id>
       <properties>
+			<config-class>org.dcm4chee.proxy.conf.prefs.PreferencesProxyConfiguration</config-class>
+      <!-- 
         <config-class>org.dcm4che.conf.prefs.PreferencesDicomConfiguration</config-class>
+         -->
         <project-classifier>prefs-jdbc</project-classifier>
         <profile.dependencies>org.jboss.logmanager,org.slf4j.impl,org.dcm4che.core,org.dcm4che.net,org.dcm4che.conf.api,org.dcm4che.conf.prefs,deployment.dcm4che-jdbc-prefs-jboss-1.0.0-SNAPSHOT.jar</profile.dependencies>
       </properties>

@@ -135,7 +135,7 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 		DeviceModel deviceModel
 			= (this.getConfigurationType(device).equals(ConfigurationType.Proxy)) ? 
 					new ProxyDeviceModel((ProxyDevice) device) : new DeviceModel(device);
-					
+
 		deviceNode.setConfigurationType(getConfigurationType(device));
 		deviceNode.setModel(deviceModel);
 		
@@ -161,7 +161,7 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 							applicationEntityModel);
 
 			uniqueAETitles.add(applicationEntityModel.getApplicationEntity().getAETitle());
-			
+
 			this.addApplicationEntitySubnodes(aeNode);
 			
 			Map<String, ConfigTreeNode> typeNodes = 
@@ -376,7 +376,6 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 
 	public void mergeDevice(Device device) throws IOException, ConfigurationException {
 		getDicomConfigurationManager().save(device);
-		Utils.prettyPrintln("Persisted device");
 		saveToSession();
 	}
 

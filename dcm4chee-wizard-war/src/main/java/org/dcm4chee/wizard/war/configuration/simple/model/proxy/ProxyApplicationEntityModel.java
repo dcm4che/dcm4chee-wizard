@@ -60,7 +60,7 @@ public class ProxyApplicationEntityModel extends ApplicationEntityModel {
 
 	private static final long serialVersionUID = 1L;
 	
-    private transient ProxyApplicationEntity applicationEntity;
+    private ProxyApplicationEntity applicationEntity;
     
     private List<ForwardRuleModel> forwardRuleModels;
     private List<ForwardScheduleModel> forwardScheduleModels;
