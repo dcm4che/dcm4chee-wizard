@@ -56,6 +56,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.resource.CssResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
+import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
 import org.dcm4chee.proxy.conf.Schedule;
 import org.dcm4chee.web.common.base.BaseWicketPage;
 import org.dcm4chee.web.common.markup.BaseForm;
@@ -90,14 +91,17 @@ public class CreateOrEditForwardSchedulePage extends SecureWebPage {
 	private Model<String> scheduleDaysModel;
 	private Model<String> scheduleHoursModel;
     
-    public CreateOrEditForwardSchedulePage(final ModalWindow window, final ForwardScheduleModel fsModel, 
-    		final ConfigTreeNode fssNode, final ConfigTreeNode fsNode) {
+    public CreateOrEditForwardSchedulePage(final ModalWindow window, final ForwardScheduleModel forwardScheduleModel, 
+    		final ConfigTreeNode aeNode) {
     	super();
+
+    	final ProxyApplicationEntity proxyApplicationEntity = 
+    			((ProxyApplicationEntityModel) aeNode.getModel()).getApplicationEntity();
 
         msgWin.setTitle("");
         add(msgWin);
-        add(new WebMarkupContainer("create-forwardSchedule-title").setVisible(fsModel == null));
-        add(new WebMarkupContainer("edit-forwardSchedule-title").setVisible(fsModel != null));
+        add(new WebMarkupContainer("create-forwardSchedule-title").setVisible(forwardScheduleModel == null));
+        add(new WebMarkupContainer("edit-forwardSchedule-title").setVisible(forwardScheduleModel != null));
 
         setOutputMarkupId(true);
         final BaseForm form = new BaseForm("form");
@@ -107,18 +111,17 @@ public class CreateOrEditForwardSchedulePage extends SecureWebPage {
         List<String> uniqueAETitles = new ArrayList<String>(ConfigTreeProvider.get().getUniqueAETitles());
         Collections.sort(uniqueAETitles);
 
-		destinationAETitleModel = Model.of(fsModel != null ? 
-				fsModel.getDestinationAETitle() : uniqueAETitles.get(0));
-        scheduleDaysModel = Model.of(fsModel != null ? fsModel.getSchedule().getDays() : null);
-        scheduleHoursModel = Model.of(fsModel != null ? fsModel.getSchedule().getHours() : null);
+		destinationAETitleModel = Model.of(forwardScheduleModel != null ? 
+				forwardScheduleModel.getDestinationAETitle() : uniqueAETitles.get(0));
+        scheduleDaysModel = Model.of(forwardScheduleModel != null ? forwardScheduleModel.getSchedule().getDays() : null);
+        scheduleHoursModel = Model.of(forwardScheduleModel != null ? forwardScheduleModel.getSchedule().getHours() : null);
         
         form.add(new Label("destinationAETitle.label", new ResourceModel("dicom.edit.forwardSchedule.destinationAETitle.label")))
         .add(new DropDownChoice<String>("destinationAETitle", destinationAETitleModel, uniqueAETitles)
         		.setNullValid(false)
         		.setRequired(true)
         		.add(new DestinationAETitleValidator(
-        				destinationAETitleModel.getObject(), 
-        				((ProxyApplicationEntityModel) fssNode.getParent().getModel()).getApplicationEntity().getForwardSchedules())));
+        				destinationAETitleModel.getObject(), proxyApplicationEntity.getForwardSchedules())));
         
         final WebMarkupContainer optionalContainer = new WebMarkupContainer("optionalContainer");
         form.add(optionalContainer
@@ -152,19 +155,26 @@ public class CreateOrEditForwardSchedulePage extends SecureWebPage {
             @Override
             protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
                 try {
-                	Schedule schedule = new Schedule();
+                	
+                	Schedule schedule = forwardScheduleModel == null ? 
+                			new Schedule() : forwardScheduleModel.getSchedule();
                 	schedule.setDays(scheduleDaysModel.getObject());
                 	schedule.setHours(scheduleHoursModel.getObject());
 
-                    if (fsModel == null)
-                    	ConfigTreeProvider.get().addForwardSchedule(fssNode, destinationAETitleModel.getObject(), schedule);
-                    else 
-                    	ConfigTreeProvider.get().editForwardSchedule(fssNode, fsNode, destinationAETitleModel.getObject(), schedule);
+                    if (forwardScheduleModel != null)
+                    	proxyApplicationEntity.getForwardSchedules()
+                    		.remove(forwardScheduleModel.getDestinationAETitle());
+                    
+                    proxyApplicationEntity.getForwardSchedules()
+                    	.put(destinationAETitleModel.getObject(), schedule);
+
+            		ConfigTreeProvider.get().mergeDevice(proxyApplicationEntity.getDevice());
+            		aeNode.getAncestor(2).setModel(null);
 
                     window.close(target);
                 } catch (Exception e) {
                 	log.error("Error modifying forward schedule", e);
-                    msgWin.show(target, new ResourceModel(fsModel == null ? 
+                    msgWin.show(target, new ResourceModel(forwardScheduleModel == null ? 
                     		"dicom.edit.forwardSchedule.create.failed" : "dicom.edit.forwardSchedule.update.failed")
                     		.wrapOnAssignment(this));
                 }

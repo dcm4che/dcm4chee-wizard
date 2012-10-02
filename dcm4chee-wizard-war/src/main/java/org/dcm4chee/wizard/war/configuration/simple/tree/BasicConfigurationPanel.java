@@ -143,39 +143,27 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 
             public void onClose(AjaxRequestTarget target) {
 
-                boolean refresh = false;
+            	boolean refresh = false;
                 for (ConfigTreeNode deviceNode : ConfigTreeProvider.get().getNodeList()) {
 
-                    // Utils.prettyPrintln("Checking " + deviceNode.getName() +
-                    // " for reload");
                     if (deviceNode.getModel() == null) {
                         try {
                             ConfigTreeProvider.get().loadDevice(deviceNode);
-                            refresh = true;
+                            refresh = true; 
                         } catch (ConfigurationException e) {
                             // TODO Auto-generated catch block
                             e.printStackTrace();
                         }
-                        // Utils.prettyPrintln("Reloading " +
-                        // deviceNode.getName() + " on close");
-                    } else {
-                        // Utils.prettyPrintln("No Reload of " +
-                        // deviceNode.getName() + ", model is " +
-                        // deviceNode.getModel());
                     }
                 }
                 if (refresh || ConfigTreeProvider.get().resync())
                     try {
-                        // BasicConfigurationPanel.this.createColumns();
                         BasicConfigurationPanel.this.refreshTree();
                     } catch (ConfigurationException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
                 target.add(form);
-                // } catch (ConfigurationException e) {
-                // log.error("Error generating configuration tree", e);
-                // }
             }
         };
         add(macb);
@@ -264,7 +252,6 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 
             @Override
             public void onConfirmation(AjaxRequestTarget target, ConfigTreeNode node) {
-
                 try {
                     if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.DEVICE)) {
                         ConfigTreeProvider.get().removeDevice(node);
@@ -585,8 +572,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 					                    	return new CreateOrEditForwardRulePage(
 					                    			editWindow, 
 					                    			null, 
-					                    			rowModel.getObject(), 
-					                    			null); 
+					                    			rowModel.getObject().getParent()); 
 					                    }
 					                });
 							} else if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_FORWARD_SCHEDULES)) {
@@ -600,8 +586,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 					                    	return new CreateOrEditForwardSchedulePage(
 					                    			editWindow, 
 					                    			null, 
-					                    			rowModel.getObject(), 
-					                    			null); 
+					                    			rowModel.getObject().getParent()); 
 					                    }
 					                });
 							} else if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_RETRIES)) {
@@ -615,8 +600,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 					                    	return new CreateOrEditRetryPage(
 					                    			editWindow, 
 					                    			null, 
-					                    			rowModel.getObject(), 
-					                    			null); 
+					                    			rowModel.getObject().getParent()); 
 					                    }
 					                });
 							} else if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_COERCIONS)) {
@@ -630,8 +614,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 					                    	return new CreateOrEditCoercionPage(
 					                    			editWindow, 
 					                    			null, 
-					                    			rowModel.getObject(), 
-					                    			null); 
+					                    			rowModel.getObject().getParent()); 
 					                    }
 					                });
 							} else {
@@ -642,7 +625,6 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 					                      
 					                    @Override
 					                    public Page createPage() {
-					                    	Utils.prettyPrintln(type);
 					        				if (type.equals(ConfigTreeNode.TreeNodeType.DEVICE)) {
 					        					try {
 						        					ConfigTreeProvider.get().loadDevice(rowModel.getObject());
@@ -656,36 +638,32 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 					        					return new CreateOrEditConnectionPage(
 					        							editWindow, 
 					        							(ConnectionModel) rowModel.getObject().getModel(), 
-					        							rowModel.getObject().getParent().getParent());
+					        							rowModel.getObject().getAncestor(2));
 					        				} else if (type.equals(ConfigTreeNode.TreeNodeType.APPLICATION_ENTITY)) {
 					        					return new CreateOrEditApplicationEntityPage(
 					        							editWindow, 
 					        							(ApplicationEntityModel) rowModel.getObject().getModel(), 
-					        		            		rowModel.getObject().getParent().getParent()); 
+					        		            		rowModel.getObject().getAncestor(2)); 
 					        				} else if (type.equals(ConfigTreeNode.TreeNodeType.TRANSFER_CAPABILITY)) {
 					        		            return new CreateOrEditTransferCapabilityPage(editWindow, 
 					        		            		(TransferCapabilityModel) rowModel.getObject().getModel(), 
-					        		            		rowModel.getObject().getParent().getParent());
+					        		            		rowModel.getObject().getAncestor(3));
 					        				} else if (type.equals(ConfigTreeNode.TreeNodeType.FORWARD_RULE)) {
 					        		            return new CreateOrEditForwardRulePage(editWindow, 
 					        		            		(ForwardRuleModel) rowModel.getObject().getModel(), 
-					        		            		rowModel.getObject().getParent(), 
-					        		            		rowModel.getObject());
+					        		            		rowModel.getObject().getAncestor(2));
 					        				} else if (type.equals(ConfigTreeNode.TreeNodeType.FORWARD_SCHEDULE)) {
 					        		            return new CreateOrEditForwardSchedulePage(editWindow, 
 					        		            		(ForwardScheduleModel) rowModel.getObject().getModel(), 
-					        		            		rowModel.getObject().getParent(), 
-					        		            		rowModel.getObject());
+					        		            		rowModel.getObject().getAncestor(2));
 					        				} else if (type.equals(ConfigTreeNode.TreeNodeType.RETRY)) {
 					        		            return new CreateOrEditRetryPage(editWindow, 
 					        		            		(RetryModel) rowModel.getObject().getModel(), 
-					        		            		rowModel.getObject().getParent(), 
-					        		            		rowModel.getObject());
+					        		            		rowModel.getObject().getAncestor(2));
 					        				} else if (type.equals(ConfigTreeNode.TreeNodeType.COERCION)) {
 					        		            return new CreateOrEditCoercionPage(editWindow, 
 					        		            		(CoercionModel) rowModel.getObject().getModel(), 
-					        		            		rowModel.getObject().getParent(), 
-					        		            		rowModel.getObject());
+					        		            		rowModel.getObject().getAncestor(2));
 					        				} else 
 					        					return null;
 					                    }
@@ -781,20 +759,6 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 		
 		form.addOrReplace(configTree);
 	}
-
-//	private void preserveState(IModel<Set<ConfigTreeNode>> currentState, ConfigTreeNode newNode) {
-//		if (newNode.hasChildren()) {
-//			Iterator<ConfigTreeNode> iterator = currentState.getObject().iterator();
-//			while (iterator.hasNext()) {
-//				ConfigTreeNode currentNode = iterator.next();
-//				if (currentNode.equals(newNode)) {
-//					configTree.expand(newNode);
-//					for (ConfigTreeNode child : newNode.getChildren()) 
-//							preserveState(currentState, child);
-//				}
-//			}
-//		}
-//	}
 
     public static String getModuleName() {
         return MODULE_NAME;

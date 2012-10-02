@@ -51,6 +51,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.resource.CssResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
+import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
 import org.dcm4chee.proxy.conf.Retry;
 import org.dcm4chee.web.common.base.BaseWicketPage;
 import org.dcm4chee.web.common.markup.BaseForm;
@@ -83,8 +84,11 @@ public class CreateOrEditRetryPage extends SecureWebPage {
 	private Model<Integer> retriesModel;
     
     public CreateOrEditRetryPage(final ModalWindow window, final RetryModel retryModel, 
-    		final ConfigTreeNode rtsNode, final ConfigTreeNode rtNode) {
+    		final ConfigTreeNode aeNode) {
     	super();
+
+    	final ProxyApplicationEntity proxyApplicationEntity = 
+    			((ProxyApplicationEntityModel) aeNode.getModel()).getApplicationEntity();
 
         msgWin.setTitle("");
         add(msgWin);
@@ -103,8 +107,7 @@ public class CreateOrEditRetryPage extends SecureWebPage {
         form.add(new Label("suffix.label", new ResourceModel("dicom.edit.retry.suffix.label")))
         .add(new TextField<String>("suffix", suffixModel).setRequired(true)
         		.add(new RetrySuffixValidator(
-        				suffixModel.getObject(), 
-        				((ProxyApplicationEntityModel) rtsNode.getParent().getModel()).getApplicationEntity().getRetries())));
+        				suffixModel.getObject(), proxyApplicationEntity.getRetries())));
         
         form.add(new Label("delay.label", new ResourceModel("dicom.edit.retry.delay.label")))
         .add(new TextField<Integer>("delay", delayModel)
@@ -128,10 +131,12 @@ public class CreateOrEditRetryPage extends SecureWebPage {
                 			delayModel.getObject(),
                 			retriesModel.getObject());
 
-                    if (retryModel == null)
-                    	ConfigTreeProvider.get().addRetry(rtsNode, retry);
-                    else 
-                    	ConfigTreeProvider.get().editRetry(rtsNode, rtNode, retry);
+            		if (retryModel != null)
+            			proxyApplicationEntity.getRetries().remove(retryModel.getRetry());
+            		proxyApplicationEntity.getRetries().add(retry);
+
+            		ConfigTreeProvider.get().mergeDevice(proxyApplicationEntity.getDevice());
+            		aeNode.getAncestor(2).setModel(null);
 
                     window.close(target);
                 } catch (Exception e) {

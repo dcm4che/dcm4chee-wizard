@@ -97,7 +97,7 @@ public class DeviceModel implements Serializable, ConfigNodeModel {
 	private void setConnections(List<Connection> connections) {
 		this.connections = new ArrayList<ConnectionModel>();
 		int i = 0;
-		for (Connection connection : connections) 
+		for (Connection connection : connections)
 			this.connections.add(new ConnectionModel(connection, i++));
 	}
 

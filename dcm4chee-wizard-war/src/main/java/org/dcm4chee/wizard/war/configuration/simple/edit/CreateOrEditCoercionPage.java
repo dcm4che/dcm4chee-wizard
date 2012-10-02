@@ -60,10 +60,12 @@ import org.apache.wicket.request.resource.ResourceReference;
 import org.dcm4che.conf.api.AttributeCoercion;
 import org.dcm4che.net.Dimse;
 import org.dcm4che.net.TransferCapability.Role;
+import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
 import org.dcm4chee.web.common.base.BaseWicketPage;
 import org.dcm4chee.web.common.markup.BaseForm;
 import org.dcm4chee.web.common.markup.modal.MessageWindow;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.CoercionModel;
+import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ProxyApplicationEntityModel;
 import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider;
 import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeNode;
 import org.dcm4chee.wizard.war.configuration.simple.validator.SOPClassValidator;
@@ -94,7 +96,7 @@ public class CreateOrEditCoercionPage extends SecureWebPage {
     private Model<String> sopClassModel;
     
     public CreateOrEditCoercionPage(final ModalWindow window, final CoercionModel coercionModel, 
-    		final ConfigTreeNode rtsNode, final ConfigTreeNode rtNode) {
+    		final ConfigTreeNode aeNode) {
     	super();
 
         msgWin.setTitle("");
@@ -185,10 +187,16 @@ public class CreateOrEditCoercionPage extends SecureWebPage {
                 					aeTitleModel.getObject(), 
                 					labeledURIModel.getObject());
 
-                    if (coercionModel == null)
-                    	ConfigTreeProvider.get().addCoercion(rtsNode, coercion);
-                    else 
-                    	ConfigTreeProvider.get().editCoercion(rtsNode, rtNode, coercion);
+                	ProxyApplicationEntity proxyApplicationEntity = 
+                			((ProxyApplicationEntityModel) aeNode.getModel()).getApplicationEntity();
+
+            		if (coercionModel != null)
+            			proxyApplicationEntity.getAttributeCoercions()
+            				.remove(coercionModel.getCoercion());
+            		proxyApplicationEntity.getAttributeCoercions().add(coercion);
+
+            		ConfigTreeProvider.get().mergeDevice(proxyApplicationEntity.getDevice());
+            		aeNode.getAncestor(2).setModel(null);
 
                     window.close(target);
                 } catch (Exception e) {

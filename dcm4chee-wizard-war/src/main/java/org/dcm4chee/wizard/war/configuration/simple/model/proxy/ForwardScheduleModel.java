@@ -12,7 +12,7 @@ public class ForwardScheduleModel implements Serializable, ConfigNodeModel {
 	public static String cssClass = "forward_schedule";
 	public static String toolTip = "forward_schedule";
 
-	private java.lang.String destinationAETitle;
+	private String destinationAETitle;
 	private Schedule schedule;
 	
 	public ForwardScheduleModel(String destinationAETitle, Schedule schedule) {

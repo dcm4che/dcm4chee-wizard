@@ -184,19 +184,18 @@ public class CreateOrEditTransferCapabilityPage extends SecureWebPage {
                     				roleModel.getObject(), 
                     				transferSyntaxModel.getArray()) : 
                     			transferCapabilityModel.getTransferCapability();
-
-                    if (transferCapabilityModel == null) {
-                    	((ApplicationEntityModel) aeNode.getModel())
-                    		.getApplicationEntity().addTransferCapability(transferCapability);
-                    } else {
+                    
+                    if (transferCapabilityModel != null) {
+                    	applicationEntity.removeTransferCapability(transferCapability);
                 		transferCapability.setSopClass(sopClassModel.getObject());
                 		transferCapability.setRole(roleModel.getObject());
                 		transferCapability.setTransferSyntaxes(transferSyntaxModel.getArray());
-                		transferCapability.setCommonName(commonNameModel.getObject());
+                		transferCapability.setCommonName(commonNameModel.getObject());                   	
                     }
+                    applicationEntity.addTransferCapability(transferCapability);
 
                     ConfigTreeProvider.get().mergeDevice(applicationEntity.getDevice());
-                    aeNode.getParent().getParent().setModel(null);
+                    aeNode.getAncestor(2).setModel(null);
                     window.close(target);
                 } catch (Exception e) {
                 	log.error("Error modifying transfer capability", e);

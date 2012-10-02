@@ -87,7 +87,7 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 
 	private static final long serialVersionUID = 1L;
 	
-	public enum ConfigurationType {Basic, Proxy, Archive};
+	public enum ConfigurationType { Basic, Proxy, Archive };
 
 	private List<ConfigTreeNode> deviceNodeList = new ArrayList<ConfigTreeNode>();
 	private Set<String> uniqueAETitles = new HashSet<String>();
@@ -112,16 +112,11 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 		for (String deviceName : deviceList) {
 
 			// CREATE DEVICE NODE AND MODEL
-			DeviceModel deviceModel
-//				= (this.getConfigurationType(device).equals(ConfigurationType.Proxy)) ? 
-//						new ProxyDeviceModel((ProxyDevice) device) : new DeviceModel(device);
-			= new DeviceModel(deviceName);
-			
-//				this.deviceModelList.put(device.getDeviceName(), deviceModel);
+			DeviceModel deviceModel = new DeviceModel(deviceName);			
 			ConfigTreeNode deviceNode = 
 					new ConfigTreeNode(null, deviceModel.getDeviceName(), 
 							ConfigTreeNode.TreeNodeType.DEVICE, 
-							ConfigurationType.Basic, deviceModel);
+							null, deviceModel);
 			deviceNodeList.add(deviceNode);
 			addDeviceSubnodes(deviceNode);
 		}
@@ -144,7 +139,8 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 		for (ConnectionModel connectionModel : deviceModel.getConnections())
 			new ConfigTreeNode(deviceNode.getContainer(ConfigTreeNode.CONTAINER_CONNECTIONS), 
 					connectionModel.getConnection().getCommonName() == null ? 
-							connectionModel.getConnection().getHostname() : 
+							connectionModel.getConnection().getHostname() + ":" + 
+							connectionModel.getConnection().getPort() : 
 								connectionModel.getConnection().getCommonName(), 
 					ConfigTreeNode.TreeNodeType.CONNECTION, connectionModel);
 		Collections.sort(deviceNode.getContainer(
@@ -162,7 +158,7 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 
 			uniqueAETitles.add(applicationEntityModel.getApplicationEntity().getAETitle());
 
-			this.addApplicationEntitySubnodes(aeNode);
+			addApplicationEntitySubnodes(aeNode);
 			
 			Map<String, ConfigTreeNode> typeNodes = 
 					new HashMap<String, ConfigTreeNode>();
@@ -356,365 +352,16 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 		return deviceNode;
 	}
 
-	public void removeDevice(ConfigTreeNode deviceNode) throws ConfigurationException {
-		getDicomConfigurationManager().remove(((DeviceModel) deviceNode.getModel()).getDeviceName());
-		deviceNodeList.remove(deviceNode);
-		resync = true;
-	}
-
-//	public void addConnection(Connection connection) throws ConfigurationException, IOException {
-//        getDicomConfigurationManager().persist(connection.getDevice());
-//        Utils.prettyPrintln("Added Connection");
-//        saveToSession();
-//	}
-//
-//	public void editConnection(Connection connection) throws IOException, ConfigurationException {
-//        getDicomConfigurationManager().persist(connection.getDevice());
-//        Utils.prettyPrintln("Edited Connection");
-//        saveToSession();
-//	}
-
 	public void mergeDevice(Device device) throws IOException, ConfigurationException {
 		getDicomConfigurationManager().save(device);
 		saveToSession();
 	}
 
-//	public void removeConnection(ConfigTreeNode connectionNode) throws ConfigurationException {
-//		Device device = ((DeviceModel) connectionNode.getParent().getParent().getModel()).getDevice();
-//        device.removeConnection(((ConnectionModel) connectionNode.getModel()).getConnection());
-//        getDicomConfigurationManager().save(device);
-//		
-//		((DeviceModel) connectionNode.getParent().getParent().getModel())
-//			.getConnections().remove(connectionNode.getModel());
-//		
-//		ConfigTreeNode connectionsNode = connectionNode.getParent();
-//		connectionNode.remove();
-//		Collections.sort(connectionsNode.getChildren());
-//	}
-
-//	public void addApplicationEntity(ConfigTreeNode aesNode, ApplicationEntity applicationEntity) throws ConfigurationException {
-//		Device device = ((DeviceModel) aesNode.getParent().getModel()).getDevice();
-//        device.addApplicationEntity(applicationEntity);
-//        getDicomConfigurationManager().save(device);
-//        
-//        registerAETitle(applicationEntity.getAETitle());
-//        
-//        ConfigTreeNode aeNode = new ConfigTreeNode(aesNode, applicationEntity.getAETitle(), 
-//				ConfigTreeNode.TreeNodeType.APPLICATION_ENTITY, 
-//				getConfigurationType(applicationEntity), 
-//				new ApplicationEntityModel(applicationEntity));
-//		Collections.sort(aesNode.getChildren());
-//		addApplicationEntitySubnodes(aeNode);
-//	}
-//
-//	public void editApplicationEntity(ConfigTreeNode aesNode, ApplicationEntity applicationEntity, 
-//			String oldAETitle) throws ConfigurationException {
-//		unregisterAETitle(oldAETitle);
-//        getDicomConfigurationManager().save(applicationEntity.getDevice());
-//        registerAETitle(applicationEntity.getAETitle());
-//
-//        Utils.prettyPrintln("Edited AE, setting model of node " + aesNode.getParent().getName() + " to null");
-//        aesNode.getParent().setModel(null);
-////        for (ConfigTreeNode aeNode : aesNode.getChildren())
-////        	if (aeNode.getName().equals(oldAETitle)) {
-////        		aeNode.setModel(new ApplicationEntityModel(applicationEntity));
-////        		aeNode.setName(applicationEntity.getAETitle());
-////        	}
-////		Collections.sort(aesNode.getChildren());
-//	}
-	
-//	public void removeApplicationEntity(ConfigTreeNode aeNode) throws ConfigurationException {
-//		Device device = ((DeviceModel) aeNode.getParent().getParent().getModel()).getDevice();
-//		ApplicationEntity applicationEntity = ((ApplicationEntityModel) aeNode.getModel())
-//				.getApplicationEntity();
-//        device.removeApplicationEntity(applicationEntity);
-//        getDicomConfigurationManager().save(device);
-//
-//        unregisterAETitle(applicationEntity.getAETitle());
-//        
-//		((DeviceModel) aeNode.getParent().getParent().getModel())
-//			.getApplicationEntities().remove(aeNode.getModel());
-//		
-//		ConfigTreeNode aesNode = aeNode.getParent();
-//		aeNode.remove();
-//		Collections.sort(aesNode.getChildren());
-//	}
-
-	private ConfigTreeNode getTypeNode(ConfigTreeNode parentNode, TransferCapability transferCapability) {
-		
-		ConfigTreeNode typeNode = null;
-		String typeName = null;
-		
-		Map<String, String> types = getDicomConfigurationManager().getTransferCapabilityTypes();
-		typeName = (types.containsKey(transferCapability.getSopClass())) ?  
-				types.get(transferCapability.getSopClass()) : 
-					new ResourceModel("dicom.list.transferCapabilities.other.label")
-				.wrapOnAssignment(forComponent).getObject();	
-
-		for (ConfigTreeNode node : parentNode.getChildren())
-			if (node.getName().equals(typeName))
-				typeNode = node;
-		
-		if (typeNode == null)
-			typeNode = new ConfigTreeNode(parentNode, typeName, 
-					ConfigTreeNode.TreeNodeType.CONTAINER_TRANSFER_CAPABILITY_TYPE, null);
-
-		return typeNode;
+	public void removeDevice(ConfigTreeNode deviceNode) throws ConfigurationException {
+		getDicomConfigurationManager().remove(((DeviceModel) deviceNode.getModel()).getDeviceName());
+		deviceNodeList.remove(deviceNode);
+		resync = true;
 	}
-	
-	public void addTransferCapability(ConfigTreeNode tcsNode,
-			TransferCapability transferCapability) throws ConfigurationException {
-		ApplicationEntity applicationEntity = 
-				((ApplicationEntityModel) tcsNode.getParent().getModel()).getApplicationEntity();
-		applicationEntity.addTransferCapability(transferCapability);
-		getDicomConfigurationManager().save(applicationEntity.getDevice());
-
-		ConfigTreeNode typeNode = getTypeNode(tcsNode, transferCapability);
-	
-//		getDicomConfigurationManager();
-//		if (DicomConfigurationManager.getTransferCapabilityTypes()
-//				.containsKey(transferCapability.getSopClass())) {
-//			getDicomConfigurationManager();
-//			typeName = DicomConfigurationManager.getTransferCapabilityTypes()
-//					.get(transferCapability.getSopClass());
-//		} else 
-//			typeName = new ResourceModel("dicom.list.transferCapabilities.other.label").wrapOnAssignment(forComponent).getObject();
-			
-//		for (ConfigTreeNode node : tcsNode.getChildren())
-//			if (node.getName().equals(typeName))
-//				typeNode = node;
-//		
-//		if (typeNode == null)
-//			typeNode = new ConfigTreeNode(tcsNode, typeName, 
-//					ConfigTreeNode.TreeNodeType.CONTAINER_TRANSFER_CAPABILITY_TYPE, null);
-			
-		new ConfigTreeNode(typeNode, 
-				transferCapability.getCommonName() != null ? transferCapability.getCommonName() : 
-					transferCapability.getSopClass() + " " + transferCapability.getRole(), 
-				ConfigTreeNode.TreeNodeType.TRANSFER_CAPABILITY, 
-				new TransferCapabilityModel(transferCapability, applicationEntity.getAETitle()));
-		Collections.sort(typeNode.getChildren());
-		
-		tcsNode.getParent().getParent().getParent().setModel(null);
-		Utils.prettyPrintln("TC: triggering reload of "  + 
-				tcsNode.getParent().getParent().getParent().getName());
-	}
-
-	public void editTransferCapability(ConfigTreeNode tcsNode, ConfigTreeNode tcNode,  
-			TransferCapability transferCapability) throws ConfigurationException {
-		ApplicationEntity applicationEntity = 
-				((ApplicationEntityModel) tcsNode.getParent().getModel()).getApplicationEntity();
-		getDicomConfigurationManager().save(applicationEntity.getDevice());
-
-		ConfigTreeNode typeNode = tcNode.getParent();
-		tcNode.remove();
-
-        String typeName = null;
-		typeNode = null;
-		Map<String, String> types = getDicomConfigurationManager().getTransferCapabilityTypes();
-		typeName = (types.containsKey(transferCapability.getSopClass())) ? 
-			types.get(transferCapability.getSopClass()) : 
-			new ResourceModel("dicom.list.tcs.other.label")
-				.wrapOnAssignment(forComponent).getObject();
-			
-		for (ConfigTreeNode node : tcsNode.getChildren())
-			if (node.getName().equals(typeName))
-				typeNode = node;
-		
-		if (typeNode == null)
-			typeNode = new ConfigTreeNode(tcsNode, typeName, 
-					ConfigTreeNode.TreeNodeType.CONTAINER_TRANSFER_CAPABILITY_TYPE, null);
-			
-		new ConfigTreeNode(typeNode, 
-				transferCapability.getCommonName() != null ? transferCapability.getCommonName() : 
-					transferCapability.getSopClass() + " " + transferCapability.getRole(), 
-				ConfigTreeNode.TreeNodeType.TRANSFER_CAPABILITY, 
-				new TransferCapabilityModel(transferCapability, applicationEntity.getAETitle()));
-		Collections.sort(typeNode.getChildren());
-	}
-
-//	public void removeTransferCapability(ConfigTreeNode tcNode) throws ConfigurationException {
-//		ApplicationEntity applicationEntity = 
-//				((ApplicationEntityModel) tcNode.getParent().getParent().getParent().getModel()).getApplicationEntity();
-//		applicationEntity.removeTransferCapability(((TransferCapabilityModel) tcNode.getModel()).getTransferCapability());
-//		getDicomConfigurationManager().save(applicationEntity.getDevice());
-//
-//		((ApplicationEntityModel) tcNode.getParent().getParent().getParent().getModel())
-//			.getTransferCapabilities().remove(tcNode.getModel());
-//        
-//		ConfigTreeNode typeNode = tcNode.getParent();
-//		tcNode.remove();
-//		Collections.sort(typeNode.getChildren());
-//	}
-	
-	public void addForwardRule(ConfigTreeNode frsNode, ForwardRule forwardRule) throws ConfigurationException {
-		ProxyApplicationEntity proxyApplicationEntity = (ProxyApplicationEntity) 
-				((ApplicationEntityModel) frsNode.getParent().getModel()).getApplicationEntity();
-		List<ForwardRule> forwardRules = proxyApplicationEntity.getForwardRules();
-		forwardRules.add(forwardRule);
-		proxyApplicationEntity.setForwardRules(forwardRules);
-		getDicomConfigurationManager().save(proxyApplicationEntity.getDevice());
-
-		new ConfigTreeNode(frsNode, 
-				forwardRule.getCommonName(), 
-				ConfigTreeNode.TreeNodeType.FORWARD_RULE, 
-				new ForwardRuleModel(forwardRule));
-		Collections.sort(frsNode.getChildren());
-	}
-
-	public void editForwardRule(ConfigTreeNode frsNode,
-			ConfigTreeNode frNode, ForwardRule forwardRule) throws ConfigurationException {
-		ProxyApplicationEntity proxyApplicationEntity = (ProxyApplicationEntity)
-				((ApplicationEntityModel) frNode.getParent().getParent().getModel()).getApplicationEntity();
-		getDicomConfigurationManager().save(proxyApplicationEntity.getDevice());
-
-		frNode.remove();
-		new ConfigTreeNode(frsNode, 
-				forwardRule.getCommonName(), 
-				ConfigTreeNode.TreeNodeType.FORWARD_RULE, 
-				new ForwardRuleModel(forwardRule));
-		Collections.sort(frsNode.getChildren());
-	}
-
-//	public void removeForwardRule(ConfigTreeNode frNode) throws ConfigurationException {
-//		ProxyApplicationEntity proxyApplicationEntity = (ProxyApplicationEntity)
-//				((ApplicationEntityModel) frNode.getParent().getParent().getModel()).getApplicationEntity();
-//		List<ForwardRule> forwardRules = proxyApplicationEntity.getForwardRules();
-//		forwardRules.remove(((ForwardRuleModel) frNode.getModel()).getForwardRule());
-//		 getDicomConfigurationManager().save(proxyApplicationEntity.getDevice());
-//
-//		ConfigTreeNode frsNode = frNode.getParent();
-//		frNode.remove();
-//		Collections.sort(frsNode.getChildren());
-//	}
-
-	public void addForwardSchedule(ConfigTreeNode fssNode, 
-			String destinationAETitle, Schedule schedule) throws ConfigurationException {
-    	ProxyApplicationEntity proxyApplicationEntity = 
-    			((ProxyApplicationEntityModel) fssNode.getParent().getModel()).getApplicationEntity();
-    	proxyApplicationEntity.getForwardSchedules().put(destinationAETitle, schedule);
-        getDicomConfigurationManager().save(proxyApplicationEntity.getDevice());
-        
-		new ConfigTreeNode(fssNode, 
-				destinationAETitle, 
-				ConfigTreeNode.TreeNodeType.FORWARD_SCHEDULE, 
-				new ForwardScheduleModel(destinationAETitle, schedule));
-		Collections.sort(fssNode.getChildren());
-	}
-
-	public void editForwardSchedule(ConfigTreeNode fssNode, ConfigTreeNode fsNode, 
-			String destinationAETitle, Schedule schedule) throws ConfigurationException {
-		ProxyApplicationEntity proxyApplicationEntity = (ProxyApplicationEntity)
-				((ApplicationEntityModel) fsNode.getParent().getParent().getModel()).getApplicationEntity();
-        getDicomConfigurationManager().save(proxyApplicationEntity.getDevice());
-
-		fsNode.remove();
-		new ConfigTreeNode(fssNode, 
-				destinationAETitle, 
-				ConfigTreeNode.TreeNodeType.FORWARD_SCHEDULE, 
-				new ForwardScheduleModel(destinationAETitle, schedule));
-		Collections.sort(fssNode.getChildren());
-	}
-
-//	public void removeForwardSchedule(ConfigTreeNode fsNode) throws ConfigurationException {
-//		ProxyApplicationEntity proxyApplicationEntity = (ProxyApplicationEntity)
-//				((ApplicationEntityModel) fsNode.getParent().getParent().getModel()).getApplicationEntity();
-//		proxyApplicationEntity.getForwardSchedules()
-//			.remove(((ForwardScheduleModel) fsNode.getModel()).getDestinationAETitle());
-//		getDicomConfigurationManager().save(proxyApplicationEntity.getDevice());
-//
-//		ConfigTreeNode fssNode = fsNode.getParent();
-//		fsNode.remove();
-//		Collections.sort(fssNode.getChildren());
-//	}
-
-	public void addRetry(ConfigTreeNode rtsNode, Retry retry) throws ConfigurationException {
-    	ProxyApplicationEntity proxyApplicationEntity = 
-    			((ProxyApplicationEntityModel) rtsNode.getParent().getModel()).getApplicationEntity();
-    	proxyApplicationEntity.getRetries().add(retry);    	   	
-        getDicomConfigurationManager().save(proxyApplicationEntity.getDevice());
-        
-		new ConfigTreeNode(rtsNode, 
-				retry.getSuffix(), 
-				ConfigTreeNode.TreeNodeType.RETRY, 
-				new RetryModel(retry));
-		Collections.sort(rtsNode.getChildren());
-	}
-
-	public void editRetry(ConfigTreeNode rtsNode,
-			ConfigTreeNode rtNode, Retry retry) throws ConfigurationException {
-		ProxyApplicationEntity proxyApplicationEntity = (ProxyApplicationEntity)
-				((ApplicationEntityModel) rtNode.getParent().getParent().getModel()).getApplicationEntity();
-        getDicomConfigurationManager().save(proxyApplicationEntity.getDevice());
-        
-		rtNode.remove();        
-		new ConfigTreeNode(rtsNode, 
-				retry.getSuffix(), 
-				ConfigTreeNode.TreeNodeType.RETRY, 
-				new RetryModel(retry));
-		Collections.sort(rtsNode.getChildren());
-	}
-
-//	public void removeRetry(ConfigTreeNode rtNode) throws ConfigurationException {
-//		ProxyApplicationEntity proxyApplicationEntity = (ProxyApplicationEntity)
-//				((ApplicationEntityModel) rtNode.getParent().getParent().getModel()).getApplicationEntity();
-//		List<Retry> retries = proxyApplicationEntity.getRetries();
-//		retries.remove(((RetryModel) rtNode.getModel()).getRetry());
-//		getDicomConfigurationManager().save(proxyApplicationEntity.getDevice());
-//
-//		ConfigTreeNode rtsNode = rtNode.getParent();
-//		rtNode.remove();
-//		Collections.sort(rtsNode.getChildren());
-//	}
-
-	public void addCoercion(ConfigTreeNode csNode, AttributeCoercion coercion) throws ConfigurationException {
-    	ProxyApplicationEntity proxyApplicationEntity = 
-    			((ProxyApplicationEntityModel) csNode.getParent().getModel()).getApplicationEntity();
-    	proxyApplicationEntity.getAttributeCoercions().add(coercion);
-    	getDicomConfigurationManager().save(proxyApplicationEntity.getDevice());
-        
-		new ConfigTreeNode(csNode, 
-				coercion.getDimse().toString() + " " +
-				coercion.getRole().toString() + " " + 
-				(coercion.getAETitle() != null ? 
-						coercion.getAETitle() + " " :  "") + 
-				(coercion.getSopClass() != null ? 
-						coercion.getSopClass() + " " :  ""),  
-				ConfigTreeNode.TreeNodeType.COERCION, 
-				new CoercionModel(coercion));
-		Collections.sort(csNode.getChildren());
-	}
-
-	public void editCoercion(ConfigTreeNode csNode, 
-			ConfigTreeNode cNode, AttributeCoercion coercion) throws ConfigurationException {
-		ProxyApplicationEntity proxyApplicationEntity = (ProxyApplicationEntity)
-				((ApplicationEntityModel) cNode.getParent().getParent().getModel()).getApplicationEntity();
-        getDicomConfigurationManager().save(proxyApplicationEntity.getDevice());
-
-		cNode.remove();
-		new ConfigTreeNode(csNode, 
-				coercion.getDimse().toString() + " " +
-				coercion.getRole().toString() + " " + 
-				(coercion.getAETitle() != null ? 
-						coercion.getAETitle() + " " :  "") + 
-				(coercion.getSopClass() != null ? 
-						coercion.getSopClass() + " " :  ""),  
-				ConfigTreeNode.TreeNodeType.COERCION, 
-				new CoercionModel(coercion));
-		Collections.sort(csNode.getChildren());
-	}
-
-//	public void removeCoercion(ConfigTreeNode cNode) throws ConfigurationException {
-//		ProxyApplicationEntity proxyApplicationEntity = (ProxyApplicationEntity)
-//				((ApplicationEntityModel) cNode.getParent().getParent().getModel()).getApplicationEntity();
-//		proxyApplicationEntity.getAttributeCoercions()
-//			.remove(((CoercionModel) cNode.getModel()).getCoercion());
-//		getDicomConfigurationManager().save(proxyApplicationEntity.getDevice());
-//
-//		ConfigTreeNode csNode = cNode.getParent();
-//		cNode.remove();
-//		Collections.sort(csNode.getChildren());
-//	}
 
 	public ConfigurationType getConfigurationType(Device device) {
 		if (device instanceof ProxyDevice)

@@ -60,6 +60,7 @@ import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.resource.CssResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.dcm4che.conf.api.ConfigurationException;
+import org.dcm4che.net.ApplicationEntity;
 import org.dcm4che.net.Dimse;
 import org.dcm4chee.proxy.conf.ForwardRule;
 import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
@@ -68,7 +69,9 @@ import org.dcm4chee.web.common.base.BaseWicketPage;
 import org.dcm4chee.web.common.markup.BaseForm;
 import org.dcm4chee.web.common.markup.modal.MessageWindow;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ApplicationEntityModel;
+import org.dcm4chee.wizard.war.configuration.simple.model.basic.DeviceModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ForwardRuleModel;
+import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ProxyApplicationEntityModel;
 import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider;
 import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeNode;
 import org.dcm4chee.wizard.war.configuration.simple.validator.CommonNameValidator;
@@ -105,21 +108,24 @@ public class CreateOrEditForwardRulePage extends SecureWebPage {
     private Model<String> useCallingAETitleModel;
     private Model<String> sopClassModel;
     
-    public CreateOrEditForwardRulePage(final ModalWindow window, final ForwardRuleModel frModel, 
-    		final ConfigTreeNode frsNode, final ConfigTreeNode frNode) {
+    public CreateOrEditForwardRulePage(final ModalWindow window, final ForwardRuleModel forwardRuleModel, 
+    		final ConfigTreeNode aeNode) {
     	super();
+
+    	final ProxyApplicationEntity proxyApplicationEntity = 
+    			((ProxyApplicationEntityModel) aeNode.getModel()).getApplicationEntity();
 
         msgWin.setTitle("");
         add(msgWin);
-        add(new WebMarkupContainer("create-forwardRule-title").setVisible(frModel == null));
-        add(new WebMarkupContainer("edit-forwardRule-title").setVisible(frModel != null));
+        add(new WebMarkupContainer("create-forwardRule-title").setVisible(forwardRuleModel == null));
+        add(new WebMarkupContainer("edit-forwardRule-title").setVisible(forwardRuleModel != null));
 
         setOutputMarkupId(true);
         final BaseForm form = new BaseForm("form");
         form.setResourceIdPrefix("dicom.edit.forwardRule.");
         add(form);
 
-		if (frModel == null) {
+		if (forwardRuleModel == null) {
 			commonNameModel = Model.of();
 		    destinationURIModel = Model.of();
 		    callingAETitleModel = Model.of();
@@ -130,7 +136,7 @@ public class CreateOrEditForwardRulePage extends SecureWebPage {
 		    useCallingAETitleModel = Model.of();
 		    sopClassModel = Model.of();
 		} else {
-			ForwardRule forwardRule = frModel.getForwardRule();
+			ForwardRule forwardRule = forwardRuleModel.getForwardRule();
 	        commonNameModel = Model.of(forwardRule.getCommonName());
 	        destinationURIModel = Model.of(forwardRule.getDestinationURI());
 	        callingAETitleModel = Model.of(forwardRule.getCallingAET());
@@ -142,15 +148,9 @@ public class CreateOrEditForwardRulePage extends SecureWebPage {
 			sopClassModel = Model.of(forwardRule.getSopClass());		
 		}
 
-        try {
-			form.add(new Label("commonName.label", new ResourceModel("dicom.edit.forwardRule.commonName.label")))
-			.add(new TextField<String>("commonName", commonNameModel).setRequired(true)
-					.add(new CommonNameValidator(commonNameModel.getObject(), 
-							(ProxyApplicationEntity) ((ApplicationEntityModel) frsNode.getParent().getModel()).getApplicationEntity())));
-		} catch (ConfigurationException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+        form.add(new Label("commonName.label", new ResourceModel("dicom.edit.forwardRule.commonName.label")))
+		.add(new TextField<String>("commonName", commonNameModel).setRequired(true)
+				.add(new CommonNameValidator(commonNameModel.getObject(), proxyApplicationEntity)));
 
         form.add(new Label("destinationURI.label", new ResourceModel("dicom.edit.forwardRule.destinationURI.label")))
         .add(new TextField<String>("destinationURI", destinationURIModel).setRequired(true)
@@ -224,8 +224,8 @@ public class CreateOrEditForwardRulePage extends SecureWebPage {
             @Override
             protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
                 try {
-                	ForwardRule forwardRule = frModel == null ? 
-                    		new ForwardRule() : frModel.getForwardRule();
+                	ForwardRule forwardRule = forwardRuleModel == null ? 
+                    		new ForwardRule() : forwardRuleModel.getForwardRule();
 
             		forwardRule.setCommonName(commonNameModel.getObject());
             		forwardRule.setDestinationURI(destinationURIModel.getObject());
@@ -239,15 +239,16 @@ public class CreateOrEditForwardRulePage extends SecureWebPage {
             		forwardRule.setUseCallingAET(useCallingAETitleModel.getObject());
             		forwardRule.setSopClass(sopClassModel.getObject());
                     		
-                    if (frModel == null)
-                    	ConfigTreeProvider.get().addForwardRule(frsNode, forwardRule);
-                    else 
-                    	ConfigTreeProvider.get().editForwardRule(frsNode, frNode, forwardRule);
+            		if (forwardRuleModel == null)
+            			proxyApplicationEntity.getForwardRules().add(forwardRule);
+
+            		ConfigTreeProvider.get().mergeDevice(proxyApplicationEntity.getDevice());
+            		aeNode.getAncestor(2).setModel(null);
 
                     window.close(target);
                 } catch (Exception e) {
                 	log.error("Error modifying forward rule", e);
-                    msgWin.show(target, new ResourceModel(frModel == null ? 
+                    msgWin.show(target, new ResourceModel(forwardRuleModel == null ? 
                     		"dicom.edit.forwardRule.create.failed" : "dicom.edit.forwardRule.update.failed")
                     		.wrapOnAssignment(this));
                 }

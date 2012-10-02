@@ -61,6 +61,7 @@ import org.dcm4che.net.Connection;
 import org.dcm4chee.web.common.base.BaseWicketPage;
 import org.dcm4chee.web.common.markup.BaseForm;
 import org.dcm4chee.web.common.markup.modal.MessageWindow;
+import org.dcm4chee.wizard.war.Utils;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ConnectionModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.DeviceModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.StringArrayModel;
@@ -185,6 +186,7 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
                     Connection connection = connectionModel == null ? 
                     		new Connection(commonNameModel.getObject(), hostnameModel.getObject()) : 
                     			connectionModel.getConnection();
+
                     connection.setHostname(hostnameModel.getObject());
                     connection.setCommonName(commonNameModel.getObject());
                     connection.setInstalled(installedModel.getObject());
