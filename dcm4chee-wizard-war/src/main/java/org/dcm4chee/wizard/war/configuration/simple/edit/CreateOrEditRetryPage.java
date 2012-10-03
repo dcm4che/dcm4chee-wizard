@@ -38,6 +38,9 @@
 
 package org.dcm4chee.wizard.war.configuration.simple.edit;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxFallbackButton;
@@ -45,14 +48,18 @@ import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.resource.CssResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
+import org.dcm4che.net.Dimse;
 import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
 import org.dcm4chee.proxy.conf.Retry;
+import org.dcm4chee.proxy.conf.RetryFileSuffix;
 import org.dcm4chee.web.common.base.BaseWicketPage;
 import org.dcm4chee.web.common.markup.BaseForm;
 import org.dcm4chee.web.common.markup.modal.MessageWindow;
@@ -79,7 +86,7 @@ public class CreateOrEditRetryPage extends SecureWebPage {
     private MessageWindow msgWin = new MessageWindow("msgWin");
     
     // mandatory
-	private Model<String> suffixModel;
+	private IModel<RetryFileSuffix> suffixModel;
     private Model<Integer> delayModel;
 	private Model<Integer> retriesModel;
     
@@ -100,15 +107,25 @@ public class CreateOrEditRetryPage extends SecureWebPage {
         form.setResourceIdPrefix("dicom.edit.retry.");
         add(form);
 
-		suffixModel = Model.of(retryModel != null ? retryModel.getRetry().getSuffix() : null);
-		delayModel = Model.of(retryModel != null ? retryModel.getRetry().getDelay() : null);
-		retriesModel = Model.of(retryModel != null ? retryModel.getRetry().getNumberOfRetries() : null);
+        if (retryModel == null) {
+    		suffixModel = Model.of(RetryFileSuffix.AAssociateRJ);
+    		delayModel = Model.of();
+    		retriesModel = Model.of();
+        } else {
+			suffixModel = Model.of(RetryFileSuffix.valueOf(retryModel.getRetry().getSuffix()));
+			delayModel = Model.of(retryModel.getRetry().getDelay());
+			retriesModel = Model.of(retryModel.getRetry().getNumberOfRetries());
+        }
 
-        form.add(new Label("suffix.label", new ResourceModel("dicom.edit.retry.suffix.label")))
-        .add(new TextField<String>("suffix", suffixModel).setRequired(true)
-        		.add(new RetrySuffixValidator(
-        				suffixModel.getObject(), proxyApplicationEntity.getRetries())));
-        
+        form.add(new Label("suffix.label", new ResourceModel("dicom.edit.retry.suffix.label")));
+        ArrayList<RetryFileSuffix> suffixList = 
+        		new ArrayList<RetryFileSuffix>();
+        suffixList.addAll(Arrays.asList(RetryFileSuffix.values()));
+        DropDownChoice<RetryFileSuffix> suffixDropDown = 
+        		new DropDownChoice<RetryFileSuffix>("suffix", suffixModel, suffixList);
+        form.add(suffixDropDown
+        		.setNullValid(false));
+
         form.add(new Label("delay.label", new ResourceModel("dicom.edit.retry.delay.label")))
         .add(new TextField<Integer>("delay", delayModel)
         		.setType(Integer.class)
@@ -127,7 +144,7 @@ public class CreateOrEditRetryPage extends SecureWebPage {
             protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
                 try {
                 	Retry retry = new Retry(
-                			suffixModel.getObject(),
+                			suffixModel.getObject().toString(),
                 			delayModel.getObject(),
                 			retriesModel.getObject());
 
