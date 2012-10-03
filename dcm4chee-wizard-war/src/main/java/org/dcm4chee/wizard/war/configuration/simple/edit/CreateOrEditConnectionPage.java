@@ -94,10 +94,10 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
 	private Model<Integer> portModel;
 	private StringArrayModel tlsCipherSuitesModel;
 	
-	private Model<String> httpProxyModel; 
+	private Model<String> httpProxyModel;
 	// [user:password@]host:port
-	private IModel<Boolean> tlsNeedClientauthModel;
-	private Model<String> tlsProtocolModel;
+	private IModel<Boolean> tlsNeedClientAuthModel;
+	private StringArrayModel tlsProtocolModel;
 	// "TLSv1", "SSLv3" if absent
 	private Model<Integer> tcpBacklogModel;
 	// Maximum queue length for incoming TCP connections; 50 if absent
@@ -109,7 +109,7 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
 	private Model<Integer> tcpReceiveBufferSizeModel;
 	private IModel<Boolean> tcpNoDelayModel;
 	// Enable/disable TCP_NODELAY (disable/enable Nagle algorithm); disable Nagle algorithm if absent
-	private Model<String> blacklistedHostnameModel;
+	private StringArrayModel blacklistedHostnameModel;
 	private Model<Integer> sendPDULengthModel;
 	// Maximal length of emitted PDUs; 16378 if absent
 	private Model<Integer> receivePDULengthModel;
@@ -118,30 +118,20 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
 	// 1 (=synchronous) if absent
 	private Model<Integer> maxOpsInvokedModel;
 	// 1 (=synchronous) if absent
-	
-
-//    HTTPProxy
-//    TLSNeedClientAuth
-//    TLSProtocol
-//    TCPBacklog
-//    TCPConnectTimeout
-//    TCPCloseDelay
-//    TCPSendBufferSize
-//    TCPReceiveBufferSize
-//    TCPNoDelay
-//    BlacklistedHostname
-//    SendPDULength
-//    ReceivePDULength
-//    MaxOpsPerformed
-//    MaxOpsInvoked
-//    PackPDV
-//    AARQTimeout
-//    AAACTimeout
-//    ARRPTimeout
-//    ResponseTimeout
-//    RetrieveTimeout
-//    IdleTimeout
-
+	private IModel<Boolean> packPDVModel;
+	// enabled if absent
+	private IModel<Integer> aarqTimeoutModel;
+	// Timeout in ms; no timeout if absent
+	private IModel<Integer> aaacTimeoutModel;
+	// Timeout in ms; no timeout if absent
+	private IModel<Integer> arrpTimeoutModel;
+	// Timeout in ms; no timeout if absent
+	private IModel<Integer> responseTimeoutModel;
+	// Timeout in ms; no timeout if absent
+	private IModel<Integer> retrieveTimeoutModel;
+	// Timeout in ms; no timeout if absent
+	private IModel<Integer> idleTimeoutModel;
+	// Timeout in ms; no timeout if absent
     
     public CreateOrEditConnectionPage(final ModalWindow window, final ConnectionModel connectionModel, 
 			final ConfigTreeNode deviceNode) {
@@ -171,12 +161,55 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
 				installedModel = Model.of();
 		        portModel = Model.of(1);
 		        tlsCipherSuitesModel = new StringArrayModel(null);
+		    	httpProxyModel = Model.of();
+		    	tlsNeedClientAuthModel = Model.of(true);
+		    	tlsProtocolModel = new StringArrayModel(new String[] { "SSLv3" });
+		    	tcpBacklogModel = Model.of(50);
+		    	tcpConnectTimeoutModel = Model.of();
+		    	tcpCloseDelayModel = Model.of(50);
+		    	tcpSendBufferSizeModel = Model.of();
+		    	tcpReceiveBufferSizeModel = Model.of();
+		    	tcpNoDelayModel = Model.of(false);
+		    	blacklistedHostnameModel = new StringArrayModel(null);
+		    	sendPDULengthModel = Model.of(16378);
+		    	receivePDULengthModel = Model.of(16378);
+		    	maxOpsPerformedModel = Model.of(1);
+		    	maxOpsInvokedModel = Model.of(1);
+		    	packPDVModel = Model.of(true);
+		    	aarqTimeoutModel = Model.of();
+		    	aaacTimeoutModel = Model.of();
+		    	arrpTimeoutModel = Model.of();	    	
+		    	responseTimeoutModel = Model.of();
+		    	retrieveTimeoutModel = Model.of();
+		    	idleTimeoutModel = Model.of();
         	} else {
-		        hostnameModel = Model.of(connectionModel.getConnection().getHostname());
-	        	commonNameModel = Model.of(connectionModel.getConnection().getCommonName());
-				installedModel = Model.of(connectionModel.getConnection().isInstalled());
-		        portModel = Model.of(connectionModel.getConnection().getPort());
-		        tlsCipherSuitesModel = new StringArrayModel(connectionModel.getConnection().getTlsCipherSuites());
+        		Connection connection = connectionModel.getConnection();
+		        hostnameModel = Model.of(connection.getHostname());
+	        	commonNameModel = Model.of(connection.getCommonName());
+				installedModel = Model.of(connection.isInstalled());
+		        portModel = Model.of(connection.getPort());
+		        tlsCipherSuitesModel = new StringArrayModel(connection.getTlsCipherSuites());
+		    	httpProxyModel = Model.of(connection.getHttpProxy());
+		    	tlsNeedClientAuthModel = Model.of(connection.isTlsNeedClientAuth());
+		    	tlsProtocolModel = new StringArrayModel(connection.getTlsProtocols());
+		    	tcpBacklogModel = Model.of(connection.getBacklog());
+		    	tcpConnectTimeoutModel = Model.of(connection.getConnectTimeout());
+		    	tcpCloseDelayModel = Model.of(connection.getSocketCloseDelay());
+		    	tcpSendBufferSizeModel = Model.of(connection.getSendBufferSize());
+		    	tcpReceiveBufferSizeModel = Model.of(connection.getReceiveBufferSize());
+		    	tcpNoDelayModel = Model.of(connection.isTcpNoDelay());
+		    	blacklistedHostnameModel = new StringArrayModel(connection.getBlacklist());
+		    	sendPDULengthModel = Model.of(connection.getSendPDULength());
+		    	receivePDULengthModel = Model.of(connection.getReceivePDULength());
+		    	maxOpsPerformedModel = Model.of(connection.getMaxOpsPerformed());
+		    	maxOpsInvokedModel = Model.of(connection.getMaxOpsInvoked());
+		    	packPDVModel = Model.of(connection.isPackPDV());
+		    	aarqTimeoutModel = Model.of(connection.getRequestTimeout());
+		    	aaacTimeoutModel = Model.of(connection.getAcceptTimeout());
+		    	arrpTimeoutModel = Model.of(connection.getReleaseTimeout());
+		    	responseTimeoutModel = Model.of(connection.getResponseTimeout());
+		    	retrieveTimeoutModel = Model.of(connection.getRetrieveTimeout());
+		    	idleTimeoutModel = Model.of(connection.getIdleTimeout());
 	        }
         } catch (ConfigurationException e1) {
 			// TODO Auto-generated catch block
@@ -210,7 +243,101 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
 
         optionalContainer.add(new Label("tlsCipherSuites.label", new ResourceModel("dicom.edit.connection.tlsCipherSuites.label")))
         .add(new TextArea<String>("tlsCipherSuites", tlsCipherSuitesModel));
+
+        optionalContainer.add(new Label("httpProxy.label", new ResourceModel("dicom.edit.connection.httpProxy.label")))
+        .add(new TextField<String>("httpProxy", httpProxyModel)
+        		.add(new HostnameValidator()));
         
+        optionalContainer.add(new Label("tlsNeedClientAuth.label", new ResourceModel("dicom.edit.connection.tlsNeedClientAuth.label")))
+        .add(new CheckBox("tlsNeedClientAuth", tlsNeedClientAuthModel));
+
+        optionalContainer.add(new Label("tlsProtocol.label", new ResourceModel("dicom.edit.connection.tlsProtocol.label")))
+        .add(new TextArea<String>("tlsProtocol", tlsProtocolModel));
+
+        optionalContainer.add(new Label("tcpBacklog.label", new ResourceModel("dicom.edit.connection.tcpBacklog.label")))
+        .add(new TextField<Integer>("tcpBacklog", tcpBacklogModel)
+        		.setType(Integer.class)
+        		.add(new RangeValidator<Integer>(0,65535)));
+
+        optionalContainer.add(new Label("tcpConnectTimeout.label", new ResourceModel("dicom.edit.connection.tcpConnectTimeout.label")))
+        .add(new TextField<Integer>("tcpConnectTimeout", tcpConnectTimeoutModel)
+        		.setType(Integer.class)
+        		.add(new RangeValidator<Integer>(0,65535)));
+
+        optionalContainer.add(new Label("tcpCloseDelay.label", new ResourceModel("dicom.edit.connection.tcpCloseDelay.label")))
+        .add(new TextField<Integer>("tcpCloseDelay", tcpCloseDelayModel)
+        		.setType(Integer.class)
+        		.add(new RangeValidator<Integer>(0,65535)));
+
+        optionalContainer.add(new Label("tcpSendBufferSize.label", new ResourceModel("dicom.edit.connection.tcpSendBufferSize.label")))
+        .add(new TextField<Integer>("tcpSendBufferSize", tcpSendBufferSizeModel)
+        		.setType(Integer.class)
+        		.add(new RangeValidator<Integer>(0,65535)));
+        
+        optionalContainer.add(new Label("tcpReceiveBufferSize.label", new ResourceModel("dicom.edit.connection.tcpReceiveBufferSize.label")))
+        .add(new TextField<Integer>("tcpReceiveBufferSize", tcpReceiveBufferSizeModel)
+        		.setType(Integer.class)
+        		.add(new RangeValidator<Integer>(0,65535)));
+        
+        optionalContainer.add(new Label("tcpNoDelay.label", new ResourceModel("dicom.edit.connection.tcpNoDelay.label")))
+        .add(new CheckBox("tcpNoDelay", tcpNoDelayModel));
+
+        optionalContainer.add(new Label("blacklistedHostname.label", new ResourceModel("dicom.edit.connection.blacklistedHostname.label")))
+        .add(new TextArea<String>("blacklistedHostname", blacklistedHostnameModel));
+
+        optionalContainer.add(new Label("sendPDULength.label", new ResourceModel("dicom.edit.connection.sendPDULength.label")))
+        .add(new TextField<Integer>("sendPDULength", sendPDULengthModel)
+        		.setType(Integer.class)
+        		.add(new RangeValidator<Integer>(0,65535)));
+        
+        optionalContainer.add(new Label("receivePDULength.label", new ResourceModel("dicom.edit.connection.receivePDULength.label")))
+        .add(new TextField<Integer>("receivePDULength", receivePDULengthModel)
+        		.setType(Integer.class)
+        		.add(new RangeValidator<Integer>(0,65535)));
+
+        optionalContainer.add(new Label("maxOpsPerformed.label", new ResourceModel("dicom.edit.connection.maxOpsPerformed.label")))
+        .add(new TextField<Integer>("maxOpsPerformed", maxOpsPerformedModel)
+        		.setType(Integer.class)
+        		.add(new RangeValidator<Integer>(0,65535)));
+
+        optionalContainer.add(new Label("maxOpsInvoked.label", new ResourceModel("dicom.edit.connection.maxOpsInvoked.label")))
+        .add(new TextField<Integer>("maxOpsInvoked", maxOpsInvokedModel)
+        		.setType(Integer.class)
+        		.add(new RangeValidator<Integer>(0,65535)));
+
+        optionalContainer.add(new Label("packPDV.label", new ResourceModel("dicom.edit.connection.packPDV.label")))
+        .add(new CheckBox("packPDV", packPDVModel));
+
+        optionalContainer.add(new Label("aarqTimeout.label", new ResourceModel("dicom.edit.connection.aarqTimeout.label")))
+        .add(new TextField<Integer>("aarqTimeout", aarqTimeoutModel)
+        		.setType(Integer.class)
+        		.add(new RangeValidator<Integer>(0,65535)));
+
+        optionalContainer.add(new Label("aaacTimeout.label", new ResourceModel("dicom.edit.connection.aaacTimeout.label")))
+        .add(new TextField<Integer>("aaacTimeout", aaacTimeoutModel)
+        		.setType(Integer.class)
+        		.add(new RangeValidator<Integer>(0,65535)));
+
+        optionalContainer.add(new Label("arrpTimeout.label", new ResourceModel("dicom.edit.connection.arrpTimeout.label")))
+        .add(new TextField<Integer>("arrpTimeout", arrpTimeoutModel)
+        		.setType(Integer.class)
+        		.add(new RangeValidator<Integer>(0,65535)));
+
+        optionalContainer.add(new Label("responseTimeout.label", new ResourceModel("dicom.edit.connection.responseTimeout.label")))
+        .add(new TextField<Integer>("responseTimeout", responseTimeoutModel)
+        		.setType(Integer.class)
+        		.add(new RangeValidator<Integer>(0,65535)));
+
+        optionalContainer.add(new Label("retrieveTimeout.label", new ResourceModel("dicom.edit.connection.retrieveTimeout.label")))
+        .add(new TextField<Integer>("retrieveTimeout", retrieveTimeoutModel)
+        		.setType(Integer.class)
+        		.add(new RangeValidator<Integer>(0,65535)));
+        
+        optionalContainer.add(new Label("idleTimeout.label", new ResourceModel("dicom.edit.connection.idleTimeout.label")))
+        .add(new TextField<Integer>("idleTimeout", idleTimeoutModel)
+        		.setType(Integer.class)
+        		.add(new RangeValidator<Integer>(0,65535)));
+
         form.add(new Label("optional.label", new ResourceModel("dicom.edit.optional.label")))
         .add(new AjaxCheckBox("optional", new Model<Boolean>()) {
 			private static final long serialVersionUID = 1L;
@@ -220,7 +347,7 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
 				target.add(optionalContainer.setVisible(this.getModelObject()));
 			}
         });
-
+        
 		form.add(new ConnectionValidator(((DeviceModel) deviceNode.getModel()).getConnections(), 
 				commonNameTextField, hostnameTextField, portTextField, commonNameTextField.getModelObject()));
         
@@ -240,7 +367,28 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
                     connection.setInstalled(installedModel.getObject());
                     connection.setPort(portModel.getObject().intValue());
                     connection.setTlsCipherSuites(tlsCipherSuitesModel.getArray());
-                    
+                    connection.setHttpProxy(httpProxyModel.getObject());
+                    connection.setTlsNeedClientAuth(tlsNeedClientAuthModel.getObject());
+                    connection.setTlsProtocols(tlsProtocolModel.getArray());
+                    connection.setBacklog(tcpBacklogModel.getObject());
+                    connection.setConnectTimeout(tcpConnectTimeoutModel.getObject());
+                    connection.setSocketCloseDelay(tcpCloseDelayModel.getObject());
+                    connection.setSendBufferSize(tcpSendBufferSizeModel.getObject());
+                    connection.setReceiveBufferSize(tcpReceiveBufferSizeModel.getObject());
+                    connection.setTcpNoDelay(tcpNoDelayModel.getObject());
+                    connection.setBlacklist(blacklistedHostnameModel.getArray());
+                    connection.setSendPDULength(sendPDULengthModel.getObject());
+                    connection.setReceivePDULength(receivePDULengthModel.getObject());
+                    connection.setMaxOpsPerformed(maxOpsPerformedModel.getObject());                    
+                    connection.setMaxOpsInvoked(maxOpsInvokedModel.getObject());
+                    connection.setPackPDV(packPDVModel.getObject());
+                    connection.setRequestTimeout(aarqTimeoutModel.getObject());
+                    connection.setAcceptTimeout(aaacTimeoutModel.getObject());
+                    connection.setReleaseTimeout(arrpTimeoutModel.getObject());
+                    connection.setResponseTimeout(responseTimeoutModel.getObject());
+                    connection.setRetrieveTimeout(retrieveTimeoutModel.getObject());
+                    connection.setIdleTimeout(idleTimeoutModel.getObject());
+
                     if (connectionModel == null) 
                         ((DeviceModel) deviceNode.getModel()).getDevice().addConnection(connection);
                     ConfigTreeProvider.get().mergeDevice(connection.getDevice());

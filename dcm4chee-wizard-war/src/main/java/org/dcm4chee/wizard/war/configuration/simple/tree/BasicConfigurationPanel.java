@@ -743,15 +743,11 @@ public class BasicConfigurationPanel extends ExtendedPanel {
     }
     
     public void refreshTree() throws ConfigurationException {
-
 		IModel<Set<ConfigTreeNode>> currentState = configTree.getModel();
-
 		configTree = new ConfigTableTree("configTree", deviceColumns,
 				ConfigTreeProvider.get(), 
 				Integer.MAX_VALUE);
-
 		configTree.setModel(currentState);
-		
 		form.addOrReplace(configTree);
 	}
 
