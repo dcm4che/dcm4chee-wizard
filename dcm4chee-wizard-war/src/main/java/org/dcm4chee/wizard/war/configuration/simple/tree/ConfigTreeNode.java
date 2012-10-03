@@ -157,7 +157,7 @@ public class ConfigTreeNode implements Serializable, Comparable<ConfigTreeNode> 
 
 	@Override
 	public int hashCode() {
-		return (getParent() != null) ? (getParent() + name).hashCode() : name.hashCode();
+		return (parent != null) ? (parent + name).hashCode() : name.hashCode();
 	}
 
 	public void remove() {
