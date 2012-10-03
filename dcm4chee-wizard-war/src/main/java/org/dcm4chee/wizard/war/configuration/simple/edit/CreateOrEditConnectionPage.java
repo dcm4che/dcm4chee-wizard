@@ -61,12 +61,11 @@ import org.dcm4che.net.Connection;
 import org.dcm4chee.web.common.base.BaseWicketPage;
 import org.dcm4chee.web.common.markup.BaseForm;
 import org.dcm4chee.web.common.markup.modal.MessageWindow;
-import org.dcm4chee.wizard.war.Utils;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ConnectionModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.DeviceModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.StringArrayModel;
-import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider;
 import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeNode;
+import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider;
 import org.dcm4chee.wizard.war.configuration.simple.validator.ConnectionValidator;
 import org.dcm4chee.wizard.war.configuration.simple.validator.HostnameValidator;
 import org.slf4j.Logger;
@@ -94,6 +93,55 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
 	private IModel<Boolean> installedModel;
 	private Model<Integer> portModel;
 	private StringArrayModel tlsCipherSuitesModel;
+	
+	private Model<String> httpProxyModel; 
+	// [user:password@]host:port
+	private IModel<Boolean> tlsNeedClientauthModel;
+	private Model<String> tlsProtocolModel;
+	// "TLSv1", "SSLv3" if absent
+	private Model<Integer> tcpBacklogModel;
+	// Maximum queue length for incoming TCP connections; 50 if absent
+	private Model<Integer> tcpConnectTimeoutModel;
+	// TCP connect timeout in ms; no timeout if absent
+	private Model<Integer> tcpCloseDelayModel;
+	// TCP socket close delay in ms; 50 ms if absent
+	private Model<Integer> tcpSendBufferSizeModel;
+	private Model<Integer> tcpReceiveBufferSizeModel;
+	private IModel<Boolean> tcpNoDelayModel;
+	// Enable/disable TCP_NODELAY (disable/enable Nagle algorithm); disable Nagle algorithm if absent
+	private Model<String> blacklistedHostnameModel;
+	private Model<Integer> sendPDULengthModel;
+	// Maximal length of emitted PDUs; 16378 if absent
+	private Model<Integer> receivePDULengthModel;
+	// Maximal length of received PDUs; 16378 if absent
+	private Model<Integer> maxOpsPerformedModel;
+	// 1 (=synchronous) if absent
+	private Model<Integer> maxOpsInvokedModel;
+	// 1 (=synchronous) if absent
+	
+
+//    HTTPProxy
+//    TLSNeedClientAuth
+//    TLSProtocol
+//    TCPBacklog
+//    TCPConnectTimeout
+//    TCPCloseDelay
+//    TCPSendBufferSize
+//    TCPReceiveBufferSize
+//    TCPNoDelay
+//    BlacklistedHostname
+//    SendPDULength
+//    ReceivePDULength
+//    MaxOpsPerformed
+//    MaxOpsInvoked
+//    PackPDV
+//    AARQTimeout
+//    AAACTimeout
+//    ARRPTimeout
+//    ResponseTimeout
+//    RetrieveTimeout
+//    IdleTimeout
+
     
     public CreateOrEditConnectionPage(final ModalWindow window, final ConnectionModel connectionModel, 
 			final ConfigTreeNode deviceNode) {
