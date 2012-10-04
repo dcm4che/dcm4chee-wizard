@@ -437,7 +437,9 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 							for (Connection connection : applicationEntity.getConnections())
 								connectionsView.add(new ConnectionPanel(connectionsView.newChildId(), 
 										ImageManager.IMAGE_WIZARD_CONNECTION, 
-										Model.of(connection.getCommonName()), 
+										Model.of(connection.getCommonName() == null ? 
+												connection.getHostname() + ":" + connection.getPort() :
+													connection.getCommonName()), 
 										Model.of(connection.toString()))
 								);
 					}
