@@ -66,13 +66,12 @@ import org.dcm4chee.web.common.base.BaseWicketPage;
 import org.dcm4chee.web.common.behaviours.FocusOnLoadBehaviour;
 import org.dcm4chee.web.common.markup.BaseForm;
 import org.dcm4chee.web.common.markup.modal.MessageWindow;
-import org.dcm4chee.wizard.war.Utils;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ApplicationEntityModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ConnectionReferenceModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.DeviceModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.StringArrayModel;
-import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider;
 import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeNode;
+import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider;
 import org.dcm4chee.wizard.war.configuration.simple.validator.AETitleValidator;
 import org.dcm4chee.wizard.war.configuration.simple.validator.ConnectionReferenceValidator;
 import org.slf4j.Logger;
@@ -204,10 +203,11 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
 					private static final long serialVersionUID = 1L;
 
 					public Object getDisplayValue(ConnectionReferenceModel connectionReference) {
-						return connectionReference.getCommonName() 
-								+ " (" + connectionReference.getHostname() 
-								+ ":" + connectionReference.getPort() 
-								+ ")";
+						String location = connectionReference.getHostname() 
+								+ ":" + connectionReference.getPort();
+						return connectionReference.getCommonName() != null ? 
+								connectionReference.getCommonName() + " (" + location + ")" : 
+									location;
 					}
 
 					public String getIdValue(ConnectionReferenceModel model, int index) {
