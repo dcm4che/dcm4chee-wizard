@@ -227,10 +227,6 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
 				forwardThreadsModel = Model.of(deviceModel.getDevice() instanceof ProxyDevice ? 
      					((ProxyDevice) deviceModel.getDevice()).getForwardThreads() : null);
         	}
-//		} catch (ConfigurationException e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//		}
 
         form.add(new Label("type.label", new ResourceModel("dicom.edit.device.type.label")));
         ArrayList<ConfigTreeProvider.ConfigurationType> configurationTypeList = 
@@ -290,7 +286,6 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
 				}
 			}
             		.setType(Integer.class)
-//            		.add(new RangeValidator<Integer>(1,65535))
             		.setRequired(deviceModel != null &&
 	            			deviceModel.getDevice() instanceof ProxyDevice ? true : false)
 			        .setOutputMarkupPlaceholderTag(true));
@@ -299,7 +294,7 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
 			e1.printStackTrace();
 		}
 
-        final WebMarkupContainer optionalContainer = new WebMarkupContainer("optionalContainer");
+        final Form<?> optionalContainer = new Form<Object>("optionalContainer");
         form.add(optionalContainer
         		.setOutputMarkupId(true)
         		.setOutputMarkupPlaceholderTag(true)
@@ -316,6 +311,7 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
 			@Override
 			protected void onUpdate(AjaxRequestTarget target) {
 				target.add(optionalContainer.setVisible(this.getModelObject()));
+				
 			}
         });
         
@@ -347,7 +343,7 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
         		new ResourceModel("dicom.edit.device.institutionCodeMeaning.label")))
         .add(codeMeaningTextField);
         
-        form.add(new CodeValidator(codeValueTextField, codingSchemeDesignatorTextField, 
+        optionalContainer.add(new CodeValidator(codeValueTextField, codingSchemeDesignatorTextField, 
         		codingSchemeVersionTextField, codeMeaningTextField));
        
         optionalContainer.add(new Label("institutionalDepartmentName.label", 
