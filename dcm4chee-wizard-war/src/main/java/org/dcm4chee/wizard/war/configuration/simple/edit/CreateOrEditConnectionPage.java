@@ -50,7 +50,6 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
-import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.resource.CssResourceReference;
@@ -62,6 +61,7 @@ import org.dcm4chee.web.common.base.BaseWicketPage;
 import org.dcm4chee.web.common.markup.BaseForm;
 import org.dcm4chee.web.common.markup.modal.MessageWindow;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ConnectionModel;
+import org.dcm4chee.wizard.war.configuration.simple.model.basic.DefaultableModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.DeviceModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.StringArrayModel;
 import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeNode;
@@ -90,48 +90,30 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
 
 	// optional
     private Model<String> commonNameModel;
-	private IModel<Boolean> installedModel;
+	private Model<Boolean> installedModel;
 	private Model<Integer> portModel;
 	private StringArrayModel tlsCipherSuitesModel;
-	
 	private Model<String> httpProxyModel;
-	// [user:password@]host:port
-	private IModel<Boolean> tlsNeedClientAuthModel;
+	private Model<Boolean> tlsNeedClientAuthModel;
 	private StringArrayModel tlsProtocolModel;
-	// "TLSv1", "SSLv3" if absent
-	private Model<Integer> tcpBacklogModel;
-	// Maximum queue length for incoming TCP connections; 50 if absent
-	private Model<Integer> tcpConnectTimeoutModel;
-	// TCP connect timeout in ms; no timeout if absent
-	private Model<Integer> tcpCloseDelayModel;
-	// TCP socket close delay in ms; 50 ms if absent
-	private Model<Integer> tcpSendBufferSizeModel;
-	private Model<Integer> tcpReceiveBufferSizeModel;
-	private IModel<Boolean> tcpNoDelayModel;
-	// Enable/disable TCP_NODELAY (disable/enable Nagle algorithm); disable Nagle algorithm if absent
+	private DefaultableModel<Integer> tcpBacklogModel;
+	private DefaultableModel<Integer> tcpConnectTimeoutModel;
+	private DefaultableModel<Integer> tcpCloseDelayModel;
+	private DefaultableModel<Integer> tcpSendBufferSizeModel;
+	private DefaultableModel<Integer> tcpReceiveBufferSizeModel;
+	private Model<Boolean> tcpNoDelayModel;
 	private StringArrayModel blacklistedHostnameModel;
-	private Model<Integer> sendPDULengthModel;
-	// Maximal length of emitted PDUs; 16378 if absent
-	private Model<Integer> receivePDULengthModel;
-	// Maximal length of received PDUs; 16378 if absent
-	private Model<Integer> maxOpsPerformedModel;
-	// 1 (=synchronous) if absent
-	private Model<Integer> maxOpsInvokedModel;
-	// 1 (=synchronous) if absent
-	private IModel<Boolean> packPDVModel;
-	// enabled if absent
-	private IModel<Integer> aarqTimeoutModel;
-	// Timeout in ms; no timeout if absent
-	private IModel<Integer> aaacTimeoutModel;
-	// Timeout in ms; no timeout if absent
-	private IModel<Integer> arrpTimeoutModel;
-	// Timeout in ms; no timeout if absent
-	private IModel<Integer> responseTimeoutModel;
-	// Timeout in ms; no timeout if absent
-	private IModel<Integer> retrieveTimeoutModel;
-	// Timeout in ms; no timeout if absent
-	private IModel<Integer> idleTimeoutModel;
-	// Timeout in ms; no timeout if absent
+	private DefaultableModel<Integer> sendPDULengthModel;
+	private DefaultableModel<Integer> receivePDULengthModel;
+	private DefaultableModel<Integer> maxOpsPerformedModel;
+	private DefaultableModel<Integer> maxOpsInvokedModel;
+	private Model<Boolean> packPDVModel;
+	private DefaultableModel<Integer> aarqTimeoutModel;
+	private DefaultableModel<Integer> aaacTimeoutModel;
+	private DefaultableModel<Integer> arrpTimeoutModel;
+	private DefaultableModel<Integer> responseTimeoutModel;
+	private DefaultableModel<Integer> retrieveTimeoutModel;
+	private DefaultableModel<Integer> idleTimeoutModel;
     
     public CreateOrEditConnectionPage(final ModalWindow window, final ConnectionModel connectionModel, 
 			final ConfigTreeNode deviceNode) {
@@ -155,6 +137,22 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
         add(form);
         
         try {
+	    	tcpBacklogModel = new DefaultableModel<Integer>(Connection.DEF_BACKLOG);
+	    	tcpConnectTimeoutModel = new DefaultableModel<Integer>(Connection.NO_TIMEOUT);
+	    	tcpCloseDelayModel = new DefaultableModel<Integer>(Connection.DEF_SOCKETDELAY);
+	    	tcpSendBufferSizeModel = new DefaultableModel<Integer>(Connection.DEF_BUFFERSIZE);
+	    	tcpReceiveBufferSizeModel = new DefaultableModel<Integer>(Connection.DEF_BUFFERSIZE);
+	    	sendPDULengthModel = new DefaultableModel<Integer>(Connection.DEF_MAX_PDU_LENGTH);
+	    	receivePDULengthModel = new DefaultableModel<Integer>(Connection.DEF_MAX_PDU_LENGTH);
+	    	maxOpsPerformedModel = new DefaultableModel<Integer>(Connection.SYNCHRONOUS_MODE);
+	    	maxOpsInvokedModel = new DefaultableModel<Integer>(Connection.SYNCHRONOUS_MODE);
+	    	aarqTimeoutModel = new DefaultableModel<Integer>(Connection.NO_TIMEOUT);
+	    	aaacTimeoutModel = new DefaultableModel<Integer>(Connection.NO_TIMEOUT);
+	    	arrpTimeoutModel = new DefaultableModel<Integer>(Connection.NO_TIMEOUT);
+	    	responseTimeoutModel = new DefaultableModel<Integer>(Connection.NO_TIMEOUT);
+	    	retrieveTimeoutModel = new DefaultableModel<Integer>(Connection.NO_TIMEOUT);
+	    	idleTimeoutModel = new DefaultableModel<Integer>(Connection.NO_TIMEOUT);
+
         	if (connectionModel == null) {
 		        hostnameModel = Model.of();
 	        	commonNameModel = Model.of();
@@ -163,25 +161,10 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
 		        tlsCipherSuitesModel = new StringArrayModel(null);
 		    	httpProxyModel = Model.of();
 		    	tlsNeedClientAuthModel = Model.of(true);
-		    	tlsProtocolModel = new StringArrayModel(new String[] { "SSLv3" });
-		    	tcpBacklogModel = Model.of(50);
-		    	tcpConnectTimeoutModel = Model.of();
-		    	tcpCloseDelayModel = Model.of(50);
-		    	tcpSendBufferSizeModel = Model.of();
-		    	tcpReceiveBufferSizeModel = Model.of();
+		    	tlsProtocolModel = new StringArrayModel(new String[] { "TLSv1", "SSLv3" });
 		    	tcpNoDelayModel = Model.of(false);
 		    	blacklistedHostnameModel = new StringArrayModel(null);
-		    	sendPDULengthModel = Model.of(16378);
-		    	receivePDULengthModel = Model.of(16378);
-		    	maxOpsPerformedModel = Model.of(1);
-		    	maxOpsInvokedModel = Model.of(1);
 		    	packPDVModel = Model.of(true);
-		    	aarqTimeoutModel = Model.of();
-		    	aaacTimeoutModel = Model.of();
-		    	arrpTimeoutModel = Model.of();	    	
-		    	responseTimeoutModel = Model.of();
-		    	retrieveTimeoutModel = Model.of();
-		    	idleTimeoutModel = Model.of();
         	} else {
         		Connection connection = connectionModel.getConnection();
 		        hostnameModel = Model.of(connection.getHostname());
@@ -192,24 +175,24 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
 		    	httpProxyModel = Model.of(connection.getHttpProxy());
 		    	tlsNeedClientAuthModel = Model.of(connection.isTlsNeedClientAuth());
 		    	tlsProtocolModel = new StringArrayModel(connection.getTlsProtocols());
-		    	tcpBacklogModel = Model.of(connection.getBacklog());
-		    	tcpConnectTimeoutModel = Model.of(connection.getConnectTimeout());
-		    	tcpCloseDelayModel = Model.of(connection.getSocketCloseDelay());
-		    	tcpSendBufferSizeModel = Model.of(connection.getSendBufferSize());
-		    	tcpReceiveBufferSizeModel = Model.of(connection.getReceiveBufferSize());
+		    	tcpBacklogModel.setObject(connection.getBacklog());
+		    	tcpConnectTimeoutModel.setObject(connection.getConnectTimeout());
+		    	tcpCloseDelayModel.setObject(connection.getSocketCloseDelay());
+		    	tcpSendBufferSizeModel.setObject(connection.getSendBufferSize());
+		    	tcpReceiveBufferSizeModel.setObject(connection.getReceiveBufferSize());
 		    	tcpNoDelayModel = Model.of(connection.isTcpNoDelay());
 		    	blacklistedHostnameModel = new StringArrayModel(connection.getBlacklist());
-		    	sendPDULengthModel = Model.of(connection.getSendPDULength());
-		    	receivePDULengthModel = Model.of(connection.getReceivePDULength());
-		    	maxOpsPerformedModel = Model.of(connection.getMaxOpsPerformed());
-		    	maxOpsInvokedModel = Model.of(connection.getMaxOpsInvoked());
+		    	sendPDULengthModel.setObject(connection.getSendPDULength());
+		    	receivePDULengthModel.setObject(connection.getReceivePDULength());
+		    	maxOpsPerformedModel.setObject(connection.getMaxOpsPerformed());
+		    	maxOpsInvokedModel.setObject(connection.getMaxOpsInvoked());
 		    	packPDVModel = Model.of(connection.isPackPDV());
-		    	aarqTimeoutModel = Model.of(connection.getRequestTimeout());
-		    	aaacTimeoutModel = Model.of(connection.getAcceptTimeout());
-		    	arrpTimeoutModel = Model.of(connection.getReleaseTimeout());
-		    	responseTimeoutModel = Model.of(connection.getResponseTimeout());
-		    	retrieveTimeoutModel = Model.of(connection.getRetrieveTimeout());
-		    	idleTimeoutModel = Model.of(connection.getIdleTimeout());
+		    	aarqTimeoutModel.setObject(connection.getRequestTimeout());
+		    	aaacTimeoutModel.setObject(connection.getAcceptTimeout());
+		    	arrpTimeoutModel.setObject(connection.getReleaseTimeout());
+		    	responseTimeoutModel.setObject(connection.getResponseTimeout());
+		    	retrieveTimeoutModel.setObject(connection.getRetrieveTimeout());
+		    	idleTimeoutModel.setObject(connection.getIdleTimeout());
 	        }
         } catch (ConfigurationException e1) {
 			// TODO Auto-generated catch block
@@ -369,7 +352,7 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
                     connection.setTlsCipherSuites(tlsCipherSuitesModel.getArray());
                     connection.setHttpProxy(httpProxyModel.getObject());
                     connection.setTlsNeedClientAuth(tlsNeedClientAuthModel.getObject());
-                    connection.setTlsProtocols(tlsProtocolModel.getArray());
+                    connection.setTlsProtocols(tlsProtocolModel.getArray());                    
                     connection.setBacklog(tcpBacklogModel.getObject());
                     connection.setConnectTimeout(tcpConnectTimeoutModel.getObject());
                     connection.setSocketCloseDelay(tcpCloseDelayModel.getObject());
@@ -427,5 +410,5 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
     public void renderHead(IHeaderResponse response) {
         if (CreateOrEditConnectionPage.BaseCSS != null)
         	response.renderCSSReference(CreateOrEditConnectionPage.BaseCSS);
-    }    
+    }
 }
