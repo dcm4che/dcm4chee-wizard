@@ -61,8 +61,11 @@ public class DeviceNameValidator extends BaseNameValidator {
     @Override
     protected void onValidate(IValidatable<String> deviceName) {
     	super.onValidate(deviceName);
-    	if (!deviceName.getValue().equals(ignore))
-			if (deviceNames.contains(deviceName.getValue()))
+    	if (!deviceName.getValue().equals(ignore)) {
+			if (deviceName.getValue().contains("/"))
+				error(deviceName, "DeviceNameValidator.invalid");
+    		if (deviceNames.contains(deviceName.getValue()))
 				error(deviceName, "DeviceNameValidator.exists");
+    	}
     }
 }
