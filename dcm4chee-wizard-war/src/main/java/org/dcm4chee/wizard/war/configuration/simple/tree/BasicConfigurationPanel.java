@@ -242,9 +242,11 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 
                         } else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.APPLICATION_ENTITY)) {
                         	deviceNode = node.getAncestor(2);
+                        	ApplicationEntity applicationEntity = 
+                        			((ApplicationEntityModel) node.getModel()).getApplicationEntity();
                         	((DeviceModel) deviceNode.getModel()).getDevice()
-                                    .removeApplicationEntity(((ApplicationEntityModel) node.getModel())
-                                            .getApplicationEntity());
+                                    .removeApplicationEntity(applicationEntity);
+                        	ConfigTreeProvider.get().unregisterAETitle(applicationEntity.getAETitle());
 
                         } else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.TRANSFER_CAPABILITY)) {
                         	deviceNode = node.getAncestor(5);
