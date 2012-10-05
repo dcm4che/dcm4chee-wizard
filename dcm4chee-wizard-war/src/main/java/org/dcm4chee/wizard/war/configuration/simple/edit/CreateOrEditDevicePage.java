@@ -245,8 +245,7 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
 						
 						@Override
 						protected void onUpdate(AjaxRequestTarget target) {
-							target.add(form.get("schedulerInterval.label"));
-							target.add(form.get("schedulerInterval"));
+							target.add(form.get("proxyContainer"));
 						}
 				}));
 
@@ -267,28 +266,20 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
         .add(new CheckBox("installed", installedModel));
 
         try {
-			form.add(new Label("schedulerInterval.label", new ResourceModel("dicom.edit.device.schedulerInterval.label")) {
-				
-				private static final long serialVersionUID = 1L;
+            form.add(new WebMarkupContainer("proxyContainer") {
+            	
+    			private static final long serialVersionUID = 1L;
 
-				@Override
-				public boolean isVisible() {
-					return typeModel.getObject().equals(ConfigurationType.Proxy);
-				}
-			}.setOutputMarkupPlaceholderTag(true))
-			.add(new TextField<Integer>("schedulerInterval", schedulerIntervalModel) {
-				
-				private static final long serialVersionUID = 1L;
-
-				@Override
-				public boolean isVisible() {
-					return typeModel.getObject().equals(ConfigurationType.Proxy);
-				}
-			}
+    			@Override
+    			public boolean isVisible() {
+    				return typeModel.getObject().equals(ConfigurationType.Proxy);
+    			}        	
+            }.add(new Label("schedulerInterval.label", new ResourceModel("dicom.edit.device.schedulerInterval.label")))
+			.add(new TextField<Integer>("schedulerInterval", schedulerIntervalModel)
             		.setType(Integer.class)
             		.setRequired(deviceModel != null &&
-	            			deviceModel.getDevice() instanceof ProxyDevice ? true : false)
-			        .setOutputMarkupPlaceholderTag(true));
+	            			deviceModel.getDevice() instanceof ProxyDevice ? true : false))
+	            			.setOutputMarkupPlaceholderTag(true));
 		} catch (ConfigurationException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();

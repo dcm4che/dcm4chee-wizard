@@ -66,7 +66,6 @@ import org.dcm4chee.web.common.base.BaseWicketPage;
 import org.dcm4chee.web.common.behaviours.FocusOnLoadBehaviour;
 import org.dcm4chee.web.common.markup.BaseForm;
 import org.dcm4chee.web.common.markup.modal.MessageWindow;
-import org.dcm4chee.wizard.war.Utils;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ApplicationEntityModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ConnectionReferenceModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.DeviceModel;
@@ -216,17 +215,29 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
 					}
         		}).add(new ConnectionReferenceValidator()));
 
-        form.add(new Label("acceptDataOnFailedNegotiation.label", new ResourceModel("dicom.edit.applicationEntity.acceptDataOnFailedNegotiation.label"))
+        WebMarkupContainer proxyContainer = 
+	        new WebMarkupContainer("proxyContainer") {
+	        	
+				private static final long serialVersionUID = 1L;
+	
+				@Override
+				public boolean isVisible() {
+					return isProxy;
+				}
+	        };
+        form.add(proxyContainer);
+        
+        proxyContainer.add(new Label("acceptDataOnFailedNegotiation.label", new ResourceModel("dicom.edit.applicationEntity.acceptDataOnFailedNegotiation.label"))
         	.setVisible(isProxy))
         .add(new CheckBox("acceptDataOnFailedNegotiation", acceptDataOnFailedNegotiationModel)
         	.setVisible(isProxy));
 
-        form.add(new Label("enableAuditLog.label", new ResourceModel("dicom.edit.applicationEntity.enableAuditLog.label"))
+        proxyContainer.add(new Label("enableAuditLog.label", new ResourceModel("dicom.edit.applicationEntity.enableAuditLog.label"))
     		.setVisible(isProxy))
     	.add(new CheckBox("enableAuditLog", enableAuditLogModel)
     		.setVisible(isProxy));
 
-        form.add(new Label("spoolDirectory.label", new ResourceModel("dicom.edit.applicationEntity.spoolDirectory.label"))
+        proxyContainer.add(new Label("spoolDirectory.label", new ResourceModel("dicom.edit.applicationEntity.spoolDirectory.label"))
     		.setVisible(isProxy))
     	.add(new TextField<String>("spoolDirectory", spoolDirectoryModel)
     		.setRequired(true)
@@ -318,7 +329,6 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
                     ConfigTreeProvider.get().mergeDevice(applicationEntity.getDevice());
                     ConfigTreeProvider.get().registerAETitle(applicationEntity.getAETitle());
                     deviceNode.setModel(null);
-Utils.prettyPrintln("Refreshing device: " + deviceNode.getName());
                     window.close(target);
                 } catch (Exception e) {
                 	log.error("Error modifying application entity", e);
