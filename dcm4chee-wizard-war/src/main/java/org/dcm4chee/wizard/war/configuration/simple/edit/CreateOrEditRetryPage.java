@@ -39,7 +39,6 @@
 package org.dcm4chee.wizard.war.configuration.simple.edit;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -50,24 +49,23 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.resource.CssResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
-import org.dcm4che.net.Dimse;
 import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
 import org.dcm4chee.proxy.conf.Retry;
-import org.dcm4chee.proxy.conf.RetryFileSuffix;
+import org.dcm4chee.proxy.conf.RetryObject;
 import org.dcm4chee.web.common.base.BaseWicketPage;
 import org.dcm4chee.web.common.markup.BaseForm;
 import org.dcm4chee.web.common.markup.modal.MessageWindow;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ProxyApplicationEntityModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.RetryModel;
-import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider;
 import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeNode;
-import org.dcm4chee.wizard.war.configuration.simple.validator.RetrySuffixValidator;
+import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wicketstuff.security.components.SecureWebPage;
@@ -86,7 +84,7 @@ public class CreateOrEditRetryPage extends SecureWebPage {
     private MessageWindow msgWin = new MessageWindow("msgWin");
     
     // mandatory
-	private IModel<RetryFileSuffix> suffixModel;
+	private IModel<RetryObject> suffixModel;
     private Model<Integer> delayModel;
 	private Model<Integer> retriesModel;
     
@@ -108,21 +106,35 @@ public class CreateOrEditRetryPage extends SecureWebPage {
         add(form);
 
         if (retryModel == null) {
-    		suffixModel = Model.of(RetryFileSuffix.AAssociateRJ);
+    		suffixModel = Model.of(RetryObject.AAssociateRJ);
     		delayModel = Model.of();
     		retriesModel = Model.of();
         } else {
-			suffixModel = Model.of(RetryFileSuffix.valueOf(retryModel.getRetry().getSuffix()));
+			suffixModel = Model.of(retryModel.getRetry().getRetryObject());
 			delayModel = Model.of(retryModel.getRetry().getDelay());
 			retriesModel = Model.of(retryModel.getRetry().getNumberOfRetries());
         }
 
         form.add(new Label("suffix.label", new ResourceModel("dicom.edit.retry.suffix.label")));
-        ArrayList<RetryFileSuffix> suffixList = 
-        		new ArrayList<RetryFileSuffix>();
-        suffixList.addAll(Arrays.asList(RetryFileSuffix.values()));
-        DropDownChoice<RetryFileSuffix> suffixDropDown = 
-        		new DropDownChoice<RetryFileSuffix>("suffix", suffixModel, suffixList);
+        final ArrayList<RetryObject> suffixValueList = new ArrayList<RetryObject>();
+        ArrayList<String> suffixDisplayList = new ArrayList<String>();
+        for (RetryObject suffix : RetryObject.values()) {
+        	suffixValueList.add(suffix);
+        	suffixDisplayList.add(suffix.getRetryNote());
+        }       	
+		DropDownChoice<RetryObject> suffixDropDown = 
+        		new DropDownChoice<RetryObject>("suffix", suffixModel, suffixValueList, new IChoiceRenderer<Object>() {
+ 
+					private static final long serialVersionUID = 1L;
+
+					public String getDisplayValue(Object object) {
+						return ((RetryObject) object).getRetryNote();
+					}
+
+					public String getIdValue(Object object, int index) {
+						return object.toString();
+					}
+        		});
         form.add(suffixDropDown
         		.setNullValid(false));
 
@@ -144,7 +156,7 @@ public class CreateOrEditRetryPage extends SecureWebPage {
             protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
                 try {
                 	Retry retry = new Retry(
-                			suffixModel.getObject().toString(),
+                			suffixModel.getObject(),
                 			delayModel.getObject(),
                 			retriesModel.getObject());
 

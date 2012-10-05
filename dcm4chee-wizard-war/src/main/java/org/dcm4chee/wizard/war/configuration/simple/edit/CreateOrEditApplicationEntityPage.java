@@ -66,6 +66,7 @@ import org.dcm4chee.web.common.base.BaseWicketPage;
 import org.dcm4chee.web.common.behaviours.FocusOnLoadBehaviour;
 import org.dcm4chee.web.common.markup.BaseForm;
 import org.dcm4chee.web.common.markup.modal.MessageWindow;
+import org.dcm4chee.wizard.war.Utils;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ApplicationEntityModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ConnectionReferenceModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.DeviceModel;
@@ -317,7 +318,7 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
                     ConfigTreeProvider.get().mergeDevice(applicationEntity.getDevice());
                     ConfigTreeProvider.get().registerAETitle(applicationEntity.getAETitle());
                     deviceNode.setModel(null);
-
+Utils.prettyPrintln("Refreshing device: " + deviceNode.getName());
                     window.close(target);
                 } catch (Exception e) {
                 	log.error("Error modifying application entity", e);

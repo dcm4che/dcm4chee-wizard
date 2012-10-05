@@ -217,7 +217,7 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 				for (RetryModel retryModel : 
 					((ProxyApplicationEntityModel) applicationEntityModel).getRetries()) {
 					new ConfigTreeNode(aeNode.getContainer(ConfigTreeNode.CONTAINER_RETRIES), 
-							retryModel.getRetry().getSuffix(), 
+							retryModel.getRetry().retryObject.getRetryNote(), 
 							ConfigTreeNode.TreeNodeType.RETRY, retryModel);
 				}
 				

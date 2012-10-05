@@ -63,7 +63,7 @@ public class RetrySuffixValidator extends StringValidator {
     protected void onValidate(IValidatable<String> suffix) {
     	if (!suffix.getValue().equals(ignore))  { 
     		for (Retry retry : retries)
-    			if (retry.getSuffix().equals(suffix.getValue())) {
+    			if (retry.getRetryObject().getSuffix().equals(suffix.getValue())) {
     				error(suffix, "RetrySuffixValidator.alreadyExists");
     				return;
     			}

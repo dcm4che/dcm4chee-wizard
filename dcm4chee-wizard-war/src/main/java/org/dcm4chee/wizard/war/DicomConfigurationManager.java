@@ -90,7 +90,7 @@ public class DicomConfigurationManager implements Serializable {
             try {
                 deviceMap = new HashMap<String, Device>();
                 for (String deviceName : Arrays.asList(dicomConfiguration.listDeviceNames()))
-                    deviceMap.put(deviceName, null);// dicomConfiguration.findDevice(deviceName));
+                    deviceMap.put(deviceName, null);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -155,62 +155,4 @@ public class DicomConfigurationManager implements Serializable {
         dicomConfiguration.removeDevice(deviceName);
         getDeviceMap().remove(deviceName);
     }
-
-    // public ApplicationEntity getApplicationEntity(String aeTitle) throws
-    // ConfigurationException {
-    // return dicomConfiguration.findApplicationEntity(aeTitle);
-    // }
-    //
-    // public void removeApplicationEntity(String aeTitle) throws
-    // ConfigurationException {
-    // Device device =
-    // dicomConfiguration.findApplicationEntity(aeTitle).getDevice();
-    // device.removeApplicationEntity(aeTitle);
-    // dicomConfiguration.merge(device);
-    // getDeviceMap().put(device.getDeviceName(), device);
-    // }
-    //
-    // public void removeTransferCapability(String deviceName, String aeTitle,
-    // int identityHashcode)
-    // throws ConfigurationException {
-    // boolean found = false;
-    // Device device = getDeviceMap().get(deviceName);
-    // ApplicationEntity ae = device.getApplicationEntity(aeTitle);
-    // Iterator<TransferCapability> iterator =
-    // ae.getTransferCapabilities().iterator();
-    // while (iterator.hasNext()) {
-    // TransferCapability tc = iterator.next();
-    // if (System.identityHashCode(tc) == identityHashcode) {
-    // ae.removeTransferCapability(tc);
-    // dicomConfiguration.merge(device);
-    // getDeviceMap().put(device.getDeviceName(), device);
-    // found = true;
-    // break;
-    // }
-    // }
-    // if (!found)
-    // throw new
-    // ConfigurationException("Error: Failed to locate transfer capability for deletion");
-    // }
-    //
-    // public void removeConnection(Device device, Connection connection) throws
-    // ConfigurationException {
-    // device.removeConnection(connection);
-    // dicomConfiguration.merge(device);
-    // getDeviceMap().put(device.getDeviceName(), device);
-    // }
-
-    // public Map<String,String> getTransferCapabilityTypes() {
-    // return sopClassTypeMap;
-    // }
-
-    // public boolean registerAETitle(String aeTitle) throws
-    // ConfigurationException {
-    // return dicomConfiguration.registerAETitle(aeTitle);
-    // }
-    //
-    // public void unregisterAETitle(String aeTitle) throws
-    // ConfigurationException {
-    // dicomConfiguration.unregisterAETitle(aeTitle);
-    // }
 }
