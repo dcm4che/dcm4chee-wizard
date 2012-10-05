@@ -84,10 +84,10 @@ public class MainPage extends SecureWicketPage {
     private void addModules(ModuleSelectorPanel selectorPanel) {
         
         selectorPanel.addModule(BasicConfigurationPanel.class);
-        selectorPanel.addModule(AdvancedConfigurationPanel.class);
-        selectorPanel.addModule(WizardPanel.class);
-        selectorPanel.addModule(ProfilePanel.class);
-        selectorPanel.addModule(DicomConfigurationSourcePanel.class);
+//        selectorPanel.addModule(AdvancedConfigurationPanel.class);
+//        selectorPanel.addModule(WizardPanel.class);
+//        selectorPanel.addModule(ProfilePanel.class);
+//        selectorPanel.addModule(DicomConfigurationSourcePanel.class);
         
         try {
             Properties properties = new Properties();
