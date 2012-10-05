@@ -172,29 +172,6 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 
         add(form = new BaseForm("form"));
         form.setResourceIdPrefix("dicom.");
-        form.add(new Label("connect.title", new Model<String>() {
-
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public String getObject() {
-                return Application
-                        .get()
-                        .getResourceSettings()
-                        .getLocalizer()
-                        .getString(
-                                connectFailed ? "dicom.connectFailed.title" : connected ? "dicom.connected.title"
-                                        : "dicom.connect.title", BasicConfigurationPanel.this, "dicom.connect.title");
-            }
-        }).add(new AttributeAppender("class", new AbstractReadOnlyModel<String>() {
-
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public String getObject() {
-                return connectFailed ? "error" : "text";
-            }
-        })));
 
         editWindow = new ModalWindow("edit-window");
         editWindow.setInitialWidth(600).setInitialHeight(400);

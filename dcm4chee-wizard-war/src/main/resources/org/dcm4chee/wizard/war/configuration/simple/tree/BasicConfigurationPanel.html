@@ -7,7 +7,7 @@
       xsi:schemaLocation="http://www.w3.org/1999/xhtml
                           http://www.w3.org/2002/08/xhtml/xhtml1-strict.xsd">
 	<head>
-	<title>Ldap</title>
+	<title>Basic</title>
 	</head>
 	<wicket:panel>
 		<div style="clear: both; margin-top: 5px;" />
@@ -15,44 +15,6 @@
 			<div wicket:id="echo-window" />
 			<div wicket:id="edit-window" />
 			<div wicket:id="remove-confirmation" />
-			<table rules="groups" class="search-table" style="margin-top: 20px;">
-				<thead>
-					<tr class="search-table">
-						<th class="search-table"></th>
-						<th class="search-table">
-						<!-- 
-							<wicket:message key="dicom.connect.title" />
-							 -->
-							 <div wicket:id="connect.title" />
-						</th>
-						<th class="search-table" colspan="7"/>
-						<th class="search-table" style="text-align: right;">
-						<!-- 
-							<a wicket:id="connectToggle">
-								<img wicket:id="connectToggleImg" />
-							</a>
-							 -->
-						</th>
-						<th class="search-table"></th>
-					</tr>
-				</thead>
-				<!-- 
-				<tr wicket:id="connectFields" class="search-table">
-					<td></td>
-					<td>
-						<div wicket:id="dcs-name.label" class="search-header">dcs-name</div>
-						<select wicket:id="dcs-name" size="1" class="edit-value"></select>
-					</td>
-					<td style="text-align: left;">
-						<button wicket:id="connectBtn">
-							<img wicket:id="connectImg" alt="Connect" />
-							<span wicket:id="connectText" />
-						</button>
-					</td>
-					<td colspan="8"></td>
-				</tr>
-				 -->
-			</table>
 			<div style="margin-top: 20px;">
 				<button wicket:id="createDevice">
 					<img wicket:id="createDeviceImg" alt="Create Device" />

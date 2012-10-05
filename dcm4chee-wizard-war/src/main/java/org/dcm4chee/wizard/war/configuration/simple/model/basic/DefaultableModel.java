@@ -41,7 +41,6 @@ package org.dcm4chee.wizard.war.configuration.simple.model.basic;
 import java.io.Serializable;
 
 import org.apache.wicket.model.Model;
-import org.dcm4chee.wizard.war.Utils;
 
 /**
  * @author Robert David <robert.david@agfa.com>
