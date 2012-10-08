@@ -70,6 +70,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.model.StringResourceModel;
+import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.net.ApplicationEntity;
@@ -79,9 +80,13 @@ import org.dcm4chee.icons.ImageManager;
 import org.dcm4chee.icons.behaviours.ImageSizeBehaviour;
 import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
 import org.dcm4chee.web.common.ajax.MaskingAjaxCallBehavior;
+import org.dcm4chee.web.common.base.BaseWicketPage;
 import org.dcm4chee.web.common.behaviours.TooltipBehaviour;
 import org.dcm4chee.web.common.markup.BaseForm;
 import org.dcm4chee.web.common.markup.modal.ConfirmationWindow;
+//import org.dcm4chee.web.common.markup.modal.ConfirmationWindow;
+//import org.dcm4chee.web.common.markup.modal.ConfirmationWindow.ConfirmPage;
+//import org.dcm4chee.web.common.markup.modal.ConfirmationWindow.DisableDefaultConfirmBehavior;
 import org.dcm4chee.wizard.war.Utils;
 import org.dcm4chee.wizard.war.common.ExtendedPanel;
 import org.dcm4chee.wizard.war.configuration.model.source.DicomConfigurationSourceModel;
@@ -123,8 +128,6 @@ public class BasicConfigurationPanel extends ExtendedPanel {
     final MaskingAjaxCallBehavior macb = new MaskingAjaxCallBehavior();
 
     private BaseForm form;
-    private boolean connected;
-    private boolean connectFailed;
 
     private ModalWindow editWindow;
     private ModalWindow echoWindow;
@@ -167,8 +170,6 @@ public class BasicConfigurationPanel extends ExtendedPanel {
             }
         };
         add(macb);
-        connected = false;
-        connectFailed = false;
 
         add(form = new BaseForm("form"));
         form.setResourceIdPrefix("dicom.");
@@ -211,12 +212,8 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 
         try {
             configTree =
-            // new DefaultTableTree<ConfigTreeNode>("configTree", deviceColumns,
-            // ConfigTreeProvider.set(BasicConfigurationPanel.this),
-            // Integer.MAX_VALUE);
-            new ConfigTableTree("configTree", deviceColumns, ConfigTreeProvider.set(BasicConfigurationPanel.this),
-                    Integer.MAX_VALUE);
-
+            		new ConfigTableTree("configTree", deviceColumns, 
+            				ConfigTreeProvider.set(BasicConfigurationPanel.this), Integer.MAX_VALUE);
         } catch (ConfigurationException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
@@ -291,8 +288,6 @@ public class BasicConfigurationPanel extends ExtendedPanel {
                     }
                     getSession().setAttribute("deviceTreeProvider", configTree.getProvider());
 
-                    connected = true;
-                    connectFailed = false;
                     target.add(form);
 
                 } catch (ConfigurationException e) {
@@ -302,7 +297,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
                 }
             }
         };
-        removeConfirmation.setInitialHeight(150);
+//        removeConfirmation.setInitialHeight(150);
         removeConfirmation.setWindowClosedCallback(windowClosedCallback);
         form.add(removeConfirmation);
 
@@ -310,38 +305,34 @@ public class BasicConfigurationPanel extends ExtendedPanel {
             createColumns();
             refreshTree();
 
-            connected = true;
-            connectFailed = false;
         } catch (ConfigurationException e) {
             log.error("Error connecting to dicom configuration source", e);
-            handleFailedConnect();
+//            handleFailedConnect();
         }
     }
 
-    private void handleFailedConnect() {
-        connected = false;
-        connectFailed = true;
-
-        List<IColumn<ConfigTreeNode>> deviceColumns = new ArrayList<IColumn<ConfigTreeNode>>();
-        deviceColumns.add(new CustomTreeColumn(Model.of("Devices")));
-
-        try {
-            configTree = new TableTree<ConfigTreeNode>("configTree", deviceColumns,
-                    ConfigTreeProvider.set(BasicConfigurationPanel.this), Integer.MAX_VALUE) {
-
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                protected Component newContentComponent(String id, IModel<ConfigTreeNode> model) {
-                    return new Folder<ConfigTreeNode>(id, this, model);
-                }
-            };
-        } catch (ConfigurationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        form.addOrReplace(configTree);
-    }
+//    private void handleFailedConnect() {
+//
+//        List<IColumn<ConfigTreeNode>> deviceColumns = new ArrayList<IColumn<ConfigTreeNode>>();
+//        deviceColumns.add(new CustomTreeColumn(Model.of("Devices")));
+//
+//        try {
+//            configTree = new TableTree<ConfigTreeNode>("configTree", deviceColumns,
+//                    ConfigTreeProvider.set(BasicConfigurationPanel.this), Integer.MAX_VALUE) {
+//
+//                private static final long serialVersionUID = 1L;
+//
+//                @Override
+//                protected Component newContentComponent(String id, IModel<ConfigTreeNode> model) {
+//                    return new Folder<ConfigTreeNode>(id, this, model);
+//                }
+//            };
+//        } catch (ConfigurationException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
+//        form.addOrReplace(configTree);
+//    }
 
     @Override
     public void renderHead(IHeaderResponse response) {
@@ -476,7 +467,6 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 						.add(new AttributeAppender("style", Model.of("width: 50px; text-align: center;")));
 				else
 					cellItem.add(new Label(componentId));
-
 			}
 		});
 		
@@ -657,10 +647,13 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 				};
 				ajaxLink.setVisible(!type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_APPLICATION_ENTITIES)
 						|| rowModel.getObject().getParent().getChildren().get(0).hasChildren());
+				try {
+					if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_FORWARD_SCHEDULES))
+						ajaxLink.setVisible(ConfigTreeProvider.get().getUniqueAETitles().length > 0);
+				} catch (ConfigurationException ce) {
+					log.error("Error listing Registered AE Titles", ce);
+				}
 				
-				if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_FORWARD_SCHEDULES))
-					ajaxLink.setVisible(ConfigTreeProvider.get().getUniqueAETitles().size() > 0);
-					
 				ResourceReference image;
 				if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_CONNECTIONS)
 						|| type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_APPLICATION_ENTITIES)
@@ -710,9 +703,12 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 
 				            @Override
 				            public void onClick(AjaxRequestTarget target) {
+//				            	String message = "" + rowModel.getObject().getNodeType();
 				                removeConfirmation
 				                	.confirm(target, 
-				                			new StringResourceModel("dicom.confirmDelete", BasicConfigurationPanel.this, null), 
+				                			new StringResourceModel("dicom.confirmDelete", 
+				                					BasicConfigurationPanel.this, null, 
+				                					new Object[] {rowModel.getObject().getNodeType(), rowModel.getObject().getName()}), 
 				                					rowModel.getObject());
 				            }
 				        };

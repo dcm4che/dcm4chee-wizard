@@ -162,7 +162,6 @@ public class CreateOrEditForwardRulePage extends SecureWebPage {
         		.setOutputMarkupPlaceholderTag(true)
         		.setVisible(false));
 
-        final List<String> uniqueAETitles = new ArrayList<String>(ConfigTreeProvider.get().getUniqueAETitles());       
         optionalContainer.add(new Label("callingAETitle.label", new ResourceModel("dicom.edit.forwardRule.callingAETitle.label")))
                 .add(new DefaultCssAutoCompleteTextField<String>("callingAETitle", callingAETitleModel) {
 
@@ -173,9 +172,14 @@ public class CreateOrEditForwardRulePage extends SecureWebPage {
 					@Override
 					protected Iterator<String> getChoices(String input) {
 						choices.clear();
-						for (String aeTitle : uniqueAETitles) 
-							if (aeTitle.startsWith(input))
-								choices.add(aeTitle);
+						try {
+							for (String aeTitle : ConfigTreeProvider.get().getUniqueAETitles()) 
+								if (aeTitle.startsWith(input))
+									choices.add(aeTitle);
+						} catch (ConfigurationException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 						return choices.iterator();
 					}
                 });

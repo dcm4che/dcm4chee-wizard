@@ -40,6 +40,7 @@ package org.dcm4chee.wizard.war.configuration.simple.validator;
 
 import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.validator.StringValidator;
+import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider;
 
 /**
@@ -53,8 +54,14 @@ public class DestinationURIValidator extends StringValidator {
     protected void onValidate(IValidatable<String> uri) {
     	if (uri.getValue().startsWith("aet:")) {
     		String aet = uri.getValue().substring(4);
-			if (!ConfigTreeProvider.get().getUniqueAETitles().contains(aet))
-				error(uri, "DestinationURIValidator.aetDoesNotExists");
+			try {
+				for (String aeTitle : ConfigTreeProvider.get().getUniqueAETitles())
+					if (aet.equals(aeTitle))
+						error(uri, "DestinationURIValidator.aetDoesNotExists");
+			} catch (ConfigurationException e) {
+				error(uri, "AETitleValidator");
+				e.printStackTrace();
+			}
     	} else
     		// TODO: validate template
     		System.out.println("Not implemented yet");

@@ -38,7 +38,7 @@
 
 package org.dcm4chee.wizard.war.configuration.simple.edit;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -56,6 +56,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.resource.CssResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
+import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
 import org.dcm4chee.proxy.conf.Schedule;
 import org.dcm4chee.web.common.base.BaseWicketPage;
@@ -63,8 +64,8 @@ import org.dcm4chee.web.common.markup.BaseForm;
 import org.dcm4chee.web.common.markup.modal.MessageWindow;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ForwardScheduleModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ProxyApplicationEntityModel;
-import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider;
 import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeNode;
+import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider;
 import org.dcm4chee.wizard.war.configuration.simple.validator.DestinationAETitleValidator;
 import org.dcm4chee.wizard.war.configuration.simple.validator.ScheduleValidator;
 import org.slf4j.Logger;
@@ -108,7 +109,13 @@ public class CreateOrEditForwardSchedulePage extends SecureWebPage {
         form.setResourceIdPrefix("dicom.edit.forwardSchedule.");
         add(form);
 
-        List<String> uniqueAETitles = new ArrayList<String>(ConfigTreeProvider.get().getUniqueAETitles());
+        List<String> uniqueAETitles = null;
+		try {
+			uniqueAETitles = Arrays.asList(ConfigTreeProvider.get().getUniqueAETitles());
+		} catch (ConfigurationException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
         Collections.sort(uniqueAETitles);
 
 		destinationAETitleModel = Model.of(forwardScheduleModel != null ? 
@@ -155,7 +162,6 @@ public class CreateOrEditForwardSchedulePage extends SecureWebPage {
             @Override
             protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
                 try {
-                	
                 	Schedule schedule = forwardScheduleModel == null ? 
                 			new Schedule() : forwardScheduleModel.getSchedule();
                 	schedule.setDays(scheduleDaysModel.getObject());
