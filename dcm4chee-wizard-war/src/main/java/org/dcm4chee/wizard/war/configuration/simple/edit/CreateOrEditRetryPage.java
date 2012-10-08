@@ -107,8 +107,8 @@ public class CreateOrEditRetryPage extends SecureWebPage {
 
         if (retryModel == null) {
     		suffixModel = Model.of(RetryObject.AAssociateRJ);
-    		delayModel = Model.of();
-    		retriesModel = Model.of();
+    		delayModel = Model.of(Retry.DEFAULT_DELAY);
+    		retriesModel = Model.of(Retry.DEFAULT_RETRIES);
         } else {
 			suffixModel = Model.of(retryModel.getRetry().getRetryObject());
 			delayModel = Model.of(retryModel.getRetry().getDelay());
