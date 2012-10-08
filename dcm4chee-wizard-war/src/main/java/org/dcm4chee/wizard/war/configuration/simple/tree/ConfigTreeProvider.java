@@ -42,11 +42,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.wicket.Application;
 import org.apache.wicket.Component;
@@ -85,7 +83,6 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 	public enum ConfigurationType { Basic, Proxy, Archive };
 
 	private List<ConfigTreeNode> deviceNodeList = new ArrayList<ConfigTreeNode>();
-	private Set<String> uniqueAETitles = new HashSet<String>();
 
 	private Component forComponent;
 	
@@ -150,8 +147,6 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 							ConfigTreeNode.TreeNodeType.APPLICATION_ENTITY, 
 							this.getConfigurationType(applicationEntityModel.getApplicationEntity()), 
 							applicationEntityModel);
-
-			uniqueAETitles.add(applicationEntityModel.getApplicationEntity().getAETitle());
 
 			addApplicationEntitySubnodes(aeNode);
 			
@@ -257,16 +252,14 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 
 	public void registerAETitle(String aeTitle) throws ConfigurationException {
 		getDicomConfigurationManager().getDicomConfiguration().registerAETitle(aeTitle);
-        uniqueAETitles.add(aeTitle);
 	}
 
 	public void unregisterAETitle(String aeTitle) throws ConfigurationException {
 		getDicomConfigurationManager().getDicomConfiguration().unregisterAETitle(aeTitle);
-        uniqueAETitles.remove(aeTitle);
 	}
 
-	public Set<String> getUniqueAETitles() {
-		return uniqueAETitles;
+	public String[] getUniqueAETitles() throws ConfigurationException {
+		return getDicomConfigurationManager().getDicomConfiguration().listRegisteredAETitles();
 	}
 	
 	private void addDeviceSubnodes(ConfigTreeNode deviceNode) {

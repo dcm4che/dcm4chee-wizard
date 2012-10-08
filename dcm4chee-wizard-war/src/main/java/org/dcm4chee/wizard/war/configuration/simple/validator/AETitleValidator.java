@@ -42,6 +42,7 @@ import java.util.Map;
 
 import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.validator.StringValidator;
+import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider;
 
 /**
@@ -87,8 +88,14 @@ public class AETitleValidator extends StringValidator {
         }
         
         if (!s.equals(ignore))
-			if (ConfigTreeProvider.get().getUniqueAETitles().contains(s))
-				error(v, "AETitleValidator.alreadyExists");
+			try {
+				for (String aeTitle : ConfigTreeProvider.get().getUniqueAETitles())
+					if (s.equals(aeTitle))
+						error(v, "AETitleValidator.alreadyExists");
+			} catch (ConfigurationException e) {
+				error(v, "AETitleValidator");
+				e.printStackTrace();
+			}
     }
     /*
      * AE valid characters: DICOM DEFAULT CHARACTER REPERTOIRE ENCODING without backslash(5C), LF, FF, CR and ESC

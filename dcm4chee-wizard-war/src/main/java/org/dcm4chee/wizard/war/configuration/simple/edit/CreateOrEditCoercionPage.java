@@ -58,6 +58,7 @@ import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.resource.CssResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.dcm4che.conf.api.AttributeCoercion;
+import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.net.Dimse;
 import org.dcm4che.net.TransferCapability.Role;
 import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
@@ -153,7 +154,13 @@ public class CreateOrEditCoercionPage extends SecureWebPage {
         		.setOutputMarkupPlaceholderTag(true)
         		.setVisible(false));
 
-        List<String> uniqueAETitles = new ArrayList<String>(ConfigTreeProvider.get().getUniqueAETitles());
+        List<String> uniqueAETitles = null;
+		try {
+			uniqueAETitles = Arrays.asList(ConfigTreeProvider.get().getUniqueAETitles());
+		} catch (ConfigurationException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
         Collections.sort(uniqueAETitles);
         
         optionalContainer.add(new Label("aeTitle.label", new ResourceModel("dicom.edit.coercion.aeTitle.label")))
