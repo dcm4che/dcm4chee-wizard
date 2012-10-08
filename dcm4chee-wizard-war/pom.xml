@@ -16,7 +16,7 @@
     <wicket.security.version>1.5.5</wicket.security.version>
     <wicket.cdi.version>1.2</wicket.cdi.version>
     <dcm4chee.proxy.version>1.0.0-SNAPSHOT</dcm4chee.proxy.version>
-    <dcm4che.version>3.0.0-SNAPSHOT</dcm4che.version>
+    <dcm4che.version>3.0.0</dcm4che.version>
   </properties>
   <profiles>
     <profile>
