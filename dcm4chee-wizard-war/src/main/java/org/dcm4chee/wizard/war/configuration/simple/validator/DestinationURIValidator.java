@@ -57,7 +57,8 @@ public class DestinationURIValidator extends StringValidator {
 			try {
 				for (String aeTitle : ConfigTreeProvider.get().getUniqueAETitles())
 					if (aet.equals(aeTitle))
-						error(uri, "DestinationURIValidator.aetDoesNotExists");
+						return;
+				error(uri, "DestinationURIValidator.aetDoesNotExists");
 			} catch (ConfigurationException e) {
 				error(uri, "AETitleValidator");
 				e.printStackTrace();
