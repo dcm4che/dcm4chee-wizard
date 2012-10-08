@@ -46,13 +46,10 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.dcm4chee.web.common.base.BaseWicketApplication;
+import org.dcm4chee.web.common.base.BaseWicketPage;
 import org.dcm4chee.web.common.base.ModuleSelectorPanel;
 import org.dcm4chee.web.common.secure.SecureWicketPage;
-import org.dcm4chee.wizard.war.configuration.advanced.AdvancedConfigurationPanel;
-import org.dcm4chee.wizard.war.configuration.profile.ProfilePanel;
 import org.dcm4chee.wizard.war.configuration.simple.tree.BasicConfigurationPanel;
-import org.dcm4chee.wizard.war.configuration.source.DicomConfigurationSourcePanel;
-import org.dcm4chee.wizard.war.configuration.wizard.WizardPanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,19 +61,19 @@ public class MainPage extends SecureWicketPage {
 	private static final long serialVersionUID = 1L;
 	
 	protected static Logger log = LoggerFactory.getLogger(MainPage.class);
-    
-	private static final ResourceReference wizardCSS = new PackageResourceReference(MainPage.class, "wizard-style.css");
-	private static final ResourceReference tableTreeCSS = new PackageResourceReference(MainPage.class, "table-tree.css");
 
-    public MainPage() {
+	private static final ResourceReference baseCSS = new PackageResourceReference(BaseWicketPage.class, "base-style.css");
+	private static final ResourceReference tableTreeCSS = new PackageResourceReference(MainPage.class, "table-tree.css");
+	
+	public MainPage() {
         super();
         addModules(getModuleSelectorPanel());
     }
 
     @Override
     public void renderHead(IHeaderResponse response) {
-    	if (MainPage.wizardCSS != null)
-    		response.renderCSSReference(MainPage.wizardCSS);
+    	if (MainPage.baseCSS != null) 
+    		response.renderCSSReference(MainPage.baseCSS);
     	if (MainPage.tableTreeCSS != null)
     		response.renderCSSReference(MainPage.tableTreeCSS);
     }

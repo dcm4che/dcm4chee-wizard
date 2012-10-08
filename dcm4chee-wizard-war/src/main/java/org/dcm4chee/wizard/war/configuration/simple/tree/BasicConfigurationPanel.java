@@ -70,6 +70,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.model.StringResourceModel;
+import org.apache.wicket.request.resource.CssResourceReference;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.dcm4che.conf.api.ConfigurationException;
@@ -123,7 +124,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 
     private static final String MODULE_NAME = "dicom";
 
-    private transient static Logger log = LoggerFactory.getLogger(BasicConfigurationPanel.class);
+    private static Logger log = LoggerFactory.getLogger(BasicConfigurationPanel.class);
 
     final MaskingAjaxCallBehavior macb = new MaskingAjaxCallBehavior();
 
@@ -171,54 +172,15 @@ public class BasicConfigurationPanel extends ExtendedPanel {
         };
         add(macb);
 
-        add(form = new BaseForm("form"));
-        form.setResourceIdPrefix("dicom.");
-
-        editWindow = new ModalWindow("edit-window");
-        editWindow.setInitialWidth(600).setInitialHeight(400);
-
-        AjaxLink<Object> createDevice = new AjaxLink<Object>("createDevice") {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void onClick(AjaxRequestTarget target) {
-                editWindow.setPageCreator(new ModalWindow.PageCreator() {
-
-                    private static final long serialVersionUID = 1L;
-
-                    @Override
-                    public Page createPage() {
-                        return new CreateOrEditDevicePage(editWindow, null);
-                    }
-                }).show(target);
-            }
-        };
-        editWindow.setWindowClosedCallback(windowClosedCallback);
-        form.add(editWindow);
-        createDevice.add(new Image("createDeviceImg", ImageManager.IMAGE_WIZARD_DEVICE_ADD).add(new ImageSizeBehaviour(
-                "vertical-align: middle;")));
-        createDevice.add(new TooltipBehaviour("dicom."));
-        createDevice.add(new Label("createDeviceText", new ResourceModel("dicom.createDevice.text"))
-                .add(new AttributeAppender("style", Model.of("vertical-align: middle"), " ")));
-        form.add(createDevice);
-
         echoWindow = new ModalWindow("echo-window");
         echoWindow.setInitialWidth(600).setInitialHeight(400);
         echoWindow.setWindowClosedCallback(windowClosedCallback);
-        form.add(echoWindow);
+        add(echoWindow);
 
-        List<IColumn<ConfigTreeNode>> deviceColumns = new ArrayList<IColumn<ConfigTreeNode>>();
-        deviceColumns.add(new CustomTreeColumn(Model.of("Devices")));
-
-        try {
-            configTree =
-            		new ConfigTableTree("configTree", deviceColumns, 
-            				ConfigTreeProvider.set(BasicConfigurationPanel.this), Integer.MAX_VALUE);
-        } catch (ConfigurationException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
-        form.addOrReplace(configTree);
+        editWindow = new ModalWindow("edit-window");
+        editWindow.setInitialWidth(600).setInitialHeight(400);
+        editWindow.setWindowClosedCallback(windowClosedCallback);
+        add(editWindow);
 
         removeConfirmation = new ConfirmationWindow<ConfigTreeNode>("remove-confirmation") {
 
@@ -299,7 +261,46 @@ public class BasicConfigurationPanel extends ExtendedPanel {
         };
 //        removeConfirmation.setInitialHeight(150);
         removeConfirmation.setWindowClosedCallback(windowClosedCallback);
-        form.add(removeConfirmation);
+        add(removeConfirmation);
+
+        add(form = new BaseForm("form"));
+        form.setResourceIdPrefix("dicom.");
+
+        AjaxLink<Object> createDevice = new AjaxLink<Object>("createDevice") {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void onClick(AjaxRequestTarget target) {
+                editWindow.setPageCreator(new ModalWindow.PageCreator() {
+
+                    private static final long serialVersionUID = 1L;
+
+                    @Override
+                    public Page createPage() {
+                        return new CreateOrEditDevicePage(editWindow, null);
+                    }
+                }).show(target);
+            }
+        };
+        createDevice.add(new Image("createDeviceImg", ImageManager.IMAGE_WIZARD_DEVICE_ADD).add(new ImageSizeBehaviour(
+                "vertical-align: middle;")));
+        createDevice.add(new TooltipBehaviour("dicom."));
+        createDevice.add(new Label("createDeviceText", new ResourceModel("dicom.createDevice.text"))
+                .add(new AttributeAppender("style", Model.of("vertical-align: middle"), " ")));
+        form.add(createDevice);
+
+        List<IColumn<ConfigTreeNode>> deviceColumns = new ArrayList<IColumn<ConfigTreeNode>>();
+        deviceColumns.add(new CustomTreeColumn(Model.of("Devices")));
+
+        try {
+            configTree =
+            		new ConfigTableTree("configTree", deviceColumns, 
+            				ConfigTreeProvider.set(BasicConfigurationPanel.this), Integer.MAX_VALUE);
+        } catch (ConfigurationException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+        form.addOrReplace(configTree);
 
         try {
             createColumns();
@@ -653,7 +654,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 				} catch (ConfigurationException ce) {
 					log.error("Error listing Registered AE Titles", ce);
 				}
-				
+
 				ResourceReference image;
 				if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_CONNECTIONS)
 						|| type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_APPLICATION_ENTITIES)
@@ -703,11 +704,10 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 
 				            @Override
 				            public void onClick(AjaxRequestTarget target) {
-//				            	String message = "" + rowModel.getObject().getNodeType();
 				                removeConfirmation
 				                	.confirm(target, 
 				                			new StringResourceModel("dicom.confirmDelete", 
-				                					BasicConfigurationPanel.this, null, 
+				                					this, null, 
 				                					new Object[] {rowModel.getObject().getNodeType(), rowModel.getObject().getName()}), 
 				                					rowModel.getObject());
 				            }
