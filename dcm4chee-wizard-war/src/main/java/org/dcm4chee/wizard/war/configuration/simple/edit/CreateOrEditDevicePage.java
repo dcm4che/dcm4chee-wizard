@@ -144,7 +144,7 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
         		typeModel = Model.of(ConfigTreeProvider.ConfigurationType.Basic);
     			deviceNameModel = Model.of();
     			installedModel = Model.of(false);
-    			schedulerIntervalModel = Model.of(0);
+    			schedulerIntervalModel = Model.of(ProxyDevice.DEFAULT_SCHEDULER_INTERVAL);
     			descriptionModel = Model.of();
     			deviceSerialNumberModel = Model.of();
     			institutionAddressModel = new StringArrayModel(null);
@@ -166,7 +166,7 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
     			softwareVersionsModel = new StringArrayModel(null);
     			stationNameModel = Model.of();
     			vendorDataModel = Model.of("size 0");
-    			forwardThreadsModel = Model.of(0);
+    			forwardThreadsModel = Model.of(ProxyDevice.DEFAULT_FORWARD_THREADS);
         	} else {
         		typeModel = Model.of(deviceModel.getDevice() instanceof ProxyDevice ? 
 	        			ConfigTreeProvider.ConfigurationType.Proxy : ConfigTreeProvider.ConfigurationType.Basic);
