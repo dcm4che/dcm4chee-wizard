@@ -46,6 +46,7 @@ import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulato
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.dcm4chee.wizard.war.Utils;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ApplicationEntityModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ConnectionModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.DeviceModel;
@@ -105,7 +106,7 @@ public class CustomTreeColumn extends TreeColumn<ConfigTreeNode> {
 	public void populateItem(Item<ICellPopulator<ConfigTreeNode>> cellItem, 
 			String componentId, IModel<ConfigTreeNode> rowModel) {
 		super.populateItem(cellItem, componentId, rowModel);
-		
+
 		cellItem.add(new AttributeAppender("class", 
 				Model.of(nodeCssClasses.get(rowModel.getObject().getNodeType())), " "));
 		cellItem.add(new AttributeAppender("title", 

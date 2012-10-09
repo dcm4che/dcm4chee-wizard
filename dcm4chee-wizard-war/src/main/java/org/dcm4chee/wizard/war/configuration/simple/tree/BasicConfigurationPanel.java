@@ -85,9 +85,6 @@ import org.dcm4chee.web.common.base.BaseWicketPage;
 import org.dcm4chee.web.common.behaviours.TooltipBehaviour;
 import org.dcm4chee.web.common.markup.BaseForm;
 import org.dcm4chee.web.common.markup.modal.ConfirmationWindow;
-//import org.dcm4chee.web.common.markup.modal.ConfirmationWindow;
-//import org.dcm4chee.web.common.markup.modal.ConfirmationWindow.ConfirmPage;
-//import org.dcm4chee.web.common.markup.modal.ConfirmationWindow.DisableDefaultConfirmBehavior;
 import org.dcm4chee.wizard.war.Utils;
 import org.dcm4chee.wizard.war.common.ExtendedPanel;
 import org.dcm4chee.wizard.war.configuration.model.source.DicomConfigurationSourceModel;
@@ -259,9 +256,8 @@ public class BasicConfigurationPanel extends ExtendedPanel {
                 }
             }
         };
-//        removeConfirmation.setInitialHeight(150);
-        removeConfirmation.setWindowClosedCallback(windowClosedCallback);
-        add(removeConfirmation);
+        add(removeConfirmation.setInitialHeight(150)
+        		.setWindowClosedCallback(windowClosedCallback));
 
         add(form = new BaseForm("form"));
         form.setResourceIdPrefix("dicom.");
@@ -300,76 +296,20 @@ public class BasicConfigurationPanel extends ExtendedPanel {
             // TODO Auto-generated catch block
             e1.printStackTrace();
         }
+
         form.addOrReplace(configTree);
 
         try {
             createColumns();
             refreshTree();
-
         } catch (ConfigurationException e) {
             log.error("Error connecting to dicom configuration source", e);
-//            handleFailedConnect();
         }
     }
-
-//    private void handleFailedConnect() {
-//
-//        List<IColumn<ConfigTreeNode>> deviceColumns = new ArrayList<IColumn<ConfigTreeNode>>();
-//        deviceColumns.add(new CustomTreeColumn(Model.of("Devices")));
-//
-//        try {
-//            configTree = new TableTree<ConfigTreeNode>("configTree", deviceColumns,
-//                    ConfigTreeProvider.set(BasicConfigurationPanel.this), Integer.MAX_VALUE) {
-//
-//                private static final long serialVersionUID = 1L;
-//
-//                @Override
-//                protected Component newContentComponent(String id, IModel<ConfigTreeNode> model) {
-//                    return new Folder<ConfigTreeNode>(id, this, model);
-//                }
-//            };
-//        } catch (ConfigurationException e) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//        }
-//        form.addOrReplace(configTree);
-//    }
 
     @Override
     public void renderHead(IHeaderResponse response) {
         response.renderOnDomReadyJavaScript("Wicket.Window.unloadConfirmation = false");
-    }
-
-    // only used in constructor
-    protected List<DicomConfigurationSourceModel> listDicomConfigurationSources() {
-        String line;
-        BufferedReader reader = null;
-        List<DicomConfigurationSourceModel> updatedList = new ArrayList<DicomConfigurationSourceModel>();
-        try {
-            String fn = System.getProperty("dcm4chee-web3.cfg.path", "conf/dcm4chee-web3/");
-            if (fn == null)
-                throw new FileNotFoundException(
-                        "Web config path not found! Not specified with System property 'dcm4chee-web3.cfg.path'");
-            File configFile = new File(fn + "dicom-configuration.json");
-            if (!configFile.isAbsolute())
-                configFile = new File(System.getProperty("jboss.server.home.dir"), configFile.getPath());
-
-            reader = new BufferedReader(new FileReader(configFile));
-            while ((line = reader.readLine()) != null)
-                updatedList.add((DicomConfigurationSourceModel) JSONObject.toBean(JSONObject.fromObject(line),
-                        DicomConfigurationSourceModel.class));
-
-        } catch (IOException ioe) {
-            log.error("Error updating dicom configuration list", ioe);
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException ignore) {
-                }
-            }
-        }
-        return updatedList;
     }
 
     public void createColumns() {

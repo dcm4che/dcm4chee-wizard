@@ -28,7 +28,7 @@ public class ConfigTableTree extends DefaultTableTree<ConfigTreeNode> {
 				ConfigTreeProvider.get().loadDevice(node);
 			} catch (ConfigurationException e) {
 				log.error("Error loading device " + node.getName() + " into tree", e);
-				e.printStackTrace();
+				return;
 			}
 		}		
 		super.expand(node);

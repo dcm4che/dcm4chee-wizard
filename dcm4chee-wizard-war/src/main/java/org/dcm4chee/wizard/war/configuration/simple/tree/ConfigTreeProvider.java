@@ -110,7 +110,7 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 							ConfigTreeNode.TreeNodeType.DEVICE, 
 							null, deviceModel);
 			deviceNodeList.add(deviceNode);
-			addDeviceSubnodes(deviceNode);
+			new ConfigTreeNode(deviceNode, null, null, null, null);
 		}
 	}
 
@@ -125,6 +125,9 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 
 		deviceNode.setConfigurationType(getConfigurationType(device));
 		deviceNode.setModel(deviceModel);
+		
+		deviceNode.removeChildren();
+		addDeviceSubnodes(deviceNode);
 		
 		// CREATE CONNECTION NODE AND MODEL
 		deviceNode.getContainer(ConfigTreeNode.CONTAINER_CONNECTIONS).removeChildren();

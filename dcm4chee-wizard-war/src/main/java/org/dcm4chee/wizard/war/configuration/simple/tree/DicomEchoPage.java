@@ -63,7 +63,6 @@ import org.dcm4che.net.pdu.AAssociateRQ;
 import org.dcm4che.net.pdu.PresentationContext;
 import org.dcm4chee.web.common.base.BaseWicketPage;
 import org.dcm4chee.web.common.markup.BaseForm;
-import org.dcm4chee.wizard.war.MainPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wicketstuff.security.components.SecureWebPage;
@@ -78,7 +77,6 @@ public class DicomEchoPage extends SecureWebPage {
     private static Logger log = LoggerFactory.getLogger(DicomEchoPage.class);
     
     private static final ResourceReference BaseCSS = new CssResourceReference(BaseWicketPage.class, "base-style.css");
-    private static final ResourceReference WizardCSS = new CssResourceReference(MainPage.class, "wizard-style.css");
     
     private transient ApplicationEntity sourceAE;
     private transient ApplicationEntity destinationAE;
@@ -86,8 +84,7 @@ public class DicomEchoPage extends SecureWebPage {
     private boolean error;
 	private Model<String> resultModel;
 
-    public DicomEchoPage(final ModalWindow window, ApplicationEntity destinationAE) {
-//    		throws IOException, InterruptedException, IncompatibleConnectionException {   	
+    public DicomEchoPage(final ModalWindow window, ApplicationEntity destinationAE) { 	
         super();
         
         this.destinationAE = destinationAE;
@@ -182,7 +179,5 @@ public class DicomEchoPage extends SecureWebPage {
     public void renderHead(IHeaderResponse response) {
         if (DicomEchoPage.BaseCSS != null)
         	response.renderCSSReference(DicomEchoPage.BaseCSS);
-        if (DicomEchoPage.WizardCSS != null)
-        	response.renderCSSReference(DicomEchoPage.WizardCSS);
     }    
 }
