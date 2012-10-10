@@ -50,6 +50,7 @@ import java.util.Set;
 import net.sf.json.JSONObject;
 
 import org.apache.wicket.Application;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.Page;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -86,8 +87,8 @@ import org.dcm4chee.web.common.behaviours.TooltipBehaviour;
 import org.dcm4chee.web.common.markup.BaseForm;
 import org.dcm4chee.web.common.markup.modal.ConfirmationWindow;
 import org.dcm4chee.wizard.war.Utils;
-import org.dcm4chee.wizard.war.common.ExtendedPanel;
-import org.dcm4chee.wizard.war.common.SimpleBaseForm;
+import org.dcm4chee.wizard.war.common.component.ExtendedPanel;
+import org.dcm4chee.wizard.war.common.component.SimpleBaseForm;
 import org.dcm4chee.wizard.war.configuration.model.source.DicomConfigurationSourceModel;
 import org.dcm4chee.wizard.war.configuration.simple.edit.CreateOrEditApplicationEntityPage;
 import org.dcm4chee.wizard.war.configuration.simple.edit.CreateOrEditCoercionPage;
@@ -650,6 +651,19 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 				        };
 				        cellItem.add(new LinkPanel(componentId, ajaxLink, ImageManager.IMAGE_WIZARD_COMMON_REMOVE, removeConfirmation))
 							.add(new AttributeAppender("style", Model.of("width: 50px; text-align: center;")));
+				        if (type.equals(ConfigTreeNode.TreeNodeType.CONNECTION)) {
+				        	Connection connection = null;
+							try {
+								connection = ((ConnectionModel) rowModel.getObject().getModel()).getConnection();
+							} catch (ConfigurationException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+				        	for (ApplicationEntity ae : connection.getDevice().getApplicationEntities())
+				        		if (ae.getConnections().contains(connection))
+				        			ajaxLink.setEnabled(false)
+				        				.add(new AttributeModifier("title", new ResourceModel("dicom.delete.connection.notAllowed")));			        	
+				        }
 			}
 		});
 
