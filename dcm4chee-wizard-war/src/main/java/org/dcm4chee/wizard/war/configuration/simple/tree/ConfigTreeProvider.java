@@ -241,13 +241,13 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 	}
 
 	public static ConfigTreeProvider get() {
-		return (ConfigTreeProvider) Session.get().getAttribute("deviceTreeProvider");
+		return (ConfigTreeProvider) Session.get().getAttribute("configTreeProvider");
 	}
 
 	public static ConfigTreeProvider set(Component forComponent) throws ConfigurationException {
-		ConfigTreeProvider deviceTreeProvider = new ConfigTreeProvider(forComponent);
-		Session.get().setAttribute("deviceTreeProvider", deviceTreeProvider);
-		return deviceTreeProvider;
+		ConfigTreeProvider configTreeProvider = new ConfigTreeProvider(forComponent);
+		Session.get().setAttribute("configTreeProvider", configTreeProvider);
+		return configTreeProvider;
 	}
 
 	public void registerAETitle(String aeTitle) throws ConfigurationException {
@@ -349,7 +349,7 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 		for (ConfigTreeNode node : deviceNodeList)
 			if (node.getName().equals(device.getDeviceName()))
 					node.setModel(null);
-		Session.get().setAttribute("deviceTreeProvider", this);
+		Session.get().setAttribute("configTreeProvider", this);
 	}
 
 	public void removeDevice(ConfigTreeNode deviceNode) throws ConfigurationException {
