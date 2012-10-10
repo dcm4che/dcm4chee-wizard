@@ -60,13 +60,13 @@ public class ConnectionValidator extends AbstractFormValidator {
 	private FormComponent<String> hostname;
 	private FormComponent<Integer> port;
 
-	private String ignore;
+	private ConnectionModel ignore;
 	
 	public ConnectionValidator(List<ConnectionModel> connectionModels,
 			FormComponent<String> commonName,
 			FormComponent<String> hostname,
 			FormComponent<Integer> port, 
-			String ignore) {
+			ConnectionModel ignore) {
 
 			this.connectionModels = connectionModels;
 			this.commonName = commonName;
@@ -86,21 +86,23 @@ public class ConnectionValidator extends AbstractFormValidator {
 			if (port.getValue() != null)
 				portNumber = Integer.parseInt(port.getValue());
 			
-			if (!commonName.getValue().equals("") && !commonName.getValue().equals(ignore)) {
+			if (!commonName.getValue().equals("") 
+					&& ignore != null  
+					&& !commonName.getValue().equals(ignore.getConnection().getCommonName())) {
 				for (ConnectionModel connectionModel : connectionModels) 
 					if (commonName.getValue().equals(connectionModel.getConnection().getCommonName()))
 						commonName.error(new StringResourceModel("ConnectionValidator.commonName.alreadyExists", hostname, null, new Object[0]).getObject());
 			} else {
-				for (ConnectionModel connectionModel : connectionModels) {
-					if (connectionModel.getConnection().getCommonName() == null)
-						continue;
-					if (hostname.getValue().equals(connectionModel.getConnection().getHostname())) 
-						for (ConnectionModel connectionModel1 : connectionModels) 
-							if (portNumber == connectionModel1.getConnection().getPort()) {
+				if (ignore != null 
+					&& hostname.getValue().equals(ignore.getConnection().getHostname())
+					&& (portNumber == ignore.getConnection().getPort()))
+					return;
+				for (ConnectionModel connectionModel : connectionModels) 
+					if (hostname.getValue().equals(connectionModel.getConnection().getHostname())
+							&& portNumber == connectionModel.getConnection().getPort()) { 
 								hostname.error(new StringResourceModel("ConnectionValidator.port.alreadyExists", hostname, null, new Object[0]).getObject());
 								port.error(new StringResourceModel("ConnectionValidator.port.alreadyExists", hostname, null, new Object[0]).getObject());
-							}				
-				}
+							}
 			}
 		} catch (ConfigurationException ce) {
 			throw new RuntimeException(ce);

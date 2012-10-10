@@ -53,6 +53,7 @@ import net.sf.json.JSONObject;
 
 import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.conf.api.DicomConfiguration;
+import org.dcm4che.net.ApplicationEntity;
 import org.dcm4che.net.Device;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -155,4 +156,8 @@ public class DicomConfigurationManager implements Serializable {
         dicomConfiguration.removeDevice(deviceName);
         getDeviceMap().remove(deviceName);
     }
+    
+    public ApplicationEntity getApplicationEntity(String aet) throws ConfigurationException {
+    	return dicomConfiguration.findApplicationEntity(aet);
+    }   
 }

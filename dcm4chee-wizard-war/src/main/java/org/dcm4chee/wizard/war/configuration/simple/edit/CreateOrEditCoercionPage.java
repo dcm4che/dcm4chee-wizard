@@ -63,12 +63,12 @@ import org.dcm4che.net.Dimse;
 import org.dcm4che.net.TransferCapability.Role;
 import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
 import org.dcm4chee.web.common.base.BaseWicketPage;
-import org.dcm4chee.web.common.markup.BaseForm;
 import org.dcm4chee.web.common.markup.modal.MessageWindow;
+import org.dcm4chee.wizard.war.common.SimpleBaseForm;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.CoercionModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ProxyApplicationEntityModel;
-import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider;
 import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeNode;
+import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider;
 import org.dcm4chee.wizard.war.configuration.simple.validator.SOPClassValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,7 +106,7 @@ public class CreateOrEditCoercionPage extends SecureWebPage {
         add(new WebMarkupContainer("edit-coercion-title").setVisible(coercionModel != null));
 
         setOutputMarkupId(true);
-        final BaseForm form = new BaseForm("form");
+        final SimpleBaseForm form = new SimpleBaseForm("form");
         form.setResourceIdPrefix("dicom.edit.coercion.");
         add(form);
 

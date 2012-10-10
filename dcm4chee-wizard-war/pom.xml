@@ -12,7 +12,7 @@
   <name>WAR for dcm4chee-wizard</name>
   <description></description>
   <properties>
-    <wicket.version>1.5.7</wicket.version>
+    <wicket.version>1.5.8</wicket.version>
     <wicket.security.version>1.5.5</wicket.security.version>
     <wicket.cdi.version>1.2</wicket.cdi.version>
     <dcm4chee.proxy.version>1.0.0-SNAPSHOT</dcm4chee.proxy.version>

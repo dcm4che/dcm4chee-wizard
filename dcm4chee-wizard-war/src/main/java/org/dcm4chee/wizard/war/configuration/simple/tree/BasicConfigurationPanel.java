@@ -87,6 +87,7 @@ import org.dcm4chee.web.common.markup.BaseForm;
 import org.dcm4chee.web.common.markup.modal.ConfirmationWindow;
 import org.dcm4chee.wizard.war.Utils;
 import org.dcm4chee.wizard.war.common.ExtendedPanel;
+import org.dcm4chee.wizard.war.common.SimpleBaseForm;
 import org.dcm4chee.wizard.war.configuration.model.source.DicomConfigurationSourceModel;
 import org.dcm4chee.wizard.war.configuration.simple.edit.CreateOrEditApplicationEntityPage;
 import org.dcm4chee.wizard.war.configuration.simple.edit.CreateOrEditCoercionPage;
@@ -125,7 +126,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 
     final MaskingAjaxCallBehavior macb = new MaskingAjaxCallBehavior();
 
-    private BaseForm form;
+    private SimpleBaseForm form;
 
     private ModalWindow editWindow;
     private ModalWindow echoWindow;
@@ -143,11 +144,14 @@ public class BasicConfigurationPanel extends ExtendedPanel {
             private static final long serialVersionUID = 1L;
 
             public void onClose(AjaxRequestTarget target) {
+System.out.println("---------------------------");
+System.out.println("windowClosedCallback");
 
             	boolean refresh = false;
                 for (ConfigTreeNode deviceNode : ConfigTreeProvider.get().getNodeList()) {
-
-                    if (deviceNode.getModel() == null) {
+System.out.println(deviceNode.getName());
+                    if (deviceNode.getModel() == null) 
+System.out.println("NULL model");
                         try {
                             ConfigTreeProvider.get().loadDevice(deviceNode);
                             refresh = true; 
@@ -155,8 +159,9 @@ public class BasicConfigurationPanel extends ExtendedPanel {
                             // TODO Auto-generated catch block
                             e.printStackTrace();
                         }
-                    }
+//                    }
                 }
+System.out.println("---------------------------");
                 if (refresh || ConfigTreeProvider.get().resync())
                     try {
                         BasicConfigurationPanel.this.refreshTree();
@@ -246,7 +251,6 @@ public class BasicConfigurationPanel extends ExtendedPanel {
                         deviceNode.setModel(null);
                     }
                     getSession().setAttribute("deviceTreeProvider", configTree.getProvider());
-
                     target.add(form);
 
                 } catch (ConfigurationException e) {
@@ -259,7 +263,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
         add(removeConfirmation.setInitialHeight(150)
         		.setWindowClosedCallback(windowClosedCallback));
 
-        add(form = new BaseForm("form"));
+        add(form = new SimpleBaseForm("form"));
         form.setResourceIdPrefix("dicom.");
 
         AjaxLink<Object> createDevice = new AjaxLink<Object>("createDevice") {

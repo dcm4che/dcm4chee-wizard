@@ -39,6 +39,8 @@
 package org.dcm4chee.wizard.war.configuration.simple.edit;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
@@ -49,6 +51,7 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.CheckBoxMultipleChoice;
+import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.markup.html.form.TextArea;
@@ -64,8 +67,9 @@ import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
 import org.dcm4chee.proxy.conf.ProxyDevice;
 import org.dcm4chee.web.common.base.BaseWicketPage;
 import org.dcm4chee.web.common.behaviours.FocusOnLoadBehaviour;
-import org.dcm4chee.web.common.markup.BaseForm;
 import org.dcm4chee.web.common.markup.modal.MessageWindow;
+import org.dcm4chee.wizard.war.Utils;
+import org.dcm4chee.wizard.war.common.SimpleBaseForm;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ApplicationEntityModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ConnectionReferenceModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.DeviceModel;
@@ -113,6 +117,8 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
 	private StringArrayModel supportedCharacterSetsModel;
 	private Model<String> vendorDataModel;
     
+	private List<String> installedRendererChoices;
+	
     public CreateOrEditApplicationEntityPage(final ModalWindow window, final ApplicationEntityModel aeModel, 
     		final ConfigTreeNode deviceNode) {
     	super();
@@ -123,9 +129,13 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
         add(new WebMarkupContainer("edit-applicationEntity-title").setVisible(aeModel != null));
 
         setOutputMarkupId(true);
-        final BaseForm form = new BaseForm("form");
+        final SimpleBaseForm form = new SimpleBaseForm("form");
         form.setResourceIdPrefix("dicom.edit.applicationEntity.");
         add(form);
+
+        installedRendererChoices = new ArrayList<String>();
+        installedRendererChoices.add(new ResourceModel("dicom.installed.true.text").wrapOnAssignment(this).getObject());
+        installedRendererChoices.add(new ResourceModel("dicom.installed.false.text").wrapOnAssignment(this).getObject());
 
         ArrayList<ConnectionReferenceModel> connectionReferences = new ArrayList<ConnectionReferenceModel>();
 
@@ -256,7 +266,22 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
         .add(new TextField<String>("description", descriptionModel));
 
         optionalContainer.add(new Label("installed.label", new ResourceModel("dicom.edit.connection.installed.label")))
-        .add(new CheckBox("installed", installedModel));
+        .add(new DropDownChoice<Boolean>("installed", installedModel, 
+        		  Arrays.asList(new Boolean[] { new Boolean(true), new Boolean(false) }), 
+        		  new IChoiceRenderer<Boolean>() {
+ 
+        			private static final long serialVersionUID = 1L;
+
+					public String getDisplayValue(Boolean object) {
+						return object.booleanValue() ? 
+								installedRendererChoices.get(0) : 
+									installedRendererChoices.get(1);
+					}
+
+					public String getIdValue(Boolean object, int index) {
+						return String.valueOf(index);
+					}
+        		}).setNullValid(true));
 
         optionalContainer.add(new Label("calledAETitles.label", new ResourceModel("dicom.edit.applicationEntity.calledAETitles.label")))
         .add(new TextArea<String>("calledAETitles", calledAETitlesModel));
@@ -308,6 +333,7 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
                 	
                 	applicationEntity.setApplicationClusters(applicationClustersModel.getArray());
                     applicationEntity.setDescription(descriptionModel.getObject());
+Utils.prettyPrintln(installedModel.getObject());
                     applicationEntity.setInstalled(installedModel.getObject());
                     applicationEntity.setPreferredCalledAETitles(calledAETitlesModel.getArray());
                     applicationEntity.setPreferredCallingAETitles(callingAETitlesModel.getArray());
@@ -363,5 +389,5 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
     public void renderHead(IHeaderResponse response) {
         if (CreateOrEditApplicationEntityPage.BaseCSS != null)
         	response.renderCSSReference(CreateOrEditApplicationEntityPage.BaseCSS);
-    }    
+    }
  }

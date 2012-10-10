@@ -66,9 +66,9 @@ import org.dcm4che.net.Device;
 import org.dcm4chee.proxy.conf.ProxyDevice;
 import org.dcm4chee.web.common.base.BaseWicketPage;
 import org.dcm4chee.web.common.behaviours.FocusOnLoadBehaviour;
-import org.dcm4chee.web.common.markup.BaseForm;
 import org.dcm4chee.web.common.markup.modal.MessageWindow;
 import org.dcm4chee.wizard.war.common.ExtendedSecureWebPage;
+import org.dcm4chee.wizard.war.common.SimpleBaseForm;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.DeviceModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.InstitutionCodeModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.StringArrayModel;
@@ -135,7 +135,7 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
         add(new WebMarkupContainer("edit-device-title").setVisible(deviceModel != null));
 
         setOutputMarkupId(true);
-        final BaseForm form = new BaseForm("form");
+        final SimpleBaseForm form = new SimpleBaseForm("form");
         form.setResourceIdPrefix("dicom.edit.device.");
         add(form);
 

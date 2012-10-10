@@ -38,6 +38,10 @@
 
 package org.dcm4chee.wizard.war.configuration.simple.edit;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.ajax.markup.html.form.AjaxFallbackButton;
@@ -46,8 +50,10 @@ import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.CheckBox;
+import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
+import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.Model;
@@ -60,6 +66,7 @@ import org.dcm4che.net.Connection;
 import org.dcm4chee.web.common.base.BaseWicketPage;
 import org.dcm4chee.web.common.markup.BaseForm;
 import org.dcm4chee.web.common.markup.modal.MessageWindow;
+import org.dcm4chee.wizard.war.Utils;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ConnectionModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.DefaultableModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.DeviceModel;
@@ -115,6 +122,8 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
 	private DefaultableModel<Integer> retrieveTimeoutModel;
 	private DefaultableModel<Integer> idleTimeoutModel;
     
+	private List<String> installedRendererChoices;
+	
     public CreateOrEditConnectionPage(final ModalWindow window, final ConnectionModel connectionModel, 
 			final ConfigTreeNode deviceNode) {
         super();
@@ -125,17 +134,14 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
         add(new WebMarkupContainer("edit-connection-title").setVisible(connectionModel != null));
 
         setOutputMarkupId(true);
-        final BaseForm form = new BaseForm("form") {
-        	
-			private static final long serialVersionUID = 1L;
-
-			public void onValidate() {
-				
-        	};
-        };
+        final BaseForm form = new BaseForm("form");
         form.setResourceIdPrefix("dicom.edit.connection.");
         add(form);
         
+        installedRendererChoices = new ArrayList<String>();
+        installedRendererChoices.add(new ResourceModel("dicom.installed.true.text").wrapOnAssignment(this).getObject());
+        installedRendererChoices.add(new ResourceModel("dicom.installed.false.text").wrapOnAssignment(this).getObject());
+
         try {
 	    	tcpBacklogModel = new DefaultableModel<Integer>(Connection.DEF_BACKLOG);
 	    	tcpConnectTimeoutModel = new DefaultableModel<Integer>(Connection.NO_TIMEOUT);
@@ -157,7 +163,7 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
 		        hostnameModel = Model.of();
 	        	commonNameModel = Model.of();
 				installedModel = Model.of();
-		        portModel = Model.of(1);
+		        portModel = Model.of(11112);
 		        tlsCipherSuitesModel = new StringArrayModel(null);
 		    	httpProxyModel = Model.of();
 		    	tlsNeedClientAuthModel = Model.of(true);
@@ -169,7 +175,7 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
         		Connection connection = connectionModel.getConnection();
 		        hostnameModel = Model.of(connection.getHostname());
 	        	commonNameModel = Model.of(connection.getCommonName());
-				installedModel = Model.of(connection.isInstalled());
+				installedModel = Model.of(connection.getInstalled());
 		        portModel = Model.of(connection.getPort());
 		        tlsCipherSuitesModel = new StringArrayModel(connection.getTlsCipherSuites());
 		    	httpProxyModel = Model.of(connection.getHttpProxy());
@@ -216,7 +222,23 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
         .add(commonNameTextField = new TextField<String>("commonName", commonNameModel));
 
         optionalContainer.add(new Label("installed.label", new ResourceModel("dicom.edit.connection.installed.label")))
-        .add(new CheckBox("installed", installedModel));
+        .add(new DropDownChoice<Boolean>("installed", installedModel, 
+        		  Arrays.asList(new Boolean[] { new Boolean(true), new Boolean(false) }), 
+        		  new IChoiceRenderer<Boolean>() {
+ 
+					private static final long serialVersionUID = 1L;
+
+					public String getDisplayValue(Boolean object) {
+						return object.booleanValue() ? 
+								installedRendererChoices.get(0) : 
+									installedRendererChoices.get(1);
+					}
+
+					public String getIdValue(Boolean object, int index) {
+						return String.valueOf(index);
+					}
+        		}).setNullValid(true));
+        	
 
         FormComponent<Integer> portTextField;
 		optionalContainer.add(new Label("port.label", new ResourceModel("dicom.edit.connection.port.label")))
@@ -332,7 +354,7 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
         });
         
 		form.add(new ConnectionValidator(((DeviceModel) deviceNode.getModel()).getConnections(), 
-				commonNameTextField, hostnameTextField, portTextField, commonNameTextField.getModelObject()));
+				commonNameTextField, hostnameTextField, portTextField, connectionModel));
         
         form.add(new AjaxFallbackButton("submit", new ResourceModel("saveBtn"), form) {
 
@@ -371,7 +393,7 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
                     connection.setResponseTimeout(responseTimeoutModel.getObject());
                     connection.setRetrieveTimeout(retrieveTimeoutModel.getObject());
                     connection.setIdleTimeout(idleTimeoutModel.getObject());
-
+Utils.prettyPrintln(installedModel.getObject());
                     if (connectionModel == null) 
                         ((DeviceModel) deviceNode.getModel()).getDevice().addConnection(connection);
                     ConfigTreeProvider.get().mergeDevice(connection.getDevice());

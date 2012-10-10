@@ -265,6 +265,10 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 		return getDicomConfigurationManager().getDicomConfiguration().listRegisteredAETitles();
 	}
 	
+	public ApplicationEntity getApplicationEntity(String aet) throws ConfigurationException {
+		return this.getDicomConfigurationManager().getApplicationEntity(aet);
+	}
+	
 	private void addDeviceSubnodes(ConfigTreeNode deviceNode) {
 		
 		// CREATE CONNECTIONS FOLDER

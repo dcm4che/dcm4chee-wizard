@@ -60,8 +60,8 @@ import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
 import org.dcm4chee.proxy.conf.Retry;
 import org.dcm4chee.proxy.conf.RetryObject;
 import org.dcm4chee.web.common.base.BaseWicketPage;
-import org.dcm4chee.web.common.markup.BaseForm;
 import org.dcm4chee.web.common.markup.modal.MessageWindow;
+import org.dcm4chee.wizard.war.common.SimpleBaseForm;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ProxyApplicationEntityModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.RetryModel;
 import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeNode;
@@ -101,7 +101,7 @@ public class CreateOrEditRetryPage extends SecureWebPage {
         add(new WebMarkupContainer("edit-retry-title").setVisible(retryModel != null));
 
         setOutputMarkupId(true);
-        final BaseForm form = new BaseForm("form");
+        final SimpleBaseForm form = new SimpleBaseForm("form");
         form.setResourceIdPrefix("dicom.edit.retry.");
         add(form);
 
