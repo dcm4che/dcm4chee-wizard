@@ -165,8 +165,6 @@ public class CreateOrEditRetryPage extends SecureWebPage {
             		proxyApplicationEntity.getRetries().add(retry);
 
             		ConfigTreeProvider.get().mergeDevice(proxyApplicationEntity.getDevice());
-            		aeNode.getAncestor(2).setModel(null);
-
                     window.close(target);
                 } catch (Exception e) {
                 	log.error("Error modifying forward schedule", e);

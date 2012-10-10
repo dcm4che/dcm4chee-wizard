@@ -144,14 +144,10 @@ public class BasicConfigurationPanel extends ExtendedPanel {
             private static final long serialVersionUID = 1L;
 
             public void onClose(AjaxRequestTarget target) {
-System.out.println("---------------------------");
-System.out.println("windowClosedCallback");
 
             	boolean refresh = false;
                 for (ConfigTreeNode deviceNode : ConfigTreeProvider.get().getNodeList()) {
-System.out.println(deviceNode.getName());
-                    if (deviceNode.getModel() == null) 
-System.out.println("NULL model");
+                    if (deviceNode.getModel() == null) { 
                         try {
                             ConfigTreeProvider.get().loadDevice(deviceNode);
                             refresh = true; 
@@ -159,9 +155,8 @@ System.out.println("NULL model");
                             // TODO Auto-generated catch block
                             e.printStackTrace();
                         }
-//                    }
+                    }
                 }
-System.out.println("---------------------------");
                 if (refresh || ConfigTreeProvider.get().resync())
                     try {
                         BasicConfigurationPanel.this.refreshTree();
@@ -248,11 +243,8 @@ System.out.println("---------------------------");
                             return;
                         }
                         ConfigTreeProvider.get().mergeDevice(((DeviceModel) deviceNode.getModel()).getDevice());
-                        deviceNode.setModel(null);
                     }
-                    getSession().setAttribute("deviceTreeProvider", configTree.getProvider());
                     target.add(form);
-
                 } catch (ConfigurationException e) {
                     e.printStackTrace();
                 } catch (Exception e) {

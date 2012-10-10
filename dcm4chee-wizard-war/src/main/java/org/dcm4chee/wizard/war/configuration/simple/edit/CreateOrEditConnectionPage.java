@@ -66,7 +66,6 @@ import org.dcm4che.net.Connection;
 import org.dcm4chee.web.common.base.BaseWicketPage;
 import org.dcm4chee.web.common.markup.BaseForm;
 import org.dcm4chee.web.common.markup.modal.MessageWindow;
-import org.dcm4chee.wizard.war.Utils;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ConnectionModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.DefaultableModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.DeviceModel;
@@ -393,11 +392,10 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
                     connection.setResponseTimeout(responseTimeoutModel.getObject());
                     connection.setRetrieveTimeout(retrieveTimeoutModel.getObject());
                     connection.setIdleTimeout(idleTimeoutModel.getObject());
-Utils.prettyPrintln(installedModel.getObject());
+
                     if (connectionModel == null) 
                         ((DeviceModel) deviceNode.getModel()).getDevice().addConnection(connection);
                     ConfigTreeProvider.get().mergeDevice(connection.getDevice());
-                    deviceNode.setModel(null);
                     window.close(target);
                 } catch (Exception e) {
                 	log.error("Error modifying connection", e);

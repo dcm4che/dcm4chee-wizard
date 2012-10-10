@@ -59,6 +59,7 @@ import org.dcm4che.net.Device;
 import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
 import org.dcm4chee.proxy.conf.ProxyDevice;
 import org.dcm4chee.wizard.war.DicomConfigurationManager;
+import org.dcm4chee.wizard.war.Utils;
 import org.dcm4chee.wizard.war.WicketApplication;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ApplicationEntityModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ConnectionModel;
@@ -249,10 +250,6 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 		return deviceTreeProvider;
 	}
 
-	private void saveToSession() {
-		Session.get().setAttribute("deviceTreeProvider", this);
-	}
-
 	public void registerAETitle(String aeTitle) throws ConfigurationException {
 		getDicomConfigurationManager().getDicomConfiguration().registerAETitle(aeTitle);
 	}
@@ -349,7 +346,10 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 
 	public void mergeDevice(Device device) throws IOException, ConfigurationException {
 		getDicomConfigurationManager().save(device);
-		saveToSession();
+		for (ConfigTreeNode node : deviceNodeList)
+			if (node.getName().equals(device.getDeviceName()))
+					node.setModel(null);
+		Session.get().setAttribute("deviceTreeProvider", this);
 	}
 
 	public void removeDevice(ConfigTreeNode deviceNode) throws ConfigurationException {

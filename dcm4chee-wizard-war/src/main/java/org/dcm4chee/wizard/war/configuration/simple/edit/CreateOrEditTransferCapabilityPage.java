@@ -195,7 +195,6 @@ public class CreateOrEditTransferCapabilityPage extends SecureWebPage {
                     applicationEntity.addTransferCapability(transferCapability);
 
                     ConfigTreeProvider.get().mergeDevice(applicationEntity.getDevice());
-                    aeNode.getAncestor(2).setModel(null);
                     window.close(target);
                 } catch (Exception e) {
                 	log.error("Error modifying transfer capability", e);

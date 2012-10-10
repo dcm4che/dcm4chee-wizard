@@ -175,8 +175,6 @@ public class CreateOrEditForwardSchedulePage extends SecureWebPage {
                     	.put(destinationAETitleModel.getObject(), schedule);
 
             		ConfigTreeProvider.get().mergeDevice(proxyApplicationEntity.getDevice());
-            		aeNode.getAncestor(2).setModel(null);
-
                     window.close(target);
                 } catch (Exception e) {
                 	log.error("Error modifying forward schedule", e);

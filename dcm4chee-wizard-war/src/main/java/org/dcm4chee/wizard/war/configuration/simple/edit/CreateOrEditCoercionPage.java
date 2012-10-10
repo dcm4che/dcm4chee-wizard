@@ -203,8 +203,6 @@ public class CreateOrEditCoercionPage extends SecureWebPage {
             		proxyApplicationEntity.getAttributeCoercions().add(coercion);
 
             		ConfigTreeProvider.get().mergeDevice(proxyApplicationEntity.getDevice());
-            		aeNode.getAncestor(2).setModel(null);
-
                     window.close(target);
                 } catch (Exception e) {
                 	log.error("Error modifying coercion", e);

@@ -333,7 +333,6 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
                 	
                 	applicationEntity.setApplicationClusters(applicationClustersModel.getArray());
                     applicationEntity.setDescription(descriptionModel.getObject());
-Utils.prettyPrintln(installedModel.getObject());
                     applicationEntity.setInstalled(installedModel.getObject());
                     applicationEntity.setPreferredCalledAETitles(calledAETitlesModel.getArray());
                     applicationEntity.setPreferredCallingAETitles(callingAETitlesModel.getArray());
@@ -354,7 +353,6 @@ Utils.prettyPrintln(installedModel.getObject());
                     	((DeviceModel) deviceNode.getModel()).getDevice().addApplicationEntity(applicationEntity);
                     ConfigTreeProvider.get().mergeDevice(applicationEntity.getDevice());
                     ConfigTreeProvider.get().registerAETitle(applicationEntity.getAETitle());
-                    deviceNode.setModel(null);
                     window.close(target);
                 } catch (Exception e) {
                 	log.error("Error modifying application entity", e);
