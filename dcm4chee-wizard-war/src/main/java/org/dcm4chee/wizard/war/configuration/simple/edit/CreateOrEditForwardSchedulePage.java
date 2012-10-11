@@ -59,8 +59,8 @@ import org.apache.wicket.request.resource.ResourceReference;
 import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
 import org.dcm4chee.proxy.conf.Schedule;
-import org.dcm4chee.web.common.base.BaseWicketPage;
-import org.dcm4chee.wizard.war.common.component.SimpleBaseForm;
+import org.dcm4chee.wizard.common.component.ExtendedWebPage;
+import org.dcm4chee.wizard.common.component.ExtendedForm;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ForwardScheduleModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ProxyApplicationEntityModel;
 import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeNode;
@@ -80,7 +80,7 @@ public class CreateOrEditForwardSchedulePage extends SecureWebPage {
 
     private static Logger log = LoggerFactory.getLogger(CreateOrEditForwardSchedulePage.class);
 
-    private static final ResourceReference BaseCSS = new CssResourceReference(BaseWicketPage.class, "base-style.css");
+    private static final ResourceReference BaseCSS = new CssResourceReference(ExtendedWebPage.class, "base-style.css");
     
     // mandatory
 	private Model<String> destinationAETitleModel;
@@ -100,7 +100,7 @@ public class CreateOrEditForwardSchedulePage extends SecureWebPage {
         add(new WebMarkupContainer("edit-forwardSchedule-title").setVisible(forwardScheduleModel != null));
 
         setOutputMarkupId(true);
-        final SimpleBaseForm form = new SimpleBaseForm("form");
+        final ExtendedForm form = new ExtendedForm("form");
         form.setResourceIdPrefix("dicom.edit.forwardSchedule.");
         add(form);
 

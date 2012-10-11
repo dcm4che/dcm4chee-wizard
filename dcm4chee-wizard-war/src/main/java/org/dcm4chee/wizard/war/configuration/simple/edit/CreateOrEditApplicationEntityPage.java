@@ -65,9 +65,9 @@ import org.dcm4che.net.ApplicationEntity;
 import org.dcm4che.net.Connection;
 import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
 import org.dcm4chee.proxy.conf.ProxyDevice;
-import org.dcm4chee.wizard.war.common.behavior.FocusOnLoadBehaviour;
-import org.dcm4chee.wizard.war.common.component.BaseWicketPage;
-import org.dcm4chee.wizard.war.common.component.SimpleBaseForm;
+import org.dcm4chee.wizard.common.behavior.FocusOnLoadBehavior;
+import org.dcm4chee.wizard.common.component.ExtendedWebPage;
+import org.dcm4chee.wizard.common.component.ExtendedForm;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ApplicationEntityModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ConnectionReferenceModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.DeviceModel;
@@ -89,7 +89,7 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
 
     private static Logger log = LoggerFactory.getLogger(CreateOrEditApplicationEntityPage.class);
     
-    private static final ResourceReference BaseCSS = new CssResourceReference(BaseWicketPage.class, "base-style.css");
+    private static final ResourceReference BaseCSS = new CssResourceReference(ExtendedWebPage.class, "base-style.css");
     
     private boolean isProxy = false;
     private String oldAETitle;
@@ -123,7 +123,7 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
         add(new WebMarkupContainer("edit-applicationEntity-title").setVisible(aeModel != null));
 
         setOutputMarkupId(true);
-        final SimpleBaseForm form = new SimpleBaseForm("form");
+        final ExtendedForm form = new ExtendedForm("form");
         form.setResourceIdPrefix("dicom.edit.applicationEntity.");
         add(form);
 
@@ -194,7 +194,7 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
         form.add(new Label("aeTitle.label", new ResourceModel("dicom.edit.applicationEntity.aeTitle.label")))
         .add(new TextField<String>("aeTitle", aeTitleModel)
         		.add(new AETitleValidator(aeTitleModel.getObject()))
-                .setRequired(true).add(FocusOnLoadBehaviour.newFocusAndSelectBehaviour()));
+                .setRequired(true).add(FocusOnLoadBehavior.newFocusAndSelectBehaviour()));
 
         form.add(new Label("associationAcceptor.label", new ResourceModel("dicom.edit.applicationEntity.associationAcceptor.label")))
         .add(new CheckBox("associationAcceptor", associationAcceptorModel));

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/2002/08/xhtml/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.w3.org/1999/xhtml
+                          http://www.w3.org/2002/08/xhtml/xhtml1-strict.xsd">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<link rel="stylesheet" type="text/css" href="style.css"/>
+	</head>
+	<body>
+		<wicket:panel>
+			<div class="confirmWindow">
+				<div class="confirmWindow_remark">
+					<span wicket:id="remark">[remark]</span>
+				</div>
+				<div class="confirmWindow_msg">
+					<span wicket:id="msg">[message]</span>
+				</div>
+		        <div class="confirmWindow-button">
+		           	<button type="submit" wicket:id="confirm" ><span wicket:id="confirmLabel">ConfirmBtn</span></button>            	
+		           	<button type="submit" wicket:id="decline" ><span wicket:id="declineLabel">DeclineBtn</span></button>            	
+		           	<button type="submit" wicket:id="cancel" ><span wicket:id="cancelLabel">CancelBtn</span></button>            	
+		           	<button type="submit" wicket:id="ok" ><span wicket:id="okLabel">okBtn</span></button>
+		        </div>
+		    </div>
+       </wicket:panel>
+	</body>
+</html>

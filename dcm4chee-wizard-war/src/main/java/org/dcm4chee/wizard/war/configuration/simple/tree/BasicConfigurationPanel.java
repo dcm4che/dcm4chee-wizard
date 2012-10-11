@@ -81,14 +81,12 @@ import org.dcm4che.net.Device;
 import org.dcm4chee.icons.ImageManager;
 import org.dcm4chee.icons.behaviours.ImageSizeBehaviour;
 import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
-import org.dcm4chee.web.common.ajax.MaskingAjaxCallBehavior;
-import org.dcm4chee.web.common.base.BaseWicketPage;
-import org.dcm4chee.web.common.behaviours.TooltipBehaviour;
-import org.dcm4chee.web.common.markup.BaseForm;
-import org.dcm4chee.web.common.markup.modal.ConfirmationWindow;
+import org.dcm4chee.wizard.common.behavior.MaskingAjaxCallBehavior;
+import org.dcm4chee.wizard.common.behavior.TooltipBehavior;
+import org.dcm4chee.wizard.common.component.ConfirmationWindow;
+import org.dcm4chee.wizard.common.component.ExtendedForm;
 import org.dcm4chee.wizard.war.Utils;
 import org.dcm4chee.wizard.war.common.component.ExtendedPanel;
-import org.dcm4chee.wizard.war.common.component.SimpleBaseForm;
 import org.dcm4chee.wizard.war.configuration.model.source.DicomConfigurationSourceModel;
 import org.dcm4chee.wizard.war.configuration.simple.edit.CreateOrEditApplicationEntityPage;
 import org.dcm4chee.wizard.war.configuration.simple.edit.CreateOrEditCoercionPage;
@@ -127,7 +125,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 
     final MaskingAjaxCallBehavior macb = new MaskingAjaxCallBehavior();
 
-    private SimpleBaseForm form;
+    private ExtendedForm form;
 
     private ModalWindow editWindow;
     private ModalWindow echoWindow;
@@ -250,7 +248,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
         add(removeConfirmation.setInitialHeight(150)
         		.setWindowClosedCallback(windowClosedCallback));
 
-        add(form = new SimpleBaseForm("form"));
+        add(form = new ExtendedForm("form"));
         form.setResourceIdPrefix("dicom.");
 
         AjaxLink<Object> createDevice = new AjaxLink<Object>("createDevice") {
@@ -271,7 +269,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
         };
         createDevice.add(new Image("createDeviceImg", ImageManager.IMAGE_WIZARD_DEVICE_ADD).add(new ImageSizeBehaviour(
                 "vertical-align: middle;")));
-        createDevice.add(new TooltipBehaviour("dicom."));
+        createDevice.add(new TooltipBehavior("dicom."));
         createDevice.add(new Label("createDeviceText", new ResourceModel("dicom.createDevice.text"))
                 .add(new AttributeAppender("style", Model.of("vertical-align: middle"), " ")));
         form.add(createDevice);

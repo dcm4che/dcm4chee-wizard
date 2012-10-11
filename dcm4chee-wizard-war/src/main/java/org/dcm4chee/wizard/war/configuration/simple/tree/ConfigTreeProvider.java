@@ -60,7 +60,7 @@ import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
 import org.dcm4chee.proxy.conf.ProxyDevice;
 import org.dcm4chee.wizard.war.DicomConfigurationManager;
 import org.dcm4chee.wizard.war.Utils;
-import org.dcm4chee.wizard.war.WicketApplication;
+import org.dcm4chee.wizard.war.WizardApplication;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ApplicationEntityModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ConnectionModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.DeviceModel;
@@ -237,7 +237,7 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 	}
 	
 	private DicomConfigurationManager getDicomConfigurationManager() {
-		return ((WicketApplication) Application.get()).getDicomConfigurationManager();
+		return ((WizardApplication) Application.get()).getDicomConfigurationManager();
 	}
 
 	public static ConfigTreeProvider get() {

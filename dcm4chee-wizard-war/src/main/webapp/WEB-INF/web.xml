@@ -8,7 +8,7 @@
     <filter-class>org.apache.wicket.protocol.http.WicketFilter</filter-class>
     <init-param>
       <param-name>applicationClassName</param-name>
-      <param-value>org.dcm4chee.wizard.war.WicketApplication</param-value>
+      <param-value>org.dcm4chee.wizard.war.WizardApplication</param-value>
     </init-param>
     <init-param>
       <param-name>dicomConfigurationClass</param-name>

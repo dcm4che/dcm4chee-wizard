@@ -14,7 +14,6 @@
   <properties>
     <wicket.version>1.5.8</wicket.version>
     <wicket.security.version>1.5.5</wicket.security.version>
-    <wicket.cdi.version>1.2</wicket.cdi.version>
     <dcm4chee.proxy.version>1.0.0-SNAPSHOT</dcm4chee.proxy.version>
     <dcm4che.version>3.0.0</dcm4che.version>
   </properties>
@@ -151,9 +150,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>dcm4che.dcm4chee</groupId>
-      <artifactId>dcm4chee-web-common</artifactId>
-      <version>3.0.1-1.5</version>
+      <groupId>org.dcm4chee</groupId>
+      <artifactId>dcm4chee-wizard-common</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.wicket</groupId>

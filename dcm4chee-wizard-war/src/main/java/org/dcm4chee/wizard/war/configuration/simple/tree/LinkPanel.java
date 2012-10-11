@@ -48,8 +48,8 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.dcm4chee.icons.ImageManager;
 import org.dcm4chee.icons.behaviours.ImageSizeBehaviour;
-import org.dcm4chee.web.common.behaviours.TooltipBehaviour;
-import org.dcm4chee.web.common.markup.modal.ConfirmationWindow;
+import org.dcm4chee.wizard.common.behavior.TooltipBehavior;
+import org.dcm4chee.wizard.common.component.ConfirmationWindow;
 
 /**
  * @author Robert David <robert.david@agfa.com>
@@ -58,7 +58,6 @@ public class LinkPanel extends Panel {
 	
 	private static final long serialVersionUID = 1L;
 	
-	private AjaxLink<?> link;
 	private ModalWindow modalWindow;
 
 	public LinkPanel(String id, AjaxLink<?> link, ModalWindow modalWindow) {
@@ -77,13 +76,12 @@ public class LinkPanel extends Panel {
         }
             .add(new Image("wickettree.link.image", ImageManager.IMAGE_WIZARD_COMMON_EDIT)
             .add(new ImageSizeBehaviour("vertical-align: middle;")))
-            .add(new TooltipBehaviour("dicom.edit."))
-//            .add(new SecurityBehavior(getModuleName() + ":editAETLink"))
+            .add(new TooltipBehavior("dicom.edit."))
         );
 		add(new AttributeAppender("style", Model.of("width: 50px; text-align: center;")));
 	}
 
-	public LinkPanel(String id, AjaxLink ajaxLink, ResourceReference linkIcon, ConfirmationWindow confirmationWindow) {
+	public LinkPanel(String id, AjaxLink<?> ajaxLink, ResourceReference linkIcon, ConfirmationWindow<?> confirmationWindow) {
 		super(id);
 
 		this.modalWindow = confirmationWindow;
@@ -92,9 +90,7 @@ public class LinkPanel extends Panel {
 		ajaxLink
             .add(new Image("wickettree.link.image", linkIcon)
             .add(new ImageSizeBehaviour("vertical-align: middle;")))
-            .add(new TooltipBehaviour("dicom.edit."));
-//            .add(new SecurityBehavior(getModuleName() + ":editAETLink"))
-//        );
+            .add(new TooltipBehavior("dicom.edit."));
 		add(new AttributeAppender("style", Model.of("width: 50px; text-align: center;")));
 	}
 }

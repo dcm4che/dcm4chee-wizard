@@ -64,10 +64,10 @@ import org.dcm4che.data.Code;
 import org.dcm4che.data.Issuer;
 import org.dcm4che.net.Device;
 import org.dcm4chee.proxy.conf.ProxyDevice;
-import org.dcm4chee.web.common.base.BaseWicketPage;
-import org.dcm4chee.web.common.behaviours.FocusOnLoadBehaviour;
+import org.dcm4chee.wizard.common.behavior.FocusOnLoadBehavior;
+import org.dcm4chee.wizard.common.component.ExtendedWebPage;
+import org.dcm4chee.wizard.common.component.ExtendedForm;
 import org.dcm4chee.wizard.war.common.component.ExtendedSecureWebPage;
-import org.dcm4chee.wizard.war.common.component.SimpleBaseForm;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.DeviceModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.InstitutionCodeModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.StringArrayModel;
@@ -87,7 +87,7 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
 
     private static Logger log = LoggerFactory.getLogger(CreateOrEditDevicePage.class);
     
-    private static final ResourceReference BaseCSS = new CssResourceReference(BaseWicketPage.class, "base-style.css");
+    private static final ResourceReference BaseCSS = new CssResourceReference(ExtendedWebPage.class, "base-style.css");
     
     // configuration type selection
 	private Model<ConfigurationType> typeModel;
@@ -130,7 +130,7 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
         add(new WebMarkupContainer("edit-device-title").setVisible(deviceModel != null));
 
         setOutputMarkupId(true);
-        final SimpleBaseForm form = new SimpleBaseForm("form");
+        final ExtendedForm form = new ExtendedForm("form");
         form.setResourceIdPrefix("dicom.edit.device.");
         add(form);
 
@@ -255,7 +255,7 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
 					.add(new DeviceNameValidator(
 							getDicomConfigurationManager().listDevices(), 
 							deviceNameModel.getObject()))
-			        .setRequired(true).add(FocusOnLoadBehaviour.newFocusAndSelectBehaviour())
+			        .setRequired(true).add(FocusOnLoadBehavior.newFocusAndSelectBehaviour())
 			        .setEnabled(deviceModel == null));
 		} catch (ConfigurationException ce) {
 			log.error(this.getClass().toString() + ": " + "Error listing devices: " + ce.getMessage());

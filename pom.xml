@@ -10,6 +10,7 @@
   <description>Wizard Application for DCM4CHEE Archive</description>
   <modules>
     <module>dcm4chee-wizard-icons</module>
+    <module>dcm4chee-wizard-common</module>
     <module>dcm4chee-wizard-war</module>
   </modules>
   <build>

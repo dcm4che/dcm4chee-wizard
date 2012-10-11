@@ -61,8 +61,8 @@ import org.dcm4che.net.Association;
 import org.dcm4che.net.DimseRSP;
 import org.dcm4che.net.pdu.AAssociateRQ;
 import org.dcm4che.net.pdu.PresentationContext;
-import org.dcm4chee.web.common.base.BaseWicketPage;
-import org.dcm4chee.wizard.war.common.component.SimpleBaseForm;
+import org.dcm4chee.wizard.common.component.ExtendedWebPage;
+import org.dcm4chee.wizard.common.component.ExtendedForm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wicketstuff.security.components.SecureWebPage;
@@ -76,7 +76,7 @@ public class DicomEchoPage extends SecureWebPage {
     
     private static Logger log = LoggerFactory.getLogger(DicomEchoPage.class);
     
-    private static final ResourceReference BaseCSS = new CssResourceReference(BaseWicketPage.class, "base-style.css");
+    private static final ResourceReference BaseCSS = new CssResourceReference(ExtendedWebPage.class, "base-style.css");
     
     private transient ApplicationEntity sourceAE;
     private transient ApplicationEntity destinationAE;
@@ -90,7 +90,7 @@ public class DicomEchoPage extends SecureWebPage {
         this.destinationAE = destinationAE;
         
         setOutputMarkupId(true);
-        final SimpleBaseForm form = new SimpleBaseForm("form");
+        final ExtendedForm form = new ExtendedForm("form");
         form.setResourceIdPrefix("dicom.list.applicationEntity.echo.");
         add(form);
         

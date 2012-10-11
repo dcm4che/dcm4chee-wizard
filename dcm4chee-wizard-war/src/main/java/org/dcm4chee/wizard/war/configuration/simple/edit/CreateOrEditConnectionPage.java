@@ -63,8 +63,8 @@ import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.validation.validator.RangeValidator;
 import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.net.Connection;
-import org.dcm4chee.web.common.base.BaseWicketPage;
-import org.dcm4chee.web.common.markup.BaseForm;
+import org.dcm4chee.wizard.common.component.ExtendedWebPage;
+import org.dcm4chee.wizard.common.component.ExtendedForm;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ConnectionModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.DefaultableModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.DeviceModel;
@@ -86,7 +86,7 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
 
     private static Logger log = LoggerFactory.getLogger(CreateOrEditConnectionPage.class);
     
-    private static final ResourceReference BaseCSS = new CssResourceReference(BaseWicketPage.class, "base-style.css");
+    private static final ResourceReference BaseCSS = new CssResourceReference(ExtendedWebPage.class, "base-style.css");
     
     // mandatory
 	private Model<String> hostnameModel;
@@ -128,7 +128,7 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
         add(new WebMarkupContainer("edit-connection-title").setVisible(connectionModel != null));
 
         setOutputMarkupId(true);
-        final BaseForm form = new BaseForm("form");
+        final ExtendedForm form = new ExtendedForm("form");
         form.setResourceIdPrefix("dicom.edit.connection.");
         add(form);
         

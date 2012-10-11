@@ -59,7 +59,6 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
-import org.dcm4chee.web.common.ajax.MaskingAjaxCallBehavior;
 import org.dcm4chee.wizard.war.configuration.model.source.DicomConfigurationSourceModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,14 +77,10 @@ public class DicomConfigurationSourcePanel extends Panel {
 
     private static Logger log = LoggerFactory.getLogger(DicomConfigurationSourcePanel.class);
 
-    final MaskingAjaxCallBehavior macb = new MaskingAjaxCallBehavior();
-
     private PropertyListView<DicomConfigurationSourceModel> list;
 
     public DicomConfigurationSourcePanel(final String id) {
         super(id);
-
-        add(macb);
 
         // name
         // type
@@ -122,7 +117,8 @@ public class DicomConfigurationSourcePanel extends Panel {
 
             private static final long serialVersionUID = 1L;
 
-            protected ListItem<DicomConfigurationSourceModel> newItem(final int index) {
+            @SuppressWarnings("unused")
+			protected ListItem<DicomConfigurationSourceModel> newItem(final int index) {
                 return new OddEvenListItem<DicomConfigurationSourceModel>(index, getListItemModel(getModel(), index));
             }
 

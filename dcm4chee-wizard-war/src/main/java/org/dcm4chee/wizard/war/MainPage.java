@@ -45,10 +45,10 @@ import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
-import org.dcm4chee.web.common.base.BaseWicketApplication;
-import org.dcm4chee.web.common.base.BaseWicketPage;
-import org.dcm4chee.web.common.base.ModuleSelectorPanel;
-import org.dcm4chee.web.common.secure.SecureWicketPage;
+import org.dcm4chee.wizard.common.component.ExtendedWebPage;
+import org.dcm4chee.wizard.common.component.ModuleSelectorPanel;
+import org.dcm4chee.wizard.common.component.secure.SecureWebApplication;
+import org.dcm4chee.wizard.common.component.secure.SecureExtendedWebPage;
 import org.dcm4chee.wizard.war.configuration.simple.tree.BasicConfigurationPanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,13 +56,13 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-public class MainPage extends SecureWicketPage {
+public class MainPage extends SecureExtendedWebPage {
     
 	private static final long serialVersionUID = 1L;
 	
 	protected static Logger log = LoggerFactory.getLogger(MainPage.class);
 
-	private static final ResourceReference baseCSS = new PackageResourceReference(BaseWicketPage.class, "base-style.css");
+	private static final ResourceReference baseCSS = new PackageResourceReference(ExtendedWebPage.class, "base-style.css");
 	private static final ResourceReference tableTreeCSS = new PackageResourceReference(MainPage.class, "table-tree.css");
 	
 	public MainPage() {
@@ -88,7 +88,7 @@ public class MainPage extends SecureWicketPage {
         
         try {
             Properties properties = new Properties();
-            properties.load(((BaseWicketApplication) getApplication()).getServletContext().getResourceAsStream("/META-INF/MANIFEST.MF"));
+            properties.load(((SecureWebApplication) getApplication()).getServletContext().getResourceAsStream("/META-INF/MANIFEST.MF"));
             selectorPanel.get("img_logo").add(new AttributeModifier("title", 
                     new Model<String>(
                             properties.getProperty("Implementation-Title", "")

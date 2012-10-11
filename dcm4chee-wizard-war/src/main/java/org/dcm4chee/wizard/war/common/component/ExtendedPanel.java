@@ -40,7 +40,7 @@ package org.dcm4chee.wizard.war.common.component;
 
 import org.apache.wicket.markup.html.panel.Panel;
 import org.dcm4chee.wizard.war.DicomConfigurationManager;
-import org.dcm4chee.wizard.war.WicketApplication;
+import org.dcm4chee.wizard.war.WizardApplication;
 
 /**
  * @author Robert David <robert.david@agfa.com>
@@ -54,6 +54,6 @@ public class ExtendedPanel extends Panel {
 	}
 	
     public DicomConfigurationManager getDicomConfigurationManager() {
-    	return ((WicketApplication) getApplication()).getDicomConfigurationManager();
+    	return ((WizardApplication) getApplication()).getDicomConfigurationManager();
     }
 }

@@ -59,8 +59,8 @@ import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.net.ApplicationEntity;
 import org.dcm4che.net.TransferCapability;
 import org.dcm4che.net.TransferCapability.Role;
-import org.dcm4chee.web.common.base.BaseWicketPage;
-import org.dcm4chee.wizard.war.common.component.SimpleBaseForm;
+import org.dcm4chee.wizard.common.component.ExtendedWebPage;
+import org.dcm4chee.wizard.common.component.ExtendedForm;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ApplicationEntityModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.StringArrayModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.TransferCapabilityModel;
@@ -82,7 +82,7 @@ public class CreateOrEditTransferCapabilityPage extends SecureWebPage {
 
     private static Logger log = LoggerFactory.getLogger(CreateOrEditTransferCapabilityPage.class);
 
-    private static final ResourceReference BaseCSS = new CssResourceReference(BaseWicketPage.class, "base-style.css");
+    private static final ResourceReference BaseCSS = new CssResourceReference(ExtendedWebPage.class, "base-style.css");
     
     // mandatory
 	private Model<String> sopClassModel;
@@ -104,7 +104,7 @@ public class CreateOrEditTransferCapabilityPage extends SecureWebPage {
         add(new WebMarkupContainer("edit-transferCapability-title").setVisible(transferCapabilityModel != null));
 
         setOutputMarkupId(true);
-        final SimpleBaseForm form = new SimpleBaseForm("form");
+        final ExtendedForm form = new ExtendedForm("form");
         form.setResourceIdPrefix("dicom.edit.transferCapability.");
         add(form);
 
