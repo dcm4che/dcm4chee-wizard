@@ -62,7 +62,7 @@ import org.dcm4che.net.DimseRSP;
 import org.dcm4che.net.pdu.AAssociateRQ;
 import org.dcm4che.net.pdu.PresentationContext;
 import org.dcm4chee.web.common.base.BaseWicketPage;
-import org.dcm4chee.wizard.war.common.SimpleBaseForm;
+import org.dcm4chee.wizard.war.common.component.SimpleBaseForm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wicketstuff.security.components.SecureWebPage;

@@ -65,7 +65,7 @@ import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
 import org.dcm4chee.proxy.conf.Schedule;
 import org.dcm4chee.web.common.base.BaseWicketPage;
 import org.dcm4chee.web.common.markup.modal.MessageWindow;
-import org.dcm4chee.wizard.war.common.SimpleBaseForm;
+import org.dcm4chee.wizard.war.common.component.SimpleBaseForm;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ForwardRuleModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ProxyApplicationEntityModel;
 import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeNode;
@@ -172,9 +172,10 @@ public class CreateOrEditForwardRulePage extends SecureWebPage {
 							for (String aeTitle : ConfigTreeProvider.get().getUniqueAETitles()) 
 								if (aeTitle.startsWith(input))
 									choices.add(aeTitle);
-						} catch (ConfigurationException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+						} catch (ConfigurationException ce) {
+		        			log.error(this.getClass().toString() + ": " + "Error retrieving unique ae titles: " + ce.getMessage());
+		                    log.debug("Exception", ce);
+		                    throw new RuntimeException(ce);
 						}
 						return choices.iterator();
 					}
@@ -245,10 +246,9 @@ public class CreateOrEditForwardRulePage extends SecureWebPage {
             		ConfigTreeProvider.get().mergeDevice(proxyApplicationEntity.getDevice());
                     window.close(target);
                 } catch (Exception e) {
-                	log.error("Error modifying forward rule", e);
-                    msgWin.show(target, new ResourceModel(forwardRuleModel == null ? 
-                    		"dicom.edit.forwardRule.create.failed" : "dicom.edit.forwardRule.update.failed")
-                    		.wrapOnAssignment(this));
+        			log.error(this.getClass().toString() + ": " + "Error modifying forward rule: " + e.getMessage());
+                    log.debug("Exception", e);
+                    throw new RuntimeException(e);
                 }
             }
 

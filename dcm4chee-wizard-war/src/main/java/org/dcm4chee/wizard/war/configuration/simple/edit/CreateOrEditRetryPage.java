@@ -60,8 +60,7 @@ import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
 import org.dcm4chee.proxy.conf.Retry;
 import org.dcm4chee.proxy.conf.RetryObject;
 import org.dcm4chee.web.common.base.BaseWicketPage;
-import org.dcm4chee.web.common.markup.modal.MessageWindow;
-import org.dcm4chee.wizard.war.common.SimpleBaseForm;
+import org.dcm4chee.wizard.war.common.component.SimpleBaseForm;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ProxyApplicationEntityModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.RetryModel;
 import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeNode;
@@ -81,8 +80,6 @@ public class CreateOrEditRetryPage extends SecureWebPage {
 
     private static final ResourceReference BaseCSS = new CssResourceReference(BaseWicketPage.class, "base-style.css");
     
-    private MessageWindow msgWin = new MessageWindow("msgWin");
-    
     // mandatory
 	private IModel<RetryObject> suffixModel;
     private Model<Integer> delayModel;
@@ -95,8 +92,6 @@ public class CreateOrEditRetryPage extends SecureWebPage {
     	final ProxyApplicationEntity proxyApplicationEntity = 
     			((ProxyApplicationEntityModel) aeNode.getModel()).getApplicationEntity();
 
-        msgWin.setTitle("");
-        add(msgWin);
         add(new WebMarkupContainer("create-retry-title").setVisible(retryModel == null));
         add(new WebMarkupContainer("edit-retry-title").setVisible(retryModel != null));
 
@@ -167,10 +162,9 @@ public class CreateOrEditRetryPage extends SecureWebPage {
             		ConfigTreeProvider.get().mergeDevice(proxyApplicationEntity.getDevice());
                     window.close(target);
                 } catch (Exception e) {
-                	log.error("Error modifying forward schedule", e);
-                    msgWin.show(target, new ResourceModel(retryModel == null ? 
-                    		"dicom.edit.retry.create.failed" : "dicom.edit.retry.update.failed")
-                    		.wrapOnAssignment(this));
+        			log.error(this.getClass().toString() + ": " + "Error modifying retry: " + e.getMessage());
+                    log.debug("Exception", e);
+                    throw new RuntimeException(e);
                 }
             }
 

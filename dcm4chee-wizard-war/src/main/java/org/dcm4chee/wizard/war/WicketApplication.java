@@ -38,19 +38,11 @@
 
 package org.dcm4chee.wizard.war;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.Preferences;
-
 import javax.security.auth.Subject;
 
 import org.apache.wicket.Page;
 import org.apache.wicket.request.Request;
 import org.apache.wicket.request.Response;
-import org.dcm4che.conf.prefs.PreferencesDicomConfiguration;
 import org.dcm4chee.web.common.base.BaseWicketApplication;
 import org.dcm4chee.web.common.login.LoginContextSecurityHelper;
 import org.dcm4chee.web.common.login.SSOLoginContext;
@@ -72,7 +64,6 @@ public class WicketApplication extends BaseWicketApplication {
     protected void init() {
         super.init();
         getDicomConfigurationManager();
-//		Preferences.userRoot().exportSubtree(new FileOutputStream(new File("/home/axfmx/devel4/SERVER/export/dump.txt")));
     }
 
     public DicomConfigurationManager getDicomConfigurationManager() {

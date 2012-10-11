@@ -145,26 +145,20 @@ public class BasicConfigurationPanel extends ExtendedPanel {
             private static final long serialVersionUID = 1L;
 
             public void onClose(AjaxRequestTarget target) {
-
-            	boolean refresh = false;
-                for (ConfigTreeNode deviceNode : ConfigTreeProvider.get().getNodeList()) {
-                    if (deviceNode.getModel() == null) { 
-                        try {
-                            ConfigTreeProvider.get().loadDevice(deviceNode);
-                            refresh = true; 
-                        } catch (ConfigurationException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                    }
-                }
-                if (refresh || ConfigTreeProvider.get().resync())
-                    try {
+                try {
+	            	boolean refresh = false;
+	                for (ConfigTreeNode deviceNode : ConfigTreeProvider.get().getNodeList())
+	                    if (deviceNode.getModel() == null) {
+	                    	ConfigTreeProvider.get().loadDevice(deviceNode);
+	                    	refresh = true; 
+	                    }
+	                if (refresh || ConfigTreeProvider.get().resync())
                         BasicConfigurationPanel.this.refreshTree();
-                    } catch (ConfigurationException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
+                } catch (ConfigurationException ce) {
+                	log.error(this.getClass().toString() + ": " + "Error refreshing tree: " + ce.getMessage());
+                	log.debug("Exception", ce);
+                	throw new RuntimeException(ce);
+                }
                 target.add(form);
             }
         };
@@ -246,11 +240,11 @@ public class BasicConfigurationPanel extends ExtendedPanel {
                         ConfigTreeProvider.get().mergeDevice(((DeviceModel) deviceNode.getModel()).getDevice());
                     }
                     target.add(form);
-                } catch (ConfigurationException e) {
-                    e.printStackTrace();
                 } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                	log.error(this.getClass().toString() + ": " + "Error deleting configuration object: " + e.getMessage());
+                	log.debug("Exception", e);
+                	throw new RuntimeException(e);
+				}
             }
         };
         add(removeConfirmation.setInitialHeight(150)
@@ -289,18 +283,13 @@ public class BasicConfigurationPanel extends ExtendedPanel {
             configTree =
             		new ConfigTableTree("configTree", deviceColumns, 
             				ConfigTreeProvider.set(BasicConfigurationPanel.this), Integer.MAX_VALUE);
-        } catch (ConfigurationException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
-
-        form.addOrReplace(configTree);
-
-        try {
+            form.addOrReplace(configTree);
             createColumns();
             refreshTree();
-        } catch (ConfigurationException e) {
-            log.error("Error connecting to dicom configuration source", e);
+        } catch (ConfigurationException ce) {
+        	log.error(this.getClass().toString() + ": " + "Error creating tree: " + ce.getMessage());
+        	log.debug("Exception", ce);
+        	throw new RuntimeException(ce);
         }
     }
 
@@ -351,10 +340,11 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 										Model.of(connection.toString()))
 								);
 					}
-				} catch (ConfigurationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+		        } catch (ConfigurationException ce) {
+		        	log.error(this.getClass().toString() + ": " + "Error listing connections for application entity: " + ce.getMessage());
+		        	log.debug("Exception", ce);
+		        	throw new RuntimeException(ce);
+		        }
 			}
 		});
 
@@ -389,8 +379,9 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 					                    	return new DicomEchoPage(echoWindow, 
 					                    			((ApplicationEntityModel) rowModel.getObject().getModel()).getApplicationEntity());
 					                    	} catch (Exception e) {
-					                    		e.printStackTrace();
-					                    		return null;
+					        		        	log.error(this.getClass().toString() + ": " + "Error creating DicomEchoPage: " + e.getMessage());
+					        		        	log.debug("Exception", e);
+					        		        	throw new RuntimeException(e);
 					                    	}
 					                    }
 					                });
@@ -655,18 +646,18 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 				        	Connection connection = null;
 							try {
 								connection = ((ConnectionModel) rowModel.getObject().getModel()).getConnection();
-							} catch (ConfigurationException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
 				        	for (ApplicationEntity ae : connection.getDevice().getApplicationEntities())
 				        		if (ae.getConnections().contains(connection))
 				        			ajaxLink.setEnabled(false)
-				        				.add(new AttributeModifier("title", new ResourceModel("dicom.delete.connection.notAllowed")));			        	
+				        				.add(new AttributeModifier("title", new ResourceModel("dicom.delete.connection.notAllowed")));
+							} catch (ConfigurationException ce) {
+					        	log.error(this.getClass().toString() + ": " + "Error checking used connections of application entities: " + ce.getMessage());
+					        	log.debug("Exception", ce);
+					        	throw new RuntimeException(ce);
+							}
 				        }
 			}
 		});
-
     }
     
     public void refreshTree() throws ConfigurationException {

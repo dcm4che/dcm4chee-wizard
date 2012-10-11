@@ -60,8 +60,7 @@ import org.dcm4che.net.ApplicationEntity;
 import org.dcm4che.net.TransferCapability;
 import org.dcm4che.net.TransferCapability.Role;
 import org.dcm4chee.web.common.base.BaseWicketPage;
-import org.dcm4chee.web.common.markup.modal.MessageWindow;
-import org.dcm4chee.wizard.war.common.SimpleBaseForm;
+import org.dcm4chee.wizard.war.common.component.SimpleBaseForm;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ApplicationEntityModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.StringArrayModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.TransferCapabilityModel;
@@ -85,8 +84,6 @@ public class CreateOrEditTransferCapabilityPage extends SecureWebPage {
 
     private static final ResourceReference BaseCSS = new CssResourceReference(BaseWicketPage.class, "base-style.css");
     
-    private MessageWindow msgWin = new MessageWindow("msgWin");
-    
     // mandatory
 	private Model<String> sopClassModel;
     private Model<Role> roleModel;
@@ -103,8 +100,6 @@ public class CreateOrEditTransferCapabilityPage extends SecureWebPage {
 			final ApplicationEntity applicationEntity = 
 					((ApplicationEntityModel) aeNode.getModel()).getApplicationEntity();
     	
-        msgWin.setTitle("");
-        add(msgWin);
         add(new WebMarkupContainer("create-transferCapability-title").setVisible(transferCapabilityModel == null));
         add(new WebMarkupContainer("edit-transferCapability-title").setVisible(transferCapabilityModel != null));
 
@@ -197,10 +192,9 @@ public class CreateOrEditTransferCapabilityPage extends SecureWebPage {
                     ConfigTreeProvider.get().mergeDevice(applicationEntity.getDevice());
                     window.close(target);
                 } catch (Exception e) {
-                	log.error("Error modifying transfer capability", e);
-                    msgWin.show(target, new ResourceModel(transferCapabilityModel == null ? 
-                    		"dicom.edit.transferCapability.create.failed" : "dicom.edit.transferCapability.update.failed")
-                    		.wrapOnAssignment(this));
+        			log.error(this.getClass().toString() + ": " + "Error modifying transfer capability: " + e.getMessage());
+                    log.debug("Exception", e);
+                    throw new RuntimeException(e);
                 }
             }
 

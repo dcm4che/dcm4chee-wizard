@@ -65,11 +65,9 @@ import org.dcm4che.net.ApplicationEntity;
 import org.dcm4che.net.Connection;
 import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
 import org.dcm4chee.proxy.conf.ProxyDevice;
-import org.dcm4chee.web.common.base.BaseWicketPage;
-import org.dcm4chee.web.common.behaviours.FocusOnLoadBehaviour;
-import org.dcm4chee.web.common.markup.modal.MessageWindow;
-import org.dcm4chee.wizard.war.Utils;
-import org.dcm4chee.wizard.war.common.SimpleBaseForm;
+import org.dcm4chee.wizard.war.common.behavior.FocusOnLoadBehaviour;
+import org.dcm4chee.wizard.war.common.component.BaseWicketPage;
+import org.dcm4chee.wizard.war.common.component.SimpleBaseForm;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ApplicationEntityModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ConnectionReferenceModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.DeviceModel;
@@ -93,8 +91,6 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
     
     private static final ResourceReference BaseCSS = new CssResourceReference(BaseWicketPage.class, "base-style.css");
     
-    private MessageWindow msgWin = new MessageWindow("msgWin");
-
     private boolean isProxy = false;
     private String oldAETitle;
     
@@ -123,8 +119,6 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
     		final ConfigTreeNode deviceNode) {
     	super();
 
-        msgWin.setTitle("");
-        add(msgWin);
         add(new WebMarkupContainer("create-applicationEntity-title").setVisible(aeModel == null));
         add(new WebMarkupContainer("edit-applicationEntity-title").setVisible(aeModel != null));
 
@@ -192,7 +186,8 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
 				vendorDataModel = Model.of("size " + aeModel.getApplicationEntity().getVendorData().length);				
 			}
 		} catch (ConfigurationException ce) {
-			log.error("Error creating connection reference list", ce);
+			log.error(this.getClass().toString() + ": " + "Error creating connection reference list: " + ce.getMessage());
+            log.debug("Exception", ce);
 		}
 		
         form.add(new Label("aeTitle.label", new ResourceModel("dicom.edit.applicationEntity.aeTitle.label")))
@@ -346,7 +341,6 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
                     	proxyApplicationEntity.setEnableAuditLog(enableAuditLogModel.getObject());
                     	proxyApplicationEntity.setSpoolDirectory(spoolDirectoryModel.getObject());
                 	}
-
                     if (aeModel != null)
                     	ConfigTreeProvider.get().unregisterAETitle(oldAETitle);
                     else
@@ -355,10 +349,9 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
                     ConfigTreeProvider.get().registerAETitle(applicationEntity.getAETitle());
                     window.close(target);
                 } catch (Exception e) {
-                	log.error("Error modifying application entity", e);
-                    msgWin.show(target, new ResourceModel(aeModel == null ? 
-                    		"dicom.edit.applicationEntity.create.failed" : "dicom.edit.applicationEntity.update.failed")
-                    		.wrapOnAssignment(this));
+        			log.error(this.getClass().toString() + ": " + "Error modifying application entity: " + e.getMessage());
+                    log.debug("Exception", e);
+                    throw new RuntimeException(e);
                 }
             }
 

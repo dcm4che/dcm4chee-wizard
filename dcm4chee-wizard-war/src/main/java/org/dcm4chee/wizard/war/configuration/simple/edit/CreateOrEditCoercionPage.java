@@ -63,8 +63,7 @@ import org.dcm4che.net.Dimse;
 import org.dcm4che.net.TransferCapability.Role;
 import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
 import org.dcm4chee.web.common.base.BaseWicketPage;
-import org.dcm4chee.web.common.markup.modal.MessageWindow;
-import org.dcm4chee.wizard.war.common.SimpleBaseForm;
+import org.dcm4chee.wizard.war.common.component.SimpleBaseForm;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.CoercionModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ProxyApplicationEntityModel;
 import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeNode;
@@ -85,8 +84,6 @@ public class CreateOrEditCoercionPage extends SecureWebPage {
 
     private static final ResourceReference BaseCSS = new CssResourceReference(BaseWicketPage.class, "base-style.css");
     
-    private MessageWindow msgWin = new MessageWindow("msgWin");
-    
     // mandatory
     private Model<Dimse> dimseModel;
     private Model<Role> transferRoleModel;
@@ -100,8 +97,6 @@ public class CreateOrEditCoercionPage extends SecureWebPage {
     		final ConfigTreeNode aeNode) {
     	super();
 
-        msgWin.setTitle("");
-        add(msgWin);
         add(new WebMarkupContainer("create-coercion-title").setVisible(coercionModel == null));
         add(new WebMarkupContainer("edit-coercion-title").setVisible(coercionModel != null));
 
@@ -157,9 +152,10 @@ public class CreateOrEditCoercionPage extends SecureWebPage {
         List<String> uniqueAETitles = null;
 		try {
 			uniqueAETitles = Arrays.asList(ConfigTreeProvider.get().getUniqueAETitles());
-		} catch (ConfigurationException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		} catch (ConfigurationException ce) {
+			log.error(this.getClass().toString() + ": " + "Error retrieving unique ae titles: " + ce.getMessage());
+            log.debug("Exception", ce);
+            throw new RuntimeException(ce);
 		}
         Collections.sort(uniqueAETitles);
         
@@ -205,10 +201,9 @@ public class CreateOrEditCoercionPage extends SecureWebPage {
             		ConfigTreeProvider.get().mergeDevice(proxyApplicationEntity.getDevice());
                     window.close(target);
                 } catch (Exception e) {
-                	log.error("Error modifying coercion", e);
-                    msgWin.show(target, new ResourceModel(coercionModel == null ? 
-                    		"dicom.edit.coercion.create.failed" : "dicom.edit.coercion.update.failed")
-                    		.wrapOnAssignment(this));
+        			log.error(this.getClass().toString() + ": " + "Error modifying coercion: " + e.getMessage());
+                    log.debug("Exception", e);
+                    throw new RuntimeException(e);
                 }
             }
 

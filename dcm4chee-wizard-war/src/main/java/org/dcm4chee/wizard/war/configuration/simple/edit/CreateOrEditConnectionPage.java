@@ -65,7 +65,6 @@ import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.net.Connection;
 import org.dcm4chee.web.common.base.BaseWicketPage;
 import org.dcm4chee.web.common.markup.BaseForm;
-import org.dcm4chee.web.common.markup.modal.MessageWindow;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ConnectionModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.DefaultableModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.DeviceModel;
@@ -89,8 +88,6 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
     
     private static final ResourceReference BaseCSS = new CssResourceReference(BaseWicketPage.class, "base-style.css");
     
-    private MessageWindow msgWin = new MessageWindow("msgWin");
-
     // mandatory
 	private Model<String> hostnameModel;
 
@@ -127,8 +124,6 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
 			final ConfigTreeNode deviceNode) {
         super();
         
-        msgWin.setTitle("");
-        add(msgWin);
         add(new WebMarkupContainer("create-connection-title").setVisible(connectionModel == null));
         add(new WebMarkupContainer("edit-connection-title").setVisible(connectionModel != null));
 
@@ -199,9 +194,10 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
 		    	retrieveTimeoutModel.setObject(connection.getRetrieveTimeout());
 		    	idleTimeoutModel.setObject(connection.getIdleTimeout());
 	        }
-        } catch (ConfigurationException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+        } catch (ConfigurationException ce) {
+			log.error(this.getClass().toString() + ": " + "Error retrieving connection data: " + ce.getMessage());
+            log.debug("Exception", ce);
+            throw new RuntimeException(ce);
 		}
 
         FormComponent<String> hostnameTextField;
@@ -398,10 +394,9 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
                     ConfigTreeProvider.get().mergeDevice(connection.getDevice());
                     window.close(target);
                 } catch (Exception e) {
-                	log.error("Error modifying connection", e);
-                    msgWin.show(target, new ResourceModel(connectionModel == null ? 
-                    		"dicom.edit.connection.create.failed" : "dicom.edit.connection.update.failed")
-                    		.wrapOnAssignment(this));
+        			log.error(this.getClass().toString() + ": " + "Error modifying connection: " + e.getMessage());
+                    log.debug("Exception", e);
+                    throw new RuntimeException(e);
                 }
             }
 
