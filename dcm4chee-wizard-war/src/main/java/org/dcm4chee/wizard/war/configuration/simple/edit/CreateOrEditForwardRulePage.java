@@ -64,7 +64,6 @@ import org.dcm4chee.proxy.conf.ForwardRule;
 import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
 import org.dcm4chee.proxy.conf.Schedule;
 import org.dcm4chee.web.common.base.BaseWicketPage;
-import org.dcm4chee.web.common.markup.modal.MessageWindow;
 import org.dcm4chee.wizard.war.common.component.SimpleBaseForm;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ForwardRuleModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ProxyApplicationEntityModel;
@@ -88,9 +87,7 @@ public class CreateOrEditForwardRulePage extends SecureWebPage {
     private static Logger log = LoggerFactory.getLogger(CreateOrEditForwardRulePage.class);
 
     private static final ResourceReference BaseCSS = new CssResourceReference(BaseWicketPage.class, "base-style.css");
-    
-    private MessageWindow msgWin = new MessageWindow("msgWin");
-    
+
     // mandatory
 	private Model<String> commonNameModel;
     private Model<String> destinationURIModel;
@@ -111,8 +108,6 @@ public class CreateOrEditForwardRulePage extends SecureWebPage {
     	final ProxyApplicationEntity proxyApplicationEntity = 
     			((ProxyApplicationEntityModel) aeNode.getModel()).getApplicationEntity();
 
-        msgWin.setTitle("");
-        add(msgWin);
         add(new WebMarkupContainer("create-forwardRule-title").setVisible(forwardRuleModel == null));
         add(new WebMarkupContainer("edit-forwardRule-title").setVisible(forwardRuleModel != null));
 

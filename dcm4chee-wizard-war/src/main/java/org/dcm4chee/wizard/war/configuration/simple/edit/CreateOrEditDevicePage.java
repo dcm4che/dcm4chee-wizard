@@ -66,7 +66,6 @@ import org.dcm4che.net.Device;
 import org.dcm4chee.proxy.conf.ProxyDevice;
 import org.dcm4chee.web.common.base.BaseWicketPage;
 import org.dcm4chee.web.common.behaviours.FocusOnLoadBehaviour;
-import org.dcm4chee.web.common.markup.modal.MessageWindow;
 import org.dcm4chee.wizard.war.common.component.ExtendedSecureWebPage;
 import org.dcm4chee.wizard.war.common.component.SimpleBaseForm;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.DeviceModel;
@@ -90,8 +89,6 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
     
     private static final ResourceReference BaseCSS = new CssResourceReference(BaseWicketPage.class, "base-style.css");
     
-    private MessageWindow msgWin = new MessageWindow("msgWin");
-
     // configuration type selection
 	private Model<ConfigurationType> typeModel;
 	
@@ -129,8 +126,6 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
     public CreateOrEditDevicePage(final ModalWindow window, final DeviceModel deviceModel) {
         super();
 
-        msgWin.setTitle("");
-        add(msgWin);
         add(new WebMarkupContainer("create-device-title").setVisible(deviceModel == null));
         add(new WebMarkupContainer("edit-device-title").setVisible(deviceModel != null));
 
@@ -227,6 +222,11 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
 				forwardThreadsModel = Model.of(deviceModel.getDevice() instanceof ProxyDevice ? 
      					((ProxyDevice) deviceModel.getDevice()).getForwardThreads() : null);
         	}
+		} catch (ConfigurationException ce) {
+			log.error(this.getClass().toString() + ": " + "Error retrieving device data: " + ce.getMessage());
+            log.debug("Exception", ce);
+            throw new RuntimeException(ce);
+		}
 
         form.add(new Label("type.label", new ResourceModel("dicom.edit.device.type.label")));
         ArrayList<ConfigTreeProvider.ConfigurationType> configurationTypeList = 
@@ -249,17 +249,18 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
 						}
 				}));
 
-        form.add(new Label("title.label", new ResourceModel("dicom.edit.device.title.label")))
-        .add(new TextField<String>("title", deviceNameModel)
-        		.add(new DeviceNameValidator(
-        				getDicomConfigurationManager().listDevices(), 
-        				deviceNameModel.getObject()))
-                .setRequired(true).add(FocusOnLoadBehaviour.newFocusAndSelectBehaviour())
-                .setEnabled(deviceModel == null));
-
-		} catch (ConfigurationException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+        try {
+			form.add(new Label("title.label", new ResourceModel("dicom.edit.device.title.label")))
+			.add(new TextField<String>("title", deviceNameModel)
+					.add(new DeviceNameValidator(
+							getDicomConfigurationManager().listDevices(), 
+							deviceNameModel.getObject()))
+			        .setRequired(true).add(FocusOnLoadBehaviour.newFocusAndSelectBehaviour())
+			        .setEnabled(deviceModel == null));
+		} catch (ConfigurationException ce) {
+			log.error(this.getClass().toString() + ": " + "Error listing devices: " + ce.getMessage());
+            log.debug("Exception", ce);
+            throw new RuntimeException(ce);
 		}
 
         form.add(new Label("installed.label", new ResourceModel("dicom.edit.device.installed.label")))
@@ -280,9 +281,10 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
             		.setRequired(deviceModel != null &&
 	            			deviceModel.getDevice() instanceof ProxyDevice ? true : false))
 	            			.setOutputMarkupPlaceholderTag(true));
-		} catch (ConfigurationException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		} catch (ConfigurationException ce) {
+			log.error(this.getClass().toString() + ": " + "Error retrieving device data: " + ce.getMessage());
+            log.debug("Exception", ce);
+            throw new RuntimeException(ce);
 		}
 
         final Form<?> optionalContainer = new Form<Object>("optionalContainer");
@@ -416,8 +418,7 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
 			}
 		}.setType(Integer.class)
 		.add(new RangeValidator<Integer>(1,256)));
-
-// TODO:         
+        
         WebMarkupContainer relatedDeviceRefsContainer = 
         		new WebMarkupContainer("relatedDeviceRefsContainer");
         optionalContainer.add(relatedDeviceRefsContainer);
@@ -506,12 +507,11 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
                     else
                     	ConfigTreeProvider.get().mergeDevice(device);                   
                     window.close(target);
-                } catch (Exception e) {
-                	log.error("Error modifying device", e);
-                    msgWin.show(target, new ResourceModel(deviceModel == null ? 
-                    		"dicom.edit.device.create.failed" : "dicom.edit.device.update.failed")
-                    		.wrapOnAssignment(this));
-                }
+        		} catch (Exception e) {
+        			log.error(this.getClass().toString() + ": " + "Error modifying device: " + e.getMessage());
+                    log.debug("Exception", e);
+                    throw new RuntimeException(e);
+        		}
             }
 
             @Override
