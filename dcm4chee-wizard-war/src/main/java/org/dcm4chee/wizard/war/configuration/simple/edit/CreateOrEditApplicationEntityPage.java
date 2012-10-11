@@ -186,8 +186,9 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
 				vendorDataModel = Model.of("size " + aeModel.getApplicationEntity().getVendorData().length);				
 			}
 		} catch (ConfigurationException ce) {
-			log.error(this.getClass().toString() + ": " + "Error creating connection reference list: " + ce.getMessage());
+			log.error(this.getClass().toString() + ": " + "Error retrieving connection data: " + ce.getMessage());
             log.debug("Exception", ce);
+            throw new RuntimeException(ce);
 		}
 		
         form.add(new Label("aeTitle.label", new ResourceModel("dicom.edit.applicationEntity.aeTitle.label")))
