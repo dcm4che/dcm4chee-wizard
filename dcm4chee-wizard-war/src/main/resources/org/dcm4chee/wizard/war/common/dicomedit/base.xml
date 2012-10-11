@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dicom>
+    <!--Study Date-->
+    <attr tag="00080020" vr="DA" len="0"></attr>
+    <!--Series Date-->
+    <attr tag="00080021" vr="DA" len="0"></attr>
+    <!--Acquisition Date-->
+    <attr tag="00080022" vr="DA" len="0"></attr>
+    <!--Content Date-->
+    <attr tag="00080023" vr="DA" len="0"></attr>
+    <!--Study Time-->
+    <attr tag="00080030" vr="TM" len="0"></attr>
+    <!--Series Time-->
+    <attr tag="00080031" vr="TM" len="0"></attr>
+    <!--Acquisition Time-->
+    <attr tag="00080032" vr="TM" len="0"></attr>
+    <!--Content Time-->
+    <attr tag="00080033" vr="TM" len="0"></attr>
+    <!--Accession Number-->
+    <attr tag="00080050" vr="SH" len="0"/>
+    <!--Modality-->
+    <attr tag="00080060" vr="CS" len="0"></attr>
+    <!--Institution Name-->
+    <attr tag="00080080" vr="LO" len="0"></attr>
+    <!--Referring Physician's Name-->
+    <attr tag="00080090" vr="PN" len="0"/>
+    <!--Study Description-->
+    <attr tag="00081030" vr="LO" len="0"></attr>
+    <!--Referenced Performed Procedure Step Sequence-->
+    <attr tag="00081111" vr="SQ" len="-1"/>
+    <!--Patient's Name-->
+    <attr tag="00100010" vr="PN" len="0"></attr>
+    <!--Patient's Birth Date-->
+    <attr tag="00100030" vr="DA" len="0"></attr>
+    <!--Patient's Sex-->
+    <attr tag="00100040" vr="CS" len="0"></attr>
+    <!--Series Description-->
+    <attr tag="0008103E" vr="LO" len="0"></attr>
+    <!-- Body Part Examined -->
+    <attr tag="00180015" vr="CS" len="0"></attr>
+    <!--Study ID-->
+    <attr tag="00200010" vr="SH" len="0"/>
+    <!--Series Number-->
+    <attr tag="00200011" vr="IS" len="2"></attr>
+    <!--Acquisition Number-->
+    <attr tag="00200012" vr="IS" len="2"></attr>
+    <!--Instance Number-->
+    <attr tag="00200013" vr="IS" len="0"></attr>
+    <!-- Laterality -->
+    <attr tag="00200060" vr="CS" len="0"></attr>   
+    <!--Value Type-->
+    <attr tag="0040A040" vr="CS" len="0"></attr>
+    <!--Concept Name Code Sequence-->
+    <attr tag="0040A043" vr="SQ" len="-1">
+        <item off="179428" len="-1">
+            <!--Code Value-->
+            <attr tag="00080100" vr="SH" len="0"></attr>
+            <!--Coding Scheme Designator-->
+            <attr tag="00080102" vr="SH" len="0"></attr>
+            <!--Coding Scheme Version-->
+            <attr tag="00080103" vr="SH" len="0"></attr>
+            <!--Code Meaning-->
+            <attr tag="00080104" vr="LO" len="0"/>
+        </item>
+    </attr>
+    <!--Continuity Of Content-->
+    <attr tag="0040A050" vr="CS" len="0"></attr>
+    <!--Current Requested Procedure Evidence Sequence-->
+    <attr tag="0040A375" vr="SQ" len="-1" />
+    <!--Content Template Sequence-->
+    <attr tag="0040A504" vr="SQ" len="-1">
+        <item off="212340" len="-1">
+            <!--Mapping Resource-->
+            <attr tag="00080105" vr="CS" len="0"></attr>
+            <!--Template Identifier-->
+            <attr tag="0040DB00" vr="CS" len="0"></attr>
+        </item>
+    </attr>
+    <!--Content Sequence-->
+    <attr tag="0040A730" vr="SQ" len="-1">
+        <item off="212400" len="-1">
+            <!--Relationship Type-->
+            <attr tag="0040A010" vr="CS" len="0"></attr>
+            <!--Value Type-->
+            <attr tag="0040A040" vr="CS" len="0"></attr>
+            <!--Concept Name Code Sequence-->
+            <attr tag="0040A043" vr="SQ" len="-1">
+                <item off="212448" len="-1">
+                    <!--Code Value-->
+                    <attr tag="00080100" vr="SH" len="0"></attr>
+                    <!--Coding Scheme Designator-->
+                    <attr tag="00080102" vr="SH" len="0"></attr>
+                    <!--Code Meaning-->
+                    <attr tag="00080104" vr="LO" len="0"></attr>
+                </item>
+            </attr>
+            <!--Text Value-->
+            <attr tag="0040A160" vr="UT" len="0"></attr>
+        </item>
+     </attr>
+</dicom>
