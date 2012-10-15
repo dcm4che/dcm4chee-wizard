@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dicom>
-  <imageStorage>
+  <group name="Image Storage">
     <dicomTransferCapability>
       <Name>Nuclear Medicine Image Storage</Name>
       <SOPClass>1.2.840.10008.5.1.4.1.1.20</SOPClass>
@@ -767,8 +767,8 @@
       <dicomTransferSyntax>1.2.840.10008.1.2.4.57</dicomTransferSyntax>
       <dicomTransferSyntax>1.2.840.10008.1.2.4.80</dicomTransferSyntax>
     </dicomTransferCapability>
-  </imageStorage>
-  <srStorage>
+  </group>
+  <group name="SR Storage">
     <dicomTransferCapability>
       <Name>Mammography CAD SR Storage</Name>
       <SOPClass>1.2.840.10008.5.1.4.1.1.88.50</SOPClass>
@@ -833,8 +833,8 @@
       <dicomTransferSyntax>1.2.840.10008.1.2.1.99</dicomTransferSyntax>
       <dicomTransferSyntax>1.2.840.10008.1.2.2</dicomTransferSyntax>
     </dicomTransferCapability>
-  </srStorage>
-  <waveformStorage>
+  </group>
+  <group name="Waveform Storage">
     <dicomTransferCapability>
       <Name>Hemodynamic Waveform Storage</Name>
       <SOPClass>1.2.840.10008.5.1.4.1.1.9.2.1</SOPClass>
@@ -907,8 +907,8 @@
       <dicomTransferSyntax>1.2.840.10008.1.2.1.99</dicomTransferSyntax>
       <dicomTransferSyntax>1.2.840.10008.1.2.2</dicomTransferSyntax>
     </dicomTransferCapability>
-  </waveformStorage>
-  <measurementsStorage>
+  </group>
+  <group name="Measurements Storage">
     <dicomTransferCapability>
       <Name>Ophthalmic Visual Field Static Perimetry Measurements Storage</Name>
       <SOPClass>1.2.840.10008.5.1.4.1.1.80.1</SOPClass>
@@ -965,8 +965,8 @@
       <dicomTransferSyntax>1.2.840.10008.1.2.1.99</dicomTransferSyntax>
       <dicomTransferSyntax>1.2.840.10008.1.2.2</dicomTransferSyntax>
     </dicomTransferCapability>
-  </measurementsStorage>
-  <presentationStateStorage>
+  </group>
+  <group name="Presentation State Storage">
     <dicomTransferCapability>
       <Name>Color Softcopy Presentation State Storage SOP Class</Name>
       <SOPClass>1.2.840.10008.5.1.4.1.1.11.2</SOPClass>
@@ -1007,8 +1007,8 @@
       <dicomTransferSyntax>1.2.840.10008.1.2.1.99</dicomTransferSyntax>
       <dicomTransferSyntax>1.2.840.10008.1.2.2</dicomTransferSyntax>
     </dicomTransferCapability>
-  </presentationStateStorage>
-  <otherStorage>
+  </group>
+  <group name="Other Storage">
     <dicomTransferCapability>
       <Name>Standalone VOI LUT Storage (Retired)</Name>
       <SOPClass>1.2.840.10008.5.1.4.1.1.11</SOPClass>
@@ -1287,5 +1287,5 @@
       <dicomTransferSyntax>1.2.840.10008.1.2.1.99</dicomTransferSyntax>
       <dicomTransferSyntax>1.2.840.10008.1.2.2</dicomTransferSyntax>
     </dicomTransferCapability>
-  </otherStorage>
+  </group>
 </dicom>
