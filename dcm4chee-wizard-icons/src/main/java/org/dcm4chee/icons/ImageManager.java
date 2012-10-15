@@ -61,6 +61,8 @@ public class ImageManager {
             new PackageResourceReference(ImageManager.class, "wizard/common/add.png");
     public static final ResourceReference IMAGE_WIZARD_COMMON_EDIT = 
             new PackageResourceReference(ImageManager.class, "wizard/common/edit.png");
+    public static final ResourceReference IMAGE_WIZARD_COMMON_PROFILE = 
+            new PackageResourceReference(ImageManager.class, "wizard/common/profile.png");
     public static final ResourceReference IMAGE_WIZARD_COMMON_REMOVE = 
             new PackageResourceReference(ImageManager.class, "wizard/common/remove.png");
     

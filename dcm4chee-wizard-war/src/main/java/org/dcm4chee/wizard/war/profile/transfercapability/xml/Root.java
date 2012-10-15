@@ -36,39 +36,46 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.wizard.war.configuration.simple.model.basic;
+package org.dcm4chee.wizard.war.profile.transfercapability.xml;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import org.dcm4che.net.TransferCapability;
-import org.dcm4chee.wizard.war.configuration.simple.model.ConfigNodeModel;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElements;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-public class TransferCapabilityModel implements Serializable, ConfigNodeModel {
+@SuppressWarnings("restriction")
+@XmlRootElement(name = "dicom")
+@XmlAccessorType(XmlAccessType.PROPERTY)
+public class Root implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
-	public static String cssClass = "transfer-capability";
-	public static String toolTip = "Transfer Capability";
+	private Map<String,Group> transferCapabilityGroups = new HashMap<String,Group>();
 
-	private boolean hasGroup;
-	private TransferCapability transferCapability;
-
-	public boolean hasGroup() {
-		return hasGroup;
+	@XmlElements({
+		@XmlElement(name = "group")})
+	public List<Group> getTransferCapabilityGroups() {
+		return new ArrayList<Group>(transferCapabilityGroups.values());
 	}
 
-	public void setGroup(boolean hasGroup) {
-		this.hasGroup = hasGroup;
-	}
-
-	public TransferCapabilityModel(TransferCapability transferCapability, String aeTitle) {
-		this.transferCapability = transferCapability;
+	public void setTransferCapabilityGroups(List<Group> transferCapabilityGroups) {
+		this.transferCapabilityGroups.clear();
+		if (transferCapabilityGroups != null)
+			for (Group group : transferCapabilityGroups)
+				this.transferCapabilityGroups.put(group.getName(), group);
 	}
 	
-	public TransferCapability getTransferCapability() {
-		return transferCapability;
-	}	
+	public Map<String,Group> asMap() {
+		return transferCapabilityGroups;
+	}
 }

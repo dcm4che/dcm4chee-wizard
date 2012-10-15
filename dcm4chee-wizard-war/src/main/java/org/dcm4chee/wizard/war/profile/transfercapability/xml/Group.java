@@ -36,39 +36,58 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.wizard.war.configuration.simple.model.basic;
+package org.dcm4chee.wizard.war.profile.transfercapability.xml;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import org.dcm4che.net.TransferCapability;
-import org.dcm4chee.wizard.war.configuration.simple.model.ConfigNodeModel;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElements;
+import javax.xml.bind.annotation.XmlRootElement;
+
 
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-public class TransferCapabilityModel implements Serializable, ConfigNodeModel {
+@SuppressWarnings("restriction")
+@XmlRootElement(name = "group")
+@XmlAccessorType(XmlAccessType.PROPERTY)
+public class Group implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+
+	private String name;
+	private Map<String,Profile> transferCapabilityProfiles = new HashMap<String,Profile>();
+
+	@XmlAttribute
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	@XmlElements({
+		@XmlElement(name = "dicomTransferCapability")})
+	public List<Profile> getTransferCapabilityProfiles() {
+		return new ArrayList<Profile>(transferCapabilityProfiles.values());
+	}
+
+	public void setTransferCapabilityProfiles(List<Profile> transferCapabilityProfiles) {
+		this.transferCapabilityProfiles.clear();
+		if (transferCapabilityProfiles != null)
+			for (Profile profile : transferCapabilityProfiles)
+				this.transferCapabilityProfiles.put(profile.name, profile);
+	}
 	
-	public static String cssClass = "transfer-capability";
-	public static String toolTip = "Transfer Capability";
-
-	private boolean hasGroup;
-	private TransferCapability transferCapability;
-
-	public boolean hasGroup() {
-		return hasGroup;
+	public Map<String,Profile> asMap() {
+		return transferCapabilityProfiles;
 	}
-
-	public void setGroup(boolean hasGroup) {
-		this.hasGroup = hasGroup;
-	}
-
-	public TransferCapabilityModel(TransferCapability transferCapability, String aeTitle) {
-		this.transferCapability = transferCapability;
-	}
-	
-	public TransferCapability getTransferCapability() {
-		return transferCapability;
-	}	
 }

@@ -1,4 +1,4 @@
-package org.dcm4chee.wizard.war;
+package org.dcm4chee.wizard.war.util;
 
 public class Utils {
 

@@ -12,6 +12,7 @@ import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Deprecated
 public class SopClassManager {
 
 	protected static Logger log = LoggerFactory.getLogger(SopClassManager.class);

@@ -75,12 +75,12 @@ public class TransferCapabilityValidator extends AbstractFormValidator {
 	public void validate(Form<?> form) {
 		String sopClass = this.sopClassTextField.getInput();
 		String role = this.roleDropDown.getInput().equals("0") ? "SCP" : "SCU";
+		if (sopClass.equals(sopClassTextField.getModelObject()) 
+				&& role.equals(roleDropDown.getModelObject().name()))
+			return;				
 		for (TransferCapability transferCapability : this.applicationEntity.getTransferCapabilities()) {
-			if (sopClass.equals(sopClassTextField.getModelObject()) 
-					&& role.equals(roleDropDown.getModelObject()))
-				continue;				
 			if (sopClass.equals(transferCapability.getSopClass())
-					&& role.equals(transferCapability.getRole().toString()))
+					&& role.equals(transferCapability.getRole().name()))
 					sopClassTextField.error(new StringResourceModel("TransferCapabilityValidator.invalid", form, null).getObject());
 		}
 	}

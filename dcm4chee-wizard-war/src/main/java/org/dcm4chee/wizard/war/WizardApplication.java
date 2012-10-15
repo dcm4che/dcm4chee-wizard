@@ -38,7 +38,12 @@
 
 package org.dcm4chee.wizard.war;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import javax.security.auth.Subject;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 
 import org.apache.wicket.Page;
 import org.apache.wicket.request.Request;
@@ -47,6 +52,7 @@ import org.dcm4chee.wizard.common.component.secure.SecureWebApplication;
 import org.dcm4chee.wizard.common.login.context.LoginContextSecurityHelper;
 import org.dcm4chee.wizard.common.login.context.SSOLoginContext;
 import org.dcm4chee.wizard.common.login.secure.SecureSession;
+import org.dcm4chee.wizard.war.profile.transfercapability.xml.Root;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wicketstuff.security.authentication.LoginException;
@@ -54,25 +60,45 @@ import org.wicketstuff.security.authentication.LoginException;
 /**
  * @author Robert David <robert.david@agfa.com>
  */
+@SuppressWarnings("restriction")
 public class WizardApplication extends SecureWebApplication {
 
     protected static Logger log = LoggerFactory.getLogger(WizardApplication.class);
 
     private DicomConfigurationManager dicomConfigurationManager;
-
+    private Root root;
+    
     @Override
     protected void init() {
         super.init();
         getDicomConfigurationManager();
+        getTransferCapabilityProfiles();
     }
 
-    public DicomConfigurationManager getDicomConfigurationManager() {
+    public synchronized DicomConfigurationManager getDicomConfigurationManager() {
 
         if (dicomConfigurationManager == null)
             dicomConfigurationManager = new DicomConfigurationManager(getInitParameter("dicomConfigurationClass"));
         return dicomConfigurationManager;
     }
 
+    public synchronized Root getTransferCapabilityProfiles() {
+
+        if (root == null) {
+	    	InputStream stream = getServletContext()
+	    			.getResourceAsStream("/WEB-INF/transferCapabilities.xml");
+			try {
+				root = (Root) 
+						JAXBContext.newInstance(Root.class).createUnmarshaller().unmarshal(stream);
+			} catch (JAXBException je) {
+				log.error("Error processing transfer capability profiles from xml file", je);
+			} finally {
+				try { stream.close(); } catch (IOException ignore) {}
+			}
+        }
+		return root;
+    }
+    
     @Override
     public Class<? extends Page> getHomePage() {
         return MainPage.class;

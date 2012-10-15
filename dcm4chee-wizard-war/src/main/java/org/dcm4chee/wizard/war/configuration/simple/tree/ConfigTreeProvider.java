@@ -41,7 +41,6 @@ package org.dcm4chee.wizard.war.configuration.simple.tree;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -70,6 +69,7 @@ import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ForwardScheduleM
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ProxyApplicationEntityModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ProxyDeviceModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.RetryModel;
+import org.dcm4chee.wizard.war.profile.transfercapability.xml.Group;
 
 import wickettree.util.SortableTreeProvider;
 
@@ -153,46 +153,49 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 
 			addApplicationEntitySubnodes(aeNode);
 			
-			Map<String, ConfigTreeNode> typeNodes = 
-					new HashMap<String, ConfigTreeNode>();
-
-			ConfigTreeNode otherNode = null;
-			if (applicationEntityModel.getTransferCapabilities().size() > 0)
-				otherNode = 
-					new ConfigTreeNode(aeNode.getContainer(ConfigTreeNode.CONTAINER_TRANSFER_CAPABILITIES), 
-						new ResourceModel("dicom.list.transferCapabilities.other.label").wrapOnAssignment(forComponent).getObject(), 
-						ConfigTreeNode.TreeNodeType.CONTAINER_TRANSFER_CAPABILITY_TYPE, null);
+			Map<String, Group> groupMap = 
+					((WizardApplication) forComponent.getApplication()).getTransferCapabilityProfiles().asMap();
 			
-			for (TransferCapabilityModel transferCapabilityModel : applicationEntityModel.getTransferCapabilities()) {
+			for (String groupName : groupMap.keySet()) {
+				ConfigTreeNode groupNode = 
+					new ConfigTreeNode(aeNode.getContainer(ConfigTreeNode.CONTAINER_TRANSFER_CAPABILITIES), 
+							groupName, 
+							ConfigTreeNode.TreeNodeType.CONTAINER_TRANSFER_CAPABILITY_TYPE, null);
 
-				ConfigTreeNode typeNode = null;
-				Map<String, String> types = getDicomConfigurationManager().getTransferCapabilityTypes();
-				if (types.containsKey(transferCapabilityModel.getTransferCapability().getSopClass())) {
-					String type = 
-							types.get(transferCapabilityModel.getTransferCapability().getSopClass());
-					
-					if (typeNodes.containsKey(type)) 
-						typeNode = typeNodes.get(type);	
-					else {
-						typeNode = new ConfigTreeNode(aeNode.getContainer(ConfigTreeNode.CONTAINER_TRANSFER_CAPABILITIES), 
-								type, 
-								ConfigTreeNode.TreeNodeType.CONTAINER_TRANSFER_CAPABILITY_TYPE, null);
-						typeNodes.put(type, typeNode);
+				for (TransferCapabilityModel transferCapabilityModel : applicationEntityModel.getTransferCapabilities())
+					if (groupMap.get(groupName).asMap().containsKey(transferCapabilityModel.getTransferCapability().getCommonName())) {
+						transferCapabilityModel.setGroup(true);
+						new ConfigTreeNode(groupNode,
+								transferCapabilityModel.getTransferCapability().getRole() + " " + (
+								transferCapabilityModel.getTransferCapability().getCommonName() != null ? 
+										transferCapabilityModel.getTransferCapability().getCommonName() :  
+										transferCapabilityModel.getTransferCapability().getSopClass() + " " + 
+										transferCapabilityModel.getTransferCapability().getRole()),
+										ConfigTreeNode.TreeNodeType.TRANSFER_CAPABILITY, 
+										transferCapabilityModel);
 					}
-				} else 
-					typeNode = otherNode;								
-				new ConfigTreeNode(typeNode, 
-						transferCapabilityModel.getTransferCapability().getCommonName() != null ? 
-								transferCapabilityModel.getTransferCapability().getCommonName() :  
-								transferCapabilityModel.getTransferCapability().getSopClass() + " " + 
-								transferCapabilityModel.getTransferCapability().getRole(),
-								ConfigTreeNode.TreeNodeType.TRANSFER_CAPABILITY, 
-								transferCapabilityModel);
+				if (!groupNode.hasChildren())
+					groupNode.remove();
 			}
-			if (otherNode != null)
-				Collections.sort(otherNode.getChildren());
-			for (ConfigTreeNode typeNode: typeNodes.values())
-				Collections.sort(typeNode.getChildren());
+			ConfigTreeNode groupNode = 
+					new ConfigTreeNode(aeNode.getContainer(ConfigTreeNode.CONTAINER_TRANSFER_CAPABILITIES), 
+							new ResourceModel("dicom.list.transferCapabilities.custom.label")
+								.wrapOnAssignment(forComponent).getObject(), 
+							ConfigTreeNode.TreeNodeType.CONTAINER_TRANSFER_CAPABILITY_TYPE, null);
+
+			for (TransferCapabilityModel transferCapabilityModel : applicationEntityModel.getTransferCapabilities())
+				if (!transferCapabilityModel.hasGroup())
+					new ConfigTreeNode(groupNode,
+							transferCapabilityModel.getTransferCapability().getRole() + " " + (
+							transferCapabilityModel.getTransferCapability().getCommonName() != null ? 
+									transferCapabilityModel.getTransferCapability().getCommonName() :  
+									transferCapabilityModel.getTransferCapability().getSopClass() + " " + 
+									transferCapabilityModel.getTransferCapability().getRole()),
+									ConfigTreeNode.TreeNodeType.TRANSFER_CAPABILITY, 
+									transferCapabilityModel);
+			if (!groupNode.hasChildren())
+				groupNode.remove();
+
 			Collections.sort(aeNode.getContainer(ConfigTreeNode.CONTAINER_TRANSFER_CAPABILITIES).getChildren());
 			
 			if (this.getConfigurationType(applicationEntityModel.getApplicationEntity())

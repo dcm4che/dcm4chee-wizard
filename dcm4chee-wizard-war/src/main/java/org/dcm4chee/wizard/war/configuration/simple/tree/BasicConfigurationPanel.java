@@ -85,9 +85,9 @@ import org.dcm4chee.wizard.common.behavior.MaskingAjaxCallBehavior;
 import org.dcm4chee.wizard.common.behavior.TooltipBehavior;
 import org.dcm4chee.wizard.common.component.ConfirmationWindow;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
-import org.dcm4chee.wizard.war.Utils;
 import org.dcm4chee.wizard.war.common.component.ExtendedPanel;
 import org.dcm4chee.wizard.war.configuration.model.source.DicomConfigurationSourceModel;
+import org.dcm4chee.wizard.war.configuration.simple.edit.ApplyTransferCapabilityProfilePage;
 import org.dcm4chee.wizard.war.configuration.simple.edit.CreateOrEditApplicationEntityPage;
 import org.dcm4chee.wizard.war.configuration.simple.edit.CreateOrEditCoercionPage;
 import org.dcm4chee.wizard.war.configuration.simple.edit.CreateOrEditConnectionPage;
@@ -106,6 +106,7 @@ import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ForwardScheduleM
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.RetryModel;
 import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeNode.TreeNodeType;
 import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider.ConfigurationType;
+import org.dcm4chee.wizard.war.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -601,6 +602,52 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 			}
 		});
 		
+		deviceColumns.add(new AbstractColumn<ConfigTreeNode>(Model.of("Profile")) {
+			
+			private static final long serialVersionUID = 1L;
+
+			public void populateItem(Item<ICellPopulator<ConfigTreeNode>> cellItem, String componentId, 
+					final IModel<ConfigTreeNode> rowModel) {
+
+				final TreeNodeType type = rowModel.getObject().getNodeType();
+				if (type == null)
+					throw new RuntimeException("Error: Unknown node type, cannot create profile modal window");
+				else if (!type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_TRANSFER_CAPABILITIES)) {
+					cellItem.add(new Label(componentId));
+					return;
+				}
+
+				AjaxLink<Object> ajaxLink = 
+						new AjaxLink<Object>("wickettree.link") { 
+
+				            private static final long serialVersionUID = 1L;
+
+				            @Override
+				            public void onClick(AjaxRequestTarget target) {
+								editWindow
+				                .setPageCreator(new ModalWindow.PageCreator() {
+				                    
+				                    private static final long serialVersionUID = 1L;
+				                      
+				                    @Override
+				                    public Page createPage() {
+				                    	return new ApplyTransferCapabilityProfilePage(
+				                    			editWindow, 
+				                    			null, 
+				                    			rowModel.getObject().getParent()); 
+				                    }
+				                });
+								editWindow.setInitialWidth(1024);
+				            	editWindow
+			            		.setWindowClosedCallback(windowClosedCallback)
+			            		.show(target);
+				            }
+				        };
+				        cellItem.add(new LinkPanel(componentId, ajaxLink, ImageManager.IMAGE_WIZARD_COMMON_PROFILE,removeConfirmation))
+							.add(new AttributeAppender("style", Model.of("width: 50px; text-align: center;")));
+			}
+		});
+
 		deviceColumns.add(new AbstractColumn<ConfigTreeNode>(Model.of("Delete")) {
 			
 			private static final long serialVersionUID = 1L;

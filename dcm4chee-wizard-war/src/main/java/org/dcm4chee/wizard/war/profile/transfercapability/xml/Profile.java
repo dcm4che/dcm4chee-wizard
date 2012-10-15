@@ -36,39 +36,31 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.wizard.war.configuration.simple.model.basic;
+package org.dcm4chee.wizard.war.profile.transfercapability.xml;
 
 import java.io.Serializable;
+import java.util.List;
 
-import org.dcm4che.net.TransferCapability;
-import org.dcm4chee.wizard.war.configuration.simple.model.ConfigNodeModel;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElements;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-public class TransferCapabilityModel implements Serializable, ConfigNodeModel {
+@SuppressWarnings("restriction")
+@XmlRootElement(name = "dicomTransferCapability")
+public class Profile implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+
+	@XmlElement(name = "Name")
+    public String name;
 	
-	public static String cssClass = "transfer-capability";
-	public static String toolTip = "Transfer Capability";
-
-	private boolean hasGroup;
-	private TransferCapability transferCapability;
-
-	public boolean hasGroup() {
-		return hasGroup;
-	}
-
-	public void setGroup(boolean hasGroup) {
-		this.hasGroup = hasGroup;
-	}
-
-	public TransferCapabilityModel(TransferCapability transferCapability, String aeTitle) {
-		this.transferCapability = transferCapability;
-	}
-	
-	public TransferCapability getTransferCapability() {
-		return transferCapability;
-	}	
+    @XmlElement(name = "SOPClass")
+    public String SOPClass;
+    
+    @XmlElements({
+    	@XmlElement(name = "dicomTransferSyntax")})
+    public List<String> dicomTransferSyntaxes;
 }
