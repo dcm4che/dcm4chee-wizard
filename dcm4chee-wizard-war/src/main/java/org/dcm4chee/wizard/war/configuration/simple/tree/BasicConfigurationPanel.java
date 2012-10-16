@@ -53,6 +53,7 @@ import org.apache.wicket.Application;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.Page;
+import org.apache.wicket.ajax.AbstractAjaxTimerBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.behavior.AttributeAppender;
@@ -72,9 +73,11 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.model.StringResourceModel;
+import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.request.resource.CssResourceReference;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
+import org.apache.wicket.util.time.Duration;
 import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.net.ApplicationEntity;
 import org.dcm4che.net.Connection;
@@ -138,6 +141,27 @@ public class BasicConfigurationPanel extends ExtendedPanel {
     public BasicConfigurationPanel(final String id) {
         super(id);
 
+        try {
+	        add(new AbstractAjaxTimerBehavior(Duration.minutes(
+	        		Integer.parseInt(((WebApplication) 
+        			this.getApplication()).getInitParameter("CheckForChangesInterval")))) {
+	            
+	            private static final long serialVersionUID = 1L;
+
+	            @Override
+	            protected void onTimer(AjaxRequestTarget target) {
+					if (ConfigTreeProvider.get().getLastModificationTime()
+							.before(getDicomConfigurationManager().getLastModificationTime())) {
+						log.warn("Session was invalidated because of concurrent modification");
+						getSession().invalidateNow();
+						getPage().setResponsePage(getPage());		
+					}
+	            }
+	        });
+        } catch (Exception e) {
+        	log.error("Error creating timer for checking changes", e);
+        }
+        
         windowClosedCallback = new ModalWindow.WindowClosedCallback() {
 
             private static final long serialVersionUID = 1L;
@@ -279,7 +303,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
         try {
             configTree =
             		new ConfigTableTree("configTree", deviceColumns, 
-            				ConfigTreeProvider.set(BasicConfigurationPanel.this), Integer.MAX_VALUE);
+            				ConfigTreeProvider.init(BasicConfigurationPanel.this), Integer.MAX_VALUE);
             form.addOrReplace(configTree);
             createColumns();
             refreshTree();

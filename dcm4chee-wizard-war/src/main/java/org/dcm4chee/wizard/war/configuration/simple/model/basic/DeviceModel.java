@@ -82,10 +82,6 @@ public class DeviceModel implements Serializable, ConfigNodeModel {
 		return deviceName;
 	}
 
-//	public void setDeviceName(java.lang.String deviceName) {
-//		this.deviceName = deviceName;
-//	}
-
 	public Device getDevice() throws ConfigurationException {
 		return device;
 	}

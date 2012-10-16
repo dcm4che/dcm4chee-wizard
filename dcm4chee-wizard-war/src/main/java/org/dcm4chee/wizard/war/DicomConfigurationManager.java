@@ -38,18 +38,12 @@
 
 package org.dcm4chee.wizard.war;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
-
-import net.sf.json.JSONObject;
 
 import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.conf.api.DicomConfiguration;
@@ -69,7 +63,7 @@ public class DicomConfigurationManager implements Serializable {
 
     private DicomConfiguration dicomConfiguration;
     private HashMap<String, Device> deviceMap;
-    private static Map<String, String> sopClassTypeMap;
+    private Date lastModificationTime;
 
     public DicomConfigurationManager(String dicomConfigurationClass) {
         try {
@@ -80,13 +74,14 @@ public class DicomConfigurationManager implements Serializable {
             throw new RuntimeException(e);
         }
         getDeviceMap();
+        lastModificationTime = new Date();
     }
 
     public DicomConfiguration getDicomConfiguration() {
         return dicomConfiguration;
     }
 
-    public HashMap<String, Device> getDeviceMap() {
+    public synchronized HashMap<String, Device> getDeviceMap() {
         if (deviceMap == null)
             try {
                 deviceMap = new HashMap<String, Device>();
@@ -98,45 +93,14 @@ public class DicomConfigurationManager implements Serializable {
         return deviceMap;
     }
 
-    public Map<String, String> getTransferCapabilityTypes() {
-
-        if (sopClassTypeMap == null) {
-            String configPath = System.getProperty("dcm4chee-wizard.cfg.path", "conf/dcm4chee-wizard/");
-            File typesFile = new File(configPath + "transfer-capability-types.json");
-            if (!typesFile.isAbsolute())
-                typesFile = new File(System.getProperty("jboss.server.home.dir"), typesFile.getPath());
-
-            sopClassTypeMap = new HashMap<String, String>();
-            String line;
-            BufferedReader reader = null;
-            try {
-                reader = new BufferedReader(new FileReader(typesFile));
-                while ((line = reader.readLine()) != null) {
-                    JSONObject jsonObject = JSONObject.fromObject(line);
-                    sopClassTypeMap.put(jsonObject.getString("sopClass"), jsonObject.getString("type"));
-                }
-            } catch (IOException e) {
-                log.error("Error processing transfer capability type mapping file", e);
-            } finally {
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (IOException ignore) {
-                    }
-                }
-            }
-        }
-        return sopClassTypeMap;
-    }
-
-    public ArrayList<String> listDevices() throws ConfigurationException {
+    public synchronized ArrayList<String> listDevices() throws ConfigurationException {
         deviceMap = null;
         ArrayList<String> deviceNameList = new ArrayList<String>(getDeviceMap().keySet());
         Collections.sort(deviceNameList);
         return deviceNameList;
     }
 
-    public Device getDevice(String deviceName) throws ConfigurationException {
+    public synchronized Device getDevice(String deviceName) throws ConfigurationException {
         Device device = getDeviceMap().get(deviceName);
         if (device == null) {
             device = dicomConfiguration.findDevice(deviceName);
@@ -145,19 +109,24 @@ public class DicomConfigurationManager implements Serializable {
         return device;
     }
 
-    public void save(Device device) throws ConfigurationException {
+    public synchronized void save(Device device, Date date) throws ConfigurationException {
         if (getDeviceMap().containsKey(device.getDeviceName()))
             dicomConfiguration.merge(device);
         else
             dicomConfiguration.persist(device);
+        lastModificationTime = date;
     }
 
-    public void remove(String deviceName) throws ConfigurationException {
+    public synchronized void remove(String deviceName) throws ConfigurationException {
         dicomConfiguration.removeDevice(deviceName);
         getDeviceMap().remove(deviceName);
     }
     
     public ApplicationEntity getApplicationEntity(String aet) throws ConfigurationException {
     	return dicomConfiguration.findApplicationEntity(aet);
-    }   
+    }
+
+	public synchronized Date getLastModificationTime() {
+		return lastModificationTime;
+	}   
 }

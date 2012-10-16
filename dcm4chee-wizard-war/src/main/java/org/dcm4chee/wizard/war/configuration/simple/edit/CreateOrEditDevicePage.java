@@ -503,7 +503,7 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
                     }
                     
                     if (deviceModel == null)
-                    	ConfigTreeProvider.get().persistDevice(device).setModel(null);
+                    	ConfigTreeProvider.get().persistDevice(device);
                     else
                     	ConfigTreeProvider.get().mergeDevice(device);                   
                     window.close(target);

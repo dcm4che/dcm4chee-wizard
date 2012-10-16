@@ -41,6 +41,7 @@ package org.dcm4chee.wizard.war.configuration.simple.tree;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -70,7 +71,6 @@ import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ProxyApplication
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ProxyDeviceModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.RetryModel;
 import org.dcm4chee.wizard.war.profile.transfercapability.xml.Group;
-import org.dcm4chee.wizard.war.util.Utils;
 
 import wickettree.util.SortableTreeProvider;
 
@@ -87,19 +87,15 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 
 	private Component forComponent;
 	
-	private boolean resync = false;
+	private boolean resync;
+	private Date lastModificationTime;
 
 	private ConfigTreeProvider(Component forComponent) throws ConfigurationException {
 		this.forComponent = forComponent;
-		loadDeviceList();
-	}
-
-	private void loadDeviceList() throws ConfigurationException {
+		lastModificationTime= new Date();
+		
 		List<String> deviceList = 
 				getDicomConfigurationManager().listDevices();
-
-		if (deviceList == null)
-			return;
 		
 		Collections.sort(deviceList);
 		for (String deviceName : deviceList) {
@@ -252,7 +248,7 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 		return (ConfigTreeProvider) Session.get().getAttribute("configTreeProvider");
 	}
 
-	public static ConfigTreeProvider set(Component forComponent) throws ConfigurationException {
+	public static ConfigTreeProvider init(Component forComponent) throws ConfigurationException {
 		ConfigTreeProvider configTreeProvider = new ConfigTreeProvider(forComponent);
 		Session.get().setAttribute("configTreeProvider", configTreeProvider);
 		return configTreeProvider;
@@ -339,24 +335,24 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 		return deviceNodeList;
 	}
 
-	public ConfigTreeNode persistDevice(Device device) throws ConfigurationException {
-		getDicomConfigurationManager().save(device);
+	public void persistDevice(Device device) throws ConfigurationException {
+		getDicomConfigurationManager().save(device, (lastModificationTime = new Date()));
 		ConfigTreeNode deviceNode = 
 				new ConfigTreeNode(null, device.getDeviceName(), 
 						ConfigTreeNode.TreeNodeType.DEVICE,
 						getConfigurationType(device),  
-						new DeviceModel(device));
+						null);
 		deviceNodeList.add(deviceNode);
 		Collections.sort(deviceNodeList);
 		addDeviceSubnodes(deviceNode);
-		return deviceNode;
+		Session.get().setAttribute("configTreeProvider", this);
 	}
 
 	public void mergeDevice(Device device) throws IOException, ConfigurationException {
 		deviceNodeList = 
 				((ConfigTreeProvider) Session.get().getAttribute("configTreeProvider"))
 					.getNodeList();
-		getDicomConfigurationManager().save(device);
+		getDicomConfigurationManager().save(device, (lastModificationTime = new Date()));
 		for (ConfigTreeNode node : deviceNodeList)
 			if (node.getName().equals(device.getDeviceName()))
 				node.setModel(null);
@@ -392,5 +388,9 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 			resync = false;
 			return true;
 		} else return false;
+	}
+	
+	public Date getLastModificationTime() {
+		return lastModificationTime;
 	}
 }
