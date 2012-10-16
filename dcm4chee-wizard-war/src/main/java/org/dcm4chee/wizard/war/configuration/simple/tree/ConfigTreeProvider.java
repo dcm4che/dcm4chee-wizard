@@ -70,6 +70,7 @@ import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ProxyApplication
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ProxyDeviceModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.RetryModel;
 import org.dcm4chee.wizard.war.profile.transfercapability.xml.Group;
+import org.dcm4chee.wizard.war.util.Utils;
 
 import wickettree.util.SortableTreeProvider;
 
@@ -358,7 +359,7 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 		getDicomConfigurationManager().save(device);
 		for (ConfigTreeNode node : deviceNodeList)
 			if (node.getName().equals(device.getDeviceName()))
-					node.setModel(null);
+				node.setModel(null);
 		Session.get().setAttribute("configTreeProvider", this);
 	}
 

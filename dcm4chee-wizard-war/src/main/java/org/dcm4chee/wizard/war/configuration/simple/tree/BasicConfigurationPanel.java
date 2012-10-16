@@ -64,6 +64,7 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.image.Image;
+import org.apache.wicket.markup.repeater.IItemReuseStrategy;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.AbstractReadOnlyModel;
@@ -124,8 +125,6 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 
     private static Logger log = LoggerFactory.getLogger(BasicConfigurationPanel.class);
 
-    final MaskingAjaxCallBehavior macb = new MaskingAjaxCallBehavior();
-
     private ExtendedForm form;
 
     private ModalWindow editWindow;
@@ -149,7 +148,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 	                for (ConfigTreeNode deviceNode : ConfigTreeProvider.get().getNodeList())
 	                    if (deviceNode.getModel() == null) {
 	                    	ConfigTreeProvider.get().loadDevice(deviceNode);
-	                    	refresh = true; 
+	                    	refresh = true;
 	                    }
 	                if (refresh || ConfigTreeProvider.get().resync())
                         BasicConfigurationPanel.this.refreshTree();
@@ -161,7 +160,6 @@ public class BasicConfigurationPanel extends ExtendedPanel {
                 target.add(form);
             }
         };
-        add(macb);
 
         echoWindow = new ModalWindow("echo-window");
         echoWindow.setInitialWidth(600).setInitialHeight(400);
@@ -238,7 +236,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
                         }
                         ConfigTreeProvider.get().mergeDevice(((DeviceModel) deviceNode.getModel()).getDevice());
                     }
-                    target.add(form);
+//                    target.add(form);
                 } catch (Exception e) {
                 	log.error(this.getClass().toString() + ": " + "Error deleting configuration object: " + e.getMessage());
                 	log.debug("Exception", e);
@@ -691,10 +689,10 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 				        	Connection connection = null;
 							try {
 								connection = ((ConnectionModel) rowModel.getObject().getModel()).getConnection();
-				        	for (ApplicationEntity ae : connection.getDevice().getApplicationEntities())
-				        		if (ae.getConnections().contains(connection))
-				        			ajaxLink.setEnabled(false)
-				        				.add(new AttributeModifier("title", new ResourceModel("dicom.delete.connection.notAllowed")));
+					        	for (ApplicationEntity ae : connection.getDevice().getApplicationEntities())
+					        		if (ae.getConnections().contains(connection))
+					        			ajaxLink.setEnabled(false)
+					        				.add(new AttributeModifier("title", new ResourceModel("dicom.delete.connection.notAllowed")));
 							} catch (ConfigurationException ce) {
 					        	log.error(this.getClass().toString() + ": " + "Error checking used connections of application entities: " + ce.getMessage());
 					        	log.debug("Exception", ce);
