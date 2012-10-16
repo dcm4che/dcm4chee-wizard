@@ -118,7 +118,7 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 
 		Device device = getDicomConfigurationManager().getDevice(deviceNode.getName());
 
-		// CREATE DEVICE NODE AND MODEL
+		// CREATE DEVICE NODE
 		DeviceModel deviceModel
 			= (this.getConfigurationType(device).equals(ConfigurationType.Proxy)) ? 
 					new ProxyDeviceModel((ProxyDevice) device) : new DeviceModel(device);
@@ -129,7 +129,7 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 		deviceNode.removeChildren();
 		addDeviceSubnodes(deviceNode);
 		
-		// CREATE CONNECTION NODE AND MODEL
+		// CREATE CONNECTION NODES
 		deviceNode.getContainer(ConfigTreeNode.CONTAINER_CONNECTIONS).removeChildren();
 		for (ConnectionModel connectionModel : deviceModel.getConnections())
 			new ConfigTreeNode(deviceNode.getContainer(ConfigTreeNode.CONTAINER_CONNECTIONS), 
@@ -141,7 +141,7 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 		Collections.sort(deviceNode.getContainer(
 				ConfigTreeNode.CONTAINER_CONNECTIONS).getChildren());
 
-		// CREATE AE NODE AND MODEL
+		// CREATE AE NODES
 		deviceNode.getContainer(ConfigTreeNode.CONTAINER_APPLICATION_ENTITIES).removeChildren();
 		for (ApplicationEntityModel applicationEntityModel : deviceModel.getApplicationEntities().values()) {
 			ConfigTreeNode aeNode = 
@@ -153,6 +153,7 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 
 			addApplicationEntitySubnodes(aeNode);
 			
+			// CREATE TRANSFER CAPABILITY NODES
 			Map<String, Group> groupMap = 
 					((WizardApplication) forComponent.getApplication()).getTransferCapabilityProfiles().asMap();
 			
@@ -201,6 +202,7 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 			if (this.getConfigurationType(applicationEntityModel.getApplicationEntity())
 					.equals(ConfigurationType.Proxy)) {
 				
+				// CREATE FORWARD RULE NODES
 				for (ForwardRuleModel forwardRuleModel : 
 					((ProxyApplicationEntityModel) applicationEntityModel).getForwardRules()) {
 					new ConfigTreeNode(aeNode.getContainer(ConfigTreeNode.CONTAINER_FORWARD_RULES), 
@@ -208,6 +210,7 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 							ConfigTreeNode.TreeNodeType.FORWARD_RULE, forwardRuleModel);
 				}
 
+				// CREATE FORWARD SCHEDULE NODES
 				for (ForwardScheduleModel forwardScheduleModel : 
 					((ProxyApplicationEntityModel) applicationEntityModel).getForwardSchedules()) {
 					new ConfigTreeNode(aeNode.getContainer(ConfigTreeNode.CONTAINER_FORWARD_SCHEDULES), 
@@ -215,6 +218,7 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 							ConfigTreeNode.TreeNodeType.FORWARD_SCHEDULE, forwardScheduleModel);
 				}
 
+				// CREATE RETRY NODES
 				for (RetryModel retryModel : 
 					((ProxyApplicationEntityModel) applicationEntityModel).getRetries()) {
 					new ConfigTreeNode(aeNode.getContainer(ConfigTreeNode.CONTAINER_RETRIES), 
@@ -222,6 +226,7 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 							ConfigTreeNode.TreeNodeType.RETRY, retryModel);
 				}
 				
+				// CREATE COERCION NODES
 				for (CoercionModel coercionModel : 
 					((ProxyApplicationEntityModel) applicationEntityModel).getCoercions()) {
 					AttributeCoercion coercion = coercionModel.getCoercion();
@@ -358,6 +363,8 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 	}
 
 	public void removeDevice(ConfigTreeNode deviceNode) throws ConfigurationException {
+		for (ApplicationEntity applicationEntity : ((DeviceModel) deviceNode.getModel()).getDevice().getApplicationEntities())
+			unregisterAETitle(applicationEntity.getAETitle());
 		getDicomConfigurationManager().remove(((DeviceModel) deviceNode.getModel()).getDeviceName());
 		deviceNodeList.remove(deviceNode);
 		resync = true;
