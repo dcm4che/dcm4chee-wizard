@@ -41,9 +41,9 @@ package org.dcm4chee.wizard.common.component;
 import org.apache.wicket.Page;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.IAjaxCallDecorator;
-import org.apache.wicket.ajax.markup.html.AjaxFallbackLink;
+import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.behavior.Behavior;
-import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxFallbackLink;
+import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxLink;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.markup.html.IHeaderResponse;
@@ -109,7 +109,7 @@ public abstract class ConfirmationWindow<T> extends ModalWindow {
                 return true;
             }
         });
-        setWindowClosedCallback(new ModalWindow.WindowClosedCallback() {  
+        setWindowClosedCallback(new ModalWindow.WindowClosedCallback() {
             
             private static final long serialVersionUID = 1L;
 
@@ -214,8 +214,8 @@ public abstract class ConfirmationWindow<T> extends ModalWindow {
         
         private final Logger log = LoggerFactory.getLogger(MessageWindowPanel.class);
         
-        private IndicatingAjaxFallbackLink<Object> confirmBtn;
-        private AjaxFallbackLink<Object> okBtn;
+        private IndicatingAjaxLink<Object> confirmBtn;
+        private AjaxLink<Object> okBtn;
         
         private IModel<?> msg;
         private Label msgLabel;
@@ -258,7 +258,7 @@ public abstract class ConfirmationWindow<T> extends ModalWindow {
 
             }).setOutputMarkupId(true));
 
-            confirmBtn = new IndicatingAjaxFallbackLink<Object>("confirm") {
+            confirmBtn = new IndicatingAjaxLink<Object>("confirm") {
 
                 private static final long serialVersionUID = 1L;
 
@@ -299,7 +299,7 @@ public abstract class ConfirmationWindow<T> extends ModalWindow {
             confirmBtn.setOutputMarkupId(true);
             add(confirmBtn);
             
-            add(new AjaxFallbackLink<Object>("decline"){
+            add(new AjaxLink<Object>("decline"){
 
                 private static final long serialVersionUID = 1L;
 
@@ -320,7 +320,7 @@ public abstract class ConfirmationWindow<T> extends ModalWindow {
                 }
             }.add(new Label("declineLabel", decline)));
             
-            add(new AjaxFallbackLink<Object>("cancel"){
+            add(new AjaxLink<Object>("cancel"){
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -336,7 +336,7 @@ public abstract class ConfirmationWindow<T> extends ModalWindow {
                 }
             }.add(new Label("cancelLabel", cancel)) );
             
-            add(okBtn = new IndicatingAjaxFallbackLink<Object>("ok") {
+            add(okBtn = new IndicatingAjaxLink<Object>("ok") {
 
                 private static final long serialVersionUID = 1L;
 
@@ -380,7 +380,7 @@ public abstract class ConfirmationWindow<T> extends ModalWindow {
             return true;
         }
 
-        public AjaxFallbackLink<Object> getOkBtn() {
+        public AjaxLink<Object> getOkBtn() {
             return okBtn;
         }
 
