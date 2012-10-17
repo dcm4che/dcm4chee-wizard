@@ -114,6 +114,7 @@ public class DicomConfigurationManager implements Serializable {
             dicomConfiguration.merge(device);
         else
             dicomConfiguration.persist(device);
+        getDeviceMap().put(device.getDeviceName(), device);
         lastModificationTime = date;
     }
 
