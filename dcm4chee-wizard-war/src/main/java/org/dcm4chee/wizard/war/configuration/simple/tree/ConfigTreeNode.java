@@ -44,6 +44,7 @@ import java.util.List;
 
 import org.dcm4chee.wizard.war.configuration.simple.model.ConfigNodeModel;
 import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider.ConfigurationType;
+import org.dcm4chee.wizard.war.util.Utils;
 
 /**
  * @author Robert David <robert.david@agfa.com>
@@ -157,7 +158,11 @@ public class ConfigTreeNode implements Serializable, Comparable<ConfigTreeNode> 
 
 	@Override
 	public int hashCode() {
-		return (parent != null) ? (parent + name).hashCode() : name.hashCode();
+		return getPath().hashCode();
+	}
+	
+	public String getPath() {
+		return parent != null ? parent.getPath() + name : name;
 	}
 
 	public void remove() {
