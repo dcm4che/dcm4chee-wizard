@@ -55,7 +55,7 @@ public class TransferCapabilityValidator extends AbstractFormValidator {
 
     private static final long serialVersionUID = 1L;
     
-	private transient ApplicationEntity applicationEntity;
+	private ApplicationEntity applicationEntity;
 	private TextField<String> sopClassTextField;
 	private DropDownChoice<Role> roleDropDown;
 
@@ -77,7 +77,7 @@ public class TransferCapabilityValidator extends AbstractFormValidator {
 		String role = this.roleDropDown.getInput().equals("0") ? "SCP" : "SCU";
 		if (sopClass.equals(sopClassTextField.getModelObject()) 
 				&& role.equals(roleDropDown.getModelObject().name()))
-			return;				
+			return;
 		for (TransferCapability transferCapability : this.applicationEntity.getTransferCapabilities()) {
 			if (sopClass.equals(transferCapability.getSopClass())
 					&& role.equals(transferCapability.getRole().name()))
