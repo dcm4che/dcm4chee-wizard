@@ -34,6 +34,11 @@
       <param-name>ConfigurationAETitle</param-name>
       <param-value>MYAE</param-value>
     </init-param>
+    <init-param>
+      <param-name>CheckForChangesInterval</param-name>
+		<!-- given in seconds -->
+      <param-value>20</param-value>
+    </init-param>
   </filter>
   <filter-mapping>
     <filter-name>wicket.dcm4chee-wizard</filter-name>
