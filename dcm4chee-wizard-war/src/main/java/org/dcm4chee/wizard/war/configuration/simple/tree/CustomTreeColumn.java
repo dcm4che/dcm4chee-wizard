@@ -55,7 +55,6 @@ import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ForwardRuleModel
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ForwardScheduleModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.RetryModel;
 import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeNode.TreeNodeType;
-import org.dcm4chee.wizard.war.util.Utils;
 
 import wickettree.table.TreeColumn;
 

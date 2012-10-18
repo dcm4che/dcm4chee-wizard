@@ -44,7 +44,6 @@ import java.util.List;
 
 import org.dcm4chee.wizard.war.configuration.simple.model.ConfigNodeModel;
 import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider.ConfigurationType;
-import org.dcm4chee.wizard.war.util.Utils;
 
 /**
  * @author Robert David <robert.david@agfa.com>
@@ -135,6 +134,10 @@ public class ConfigTreeNode implements Serializable, Comparable<ConfigTreeNode> 
 		return (hops < 0) ? null : (hops == 0) ? this : parent.getAncestor(hops - 1);
 	}
 
+	public ConfigTreeNode getRoot() {
+		return parent == null ? this : parent.getRoot();
+	}
+	
 	public boolean hasChildren() {
 		return !children.isEmpty();
 	}

@@ -83,7 +83,7 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 	
 	public enum ConfigurationType { Basic, Proxy, Archive };
 
-	private List<ConfigTreeNode> deviceNodeList = new ArrayList<ConfigTreeNode>();
+	private List<ConfigTreeNode> deviceNodeList;
 
 	private Component forComponent;
 	
@@ -92,16 +92,21 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 
 	private ConfigTreeProvider(Component forComponent) throws ConfigurationException {
 		this.forComponent = forComponent;
-		lastModificationTime= new Date();
+		loadDeviceList();
+	}
+
+	public void loadDeviceList() throws ConfigurationException {
+		
+		deviceNodeList = new ArrayList<ConfigTreeNode>();
 		
 		List<String> deviceList = 
-				getDicomConfigurationManager().listDevices();
-		
+				getDicomConfigurationManager().listDevices();		
 		Collections.sort(deviceList);
+
 		for (String deviceName : deviceList) {
 
 			// CREATE DEVICE NODE AND MODEL
-			DeviceModel deviceModel = new DeviceModel(deviceName);			
+			DeviceModel deviceModel = new DeviceModel(deviceName);
 			ConfigTreeNode deviceNode = 
 					new ConfigTreeNode(null, deviceModel.getDeviceName(), 
 							ConfigTreeNode.TreeNodeType.DEVICE, 
@@ -109,6 +114,8 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 			deviceNodeList.add(deviceNode);
 			new ConfigTreeNode(deviceNode, null, null, null, null);
 		}
+		lastModificationTime = new Date();
+		resync = true;
 	}
 
 	public void loadDevice(ConfigTreeNode deviceNode) throws ConfigurationException {
@@ -360,11 +367,13 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
 	}
 
 	public void removeDevice(ConfigTreeNode deviceNode) throws ConfigurationException {
+		loadDevice(deviceNode);
 		for (ApplicationEntity applicationEntity : ((DeviceModel) deviceNode.getModel()).getDevice().getApplicationEntities())
 			unregisterAETitle(applicationEntity.getAETitle());
 		getDicomConfigurationManager().remove(((DeviceModel) deviceNode.getModel()).getDeviceName());
 		deviceNodeList.remove(deviceNode);
 		resync = true;
+		Session.get().setAttribute("configTreeProvider", this);
 	}
 
 	public ConfigurationType getConfigurationType(Device device) {

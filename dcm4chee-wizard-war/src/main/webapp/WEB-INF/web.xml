@@ -32,7 +32,8 @@
     </init-param>
     <init-param>
       <param-name>CheckForChangesInterval</param-name>
-      <param-value>5</param-value>
+		<!-- given in seconds -->
+      <param-value>20</param-value>
     </init-param>
   </filter>
   <filter-mapping>

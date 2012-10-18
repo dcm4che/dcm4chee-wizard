@@ -44,6 +44,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -89,6 +91,7 @@ import org.dcm4chee.wizard.common.behavior.MaskingAjaxCallBehavior;
 import org.dcm4chee.wizard.common.behavior.TooltipBehavior;
 import org.dcm4chee.wizard.common.component.ConfirmationWindow;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
+import org.dcm4chee.wizard.common.component.MessageWindow;
 import org.dcm4chee.wizard.war.common.component.ExtendedPanel;
 import org.dcm4chee.wizard.war.configuration.model.source.DicomConfigurationSourceModel;
 import org.dcm4chee.wizard.war.configuration.simple.edit.ApplyTransferCapabilityProfilePage;
@@ -133,6 +136,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
     private ModalWindow editWindow;
     private ModalWindow echoWindow;
     private ConfirmationWindow<ConfigTreeNode> removeConfirmation;
+    private MessageWindow refreshMessage;
     public WindowClosedCallback windowClosedCallback;
 
     List<IColumn<ConfigTreeNode>> deviceColumns;
@@ -142,7 +146,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
         super(id);
 
         try {
-	        add(new AbstractAjaxTimerBehavior(Duration.minutes(
+	        add(new AbstractAjaxTimerBehavior(Duration.seconds(
 	        		Integer.parseInt(((WebApplication) 
         			this.getApplication()).getInitParameter("CheckForChangesInterval")))) {
 	            
@@ -152,9 +156,8 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 	            protected void onTimer(AjaxRequestTarget target) {
 					if (ConfigTreeProvider.get().getLastModificationTime()
 							.before(getDicomConfigurationManager().getLastModificationTime())) {
-						log.warn("Session was invalidated because of concurrent modification");
-						getSession().invalidateNow();
-						getPage().setResponsePage(getPage());		
+						log.warn("Configuration needs to be reloaded because of concurrent modification");
+						refreshMessage.show(target);
 					}
 	            }
 	        });
@@ -175,7 +178,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 	                    	refresh = true;
 	                    }
 	                if (refresh || ConfigTreeProvider.get().resync())
-                        BasicConfigurationPanel.this.refreshTree();
+                        renderTree();
                 } catch (ConfigurationException ce) {
                 	log.error(this.getClass().toString() + ": " + "Error refreshing tree: " + ce.getMessage());
                 	log.debug("Exception", ce);
@@ -205,15 +208,13 @@ public class BasicConfigurationPanel extends ExtendedPanel {
                     if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.DEVICE)) {
                         ConfigTreeProvider.get().removeDevice(node);
                     } else {
-                    	ConfigTreeNode deviceNode = null;
+                    	ConfigTreeNode deviceNode = node.getRoot();
 
                         if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.CONNECTION)) {
-                        	deviceNode = node.getAncestor(2);
                             ((DeviceModel) deviceNode.getModel()).getDevice()
                                     .removeConnection(((ConnectionModel) node.getModel()).getConnection());
 
                         } else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.APPLICATION_ENTITY)) {
-                        	deviceNode = node.getAncestor(2);
                         	ApplicationEntity applicationEntity = 
                         			((ApplicationEntityModel) node.getModel()).getApplicationEntity();
                         	((DeviceModel) deviceNode.getModel()).getDevice()
@@ -221,34 +222,29 @@ public class BasicConfigurationPanel extends ExtendedPanel {
                         	ConfigTreeProvider.get().unregisterAETitle(applicationEntity.getAETitle());
 
                         } else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.TRANSFER_CAPABILITY)) {
-                        	deviceNode = node.getAncestor(5);
                         	((ApplicationEntityModel) node.getAncestor(3).getModel()).getApplicationEntity()
                             	.removeTransferCapability(((TransferCapabilityModel) node.getModel())
                             			.getTransferCapability());
 
                         } else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.FORWARD_RULE)) {
-                        	deviceNode = node.getAncestor(4);
                         	((ProxyApplicationEntity) 
                         			((ApplicationEntityModel) node.getAncestor(2).getModel()).getApplicationEntity())
                         			.getForwardRules().remove(((ForwardRuleModel) node.getModel())
                         					.getForwardRule());
 
                         } else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.FORWARD_SCHEDULE)) {
-                        	deviceNode = node.getAncestor(4);
                         	((ProxyApplicationEntity) 
                         			((ApplicationEntityModel) node.getAncestor(2).getModel()).getApplicationEntity())
                         			.getForwardSchedules().remove(((ForwardScheduleModel) node.getModel())
                         					.getDestinationAETitle());
 
                         } else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.RETRY)) {
-                        	deviceNode = node.getAncestor(4);
                         	((ProxyApplicationEntity) 
                         			((ApplicationEntityModel) node.getAncestor(2).getModel()).getApplicationEntity())
                         				.getRetries().remove(((RetryModel) node.getModel())
                         						.getRetry());
 
                         } else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.COERCION)) {
-                        	deviceNode = node.getAncestor(4);
                         	((ProxyApplicationEntity) 
                         			((ApplicationEntityModel) node.getAncestor(2).getModel()).getApplicationEntity())
                         				.getAttributeCoercions().remove(((CoercionModel) node.getModel())
@@ -260,9 +256,9 @@ public class BasicConfigurationPanel extends ExtendedPanel {
                         }
                         ConfigTreeProvider.get().mergeDevice(((DeviceModel) deviceNode.getModel()).getDevice());
                     }
-//                    target.add(form);
                 } catch (Exception e) {
                 	log.error(this.getClass().toString() + ": " + "Error deleting configuration object: " + e.getMessage());
+                	e.printStackTrace();
                 	log.debug("Exception", e);
                 	throw new RuntimeException(e);
 				}
@@ -271,6 +267,33 @@ public class BasicConfigurationPanel extends ExtendedPanel {
         add(removeConfirmation.setInitialHeight(150)
         		.setWindowClosedCallback(windowClosedCallback));
 
+        refreshMessage = new MessageWindow("refresh-message", 
+        		new StringResourceModel("dicom.confirmRefresh", this, null)) {
+
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void onOk(AjaxRequestTarget target) {
+                try {
+					log.warn("Reloading device list from configuration");
+					ConfigTreeProvider.get().loadDeviceList();				
+					for (Iterator<ConfigTreeNode> i = 
+							configTree.getModel().getObject().iterator(); i.hasNext(); ) {
+						ConfigTreeNode root = i.next().getRoot();
+						for (ConfigTreeNode deviceNode : ConfigTreeProvider.get().getNodeList())
+							if (deviceNode.equals(root) && 
+									(((DeviceModel) deviceNode.getModel()).getDevice() == null))								
+							ConfigTreeProvider.get().loadDevice(deviceNode);
+					}
+					renderTree();
+				} catch (ConfigurationException ce) {
+					log.error("Error reloading configuration after concurrent modification", ce);
+				}
+            }
+        };
+        add(refreshMessage.setInitialHeight(150)
+        		.setWindowClosedCallback(windowClosedCallback));
+        
         add(form = new ExtendedForm("form"));
         form.setResourceIdPrefix("dicom.");
 
@@ -301,12 +324,11 @@ public class BasicConfigurationPanel extends ExtendedPanel {
         deviceColumns.add(new CustomTreeColumn(Model.of("Devices")));
 
         try {
-            configTree =
+            createColumns();
+        	configTree =
             		new ConfigTableTree("configTree", deviceColumns, 
             				ConfigTreeProvider.init(BasicConfigurationPanel.this), Integer.MAX_VALUE);
-            form.addOrReplace(configTree);
-            createColumns();
-            refreshTree();
+        	renderTree();
         } catch (ConfigurationException ce) {
         	log.error(this.getClass().toString() + ": " + "Error creating tree: " + ce.getMessage());
         	log.debug("Exception", ce);
@@ -322,7 +344,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
     public void createColumns() {
 
     	deviceColumns = new ArrayList<IColumn<ConfigTreeNode>>();
-		
+    	
     	deviceColumns.add(new CustomTreeColumn(Model.of("Devices")));
 
 		deviceColumns.add(new AbstractColumn<ConfigTreeNode>(Model.of("ConfigurationType")) {
@@ -351,7 +373,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 					if (configTreeNode.getNodeType().equals(ConfigTreeNode.TreeNodeType.APPLICATION_ENTITY)) {
 						ApplicationEntity applicationEntity = 
 								((ApplicationEntityModel) configTreeNode.getModel()).getApplicationEntity();
-						if (applicationEntity != null) 							
+						if (applicationEntity != null)					
 							for (Connection connection : applicationEntity.getConnections())
 								connectionsView.add(new ConnectionPanel(connectionsView.newChildId(), 
 										ImageManager.IMAGE_WIZARD_CONNECTION, 
@@ -727,7 +749,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 		});
     }
     
-    public void refreshTree() throws ConfigurationException {
+    public void renderTree() throws ConfigurationException {
 		IModel<Set<ConfigTreeNode>> currentState = configTree.getModel();
 		configTree = new ConfigTableTree("configTree", deviceColumns,
 				ConfigTreeProvider.get(), 
