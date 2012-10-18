@@ -147,17 +147,17 @@ public class CreateOrEditTransferCapabilityPage extends SecureWebPage {
 					applicationEntity, 
 					sopClassTextField, roleDropDown));
 
-        final WebMarkupContainer optionalContainer = new WebMarkupContainer("optionalContainer");
+        final WebMarkupContainer optionalContainer = new WebMarkupContainer("optional");
         form.add(optionalContainer
         		.setOutputMarkupId(true)
         		.setOutputMarkupPlaceholderTag(true)
         		.setVisible(false));
 
-        optionalContainer.add(new Label("commonName.label", new ResourceModel("dicom.edit.transferCapability.commonName.label")))
+        optionalContainer.add(new Label("commonName.label", new ResourceModel("dicom.edit.transferCapability.optional.commonName.label")))
         .add(new TextField<String>("commonName", commonNameModel));
 
-        form.add(new Label("optional.label", new ResourceModel("dicom.edit.optional.label")))
-        .add(new AjaxCheckBox("optional", new Model<Boolean>()) {
+        form.add(new Label("toggleOptional.label", new ResourceModel("dicom.edit.toggleOptional.label")))
+        .add(new AjaxCheckBox("toggleOptional", new Model<Boolean>()) {
 			private static final long serialVersionUID = 1L;
 
 			@Override
