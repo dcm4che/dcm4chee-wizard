@@ -245,7 +245,7 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
 						
 						@Override
 						protected void onUpdate(AjaxRequestTarget target) {
-							target.add(form.get("proxyContainer"));
+							target.add(form.get("proxy"));
 						}
 				}));
 
@@ -275,7 +275,7 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
     			public boolean isVisible() {
     				return typeModel.getObject().equals(ConfigurationType.Proxy);
     			}        	
-            }.add(new Label("schedulerInterval.label", new ResourceModel("dicom.edit.device.schedulerInterval.label")))
+            }.add(new Label("schedulerInterval.label", new ResourceModel("dicom.edit.device.proxy.schedulerInterval.label")))
 			.add(new TextField<Integer>("schedulerInterval", schedulerIntervalModel)
             		.setType(Integer.class)
             		.setRequired(deviceModel != null &&
@@ -309,97 +309,97 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
         });
         
         optionalContainer.add(new Label("deviceSerialNumber.label", 
-        		new ResourceModel("dicom.edit.device.deviceSerialNumber.label")))
+        		new ResourceModel("dicom.edit.device.optional.deviceSerialNumber.label")))
         .add(new TextField<String>("deviceSerialNumber", deviceSerialNumberModel));
 
         optionalContainer.add(new Label("institutionAddress.label", 
-        		new ResourceModel("dicom.edit.device.institutionAddress.label")))
+        		new ResourceModel("dicom.edit.device.optional.institutionAddress.label")))
         .add(new TextArea<String>("institutionAddress", institutionAddressModel));
         
         TextField<String> codeValueTextField = new TextField<String>("institutionCodeValue", institutionCodeModel.getCodeFieldModel(0));
         optionalContainer.add(new Label("institutionCodeValue.label", 
-        		new ResourceModel("dicom.edit.device.institutionCodeValue.label")))
+        		new ResourceModel("dicom.edit.device.optional.institutionCodeValue.label")))
         .add(codeValueTextField);
 
         TextField<String> codingSchemeDesignatorTextField = new TextField<String>("institutionCodingSchemeDesignator", institutionCodeModel.getCodeFieldModel(1));
         optionalContainer.add(new Label("institutionCodingSchemeDesignator.label", 
-        		new ResourceModel("dicom.edit.device.institutionCodingSchemeDesignator.label")))
+        		new ResourceModel("dicom.edit.device.optional.institutionCodingSchemeDesignator.label")))
         .add(codingSchemeDesignatorTextField);
 
         TextField<String> codingSchemeVersionTextField = new TextField<String>("institutionCodingSchemeVersion", institutionCodeModel.getCodeFieldModel(2));
         optionalContainer.add(new Label("institutionCodingSchemeVersion.label", 
-        		new ResourceModel("dicom.edit.device.institutionCodingSchemeVersion.label")))
+        		new ResourceModel("dicom.edit.device.optional.institutionCodingSchemeVersion.label")))
         .add(codingSchemeVersionTextField);
         
         TextField<String> codeMeaningTextField = new TextField<String>("institutionCodeMeaning", institutionCodeModel.getCodeFieldModel(3));
         optionalContainer.add(new Label("institutionCodeMeaning.label", 
-        		new ResourceModel("dicom.edit.device.institutionCodeMeaning.label")))
+        		new ResourceModel("dicom.edit.device.optional.institutionCodeMeaning.label")))
         .add(codeMeaningTextField);
         
         optionalContainer.add(new CodeValidator(codeValueTextField, codingSchemeDesignatorTextField, 
         		codingSchemeVersionTextField, codeMeaningTextField));
        
         optionalContainer.add(new Label("institutionalDepartmentName.label", 
-        		new ResourceModel("dicom.edit.device.institutionalDepartmentName.label")))
+        		new ResourceModel("dicom.edit.device.optional.institutionalDepartmentName.label")))
         .add(new TextArea<String>("institutionalDepartmentName", institutionalDepartmentNameModel));
 
         optionalContainer.add(new Label("institutionName.label", 
-        		new ResourceModel("dicom.edit.device.institutionName.label")))
+        		new ResourceModel("dicom.edit.device.optional.institutionName.label")))
         .add(new TextArea<String>("institutionName", institutionNameModel));
 
         optionalContainer.add(new Label("issuerOfAccessionNumber.label", 
-        		new ResourceModel("dicom.edit.device.issuerOfAccessionNumber.label")))
+        		new ResourceModel("dicom.edit.device.optional.issuerOfAccessionNumber.label")))
         .add(new TextField<String>("issuerOfAccessionNumber", issuerOfAccessionNumberModel));
 
         optionalContainer.add(new Label("issuerOfAdmissionID.label", 
-        		new ResourceModel("dicom.edit.device.issuerOfAdmissionID.label")))
+        		new ResourceModel("dicom.edit.device.optional.issuerOfAdmissionID.label")))
         .add(new TextField<String>("issuerOfAdmissionID", issuerOfAdmissionIDModel));
 
         optionalContainer.add(new Label("issuerOfContainerIdentifier.label", 
-        		new ResourceModel("dicom.edit.device.issuerOfContainerIdentifier.label")))
+        		new ResourceModel("dicom.edit.device.optional.issuerOfContainerIdentifier.label")))
         .add(new TextField<String>("issuerOfContainerIdentifier", issuerOfContainerIdentifierModel));
         
         optionalContainer.add(new Label("issuerOfPatientID.label", 
-        		new ResourceModel("dicom.edit.device.issuerOfPatientID.label")))
+        		new ResourceModel("dicom.edit.device.optional.issuerOfPatientID.label")))
         .add(new TextField<String>("issuerOfPatientID", issuerOfPatientIDModel));
 
         optionalContainer.add(new Label("issuerOfServiceEpisodeID.label", 
-        		new ResourceModel("dicom.edit.device.issuerOfServiceEpisodeID.label")))
+        		new ResourceModel("dicom.edit.device.optional.issuerOfServiceEpisodeID.label")))
         .add(new TextField<String>("issuerOfServiceEpisodeID", issuerOfServiceEpisodeIDModel));
 
         optionalContainer.add(new Label("issuerOfSpecimenIdentifier.label", 
-        		new ResourceModel("dicom.edit.device.issuerOfSpecimenIdentifier.label")))
+        		new ResourceModel("dicom.edit.device.optional.issuerOfSpecimenIdentifier.label")))
         .add(new TextField<String>("issuerOfSpecimenIdentifier", issuerOfSpecimenIdentifierModel));
         
         optionalContainer.add(new Label("manufacturer.label", 
-        		new ResourceModel("dicom.edit.device.manufacturer.label")))
+        		new ResourceModel("dicom.edit.device.optional.manufacturer.label")))
         .add(new TextField<String>("manufacturer", manufacturerModel));
 
         optionalContainer.add(new Label("manufacturerModelName.label", 
-        		new ResourceModel("dicom.edit.device.manufacturerModelName.label")))
+        		new ResourceModel("dicom.edit.device.optional.manufacturerModelName.label")))
         .add(new TextField<String>("manufacturerModelName", manufacturerModelNameModel));
 
         optionalContainer.add(new Label("orderFillerIdentifier.label", 
-        		new ResourceModel("dicom.edit.device.orderFillerIdentifier.label")))
+        		new ResourceModel("dicom.edit.device.optional.orderFillerIdentifier.label")))
         .add(new TextField<String>("orderFillerIdentifier", orderFillerIdentifierModel));
 
         optionalContainer.add(new Label("orderPlacerIdentifier.label", 
-        		new ResourceModel("dicom.edit.device.orderPlacerIdentifier.label")))
+        		new ResourceModel("dicom.edit.device.optional.orderPlacerIdentifier.label")))
         .add(new TextField<String>("orderPlacerIdentifier", orderPlacerIdentifierModel));
         
         optionalContainer.add(new Label("primaryDeviceTypes.label", 
-        		new ResourceModel("dicom.edit.device.primaryDeviceTypes.label")))
+        		new ResourceModel("dicom.edit.device.optional.primaryDeviceTypes.label")))
         .add(new TextArea<String>("primaryDeviceTypes", primaryDeviceTypesModel));
 
         optionalContainer.add(new Label("softwareVersions.label", 
-        		new ResourceModel("dicom.edit.device.softwareVersions.label")))
+        		new ResourceModel("dicom.edit.device.optional.softwareVersions.label")))
         .add(new TextArea<String>("softwareVersions", softwareVersionsModel));
 
         optionalContainer.add(new Label("stationName.label", 
-        		new ResourceModel("dicom.edit.device.stationName.label")))
+        		new ResourceModel("dicom.edit.device.optional.stationName.label")))
         .add(new TextField<String>("stationName", stationNameModel));
 
-        optionalContainer.add(new Label("forwardThreads.label", new ResourceModel("dicom.edit.device.forwardThreads.label")) {
+        optionalContainer.add(new Label("forwardThreads.label", new ResourceModel("dicom.edit.device.optional.forwardThreads.label")) {
 			
 			private static final long serialVersionUID = 1L;
 
