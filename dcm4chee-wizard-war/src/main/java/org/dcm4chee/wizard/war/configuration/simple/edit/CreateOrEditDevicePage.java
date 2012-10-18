@@ -267,7 +267,7 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
         .add(new CheckBox("installed", installedModel));
 
         try {
-            form.add(new WebMarkupContainer("proxyContainer") {
+            form.add(new WebMarkupContainer("proxy") {
             	
     			private static final long serialVersionUID = 1L;
 
@@ -287,17 +287,17 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
             throw new RuntimeException(ce);
 		}
 
-        final Form<?> optionalContainer = new Form<Object>("optionalContainer");
+        final Form<?> optionalContainer = new Form<Object>("optional");
         form.add(optionalContainer
         		.setOutputMarkupId(true)
         		.setOutputMarkupPlaceholderTag(true)
         		.setVisible(false));
 
-        optionalContainer.add(new Label("description.label", new ResourceModel("dicom.edit.device.description.label")))
+        optionalContainer.add(new Label("description.label", new ResourceModel("dicom.edit.device.optional.description.label")))
         .add(new TextField<String>("description", descriptionModel));
 
-        form.add(new Label("optional.label", new ResourceModel("dicom.edit.optional.label")))
-        .add(new AjaxCheckBox("optional", new Model<Boolean>()) {
+        form.add(new Label("toggleOptional.label", new ResourceModel("dicom.edit.toggleOptional.label")))
+        .add(new AjaxCheckBox("toggleOptional", new Model<Boolean>()) {
         	
 			private static final long serialVersionUID = 1L;
 
