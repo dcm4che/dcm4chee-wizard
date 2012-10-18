@@ -681,7 +681,6 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 				                    			rowModel.getObject().getParent()); 
 				                    }
 				                });
-								editWindow.setInitialWidth(1024);
 				            	editWindow
 			            		.setWindowClosedCallback(windowClosedCallback)
 			            		.show(target);

@@ -97,8 +97,8 @@ public class ApplyTransferCapabilityProfilePage extends SecureWebPage {
     		final ConfigTreeNode aeNode) {
     	super();
 
-    	scuModel = Model.of();
-    	scpModel = Model.of();
+    	scuModel = Model.of(true);
+    	scpModel = Model.of(true);
     	groupModel = new Model<Group>();
     	profileModel = new Model<Profile>();
     	
