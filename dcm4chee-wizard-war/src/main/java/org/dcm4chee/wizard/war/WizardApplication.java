@@ -67,12 +67,14 @@ public class WizardApplication extends SecureWebApplication {
 
     private DicomConfigurationManager dicomConfigurationManager;
     private Root root;
+    private String connectedDeviceName;
     
     @Override
     protected void init() {
         super.init();
         getDicomConfigurationManager();
-        getTransferCapabilityProfiles();
+        getTransferCapabilityProfiles();       
+        connectedDeviceName = getInitParameter("deviceName");
     }
 
     public synchronized DicomConfigurationManager getDicomConfigurationManager() {
@@ -97,6 +99,10 @@ public class WizardApplication extends SecureWebApplication {
 			}
         }
 		return root;
+    }
+    
+    public String getConnectedDeviceName() {
+    	return connectedDeviceName;
     }
     
     @Override

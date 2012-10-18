@@ -98,4 +98,6 @@ public class ImageManager {
 
         public static final ResourceReference IMAGE_WIZARD_ECHO = 
                 new PackageResourceReference(ImageManager.class, "wizard/functions/echo.png");
+        public static final ResourceReference IMAGE_WIZARD_RELOAD = 
+                new PackageResourceReference(ImageManager.class, "wizard/functions/reload.png");
 }

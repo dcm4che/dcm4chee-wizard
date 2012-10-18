@@ -53,6 +53,7 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
@@ -65,6 +66,7 @@ import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
 import org.dcm4chee.proxy.conf.Schedule;
 import org.dcm4chee.wizard.common.component.ExtendedWebPage;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
+import org.dcm4chee.wizard.war.configuration.simple.model.basic.StringArrayModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ForwardRuleModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ProxyApplicationEntityModel;
 import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeNode;
@@ -90,7 +92,7 @@ public class CreateOrEditForwardRulePage extends SecureWebPage {
 
     // mandatory
 	private Model<String> commonNameModel;
-    private Model<String> destinationURIModel;
+    private StringArrayModel destinationURIModel;
 	
 	// optional
     private Model<String> callingAETitleModel;
@@ -99,7 +101,7 @@ public class CreateOrEditForwardRulePage extends SecureWebPage {
     private Model<String> scheduleDaysModel;
     private Model<String> scheduleHoursModel;
     private Model<String> useCallingAETitleModel;
-    private Model<String> sopClassModel;
+    private StringArrayModel sopClassModel;
     
     public CreateOrEditForwardRulePage(final ModalWindow window, final ForwardRuleModel forwardRuleModel, 
     		final ConfigTreeNode aeNode) {
@@ -118,25 +120,27 @@ public class CreateOrEditForwardRulePage extends SecureWebPage {
 
 		if (forwardRuleModel == null) {
 			commonNameModel = Model.of();
-		    destinationURIModel = Model.of();
+		    destinationURIModel = new StringArrayModel(null);
 		    callingAETitleModel = Model.of();
 		    dimseModel = Model.of();
 		    exclusiveUseDefinedTCModel = Model.of(false);
 		    scheduleDaysModel = Model.of();
 		    scheduleHoursModel = Model.of();
 		    useCallingAETitleModel = Model.of();
-		    sopClassModel = Model.of();
+		    sopClassModel = new StringArrayModel(null);
 		} else {
 			ForwardRule forwardRule = forwardRuleModel.getForwardRule();
 	        commonNameModel = Model.of(forwardRule.getCommonName());
-	        destinationURIModel = Model.of(forwardRule.getDestinationURI());
+	        destinationURIModel = new StringArrayModel(forwardRule.getDestinationURI()
+	        		.toArray(new String[0]));
 	        callingAETitleModel = Model.of(forwardRule.getCallingAET());
 	        dimseModel = Model.of(forwardRule.getDimse());
 	        exclusiveUseDefinedTCModel = Model.of(forwardRule.isExclusiveUseDefinedTC());
 		    scheduleDaysModel = Model.of(forwardRule.getReceiveSchedule().getDays());
 		    scheduleHoursModel = Model.of(forwardRule.getReceiveSchedule().getHours());
 		    useCallingAETitleModel = Model.of(forwardRule.getUseCallingAET());
-			sopClassModel = Model.of(forwardRule.getSopClass());		
+			sopClassModel = new StringArrayModel(forwardRule.getSopClass()
+					.toArray(new String[0]));		
 		}
 
         form.add(new Label("commonName.label", new ResourceModel("dicom.edit.forwardRule.commonName.label")))
@@ -144,7 +148,7 @@ public class CreateOrEditForwardRulePage extends SecureWebPage {
 				.add(new CommonNameValidator(commonNameModel.getObject(), proxyApplicationEntity)));
 
         form.add(new Label("destinationURI.label", new ResourceModel("dicom.edit.forwardRule.destinationURI.label")))
-        .add(new TextField<String>("destinationURI", destinationURIModel).setRequired(true)
+        .add(new TextArea<String>("destinationURI", destinationURIModel).setRequired(true)
         		.add(new DestinationURIValidator()));
 
         final WebMarkupContainer optionalContainer = new WebMarkupContainer("optionalContainer");
@@ -200,7 +204,7 @@ public class CreateOrEditForwardRulePage extends SecureWebPage {
         .add(new TextField<String>("useCallingAETitle", useCallingAETitleModel));
                 		
         optionalContainer.add(new Label("sopClass.label", new ResourceModel("dicom.edit.forwardRule.sopClass.label")))
-        .add(new TextField<String>("sopClass", sopClassModel)
+        .add(new TextArea<String>("sopClass", sopClassModel)
         		.add(new SOPClassValidator()));
 
         form.add(new Label("optional.label", new ResourceModel("dicom.edit.optional.label")))
@@ -224,7 +228,7 @@ public class CreateOrEditForwardRulePage extends SecureWebPage {
                     		new ForwardRule() : forwardRuleModel.getForwardRule();
 
             		forwardRule.setCommonName(commonNameModel.getObject());
-            		forwardRule.setDestinationURI(destinationURIModel.getObject());
+            		forwardRule.setDestinationURIs(Arrays.asList(destinationURIModel.getArray()));
             		forwardRule.setCallingAET(callingAETitleModel.getObject());
             		forwardRule.setDimse(dimseModel.getObject());
             		forwardRule.setExclusiveUseDefinedTC(exclusiveUseDefinedTCModel.getObject());
@@ -233,7 +237,7 @@ public class CreateOrEditForwardRulePage extends SecureWebPage {
             		schedule.setHours(scheduleHoursModel.getObject());
             		forwardRule.setReceiveSchedule(schedule);
             		forwardRule.setUseCallingAET(useCallingAETitleModel.getObject());
-            		forwardRule.setSopClass(sopClassModel.getObject());
+            		forwardRule.setSopClass(Arrays.asList(sopClassModel.getArray()));
                     		
             		if (forwardRuleModel == null)
             			proxyApplicationEntity.getForwardRules().add(forwardRule);

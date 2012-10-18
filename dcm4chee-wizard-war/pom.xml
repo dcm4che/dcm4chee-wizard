@@ -16,6 +16,7 @@
     <wicket.security.version>1.5.5</wicket.security.version>
     <dcm4chee.proxy.version>1.0.0-SNAPSHOT</dcm4chee.proxy.version>
     <dcm4che.version>3.0.0</dcm4che.version>
+    <device-name>dcm4chee-proxy</device-name>
   </properties>
   <profiles>
     <profile>

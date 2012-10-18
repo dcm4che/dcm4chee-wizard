@@ -92,6 +92,7 @@ import org.dcm4chee.wizard.common.behavior.TooltipBehavior;
 import org.dcm4chee.wizard.common.component.ConfirmationWindow;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
 import org.dcm4chee.wizard.common.component.MessageWindow;
+import org.dcm4chee.wizard.war.WizardApplication;
 import org.dcm4chee.wizard.war.common.component.ExtendedPanel;
 import org.dcm4chee.wizard.war.configuration.model.source.DicomConfigurationSourceModel;
 import org.dcm4chee.wizard.war.configuration.simple.edit.ApplyTransferCapabilityProfilePage;
@@ -137,15 +138,22 @@ public class BasicConfigurationPanel extends ExtendedPanel {
     private ModalWindow echoWindow;
     private ConfirmationWindow<ConfigTreeNode> removeConfirmation;
     private MessageWindow refreshMessage;
+    private MessageWindow reloadMessage;
     public WindowClosedCallback windowClosedCallback;
 
     List<IColumn<ConfigTreeNode>> deviceColumns;
     TableTree<ConfigTreeNode> configTree;
 
+    private String connectedDeviceName;
+    
     public BasicConfigurationPanel(final String id) {
         super(id);
 
         try {
+        	connectedDeviceName = 
+        			((WizardApplication) this.getApplication()).getConnectedDeviceName();
+        	add(new Label("reload-message"));
+        	
 	        add(new AbstractAjaxTimerBehavior(Duration.seconds(
 	        		Integer.parseInt(((WebApplication) 
         			this.getApplication()).getInitParameter("CheckForChangesInterval")))) {
@@ -390,6 +398,53 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 		        }
 			}
 		});
+
+		if (connectedDeviceName != null)
+			deviceColumns.add(new AbstractColumn<ConfigTreeNode>(Model.of("Send")) {
+	
+				private static final long serialVersionUID = 1L;
+	
+				public void populateItem(final Item<ICellPopulator<ConfigTreeNode>> cellItem, final String componentId, 
+						final IModel<ConfigTreeNode> rowModel) {
+					
+					final TreeNodeType type = rowModel.getObject().getNodeType();
+					if (type == null)
+						throw new RuntimeException("Error: Unknown node type, cannot create edit modal window");
+	
+					if (!type.equals(ConfigTreeNode.TreeNodeType.DEVICE) || 
+							!connectedDeviceName.equals(rowModel.getObject().getName())) {
+						cellItem.add(new Label(componentId));
+						return;
+					}
+						
+					AjaxLink<Object> ajaxLink = 
+							new AjaxLink<Object>("wickettree.link") { 
+	
+				            private static final long serialVersionUID = 1L;
+	
+				            @Override
+				            public void onClick(AjaxRequestTarget target) {
+
+				            	reloadMessage = new MessageWindow("reload-message", 
+				                		new StringResourceModel("dicom.confirmReload", this, null)) {
+
+				                    private static final long serialVersionUID = 1L;
+
+				                    @Override
+				                    public void onOk(AjaxRequestTarget target) {
+				                        log.info("Reloading configuration for connected device");
+				                    }
+				                };
+				                BasicConfigurationPanel.this.
+				                	addOrReplace(reloadMessage.setInitialHeight(150)
+				                		.setWindowClosedCallback(windowClosedCallback));
+				                reloadMessage.show(target);
+				            }
+					};
+					cellItem.add(new LinkPanel(componentId, ajaxLink, ImageManager.IMAGE_WIZARD_RELOAD, reloadMessage))
+						.add(new AttributeAppender("style", Model.of("width: 50px; text-align: center;")));
+				}
+			});
 
 		deviceColumns.add(new AbstractColumn<ConfigTreeNode>(Model.of("Echo")) {
 

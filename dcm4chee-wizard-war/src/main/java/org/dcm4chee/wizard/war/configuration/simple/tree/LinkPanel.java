@@ -49,7 +49,6 @@ import org.apache.wicket.request.resource.ResourceReference;
 import org.dcm4chee.icons.ImageManager;
 import org.dcm4chee.icons.behaviours.ImageSizeBehaviour;
 import org.dcm4chee.wizard.common.behavior.TooltipBehavior;
-import org.dcm4chee.wizard.common.component.ConfirmationWindow;
 
 /**
  * @author Robert David <robert.david@agfa.com>
@@ -81,7 +80,7 @@ public class LinkPanel extends Panel {
 		add(new AttributeAppender("style", Model.of("width: 50px; text-align: center;")));
 	}
 
-	public LinkPanel(String id, AjaxLink<?> ajaxLink, ResourceReference linkIcon, ConfirmationWindow<?> confirmationWindow) {
+	public LinkPanel(String id, AjaxLink<?> ajaxLink, ResourceReference linkIcon, ModalWindow confirmationWindow) {
 		super(id);
 
 		this.modalWindow = confirmationWindow;
