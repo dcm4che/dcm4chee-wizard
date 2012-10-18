@@ -39,6 +39,9 @@
 package org.dcm4chee.wizard.war.configuration.simple.edit;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
@@ -126,8 +129,16 @@ public class ApplyTransferCapabilityProfilePage extends SecureWebPage {
         .add(new CheckBox("scp", scpModel));
 
         form.add(new Label("group.label", new ResourceModel("dicom.edit.transferCapability.profile.group.label")));
+        
+        List<Group> groups = root.getTransferCapabilityGroups();
+		Collections.sort(groups, new Comparator<Group>() {
+			public int compare(Group group1, Group group2) {
+				return group1.getName().compareToIgnoreCase(group2.getName());
+			}
+		});
+
         final DropDownChoice<Group> groupDropDown = 
-        		new DropDownChoice<Group>("group", groupModel, root.getTransferCapabilityGroups(), 
+        		new DropDownChoice<Group>("group", groupModel, groups, 
         				new IChoiceRenderer<Group>() {
 
 							private static final long serialVersionUID = 1L;
@@ -147,7 +158,7 @@ public class ApplyTransferCapabilityProfilePage extends SecureWebPage {
         final DropDownChoice<Profile> profileDropDown = 
         		new DropDownChoice<Profile>("profile", profileModel, 
         				root.getTransferCapabilityGroups().size() <= 0 ? new ArrayList<Profile>() : 
-        					root.getTransferCapabilityGroups().get(0).getTransferCapabilityProfiles(), 
+        					orderedProfiles(root.getTransferCapabilityGroups().get(0)), 
         				new IChoiceRenderer<Profile>() {
 
 							private static final long serialVersionUID = 1L;
@@ -179,8 +190,9 @@ public class ApplyTransferCapabilityProfilePage extends SecureWebPage {
                 for (Group group : root.getTransferCapabilityGroups())
                 	if (groupName.equals(group.getName()) && group.getTransferCapabilityProfiles().size() > 0) {
                 		profileDropDown
-                			.setChoices(group.getTransferCapabilityProfiles());
-        				profileModel.setObject(group.getTransferCapabilityProfiles().get(0));
+                			.setChoices(orderedProfiles(group));
+                		if (profileDropDown.getChoices().size() > 0)
+                        	profileModel.setObject(profileDropDown.getChoices().get(0));
         				profileDropDown.setEnabled(true);
                 	}
                 target.add(form);
@@ -251,5 +263,15 @@ public class ApplyTransferCapabilityProfilePage extends SecureWebPage {
     public void renderHead(IHeaderResponse response) {
         if (ApplyTransferCapabilityProfilePage.BaseCSS != null)
         	response.renderCSSReference(ApplyTransferCapabilityProfilePage.BaseCSS);
+    }
+    
+    private List<Profile> orderedProfiles(Group group) {
+		List<Profile> profiles = group.getTransferCapabilityProfiles();
+		Collections.sort(profiles, new Comparator<Profile>() {
+			public int compare(Profile profile1, Profile profile2) {
+				return profile1.name.compareToIgnoreCase(profile2.name);
+			}
+		});
+		return profiles;
     }
  }
