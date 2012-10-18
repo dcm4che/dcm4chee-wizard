@@ -52,7 +52,7 @@ public class DestinationAETitleValidator extends StringValidator {
     private static final long serialVersionUID = 1L;
 
     private String ignore;
-    private transient HashMap<String,Schedule> forwardSchedules;
+    private HashMap<String,Schedule> forwardSchedules;
     
     public DestinationAETitleValidator(String ignore, HashMap<String,Schedule> forwardSchedules) {
     	this.ignore = ignore;

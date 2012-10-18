@@ -52,7 +52,7 @@ public class RetrySuffixValidator extends StringValidator {
     private static final long serialVersionUID = 1L;
 
     private String ignore;
-    private transient List<Retry> retries;
+    private List<Retry> retries;
     
     public RetrySuffixValidator(String ignore, List<Retry> retries) {
     	this.ignore = ignore;

@@ -51,7 +51,7 @@ public class CommonNameValidator extends StringValidator {
     private static final long serialVersionUID = 1L;
 
     private String ignore;
-	private transient ProxyApplicationEntity applicationEntity;
+	private ProxyApplicationEntity applicationEntity;
     
     public CommonNameValidator(String ignore, ProxyApplicationEntity applicationEntity) {
     	this.ignore = ignore;
