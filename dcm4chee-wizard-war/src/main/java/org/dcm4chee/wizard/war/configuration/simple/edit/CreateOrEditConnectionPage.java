@@ -206,17 +206,17 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
         		.add(new HostnameValidator())
         		.setRequired(true));
 
-        final WebMarkupContainer optionalContainer = new WebMarkupContainer("optionalContainer");
+        final WebMarkupContainer optionalContainer = new WebMarkupContainer("optional");
         form.add(optionalContainer
         		.setOutputMarkupId(true)
         		.setOutputMarkupPlaceholderTag(true)
         		.setVisible(false));
         
         TextField<String> commonNameTextField;
-		optionalContainer.add(new Label("commonName.label", new ResourceModel("dicom.edit.connection.commonName.label")))
+		optionalContainer.add(new Label("commonName.label", new ResourceModel("dicom.edit.connection.optional.commonName.label")))
         .add(commonNameTextField = new TextField<String>("commonName", commonNameModel));
 
-        optionalContainer.add(new Label("installed.label", new ResourceModel("dicom.edit.connection.installed.label")))
+        optionalContainer.add(new Label("installed.label", new ResourceModel("dicom.edit.connection.optional.installed.label")))
         .add(new DropDownChoice<Boolean>("installed", installedModel, 
         		  Arrays.asList(new Boolean[] { new Boolean(true), new Boolean(false) }), 
         		  new IChoiceRenderer<Boolean>() {
@@ -236,110 +236,110 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
         	
 
         FormComponent<Integer> portTextField;
-		optionalContainer.add(new Label("port.label", new ResourceModel("dicom.edit.connection.port.label")))
+		optionalContainer.add(new Label("port.label", new ResourceModel("dicom.edit.connection.optional.port.label")))
         .add(portTextField = new TextField<Integer>("port", portModel)
         		.setType(Integer.class)
         		.add(new RangeValidator<Integer>(1,65535)));
 
-        optionalContainer.add(new Label("tlsCipherSuites.label", new ResourceModel("dicom.edit.connection.tlsCipherSuites.label")))
+        optionalContainer.add(new Label("tlsCipherSuites.label", new ResourceModel("dicom.edit.connection.optional.tlsCipherSuites.label")))
         .add(new TextArea<String>("tlsCipherSuites", tlsCipherSuitesModel));
 
-        optionalContainer.add(new Label("httpProxy.label", new ResourceModel("dicom.edit.connection.httpProxy.label")))
+        optionalContainer.add(new Label("httpProxy.label", new ResourceModel("dicom.edit.connection.optional.httpProxy.label")))
         .add(new TextField<String>("httpProxy", httpProxyModel)
         		.add(new HostnameValidator()));
         
-        optionalContainer.add(new Label("tlsNeedClientAuth.label", new ResourceModel("dicom.edit.connection.tlsNeedClientAuth.label")))
+        optionalContainer.add(new Label("tlsNeedClientAuth.label", new ResourceModel("dicom.edit.connection.optional.tlsNeedClientAuth.label")))
         .add(new CheckBox("tlsNeedClientAuth", tlsNeedClientAuthModel));
 
-        optionalContainer.add(new Label("tlsProtocol.label", new ResourceModel("dicom.edit.connection.tlsProtocol.label")))
+        optionalContainer.add(new Label("tlsProtocol.label", new ResourceModel("dicom.edit.connection.optional.tlsProtocol.label")))
         .add(new TextArea<String>("tlsProtocol", tlsProtocolModel));
 
-        optionalContainer.add(new Label("tcpBacklog.label", new ResourceModel("dicom.edit.connection.tcpBacklog.label")))
+        optionalContainer.add(new Label("tcpBacklog.label", new ResourceModel("dicom.edit.connection.optional.tcpBacklog.label")))
         .add(new TextField<Integer>("tcpBacklog", tcpBacklogModel)
         		.setType(Integer.class)
         		.add(new RangeValidator<Integer>(0,Integer.MAX_VALUE)));
 
-        optionalContainer.add(new Label("tcpConnectTimeout.label", new ResourceModel("dicom.edit.connection.tcpConnectTimeout.label")))
+        optionalContainer.add(new Label("tcpConnectTimeout.label", new ResourceModel("dicom.edit.connection.optional.tcpConnectTimeout.label")))
         .add(new TextField<Integer>("tcpConnectTimeout", tcpConnectTimeoutModel)
         		.setType(Integer.class)
         		.add(new RangeValidator<Integer>(0,Integer.MAX_VALUE)));
 
-        optionalContainer.add(new Label("tcpCloseDelay.label", new ResourceModel("dicom.edit.connection.tcpCloseDelay.label")))
+        optionalContainer.add(new Label("tcpCloseDelay.label", new ResourceModel("dicom.edit.connection.optional.tcpCloseDelay.label")))
         .add(new TextField<Integer>("tcpCloseDelay", tcpCloseDelayModel)
         		.setType(Integer.class)
         		.add(new RangeValidator<Integer>(0,Integer.MAX_VALUE)));
 
-        optionalContainer.add(new Label("tcpSendBufferSize.label", new ResourceModel("dicom.edit.connection.tcpSendBufferSize.label")))
+        optionalContainer.add(new Label("tcpSendBufferSize.label", new ResourceModel("dicom.edit.connection.optional.tcpSendBufferSize.label")))
         .add(new TextField<Integer>("tcpSendBufferSize", tcpSendBufferSizeModel)
         		.setType(Integer.class)
         		.add(new RangeValidator<Integer>(0,Integer.MAX_VALUE)));
         
-        optionalContainer.add(new Label("tcpReceiveBufferSize.label", new ResourceModel("dicom.edit.connection.tcpReceiveBufferSize.label")))
+        optionalContainer.add(new Label("tcpReceiveBufferSize.label", new ResourceModel("dicom.edit.connection.optional.tcpReceiveBufferSize.label")))
         .add(new TextField<Integer>("tcpReceiveBufferSize", tcpReceiveBufferSizeModel)
         		.setType(Integer.class)
         		.add(new RangeValidator<Integer>(0,Integer.MAX_VALUE)));
         
-        optionalContainer.add(new Label("tcpNoDelay.label", new ResourceModel("dicom.edit.connection.tcpNoDelay.label")))
+        optionalContainer.add(new Label("tcpNoDelay.label", new ResourceModel("dicom.edit.connection.optional.tcpNoDelay.label")))
         .add(new CheckBox("tcpNoDelay", tcpNoDelayModel));
 
-        optionalContainer.add(new Label("blacklistedHostname.label", new ResourceModel("dicom.edit.connection.blacklistedHostname.label")))
+        optionalContainer.add(new Label("blacklistedHostname.label", new ResourceModel("dicom.edit.connection.optional.blacklistedHostname.label")))
         .add(new TextArea<String>("blacklistedHostname", blacklistedHostnameModel));
 
-        optionalContainer.add(new Label("sendPDULength.label", new ResourceModel("dicom.edit.connection.sendPDULength.label")))
+        optionalContainer.add(new Label("sendPDULength.label", new ResourceModel("dicom.edit.connection.optional.sendPDULength.label")))
         .add(new TextField<Integer>("sendPDULength", sendPDULengthModel)
         		.setType(Integer.class)
         		.add(new RangeValidator<Integer>(0,Integer.MAX_VALUE)));
         
-        optionalContainer.add(new Label("receivePDULength.label", new ResourceModel("dicom.edit.connection.receivePDULength.label")))
+        optionalContainer.add(new Label("receivePDULength.label", new ResourceModel("dicom.edit.connection.optional.receivePDULength.label")))
         .add(new TextField<Integer>("receivePDULength", receivePDULengthModel)
         		.setType(Integer.class)
         		.add(new RangeValidator<Integer>(0,Integer.MAX_VALUE)));
 
-        optionalContainer.add(new Label("maxOpsPerformed.label", new ResourceModel("dicom.edit.connection.maxOpsPerformed.label")))
+        optionalContainer.add(new Label("maxOpsPerformed.label", new ResourceModel("dicom.edit.connection.optional.maxOpsPerformed.label")))
         .add(new TextField<Integer>("maxOpsPerformed", maxOpsPerformedModel)
         		.setType(Integer.class)
         		.add(new RangeValidator<Integer>(0,Integer.MAX_VALUE)));
 
-        optionalContainer.add(new Label("maxOpsInvoked.label", new ResourceModel("dicom.edit.connection.maxOpsInvoked.label")))
+        optionalContainer.add(new Label("maxOpsInvoked.label", new ResourceModel("dicom.edit.connection.optional.maxOpsInvoked.label")))
         .add(new TextField<Integer>("maxOpsInvoked", maxOpsInvokedModel)
         		.setType(Integer.class)
         		.add(new RangeValidator<Integer>(0,Integer.MAX_VALUE)));
 
-        optionalContainer.add(new Label("packPDV.label", new ResourceModel("dicom.edit.connection.packPDV.label")))
+        optionalContainer.add(new Label("packPDV.label", new ResourceModel("dicom.edit.connection.optional.packPDV.label")))
         .add(new CheckBox("packPDV", packPDVModel));
 
-        optionalContainer.add(new Label("aarqTimeout.label", new ResourceModel("dicom.edit.connection.aarqTimeout.label")))
+        optionalContainer.add(new Label("aarqTimeout.label", new ResourceModel("dicom.edit.connection.optional.aarqTimeout.label")))
         .add(new TextField<Integer>("aarqTimeout", aarqTimeoutModel)
         		.setType(Integer.class)
         		.add(new RangeValidator<Integer>(0,Integer.MAX_VALUE)));
 
-        optionalContainer.add(new Label("aaacTimeout.label", new ResourceModel("dicom.edit.connection.aaacTimeout.label")))
+        optionalContainer.add(new Label("aaacTimeout.label", new ResourceModel("dicom.edit.connection.optional.aaacTimeout.label")))
         .add(new TextField<Integer>("aaacTimeout", aaacTimeoutModel)
         		.setType(Integer.class)
         		.add(new RangeValidator<Integer>(0,Integer.MAX_VALUE)));
 
-        optionalContainer.add(new Label("arrpTimeout.label", new ResourceModel("dicom.edit.connection.arrpTimeout.label")))
+        optionalContainer.add(new Label("arrpTimeout.label", new ResourceModel("dicom.edit.connection.optional.arrpTimeout.label")))
         .add(new TextField<Integer>("arrpTimeout", arrpTimeoutModel)
         		.setType(Integer.class)
         		.add(new RangeValidator<Integer>(0,Integer.MAX_VALUE)));
 
-        optionalContainer.add(new Label("responseTimeout.label", new ResourceModel("dicom.edit.connection.responseTimeout.label")))
+        optionalContainer.add(new Label("responseTimeout.label", new ResourceModel("dicom.edit.connection.optional.responseTimeout.label")))
         .add(new TextField<Integer>("responseTimeout", responseTimeoutModel)
         		.setType(Integer.class)
         		.add(new RangeValidator<Integer>(0,Integer.MAX_VALUE)));
 
-        optionalContainer.add(new Label("retrieveTimeout.label", new ResourceModel("dicom.edit.connection.retrieveTimeout.label")))
+        optionalContainer.add(new Label("retrieveTimeout.label", new ResourceModel("dicom.edit.connection.optional.retrieveTimeout.label")))
         .add(new TextField<Integer>("retrieveTimeout", retrieveTimeoutModel)
         		.setType(Integer.class)
         		.add(new RangeValidator<Integer>(0,Integer.MAX_VALUE)));
         
-        optionalContainer.add(new Label("idleTimeout.label", new ResourceModel("dicom.edit.connection.idleTimeout.label")))
+        optionalContainer.add(new Label("idleTimeout.label", new ResourceModel("dicom.edit.connection.optional.idleTimeout.label")))
         .add(new TextField<Integer>("idleTimeout", idleTimeoutModel)
         		.setType(Integer.class)
         		.add(new RangeValidator<Integer>(0,Integer.MAX_VALUE)));
 
-        form.add(new Label("optional.label", new ResourceModel("dicom.edit.optional.label")))
-        .add(new AjaxCheckBox("optional", new Model<Boolean>()) {
+        form.add(new Label("toggleOptional.label", new ResourceModel("dicom.edit.toggleOptional.label")))
+        .add(new AjaxCheckBox("toggleOptional", new Model<Boolean>()) {
 			private static final long serialVersionUID = 1L;
 
 			@Override

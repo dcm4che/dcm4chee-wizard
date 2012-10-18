@@ -222,7 +222,7 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
         		}).add(new ConnectionReferenceValidator()));
 
         WebMarkupContainer proxyContainer = 
-	        new WebMarkupContainer("proxyContainer") {
+	        new WebMarkupContainer("proxy") {
 	        	
 				private static final long serialVersionUID = 1L;
 	
@@ -233,35 +233,35 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
 	        };
         form.add(proxyContainer);
         
-        proxyContainer.add(new Label("acceptDataOnFailedNegotiation.label", new ResourceModel("dicom.edit.applicationEntity.acceptDataOnFailedNegotiation.label"))
+        proxyContainer.add(new Label("acceptDataOnFailedNegotiation.label", new ResourceModel("dicom.edit.applicationEntity.proxy.acceptDataOnFailedNegotiation.label"))
         	.setVisible(isProxy))
         .add(new CheckBox("acceptDataOnFailedNegotiation", acceptDataOnFailedNegotiationModel)
         	.setVisible(isProxy));
 
-        proxyContainer.add(new Label("enableAuditLog.label", new ResourceModel("dicom.edit.applicationEntity.enableAuditLog.label"))
+        proxyContainer.add(new Label("enableAuditLog.label", new ResourceModel("dicom.edit.applicationEntity.proxy.enableAuditLog.label"))
     		.setVisible(isProxy))
     	.add(new CheckBox("enableAuditLog", enableAuditLogModel)
     		.setVisible(isProxy));
 
-        proxyContainer.add(new Label("spoolDirectory.label", new ResourceModel("dicom.edit.applicationEntity.spoolDirectory.label"))
+        proxyContainer.add(new Label("spoolDirectory.label", new ResourceModel("dicom.edit.applicationEntity.proxy.spoolDirectory.label"))
     		.setVisible(isProxy))
     	.add(new TextField<String>("spoolDirectory", spoolDirectoryModel)
     		.setRequired(true)
     		.setVisible(isProxy));      
         
-        final WebMarkupContainer optionalContainer = new WebMarkupContainer("optionalContainer");
+        final WebMarkupContainer optionalContainer = new WebMarkupContainer("optional");
         form.add(optionalContainer
         		.setOutputMarkupId(true)
         		.setOutputMarkupPlaceholderTag(true)
         		.setVisible(false));
         
-        optionalContainer.add(new Label("applicationClusters.label", new ResourceModel("dicom.edit.applicationEntity.applicationClusters.label")))
+        optionalContainer.add(new Label("applicationClusters.label", new ResourceModel("dicom.edit.applicationEntity.optional.applicationClusters.label")))
         .add(new TextArea<String>("applicationClusters", applicationClustersModel));
         
-        optionalContainer.add(new Label("description.label", new ResourceModel("dicom.edit.applicationEntity.description.label")))
+        optionalContainer.add(new Label("description.label", new ResourceModel("dicom.edit.applicationEntity.optional.description.label")))
         .add(new TextField<String>("description", descriptionModel));
 
-        optionalContainer.add(new Label("installed.label", new ResourceModel("dicom.edit.connection.installed.label")))
+        optionalContainer.add(new Label("installed.label", new ResourceModel("dicom.edit.applicationEntity.optional.installed.label")))
         .add(new DropDownChoice<Boolean>("installed", installedModel, 
         		  Arrays.asList(new Boolean[] { new Boolean(true), new Boolean(false) }), 
         		  new IChoiceRenderer<Boolean>() {
@@ -279,21 +279,21 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
 					}
         		}).setNullValid(true));
 
-        optionalContainer.add(new Label("calledAETitles.label", new ResourceModel("dicom.edit.applicationEntity.calledAETitles.label")))
+        optionalContainer.add(new Label("calledAETitles.label", new ResourceModel("dicom.edit.applicationEntity.optional.calledAETitles.label")))
         .add(new TextArea<String>("calledAETitles", calledAETitlesModel));
 
-        optionalContainer.add(new Label("callingAETitles.label", new ResourceModel("dicom.edit.applicationEntity.callingAETitles.label")))
+        optionalContainer.add(new Label("callingAETitles.label", new ResourceModel("dicom.edit.applicationEntity.optional.callingAETitles.label")))
         .add(new TextArea<String>("callingAETitles", callingAETitlesModel));
 
-        optionalContainer.add(new Label("supportedCharacterSets.label", new ResourceModel("dicom.edit.applicationEntity.supportedCharacterSets.label")))
+        optionalContainer.add(new Label("supportedCharacterSets.label", new ResourceModel("dicom.edit.applicationEntity.optional.supportedCharacterSets.label")))
         .add(new TextArea<String>("supportedCharacterSets", supportedCharacterSetsModel));
     	
     	optionalContainer.add(new Label("vendorData.label", 
-    			new ResourceModel("dicom.edit.applicationEntity.vendorData.label")))
+    			new ResourceModel("dicom.edit.applicationEntity.optional.vendorData.label")))
     	.add(new Label("vendorData", vendorDataModel));
     	
-        form.add(new Label("optional.label", new ResourceModel("dicom.edit.optional.label")))
-        .add(new AjaxCheckBox("optional", new Model<Boolean>()) {
+        form.add(new Label("toggleOptional.label", new ResourceModel("dicom.edit.toggleOptional.label")))
+        .add(new AjaxCheckBox("toggleOptional", new Model<Boolean>()) {
 			private static final long serialVersionUID = 1L;
 
 			@Override
