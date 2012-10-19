@@ -138,7 +138,7 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
         	if (deviceModel == null) {
         		typeModel = Model.of(ConfigTreeProvider.ConfigurationType.Basic);
     			deviceNameModel = Model.of();
-    			installedModel = Model.of(false);
+    			installedModel = Model.of(true);
     			schedulerIntervalModel = Model.of(ProxyDevice.DEFAULT_SCHEDULER_INTERVAL);
     			descriptionModel = Model.of();
     			deviceSerialNumberModel = Model.of();
