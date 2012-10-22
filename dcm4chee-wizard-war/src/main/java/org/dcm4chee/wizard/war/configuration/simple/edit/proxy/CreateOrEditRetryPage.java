@@ -36,14 +36,12 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.wizard.war.configuration.simple.edit;
+package org.dcm4chee.wizard.war.configuration.simple.edit.proxy;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.ArrayList;
 
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.ajax.markup.html.form.AjaxFallbackButton;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.html.IHeaderResponse;
@@ -51,22 +49,22 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.resource.CssResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
-import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
-import org.dcm4chee.proxy.conf.Schedule;
+import org.dcm4chee.proxy.conf.Retry;
+import org.dcm4chee.proxy.conf.RetryObject;
 import org.dcm4chee.wizard.common.component.ExtendedWebPage;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
-import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ForwardScheduleModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ProxyApplicationEntityModel;
+import org.dcm4chee.wizard.war.configuration.simple.model.proxy.RetryModel;
 import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeNode;
 import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider;
-import org.dcm4chee.wizard.war.configuration.simple.validator.DestinationAETitleValidator;
-import org.dcm4chee.wizard.war.configuration.simple.validator.ScheduleValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wicketstuff.security.components.SecureWebPage;
@@ -74,83 +72,77 @@ import org.wicketstuff.security.components.SecureWebPage;
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-public class CreateOrEditForwardSchedulePage extends SecureWebPage {
+public class CreateOrEditRetryPage extends SecureWebPage {
     
     private static final long serialVersionUID = 1L;
 
-    private static Logger log = LoggerFactory.getLogger(CreateOrEditForwardSchedulePage.class);
+    private static Logger log = LoggerFactory.getLogger(CreateOrEditRetryPage.class);
 
     private static final ResourceReference BaseCSS = new CssResourceReference(ExtendedWebPage.class, "base-style.css");
     
     // mandatory
-	private Model<String> destinationAETitleModel;
-	
-	// optional
-	private Model<String> scheduleDaysModel;
-	private Model<String> scheduleHoursModel;
+	private IModel<RetryObject> suffixModel;
+    private Model<Integer> delayModel;
+	private Model<Integer> retriesModel;
     
-    public CreateOrEditForwardSchedulePage(final ModalWindow window, final ForwardScheduleModel forwardScheduleModel, 
+    public CreateOrEditRetryPage(final ModalWindow window, final RetryModel retryModel, 
     		final ConfigTreeNode aeNode) {
     	super();
 
     	final ProxyApplicationEntity proxyApplicationEntity = 
     			((ProxyApplicationEntityModel) aeNode.getModel()).getApplicationEntity();
 
-        add(new WebMarkupContainer("create-forwardSchedule-title").setVisible(forwardScheduleModel == null));
-        add(new WebMarkupContainer("edit-forwardSchedule-title").setVisible(forwardScheduleModel != null));
+        add(new WebMarkupContainer("create-retry-title").setVisible(retryModel == null));
+        add(new WebMarkupContainer("edit-retry-title").setVisible(retryModel != null));
 
         setOutputMarkupId(true);
         final ExtendedForm form = new ExtendedForm("form");
-        form.setResourceIdPrefix("dicom.edit.forwardSchedule.");
+        form.setResourceIdPrefix("dicom.edit.retry.");
         add(form);
 
-        List<String> uniqueAETitles = null;
-		try {
-			uniqueAETitles = Arrays.asList(ConfigTreeProvider.get().getUniqueAETitles());
-		} catch (ConfigurationException ce) {
-			log.error(this.getClass().toString() + ": " + "Error retrieving unique ae titles: " + ce.getMessage());
-            log.debug("Exception", ce);
-            throw new RuntimeException(ce);
-		}
-        Collections.sort(uniqueAETitles);
+        if (retryModel == null) {
+    		suffixModel = Model.of(RetryObject.AAssociateRJ);
+    		delayModel = Model.of(Retry.DEFAULT_DELAY);
+    		retriesModel = Model.of(Retry.DEFAULT_RETRIES);
+        } else {
+			suffixModel = Model.of(retryModel.getRetry().getRetryObject());
+			delayModel = Model.of(retryModel.getRetry().getDelay());
+			retriesModel = Model.of(retryModel.getRetry().getNumberOfRetries());
+        }
 
-		destinationAETitleModel = Model.of(forwardScheduleModel != null ? 
-				forwardScheduleModel.getDestinationAETitle() : uniqueAETitles.get(0));
-        scheduleDaysModel = Model.of(forwardScheduleModel != null ? forwardScheduleModel.getSchedule().getDays() : null);
-        scheduleHoursModel = Model.of(forwardScheduleModel != null ? forwardScheduleModel.getSchedule().getHours() : null);
-        
-        form.add(new Label("destinationAETitle.label", new ResourceModel("dicom.edit.forwardSchedule.destinationAETitle.label")))
-        .add(new DropDownChoice<String>("destinationAETitle", destinationAETitleModel, uniqueAETitles)
-        		.setNullValid(false)
+        form.add(new Label("suffix.label", new ResourceModel("dicom.edit.retry.suffix.label")));
+        final ArrayList<RetryObject> suffixValueList = new ArrayList<RetryObject>();
+        ArrayList<String> suffixDisplayList = new ArrayList<String>();
+        for (RetryObject suffix : RetryObject.values()) {
+        	suffixValueList.add(suffix);
+        	suffixDisplayList.add(suffix.getRetryNote());
+        }       	
+		DropDownChoice<RetryObject> suffixDropDown = 
+        		new DropDownChoice<RetryObject>("suffix", suffixModel, suffixValueList, new IChoiceRenderer<Object>() {
+ 
+					private static final long serialVersionUID = 1L;
+
+					public String getDisplayValue(Object object) {
+						return ((RetryObject) object).getRetryNote();
+					}
+
+					public String getIdValue(Object object, int index) {
+						return object.toString();
+					}
+        		});
+        form.add(suffixDropDown
+        		.setNullValid(false));
+
+        form.add(new Label("delay.label", new ResourceModel("dicom.edit.retry.delay.label")))
+        .add(new TextField<Integer>("delay", delayModel)
+        		.setType(Integer.class)
         		.setRequired(true)
-        		.add(new DestinationAETitleValidator(
-        				destinationAETitleModel.getObject(), proxyApplicationEntity.getForwardSchedules())));
-        
-        final WebMarkupContainer optionalContainer = new WebMarkupContainer("optionalContainer");
-        form.add(optionalContainer
-        		.setOutputMarkupId(true)
-        		.setOutputMarkupPlaceholderTag(true)
-        		.setVisible(false));
+        		.add(new AttributeModifier("title", new ResourceModel("dicom.edit.retry.delay.tooltip"))));
 
-        optionalContainer.add(new Label("scheduleDays.label", new ResourceModel("dicom.edit.forwardSchedule.scheduleDays.label")))
-        .add(new TextField<String>("scheduleDays", scheduleDaysModel)
-        		.add(new ScheduleValidator(ScheduleValidator.Type.DAYS)));
+        form.add(new Label("retries.label", new ResourceModel("dicom.edit.retry.retries.label")))
+        .add(new TextField<Integer>("retries", retriesModel)
+        		.setType(Integer.class).setRequired(true));
 
-        optionalContainer.add(new Label("scheduleHours.label", new ResourceModel("dicom.edit.forwardSchedule.scheduleHours.label")))
-        .add(new TextField<String>("scheduleHours", scheduleHoursModel)
-        		.add(new ScheduleValidator(ScheduleValidator.Type.HOURS)));
-
-        form.add(new Label("optional.label", new ResourceModel("dicom.edit.optional.label")))
-        .add(new AjaxCheckBox("optional", new Model<Boolean>(true)) {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			protected void onUpdate(AjaxRequestTarget target) {
-				target.add(optionalContainer.setVisible(this.getModelObject()));
-			}
-        });
-        optionalContainer.setVisible(true);
-        		
         form.add(new AjaxFallbackButton("submit", new ResourceModel("saveBtn"), form) {
 
             private static final long serialVersionUID = 1L;
@@ -158,22 +150,19 @@ public class CreateOrEditForwardSchedulePage extends SecureWebPage {
             @Override
             protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
                 try {
-                	Schedule schedule = forwardScheduleModel == null ? 
-                			new Schedule() : forwardScheduleModel.getSchedule();
-                	schedule.setDays(scheduleDaysModel.getObject());
-                	schedule.setHours(scheduleHoursModel.getObject());
+                	Retry retry = new Retry(
+                			suffixModel.getObject(),
+                			delayModel.getObject(),
+                			retriesModel.getObject());
 
-                    if (forwardScheduleModel != null)
-                    	proxyApplicationEntity.getForwardSchedules()
-                    		.remove(forwardScheduleModel.getDestinationAETitle());
-                    
-                    proxyApplicationEntity.getForwardSchedules()
-                    	.put(destinationAETitleModel.getObject(), schedule);
+            		if (retryModel != null)
+            			proxyApplicationEntity.getRetries().remove(retryModel.getRetry());
+            		proxyApplicationEntity.getRetries().add(retry);
 
             		ConfigTreeProvider.get().mergeDevice(proxyApplicationEntity.getDevice());
                     window.close(target);
                 } catch (Exception e) {
-        			log.error(this.getClass().toString() + ": " + "Error modifying forward schedule: " + e.getMessage());
+        			log.error(this.getClass().toString() + ": " + "Error modifying retry: " + e.getMessage());
                     log.debug("Exception", e);
                     throw new RuntimeException(e);
                 }
@@ -201,7 +190,7 @@ public class CreateOrEditForwardSchedulePage extends SecureWebPage {
 
 	@Override
     public void renderHead(IHeaderResponse response) {
-        if (CreateOrEditForwardSchedulePage.BaseCSS != null)
-        	response.renderCSSReference(CreateOrEditForwardSchedulePage.BaseCSS);
+        if (CreateOrEditRetryPage.BaseCSS != null)
+        	response.renderCSSReference(CreateOrEditRetryPage.BaseCSS);
     }
  }

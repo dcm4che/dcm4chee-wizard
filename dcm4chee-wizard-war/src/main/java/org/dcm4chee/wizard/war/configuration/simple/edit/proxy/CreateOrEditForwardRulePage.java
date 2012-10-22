@@ -36,7 +36,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.wizard.war.configuration.simple.edit;
+package org.dcm4chee.wizard.war.configuration.simple.edit.proxy;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -151,13 +151,13 @@ public class CreateOrEditForwardRulePage extends SecureWebPage {
         .add(new TextArea<String>("destinationURI", destinationURIModel).setRequired(true)
         		.add(new DestinationURIValidator()));
 
-        final WebMarkupContainer optionalContainer = new WebMarkupContainer("optionalContainer");
+        final WebMarkupContainer optionalContainer = new WebMarkupContainer("optional");
         form.add(optionalContainer
         		.setOutputMarkupId(true)
         		.setOutputMarkupPlaceholderTag(true)
         		.setVisible(false));
 
-        optionalContainer.add(new Label("callingAETitle.label", new ResourceModel("dicom.edit.forwardRule.callingAETitle.label")))
+        optionalContainer.add(new Label("callingAETitle.label", new ResourceModel("dicom.edit.forwardRule.optional.callingAETitle.label")))
                 .add(new DefaultCssAutoCompleteTextField<String>("callingAETitle", callingAETitleModel) {
 
 					private static final long serialVersionUID = 1L;
@@ -180,7 +180,7 @@ public class CreateOrEditForwardRulePage extends SecureWebPage {
 					}
                 });
         
-        optionalContainer.add(new Label("dimse.label", new ResourceModel("dicom.edit.forwardRule.dimse.label")));
+        optionalContainer.add(new Label("dimse.label", new ResourceModel("dicom.edit.forwardRule.optional.dimse.label")));
         ArrayList<Dimse> dimseList = 
         		new ArrayList<Dimse>();
         dimseList.addAll(Arrays.asList(Dimse.values())); 
@@ -189,26 +189,26 @@ public class CreateOrEditForwardRulePage extends SecureWebPage {
         optionalContainer.add(dimseDropDown
         		.setNullValid(false));
 
-        optionalContainer.add(new Label("exclusiveUseDefinedTC.label", new ResourceModel("dicom.edit.forwardRule.exclusiveUseDefinedTC.label")))
+        optionalContainer.add(new Label("exclusiveUseDefinedTC.label", new ResourceModel("dicom.edit.forwardRule.optional.exclusiveUseDefinedTC.label")))
         .add(new CheckBox("exclusiveUseDefinedTC", exclusiveUseDefinedTCModel));
 
-        optionalContainer.add(new Label("scheduleDays.label", new ResourceModel("dicom.edit.forwardRule.scheduleDays.label")))
+        optionalContainer.add(new Label("scheduleDays.label", new ResourceModel("dicom.edit.forwardRule.optional.scheduleDays.label")))
         .add(new TextField<String>("scheduleDays", scheduleDaysModel)
         		.add(new ScheduleValidator(ScheduleValidator.Type.DAYS)));
 
-        optionalContainer.add(new Label("scheduleHours.label", new ResourceModel("dicom.edit.forwardRule.scheduleHours.label")))
+        optionalContainer.add(new Label("scheduleHours.label", new ResourceModel("dicom.edit.forwardRule.optional.scheduleHours.label")))
         .add(new TextField<String>("scheduleHours", scheduleHoursModel)
         		.add(new ScheduleValidator(ScheduleValidator.Type.HOURS)));
 
-        optionalContainer.add(new Label("useCallingAETitle.label", new ResourceModel("dicom.edit.forwardRule.useCallingAETitle.label")))
+        optionalContainer.add(new Label("useCallingAETitle.label", new ResourceModel("dicom.edit.forwardRule.optional.useCallingAETitle.label")))
         .add(new TextField<String>("useCallingAETitle", useCallingAETitleModel));
                 		
-        optionalContainer.add(new Label("sopClass.label", new ResourceModel("dicom.edit.forwardRule.sopClass.label")))
+        optionalContainer.add(new Label("sopClass.label", new ResourceModel("dicom.edit.forwardRule.optional.sopClass.label")))
         .add(new TextArea<String>("sopClass", sopClassModel)
         		.add(new SOPClassValidator()));
 
-        form.add(new Label("optional.label", new ResourceModel("dicom.edit.optional.label")))
-        .add(new AjaxCheckBox("optional", new Model<Boolean>()) {
+        form.add(new Label("toggleOptional.label", new ResourceModel("dicom.edit.toggleOptional.label")))
+        .add(new AjaxCheckBox("toggleOptional", new Model<Boolean>()) {
 			private static final long serialVersionUID = 1L;
 
 			@Override

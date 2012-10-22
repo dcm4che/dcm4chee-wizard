@@ -36,7 +36,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.wizard.war.configuration.simple.edit;
+package org.dcm4chee.wizard.war.configuration.simple.edit.proxy;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -143,7 +143,7 @@ public class CreateOrEditCoercionPage extends SecureWebPage {
         .add(new TextField<String>("labeledURI", labeledURIModel)
         		.setRequired(true));
 
-        final WebMarkupContainer optionalContainer = new WebMarkupContainer("optionalContainer");
+        final WebMarkupContainer optionalContainer = new WebMarkupContainer("optional");
         form.add(optionalContainer
         		.setOutputMarkupId(true)
         		.setOutputMarkupPlaceholderTag(true)
@@ -159,15 +159,15 @@ public class CreateOrEditCoercionPage extends SecureWebPage {
 		}
         Collections.sort(uniqueAETitles);
         
-        optionalContainer.add(new Label("aeTitle.label", new ResourceModel("dicom.edit.coercion.aeTitle.label")))
+        optionalContainer.add(new Label("aeTitle.label", new ResourceModel("dicom.edit.coercion.optional.aeTitle.label")))
         .add(new DropDownChoice<String>("aeTitle", aeTitleModel, uniqueAETitles));
 
-        optionalContainer.add(new Label("sopClass.label", new ResourceModel("dicom.edit.forwardRule.sopClass.label")))
+        optionalContainer.add(new Label("sopClass.label", new ResourceModel("dicom.edit.coercion.optional.sopClass.label")))
         .add(new TextField<String>("sopClass", sopClassModel)
         		.add(new SOPClassValidator()));
 
-        form.add(new Label("optional.label", new ResourceModel("dicom.edit.optional.label")))
-        .add(new AjaxCheckBox("optional", new Model<Boolean>()) {
+        form.add(new Label("toggleOptional.label", new ResourceModel("dicom.edit.toggleOptional.label")))
+        .add(new AjaxCheckBox("toggleOptional", new Model<Boolean>()) {
 			private static final long serialVersionUID = 1L;
 
 			@Override
