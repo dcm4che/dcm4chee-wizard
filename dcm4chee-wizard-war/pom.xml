@@ -68,6 +68,12 @@
           <version>${dcm4che.version}</version>
           <scope>provided</scope>
         </dependency>
+        <dependency>
+          <groupId>org.jboss.jbossas</groupId>
+          <artifactId>jboss-as-resteasy</artifactId>
+          <version>6.1.0.Final</version>
+          <scope>provided</scope>
+        </dependency>
       </dependencies>
       <build>
         <finalName>dcm4chee-wizard-war-${version}-${project-classifier}</finalName>
