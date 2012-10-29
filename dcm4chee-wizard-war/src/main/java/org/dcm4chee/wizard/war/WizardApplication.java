@@ -40,6 +40,7 @@ package org.dcm4chee.wizard.war;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 
 import javax.security.auth.Subject;
 import javax.xml.bind.JAXBContext;
@@ -60,7 +61,6 @@ import org.wicketstuff.security.authentication.LoginException;
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-@SuppressWarnings("restriction")
 public class WizardApplication extends SecureWebApplication {
 
     protected static Logger log = LoggerFactory.getLogger(WizardApplication.class);
@@ -68,13 +68,15 @@ public class WizardApplication extends SecureWebApplication {
     private DicomConfigurationManager dicomConfigurationManager;
     private Root root;
     private String connectedDeviceName;
-    
+	private String reloadServiceEndpoint;
+
     @Override
     protected void init() {
         super.init();
         getDicomConfigurationManager();
         getTransferCapabilityProfiles();       
-        connectedDeviceName = getInitParameter("deviceName");
+        connectedDeviceName = System.getProperty("proxy.device.name");
+        reloadServiceEndpoint = getInitParameter("ReloadServiceEndpoint");
     }
 
     public synchronized DicomConfigurationManager getDicomConfigurationManager() {
@@ -103,6 +105,10 @@ public class WizardApplication extends SecureWebApplication {
     
     public String getConnectedDeviceName() {
     	return connectedDeviceName;
+    }
+    
+    public String getReloadServiceEndpoint() throws MalformedURLException {
+    	return reloadServiceEndpoint;
     }
     
     @Override

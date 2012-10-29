@@ -39,21 +39,20 @@
 package org.dcm4chee.wizard.war.configuration.simple.tree;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import net.sf.json.JSONObject;
-
-import org.apache.wicket.Application;
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.Component;
 import org.apache.wicket.Page;
 import org.apache.wicket.ajax.AbstractAjaxTimerBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -67,34 +66,27 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.image.Image;
-import org.apache.wicket.markup.repeater.IItemReuseStrategy;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.markup.repeater.RepeatingView;
-import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.model.StringResourceModel;
 import org.apache.wicket.protocol.http.WebApplication;
-import org.apache.wicket.request.resource.CssResourceReference;
-import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.util.time.Duration;
 import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.net.ApplicationEntity;
 import org.dcm4che.net.Connection;
-import org.dcm4che.net.Device;
 import org.dcm4chee.icons.ImageManager;
 import org.dcm4chee.icons.behaviours.ImageSizeBehaviour;
 import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
-import org.dcm4chee.wizard.common.behavior.MaskingAjaxCallBehavior;
 import org.dcm4chee.wizard.common.behavior.TooltipBehavior;
 import org.dcm4chee.wizard.common.component.ConfirmationWindow;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
 import org.dcm4chee.wizard.common.component.MessageWindow;
 import org.dcm4chee.wizard.war.WizardApplication;
 import org.dcm4chee.wizard.war.common.component.ExtendedPanel;
-import org.dcm4chee.wizard.war.configuration.model.source.DicomConfigurationSourceModel;
 import org.dcm4chee.wizard.war.configuration.simple.edit.ApplyTransferCapabilityProfilePage;
 import org.dcm4chee.wizard.war.configuration.simple.edit.CreateOrEditApplicationEntityPage;
 import org.dcm4chee.wizard.war.configuration.simple.edit.CreateOrEditConnectionPage;
@@ -119,7 +111,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import wickettree.TableTree;
-import wickettree.content.Folder;
 
 /**
  * @author Robert David <robert.david@agfa.com>
@@ -145,6 +136,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
     TableTree<ConfigTreeNode> configTree;
 
     private String connectedDeviceName;
+    private String reloadServiceEndpoint;
     
     public BasicConfigurationPanel(final String id) {
         super(id);
@@ -152,6 +144,10 @@ public class BasicConfigurationPanel extends ExtendedPanel {
         try {
         	connectedDeviceName = 
         			((WizardApplication) this.getApplication()).getConnectedDeviceName();
+        	
+        	reloadServiceEndpoint = 
+        			((WizardApplication) this.getApplication()).getReloadServiceEndpoint();
+
         	add(new Label("reload-message"));
         	
 	        add(new AbstractAjaxTimerBehavior(Duration.seconds(
@@ -425,14 +421,39 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 				            @Override
 				            public void onClick(AjaxRequestTarget target) {
 
-				            	reloadMessage = new MessageWindow("reload-message", 
-				                		new StringResourceModel("dicom.confirmReload", this, null)) {
+				            	if (reloadServiceEndpoint == null)
+				            		return;
+				            		
+				            	HttpURLConnection connection;
+				            	StringResourceModel resultMessage;
+
+								try {
+									connection = (HttpURLConnection) 
+											new URL(reloadServiceEndpoint 
+													+ (reloadServiceEndpoint.endsWith("/") ? "" : "/") 
+													+ connectedDeviceName)
+											.openConnection();
+									connection.setRequestMethod("POST");
+
+									if (connection.getResponseCode() != 204)
+											throw new Exception("Expected response 204, but was " 
+													+ connection.getResponseCode());
+
+									resultMessage = 
+											new StringResourceModel("dicom.reload.message.success", this, null);
+								} catch (Exception e) {
+									log.error("Error reloading configuration of connected device", e);
+									resultMessage = 
+											new StringResourceModel("dicom.reload.message.failed", this, null, 
+													new Object[] {e.getMessage()});
+								}
+				            	
+				            	reloadMessage = new MessageWindow("reload-message", resultMessage) {
 
 				                    private static final long serialVersionUID = 1L;
 
 				                    @Override
 				                    public void onOk(AjaxRequestTarget target) {
-				                        log.info("Reloading configuration for connected device");
 				                    }
 				                };
 				                BasicConfigurationPanel.this.

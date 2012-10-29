@@ -43,6 +43,10 @@
       <!-- given in seconds -->
       <param-value>20</param-value>
     </init-param>
+    <init-param>
+      <param-name>ReloadServiceEndpoint</param-name>
+      <param-value>http://localhost:8080/dcm4chee-wizard/config/reload</param-value>
+    </init-param>
   </filter>
   <filter-mapping>
     <filter-name>wicket.dcm4chee-wizard</filter-name>
