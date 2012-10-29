@@ -42,6 +42,8 @@ import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.validator.StringValidator;
 import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert David <robert.david@agfa.com>
@@ -49,22 +51,25 @@ import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider;
 public class DestinationURIValidator extends StringValidator {
 
     private static final long serialVersionUID = 1L;
+    
+    private static Logger log = LoggerFactory.getLogger(DestinationURIValidator.class);
 
-    @Override
-    protected void onValidate(IValidatable<String> uri) {
-    	if (uri.getValue().startsWith("aet:")) {
-    		String aet = uri.getValue().substring(4);
-			try {
-				for (String aeTitle : ConfigTreeProvider.get().getUniqueAETitles())
-					if (aet.equals(aeTitle))
-						return;
-				error(uri, "DestinationURIValidator.aetDoesNotExists");
-			} catch (ConfigurationException e) {
-				error(uri, "AETitleValidator");
-				e.printStackTrace();
-			}
-    	} else
-    		// TODO: validate template
-    		System.out.println("Not implemented yet");
-    }
+  @Override
+  protected void onValidate(IValidatable<String> validatable) {
+	  for (String uri : validatable.getValue().split("\n"))
+	  	if (uri.startsWith("aet:")) {
+	  		String aet = uri.substring(4);
+				try {
+					for (String aeTitle : ConfigTreeProvider.get().getUniqueAETitles())
+						if (aet.equals(aeTitle))
+							return;
+					error(validatable, "DestinationURIValidator.aetDoesNotExist");
+				} catch (ConfigurationException e) {
+					error(validatable, "AETitleValidator");
+					log.error("Error validating AETs for DestinationURIs", e);
+				}
+	  	} else
+	  		// TODO: validate template
+	  		System.out.println("Not implemented yet");
+	  }
 }

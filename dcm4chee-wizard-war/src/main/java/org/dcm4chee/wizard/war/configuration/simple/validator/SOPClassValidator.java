@@ -51,9 +51,9 @@ public class SOPClassValidator extends StringValidator {
 	private String ValidSOPClass = "^([0-9]+(\\.)?)+$";
 
     @Override
-    protected void onValidate(IValidatable<String> sopClass) {
-    	if (sopClass.getValue().matches(ValidSOPClass))
-    		return;
-    	else error(sopClass, "SOPClassValidator.invalid");
+    protected void onValidate(IValidatable<String> validatable) {
+	  for (String sopClass : validatable.getValue().split("\n"))
+		  if (!sopClass.matches(ValidSOPClass))
+			  error(validatable, "SOPClassValidator.invalid");
     }
 }
