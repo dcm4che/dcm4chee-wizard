@@ -40,7 +40,7 @@ package org.dcm4chee.wizard.common.behavior;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.behavior.Behavior;
-import org.apache.wicket.feedback.FeedbackMessage;
+import org.apache.wicket.feedback.FeedbackMessages;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.form.FormComponent;
 
@@ -60,9 +60,9 @@ public class MarkInvalidBehavior extends Behavior {
         if (component instanceof FormComponent<?>) {
             FormComponent<?> fc = (FormComponent<?>)component;
             if (!fc.isValid()) {
-                FeedbackMessage fbMsg = fc.getFeedbackMessage();
-                msg = fbMsg != null ? msg = fbMsg.getMessage().toString() : "";
-                if (fbMsg != null) fbMsg.markRendered();
+                FeedbackMessages fbMsg = fc.getFeedbackMessages();
+                msg = fbMsg != null ? msg = fbMsg.first().toString() : "";
+                if (fbMsg != null) fbMsg.first().markRendered();
             }
         }
     }

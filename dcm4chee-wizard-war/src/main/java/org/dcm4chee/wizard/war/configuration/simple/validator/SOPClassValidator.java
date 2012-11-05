@@ -39,6 +39,7 @@
 package org.dcm4chee.wizard.war.configuration.simple.validator;
 
 import org.apache.wicket.validation.IValidatable;
+import org.apache.wicket.validation.ValidationError;
 import org.apache.wicket.validation.validator.StringValidator;
 
 /**
@@ -51,9 +52,9 @@ public class SOPClassValidator extends StringValidator {
 	private String ValidSOPClass = "^([0-9]+(\\.)?)+$";
 
     @Override
-    protected void onValidate(IValidatable<String> validatable) {
+    public void validate(IValidatable<String> validatable) {
 	  for (String sopClass : validatable.getValue().split("\n"))
 		  if (!sopClass.matches(ValidSOPClass))
-			  error(validatable, "SOPClassValidator.invalid");
+			  validatable.error(new ValidationError().addKey("SOPClassValidator.invalid"));
     }
 }

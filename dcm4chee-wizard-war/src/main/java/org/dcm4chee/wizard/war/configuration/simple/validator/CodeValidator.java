@@ -73,7 +73,7 @@ public class CodeValidator extends AbstractFormValidator {
 		final FormComponent<String> codeMeaning = components[3];
 
 		ValidationError validationError = new ValidationError();
-		validationError.addMessageKey("CodeValidator.invalid");
+		validationError.addKey("CodeValidator.invalid");
 		
 		if (!codeValue.getInput().isEmpty()) {
 			if (codingSchemeDesignator.getInput().isEmpty())

@@ -39,7 +39,8 @@
 package org.dcm4chee.wizard.common.component.secure;
 
 import org.apache.wicket.Application;
-import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.markup.head.CssHeaderItem;
+import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.request.resource.CssResourceReference;
@@ -68,7 +69,8 @@ public class SecureExtendedWebPage extends SecureWebPage {
     @Override
     public void renderHead(IHeaderResponse response) {
     	if (SecureExtendedWebPage.baseCSS != null)
-    		response.renderCSSReference(SecureExtendedWebPage.baseCSS);
+    		response.render(CssHeaderItem.forReference(SecureExtendedWebPage.baseCSS));
+
     }
 
     private void initLayout() {

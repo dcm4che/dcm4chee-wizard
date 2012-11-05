@@ -1,4 +1,4 @@
-table.tree { 
+div.tree table { 
 	table-layout: auto;
 	border: thin; 
 	border-width: 1px; 
@@ -10,15 +10,15 @@ table.tree {
 	font-size: 12px; 
 }
 
-table.left { width: 49%; float: left; margin-right: 2%; }
-table.right { width: 49%; }
+div.tree table.left { width: 49%; float: left; margin-right: 2%; }
+div.tree table.right { width: 49%; }
 
-table.tree tr td, table.tree tr th {
+div.tree table tr td, div.tree table tr th {
 	height: 25px;
 	padding-left: 10px;
 }
 
-table.tree tr.headers { 
+div.tree table tr.headers { 
 	background-color: #446666; 
 	color: white; 
 /*	width: 20px; 
@@ -26,8 +26,8 @@ table.tree tr.headers {
 	text-align: left; 
 }
 
-table.tree tr.odd { background-color: #FFFFFF; }
-table.tree tr.even { background-color: #E1E0DE; }
+div.tree table tr.odd { background-color: #FFFFFF; }
+div.tree table tr.even { background-color: #E1E0DE; }
 
 
 /* JUNCTIONS */

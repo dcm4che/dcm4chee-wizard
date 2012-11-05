@@ -38,20 +38,27 @@
 
 package org.dcm4chee.wizard.war.configuration.simple.validator;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.wicket.validation.IValidatable;
+import org.apache.wicket.validation.ValidationError;
 import org.apache.wicket.validation.validator.StringValidator;
 import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Franz Willer <franz.willer@gmail.com>
+ * @author Robert David <robert.david@agfa.com>
  */
 public class AETitleValidator extends StringValidator {
 
     private static final long serialVersionUID = 1L;
 
+    private static Logger log = LoggerFactory.getLogger(AETitleValidator.class);
+    
     private static final int MAX_AET_LEN = 16;
     private static final int MAX_HL7_LEN = 250;
 
@@ -72,18 +79,24 @@ public class AETitleValidator extends StringValidator {
      * </p>
      */
     @Override
-    protected void onValidate(IValidatable<String> v) {
+	public void validate(IValidatable<String> v) {
         String s = v.getValue();
         if ( s.indexOf('^') == -1 ) {
             if ( s.length() > MAX_AET_LEN || s.trim().length() < 1) {
-                error(v,"StringValidator.range", getLengthVarMap(v, MAX_AET_LEN));
+            	v.error(new ValidationError()
+            		.addKey("StringValidator.range")
+            		.setVariables(getLengthVarMap(v, MAX_AET_LEN)));
             }
             if ( ! validateAEChars(s) ) {
-                error(v,"PatternValidator", getPatternVarMap(v));
+            	v.error(new ValidationError()
+        			.addKey("PatternValidator")
+        			.setVariables(getPatternVarMap(v)));
             }
         } else { //HL7 Target Application^Facility for HL7 Send (ST) max 250 chars (see DB AE.aet)
             if ( s.length() > MAX_HL7_LEN ) {
-                error(v,"StringValidator.maximum", getLengthVarMap(v, MAX_HL7_LEN));
+            	v.error(new ValidationError()
+        			.addKey("StringValidator.maximum")
+        			.setVariables(getLengthVarMap(v, MAX_HL7_LEN)));
             }            
         }
         
@@ -91,10 +104,12 @@ public class AETitleValidator extends StringValidator {
 			try {
 				for (String aeTitle : ConfigTreeProvider.get().getUniqueAETitles())
 					if (s.equals(aeTitle))
-						error(v, "AETitleValidator.alreadyExists");
+						v.error(new ValidationError()
+	            		.addKey("AETitleValidator.alreadyExists"));
 			} catch (ConfigurationException e) {
-				error(v, "AETitleValidator");
-				e.printStackTrace();
+				v.error(new ValidationError()
+        		.addKey("AETitleValidator"));
+				log.error("Error validating AE Title", e);
 			}
     }
     /*
@@ -110,8 +125,8 @@ public class AETitleValidator extends StringValidator {
         return true;
     }
 
-    private Map<String, Object> getLengthVarMap(IValidatable<String> validatable, int max) {
-        final Map<String, Object> map = super.variablesMap(validatable);
+    private Map<String,Object> getLengthVarMap(IValidatable<String> validatable, int max) {
+        final Map<String,Object> map = new HashMap<String,Object>();
         map.put("maximum", new Integer(max));
         map.put("minimum", new Integer(1));
         map.put("length", new Integer(((String) validatable.getValue()).length()));
@@ -119,7 +134,7 @@ public class AETitleValidator extends StringValidator {
     }
     
     private Map<String, Object> getPatternVarMap(IValidatable<String> validatable) {
-        final Map<String, Object> map = super.variablesMap(validatable);
+    	final Map<String,Object> map = new HashMap<String,Object>();
         map.put("pattern", "DICOM DEFAULT CHARACTER REPERTOIRE exclude '\\', LF, FF, CR and ESC");
         return map;
     }

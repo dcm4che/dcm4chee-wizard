@@ -41,6 +41,7 @@ package org.dcm4chee.wizard.war.configuration.simple.validator;
 import java.util.List;
 
 import org.apache.wicket.validation.IValidatable;
+import org.apache.wicket.validation.ValidationError;
 import org.apache.wicket.validation.validator.StringValidator;
 import org.dcm4chee.proxy.conf.Retry;
 
@@ -60,11 +61,12 @@ public class RetrySuffixValidator extends StringValidator {
     }
 
     @Override
-    protected void onValidate(IValidatable<String> suffix) {
+    public void validate(IValidatable<String> suffix) {
     	if (!suffix.getValue().equals(ignore))  { 
     		for (Retry retry : retries)
     			if (retry.getRetryObject().getSuffix().equals(suffix.getValue())) {
-    				error(suffix, "RetrySuffixValidator.alreadyExists");
+    				suffix.error(new ValidationError()
+    					.addKey("RetrySuffixValidator.alreadyExists"));
     				return;
     			}
     	}

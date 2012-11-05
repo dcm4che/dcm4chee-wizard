@@ -49,7 +49,6 @@ import java.util.List;
 import net.sf.json.JSONObject;
 
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.OddEvenListItem;
@@ -57,8 +56,6 @@ import org.apache.wicket.markup.html.list.PropertyListView;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
-import org.apache.wicket.request.resource.PackageResourceReference;
-import org.apache.wicket.request.resource.ResourceReference;
 import org.dcm4chee.wizard.war.configuration.model.source.DicomConfigurationSourceModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,9 +66,6 @@ import org.slf4j.LoggerFactory;
 public class DicomConfigurationSourcePanel extends Panel {
 
     private static final long serialVersionUID = 1L;
-
-    private static final ResourceReference CSS = new PackageResourceReference(DicomConfigurationSourcePanel.class,
-            "folder-style.css");
 
     private static final String MODULE_NAME = "source";
 
@@ -206,12 +200,6 @@ public class DicomConfigurationSourcePanel extends Panel {
             }
         }));
         updateDicomConfigurationList();
-    }
-
-    @Override
-    public void renderHead(IHeaderResponse response) {
-        if (DicomConfigurationSourcePanel.CSS != null)
-            response.renderCSSReference(DicomConfigurationSourcePanel.CSS);
     }
 
     @Override

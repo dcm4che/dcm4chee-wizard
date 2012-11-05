@@ -44,7 +44,8 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxFallbackButton;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
-import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.markup.head.CssHeaderItem;
+import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
@@ -59,8 +60,8 @@ import org.apache.wicket.request.resource.ResourceReference;
 import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
 import org.dcm4chee.proxy.conf.Retry;
 import org.dcm4chee.proxy.conf.RetryObject;
-import org.dcm4chee.wizard.common.component.ExtendedWebPage;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
+import org.dcm4chee.wizard.common.component.ExtendedWebPage;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ProxyApplicationEntityModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.RetryModel;
 import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeNode;
@@ -78,7 +79,7 @@ public class CreateOrEditRetryPage extends SecureWebPage {
 
     private static Logger log = LoggerFactory.getLogger(CreateOrEditRetryPage.class);
 
-    private static final ResourceReference BaseCSS = new CssResourceReference(ExtendedWebPage.class, "base-style.css");
+    private static final ResourceReference baseCSS = new CssResourceReference(ExtendedWebPage.class, "base-style.css");
     
     // mandatory
 	private IModel<RetryObject> suffixModel;
@@ -190,7 +191,7 @@ public class CreateOrEditRetryPage extends SecureWebPage {
 
 	@Override
     public void renderHead(IHeaderResponse response) {
-        if (CreateOrEditRetryPage.BaseCSS != null)
-        	response.renderCSSReference(CreateOrEditRetryPage.BaseCSS);
+    	if (CreateOrEditRetryPage.baseCSS != null) 
+    		response.render(CssHeaderItem.forReference(CreateOrEditRetryPage.baseCSS));
     }
  }

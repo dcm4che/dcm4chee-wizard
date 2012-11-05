@@ -39,6 +39,7 @@
 package org.dcm4chee.wizard.war.configuration.simple.validator;
 
 import org.apache.wicket.validation.IValidatable;
+import org.apache.wicket.validation.ValidationError;
 import org.apache.wicket.validation.validator.StringValidator;
 
 /**
@@ -51,9 +52,10 @@ public class TransferSyntaxValidator extends StringValidator {
 	private String ValidTransferSyntax = "^([0-9]+(\\.)?)+$";
 
     @Override
-    protected void onValidate(IValidatable<String> transferSyntax) {
+    public void validate(IValidatable<String> transferSyntax) {
     	for (String tsString : transferSyntax.getValue().split("\n"))
 	    	if (!tsString.matches(ValidTransferSyntax))
-	    		error(transferSyntax, "TransferSyntaxValidator.invalid");
+    			transferSyntax.error(new ValidationError()
+    				.addKey("TransferSyntaxValidator.invalid"));
     }
 }

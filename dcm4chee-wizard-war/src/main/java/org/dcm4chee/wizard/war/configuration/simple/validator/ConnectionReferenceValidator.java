@@ -38,23 +38,25 @@
 
 package org.dcm4chee.wizard.war.configuration.simple.validator;
 
-import java.util.ArrayList;
+import java.util.Collection;
 
 import org.apache.wicket.validation.IValidatable;
-import org.apache.wicket.validation.validator.AbstractValidator;
+import org.apache.wicket.validation.IValidator;
+import org.apache.wicket.validation.ValidationError;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ConnectionReferenceModel;
 
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-public class ConnectionReferenceValidator extends AbstractValidator<ArrayList<ConnectionReferenceModel>> {
+public class ConnectionReferenceValidator implements IValidator<Collection<ConnectionReferenceModel>> {
 
     private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void onValidate(
-			IValidatable<ArrayList<ConnectionReferenceModel>> validatable) {
+	public void validate(
+			IValidatable<Collection<ConnectionReferenceModel>> validatable) {
 		if (validatable.getValue().size() <= 0)
-			error(validatable, "ConnectionReferenceValidator.invalid");
+			validatable.error(new ValidationError()
+				.addKey("ConnectionReferenceValidator.invalid"));
 	}
 }

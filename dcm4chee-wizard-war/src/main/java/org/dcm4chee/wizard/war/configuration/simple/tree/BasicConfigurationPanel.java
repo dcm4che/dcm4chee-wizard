@@ -38,15 +38,8 @@
 
 package org.dcm4chee.wizard.war.configuration.simple.tree;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -63,7 +56,9 @@ import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow.WindowClo
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
-import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.extensions.markup.html.repeater.tree.TableTree;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.image.Image;
 import org.apache.wicket.markup.repeater.Item;
@@ -106,11 +101,8 @@ import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ForwardScheduleM
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.RetryModel;
 import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeNode.TreeNodeType;
 import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider.ConfigurationType;
-import org.dcm4chee.wizard.war.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import wickettree.TableTree;
 
 /**
  * @author Robert David <robert.david@agfa.com>
@@ -132,8 +124,8 @@ public class BasicConfigurationPanel extends ExtendedPanel {
     private MessageWindow reloadMessage;
     public WindowClosedCallback windowClosedCallback;
 
-    List<IColumn<ConfigTreeNode>> deviceColumns;
-    TableTree<ConfigTreeNode> configTree;
+    List<IColumn<ConfigTreeNode,String>> deviceColumns;
+    TableTree<ConfigTreeNode,String> configTree;
 
     private String connectedDeviceName;
     private String reloadServiceEndpoint;
@@ -324,7 +316,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
                 .add(new AttributeAppender("style", Model.of("vertical-align: middle"), " ")));
         form.add(createDevice);
 
-        List<IColumn<ConfigTreeNode>> deviceColumns = new ArrayList<IColumn<ConfigTreeNode>>();
+        List<IColumn<ConfigTreeNode,String>> deviceColumns = new ArrayList<IColumn<ConfigTreeNode,String>>();
         deviceColumns.add(new CustomTreeColumn(Model.of("Devices")));
 
         try {
@@ -342,16 +334,16 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 
     @Override
     public void renderHead(IHeaderResponse response) {
-        response.renderOnDomReadyJavaScript("Wicket.Window.unloadConfirmation = false");
+    	response.render(OnDomReadyHeaderItem.forScript("Wicket.Window.unloadConfirmation = false"));
     }
 
     public void createColumns() {
 
-    	deviceColumns = new ArrayList<IColumn<ConfigTreeNode>>();
+    	deviceColumns = new ArrayList<IColumn<ConfigTreeNode,String>>();
     	
     	deviceColumns.add(new CustomTreeColumn(Model.of("Devices")));
 
-		deviceColumns.add(new AbstractColumn<ConfigTreeNode>(Model.of("ConfigurationType")) {
+		deviceColumns.add(new AbstractColumn<ConfigTreeNode,String>(Model.of("ConfigurationType")) {
 
 			private static final long serialVersionUID = 1L;
 
@@ -364,7 +356,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 			}
 		});
 
-		deviceColumns.add(new AbstractColumn<ConfigTreeNode>(Model.of("Connections")) {
+		deviceColumns.add(new AbstractColumn<ConfigTreeNode,String>(Model.of("Connections")) {
 			
 			private static final long serialVersionUID = 1L;
 
@@ -396,7 +388,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 		});
 
 		if (connectedDeviceName != null)
-			deviceColumns.add(new AbstractColumn<ConfigTreeNode>(Model.of("Send")) {
+			deviceColumns.add(new AbstractColumn<ConfigTreeNode,String>(Model.of("Send")) {
 	
 				private static final long serialVersionUID = 1L;
 	
@@ -467,7 +459,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 				}
 			});
 
-		deviceColumns.add(new AbstractColumn<ConfigTreeNode>(Model.of("Echo")) {
+		deviceColumns.add(new AbstractColumn<ConfigTreeNode,String>(Model.of("Echo")) {
 
 			private static final long serialVersionUID = 1L;
 
@@ -518,7 +510,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 			}
 		});
 		
-		deviceColumns.add(new AbstractColumn<ConfigTreeNode>(Model.of("Edit")) {
+		deviceColumns.add(new AbstractColumn<ConfigTreeNode,String>(Model.of("Edit")) {
 			
 			private static final long serialVersionUID = 1L;
 
@@ -722,7 +714,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 			}
 		});
 		
-		deviceColumns.add(new AbstractColumn<ConfigTreeNode>(Model.of("Profile")) {
+		deviceColumns.add(new AbstractColumn<ConfigTreeNode,String>(Model.of("Profile")) {
 			
 			private static final long serialVersionUID = 1L;
 
@@ -767,7 +759,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 			}
 		});
 
-		deviceColumns.add(new AbstractColumn<ConfigTreeNode>(Model.of("Delete")) {
+		deviceColumns.add(new AbstractColumn<ConfigTreeNode,String>(Model.of("Delete")) {
 			
 			private static final long serialVersionUID = 1L;
 
@@ -823,7 +815,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 			}
 		});
     }
-    
+
     public void renderTree() throws ConfigurationException {
 		IModel<Set<ConfigTreeNode>> currentState = configTree.getModel();
 		configTree = new ConfigTableTree("configTree", deviceColumns,

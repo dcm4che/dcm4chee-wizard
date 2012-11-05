@@ -38,12 +38,7 @@
 
 package org.dcm4chee.wizard.war.configuration.advanced;
 
-import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.panel.Panel;
-import org.apache.wicket.request.resource.PackageResourceReference;
-import org.apache.wicket.request.resource.ResourceReference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert David <robert.david@agfa.com>
@@ -52,20 +47,10 @@ public class AdvancedConfigurationPanel extends Panel {
 
     private static final long serialVersionUID = 1L;
     
-    private static final ResourceReference CSS = new PackageResourceReference(AdvancedConfigurationPanel.class, "folder-style.css");
-    
     private static final String MODULE_NAME = "advanced";
-
-    private static Logger log = LoggerFactory.getLogger(AdvancedConfigurationPanel.class);
 
     public AdvancedConfigurationPanel(final String id) {
         super(id);
-    }
-    
-    @Override
-    public void renderHead(IHeaderResponse response) {
-    	if (AdvancedConfigurationPanel.CSS != null)
-    		response.renderCSSReference(AdvancedConfigurationPanel.CSS);
     }
     
     public static String getModuleName() {

@@ -39,11 +39,12 @@
 package org.dcm4chee.wizard.common.component;
 
 import org.apache.wicket.Application;
-import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.markup.head.CssHeaderItem;
+import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.AbstractReadOnlyModel;
-import org.apache.wicket.request.resource.PackageResourceReference;
+import org.apache.wicket.request.resource.CssResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.resource.loader.ClassStringResourceLoader;
 import org.apache.wicket.resource.loader.PackageStringResourceLoader;
@@ -55,7 +56,7 @@ public class ExtendedWebPage extends WebPage {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final ResourceReference baseCSS = new PackageResourceReference(ExtendedWebPage.class, "base-style.css");
+	private static final ResourceReference baseCSS = new CssResourceReference(ExtendedWebPage.class, "base-style.css");
     
     protected ModuleSelectorPanel selectorPanel;
     
@@ -67,7 +68,7 @@ public class ExtendedWebPage extends WebPage {
     @Override
     public void renderHead(IHeaderResponse response) {
     	if (ExtendedWebPage.baseCSS != null)
-    		response.renderCSSReference(ExtendedWebPage.baseCSS);
+    		response.render(CssHeaderItem.forReference(ExtendedWebPage.baseCSS));
     }
     
     private void initLayout() {

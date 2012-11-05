@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.wicket.validation.IValidatable;
+import org.apache.wicket.validation.ValidationError;
 
 /**
  * @author Robert David <robert.david@agfa.com>
@@ -59,13 +60,15 @@ public class DeviceNameValidator extends BaseNameValidator {
     }
     
     @Override
-    protected void onValidate(IValidatable<String> deviceName) {
-    	super.onValidate(deviceName);
+    public void validate(IValidatable<String> deviceName) {
+    	super.validate(deviceName);
     	if (!deviceName.getValue().equals(ignore)) {
 			if (deviceName.getValue().contains("/"))
-				error(deviceName, "DeviceNameValidator.invalid");
+				deviceName.error(new ValidationError()
+					.addKey("DeviceNameValidator.invalid"));
     		if (deviceNames.contains(deviceName.getValue()))
-				error(deviceName, "DeviceNameValidator.exists");
+				deviceName.error(new ValidationError()
+					.addKey("DeviceNameValidator.exists"));    	
     	}
     }
 }

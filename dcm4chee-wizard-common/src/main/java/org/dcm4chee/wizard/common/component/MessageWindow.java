@@ -40,10 +40,11 @@ package org.dcm4chee.wizard.common.component;
 
 import org.apache.wicket.Page;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.IAjaxCallDecorator;
 import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxLink;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
-import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.markup.head.CssHeaderItem;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.AbstractReadOnlyModel;
@@ -51,9 +52,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
-import org.dcm4chee.wizard.common.behavior.MaskingAjaxCallBehavior;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.dcm4chee.wizard.common.behavior.MaskingAjaxCallDecorator;
 
 /**
  * @author Robert David <robert.david@agfa.com>
@@ -62,8 +61,6 @@ public abstract class MessageWindow extends ModalWindow {
 
 	private static final long serialVersionUID = 1L;
 
-	private final Logger log = LoggerFactory.getLogger(MessageWindow.class);
-	
 	private static final ResourceReference baseCSS = new PackageResourceReference(ExtendedWebPage.class, "base-style.css");
 	
     public MessageWindow(String id, final IModel<?> message) {
@@ -92,9 +89,6 @@ public abstract class MessageWindow extends ModalWindow {
 		
 		public MessagePage(final IModel<?> message) {
 			
-            final MaskingAjaxCallBehavior macb = new MaskingAjaxCallBehavior();
-            add(macb);
-
             add(new Label("msg", new AbstractReadOnlyModel<Object>() {
 
                 private static final long serialVersionUID = 1L;
@@ -115,26 +109,18 @@ public abstract class MessageWindow extends ModalWindow {
                 	onOk(target);
                 	close(target);
                 }
-
-                @Override
-                protected IAjaxCallDecorator getAjaxCallDecorator() {
-                    try {
-                        return macb.getAjaxCallDecorator();
-                    } catch (Exception e) {
-                        log.error("Failed to get IAjaxCallDecorator", e);
-                    }
-                    return null;
-                }
             };
+            okBtn.add(new MaskingAjaxCallDecorator());
             add(okBtn.add(new Label("okLabel", new ResourceModel("okBtn")))
             		.setOutputMarkupId(true));
         }
 		
 	    @Override
 	    public void renderHead(IHeaderResponse response) {
-	    	response.renderOnDomReadyJavaScript ("Wicket.Window.unloadConfirmation = false");
+	    	response.render(OnDomReadyHeaderItem
+	    			.forScript("Wicket.Window.unloadConfirmation = false"));
 	    	if (MessageWindow.baseCSS != null)
-	    		response.renderCSSReference(MessageWindow.baseCSS);
+	    		response.render(CssHeaderItem.forReference(MessageWindow.baseCSS));
 	    }
     }
 }

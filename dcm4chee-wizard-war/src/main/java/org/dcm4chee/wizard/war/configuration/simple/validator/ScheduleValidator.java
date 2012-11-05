@@ -39,6 +39,7 @@
 package org.dcm4chee.wizard.war.configuration.simple.validator;
 
 import org.apache.wicket.validation.IValidatable;
+import org.apache.wicket.validation.ValidationError;
 import org.apache.wicket.validation.validator.StringValidator;
 
 /**
@@ -60,7 +61,7 @@ public class ScheduleValidator extends StringValidator {
     }
     
     @Override
-    protected void onValidate(IValidatable<String> v) {
+    public void validate(IValidatable<String> v) {
         String testType = null;
 		if (type.equals(Type.DAYS)) 
         	testType = days;
@@ -68,6 +69,6 @@ public class ScheduleValidator extends StringValidator {
         	testType = hours;
         String regex = "^(" + testType + "{1,1}(\\-+" + testType + "+){0,1})(,(" + testType + "{1,1}(\\-+" + testType + "+){0,1}))*$";
         if (!v.getValue().matches(regex))
-        	error(v, "ScheduleValidator.invalid");   	
+        	v.error(new ValidationError().addKey("ScheduleValidator.invalid"));
     }
 }

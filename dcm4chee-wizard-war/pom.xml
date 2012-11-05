@@ -12,9 +12,9 @@
   <name>WAR for dcm4chee-wizard</name>
   <description></description>
   <properties>
-    <wicket.version>1.5.8</wicket.version>
-    <wicket.security.version>1.5.5</wicket.security.version>
-    <dcm4chee.proxy.version>1.0.0-SNAPSHOT</dcm4chee.proxy.version>
+  	<wicket.version>6.2.0</wicket.version>
+  	<wicket.security.version>6.0.0</wicket.security.version>
+  	<dcm4chee.proxy.version>1.0.0-SNAPSHOT</dcm4chee.proxy.version>
     <dcm4che.version>3.0.0</dcm4che.version>
     <device-name>dcm4chee-proxy</device-name>
   </properties>
@@ -181,11 +181,6 @@
       <version>${wicket.version}</version>
     </dependency>
     <dependency>
-      <groupId>wicket-tree</groupId>
-      <artifactId>wicket-tree</artifactId>
-      <version>0.5-SNAPSHOT</version>
-    </dependency>
-    <dependency>
       <groupId>org.wicketstuff</groupId>
       <artifactId>wicketstuff-security-swarm</artifactId>
       <version>${wicket.security.version}</version>
@@ -218,13 +213,6 @@
       <classifier>jdk15</classifier>
     </dependency>
   </dependencies>
-  <repositories>
-    <repository>
-      <id>wicket-tree</id>
-      <name>Wicket-tree Repository</name>
-      <url>http://wicket-tree.googlecode.com/svn/repo</url>
-    </repository>
-  </repositories>
   <build>
     <finalName>dcm4chee-wizard-war-${version}-${project-classifier}</finalName>
     <testResources>

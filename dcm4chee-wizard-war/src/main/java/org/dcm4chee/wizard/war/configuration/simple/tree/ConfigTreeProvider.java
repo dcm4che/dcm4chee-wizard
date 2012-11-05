@@ -49,6 +49,7 @@ import java.util.Map;
 import org.apache.wicket.Application;
 import org.apache.wicket.Component;
 import org.apache.wicket.Session;
+import org.apache.wicket.extensions.markup.html.repeater.util.SortableTreeProvider;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
@@ -72,12 +73,10 @@ import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ProxyDeviceModel
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.RetryModel;
 import org.dcm4chee.wizard.war.profile.transfercapability.xml.Group;
 
-import wickettree.util.SortableTreeProvider;
-
 /**
  * @author Robert David
  */
-public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode> {
+public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode,String> {
 
 	private static final long serialVersionUID = 1L;
 	

@@ -46,7 +46,8 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.ajax.markup.html.form.AjaxFallbackButton;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
-import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.markup.head.CssHeaderItem;
+import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.CheckBox;
@@ -66,8 +67,8 @@ import org.dcm4che.net.Connection;
 import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
 import org.dcm4chee.proxy.conf.ProxyDevice;
 import org.dcm4chee.wizard.common.behavior.FocusOnLoadBehavior;
-import org.dcm4chee.wizard.common.component.ExtendedWebPage;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
+import org.dcm4chee.wizard.common.component.ExtendedWebPage;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ApplicationEntityModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ConnectionReferenceModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.DeviceModel;
@@ -89,7 +90,7 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
 
     private static Logger log = LoggerFactory.getLogger(CreateOrEditApplicationEntityPage.class);
     
-    private static final ResourceReference BaseCSS = new CssResourceReference(ExtendedWebPage.class, "base-style.css");
+    private static final ResourceReference baseCSS = new CssResourceReference(ExtendedWebPage.class, "base-style.css");
     
     private boolean isProxy = false;
     private String oldAETitle;
@@ -379,7 +380,7 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
     
     @Override
     public void renderHead(IHeaderResponse response) {
-        if (CreateOrEditApplicationEntityPage.BaseCSS != null)
-        	response.renderCSSReference(CreateOrEditApplicationEntityPage.BaseCSS);
+    	if (CreateOrEditApplicationEntityPage.baseCSS != null) 
+    		response.render(CssHeaderItem.forReference(CreateOrEditApplicationEntityPage.baseCSS));
     }
  }

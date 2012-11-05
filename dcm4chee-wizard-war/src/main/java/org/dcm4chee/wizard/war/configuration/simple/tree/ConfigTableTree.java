@@ -3,21 +3,20 @@ package org.dcm4chee.wizard.war.configuration.simple.tree;
 import java.util.List;
 
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
+import org.apache.wicket.extensions.markup.html.repeater.tree.DefaultTableTree;
+import org.apache.wicket.extensions.markup.html.repeater.tree.ISortableTreeProvider;
 import org.dcm4che.conf.api.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import wickettree.DefaultTableTree;
-import wickettree.ISortableTreeProvider;
-
-public class ConfigTableTree extends DefaultTableTree<ConfigTreeNode> {
+public class ConfigTableTree extends DefaultTableTree<ConfigTreeNode,String> {
 
 	private static final long serialVersionUID = 1L;
 
 	private static Logger log = LoggerFactory.getLogger(ConfigTableTree.class);
 	
-	public ConfigTableTree(String id, List<IColumn<ConfigTreeNode>> columns,
-			ISortableTreeProvider<ConfigTreeNode> provider, int rowsPerPage) {
+	public ConfigTableTree(String id, List<IColumn<ConfigTreeNode,String>> columns,
+			ISortableTreeProvider<ConfigTreeNode,String> provider, int rowsPerPage) {
 		super(id, columns, provider, rowsPerPage);
 	}
 

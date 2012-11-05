@@ -45,7 +45,8 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
-import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.markup.head.CssHeaderItem;
+import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextArea;
@@ -61,8 +62,8 @@ import org.dcm4che.net.Association;
 import org.dcm4che.net.DimseRSP;
 import org.dcm4che.net.pdu.AAssociateRQ;
 import org.dcm4che.net.pdu.PresentationContext;
-import org.dcm4chee.wizard.common.component.ExtendedWebPage;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
+import org.dcm4chee.wizard.common.component.ExtendedWebPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wicketstuff.security.components.SecureWebPage;
@@ -76,7 +77,7 @@ public class DicomEchoPage extends SecureWebPage {
     
     private static Logger log = LoggerFactory.getLogger(DicomEchoPage.class);
     
-    private static final ResourceReference BaseCSS = new CssResourceReference(ExtendedWebPage.class, "base-style.css");
+    private static final ResourceReference baseCSS = new CssResourceReference(ExtendedWebPage.class, "base-style.css");
     
     private transient ApplicationEntity sourceAE;
     private transient ApplicationEntity destinationAE;
@@ -177,7 +178,7 @@ public class DicomEchoPage extends SecureWebPage {
     
     @Override
     public void renderHead(IHeaderResponse response) {
-        if (DicomEchoPage.BaseCSS != null)
-        	response.renderCSSReference(DicomEchoPage.BaseCSS);
+    	if (DicomEchoPage.baseCSS != null) 
+    		response.render(CssHeaderItem.forReference(DicomEchoPage.baseCSS));
     }    
 }

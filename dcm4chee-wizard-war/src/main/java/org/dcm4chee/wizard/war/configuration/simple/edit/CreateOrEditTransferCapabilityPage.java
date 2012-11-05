@@ -44,7 +44,8 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.ajax.markup.html.form.AjaxFallbackButton;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
-import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.markup.head.CssHeaderItem;
+import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
@@ -59,8 +60,9 @@ import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.net.ApplicationEntity;
 import org.dcm4che.net.TransferCapability;
 import org.dcm4che.net.TransferCapability.Role;
-import org.dcm4chee.wizard.common.component.ExtendedWebPage;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
+import org.dcm4chee.wizard.common.component.ExtendedWebPage;
+import org.dcm4chee.wizard.war.common.component.ExtendedSecureWebPage;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ApplicationEntityModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.StringArrayModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.TransferCapabilityModel;
@@ -71,19 +73,18 @@ import org.dcm4chee.wizard.war.configuration.simple.validator.TransferCapability
 import org.dcm4chee.wizard.war.configuration.simple.validator.TransferSyntaxValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wicketstuff.security.components.SecureWebPage;
 
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-public class CreateOrEditTransferCapabilityPage extends SecureWebPage {
+public class CreateOrEditTransferCapabilityPage extends ExtendedSecureWebPage {
     
     private static final long serialVersionUID = 1L;
 
     private static Logger log = LoggerFactory.getLogger(CreateOrEditTransferCapabilityPage.class);
 
-    private static final ResourceReference BaseCSS = new CssResourceReference(ExtendedWebPage.class, "base-style.css");
-    
+    private static final ResourceReference baseCSS = new CssResourceReference(ExtendedWebPage.class, "base-style.css");
+
     // mandatory
 	private Model<String> sopClassModel;
     private Model<Role> roleModel;
@@ -220,10 +221,10 @@ public class CreateOrEditTransferCapabilityPage extends SecureWebPage {
 			log.error("Error creating TransferCapabilityValidator for sopClass TextField", e);
 		}
     }
-
+    
     @Override
     public void renderHead(IHeaderResponse response) {
-        if (CreateOrEditTransferCapabilityPage.BaseCSS != null)
-        	response.renderCSSReference(CreateOrEditTransferCapabilityPage.BaseCSS);
+    	if (CreateOrEditTransferCapabilityPage.baseCSS != null) 
+    		response.render(CssHeaderItem.forReference(CreateOrEditTransferCapabilityPage.baseCSS));
     }
  }

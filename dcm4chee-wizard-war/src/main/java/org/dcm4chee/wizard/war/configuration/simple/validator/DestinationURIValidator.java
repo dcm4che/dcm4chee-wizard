@@ -39,6 +39,7 @@
 package org.dcm4chee.wizard.war.configuration.simple.validator;
 
 import org.apache.wicket.validation.IValidatable;
+import org.apache.wicket.validation.ValidationError;
 import org.apache.wicket.validation.validator.StringValidator;
 import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider;
@@ -54,22 +55,24 @@ public class DestinationURIValidator extends StringValidator {
     
     private static Logger log = LoggerFactory.getLogger(DestinationURIValidator.class);
 
-  @Override
-  protected void onValidate(IValidatable<String> validatable) {
-	  for (String uri : validatable.getValue().split("\n"))
-	  	if (uri.startsWith("aet:")) {
-	  		String aet = uri.substring(4);
-				try {
+    @Override
+    public void validate(IValidatable<String> validatable) {
+    	for (String uri : validatable.getValue().split("\n"))
+    		if (uri.startsWith("aet:")) {
+    			String aet = uri.substring(4);
+    			try {
 					for (String aeTitle : ConfigTreeProvider.get().getUniqueAETitles())
 						if (aet.equals(aeTitle))
 							return;
-					error(validatable, "DestinationURIValidator.aetDoesNotExist");
+					validatable.error(new ValidationError()
+	    				.addKey("DestinationURIValidator.aetDoesNotExist"));
 				} catch (ConfigurationException e) {
-					error(validatable, "AETitleValidator");
+					validatable.error(new ValidationError()
+    					.addKey("AETitleValidator"));
 					log.error("Error validating AETs for DestinationURIs", e);
 				}
-	  	} else
+    		} else
 	  		// TODO: validate template
 	  		System.out.println("Not implemented yet");
-	  }
+    }
 }

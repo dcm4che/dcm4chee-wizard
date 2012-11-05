@@ -11,8 +11,8 @@
   <packaging>jar</packaging>
   <description>Common web components for dcm4chee-wizard</description>
   <properties>
-    <wicket.version>1.5.8</wicket.version>
-    <wicket.security.version>1.5.5</wicket.security.version>
+    <wicket.version>6.2.0</wicket.version>
+    <wicket.security.version>6.0.0</wicket.security.version>
     <dcm4chee.proxy.version>1.0.0-SNAPSHOT</dcm4chee.proxy.version>
     <dcm4che.version>3.0.0</dcm4che.version>
   </properties>

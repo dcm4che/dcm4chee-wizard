@@ -47,7 +47,8 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.ajax.markup.html.form.AjaxFallbackButton;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
-import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.markup.head.CssHeaderItem;
+import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.CheckBox;
@@ -86,7 +87,7 @@ public class ApplyTransferCapabilityProfilePage extends SecureWebPage {
 
     private static Logger log = LoggerFactory.getLogger(ApplyTransferCapabilityProfilePage.class);
 
-    private static final ResourceReference BaseCSS = new CssResourceReference(ExtendedWebPage.class, "base-style.css");
+    private static final ResourceReference baseCSS = new CssResourceReference(ExtendedWebPage.class, "base-style.css");
     
     // mandatory
     private Model<Boolean> scuModel;
@@ -258,12 +259,6 @@ public class ApplyTransferCapabilityProfilePage extends SecureWebPage {
 			log.error("Error creating TransferCapabilityValidator for sopClass TextField", e);
 		}
     }
-
-    @Override
-    public void renderHead(IHeaderResponse response) {
-        if (ApplyTransferCapabilityProfilePage.BaseCSS != null)
-        	response.renderCSSReference(ApplyTransferCapabilityProfilePage.BaseCSS);
-    }
     
     private List<Profile> orderedProfiles(Group group) {
 		List<Profile> profiles = group.getTransferCapabilityProfiles();
@@ -274,4 +269,10 @@ public class ApplyTransferCapabilityProfilePage extends SecureWebPage {
 		});
 		return profiles;
     }
- }
+
+    @Override
+    public void renderHead(IHeaderResponse response) {
+    	if (ApplyTransferCapabilityProfilePage.baseCSS != null) 
+    		response.render(CssHeaderItem.forReference(ApplyTransferCapabilityProfilePage.baseCSS));
+    }
+}

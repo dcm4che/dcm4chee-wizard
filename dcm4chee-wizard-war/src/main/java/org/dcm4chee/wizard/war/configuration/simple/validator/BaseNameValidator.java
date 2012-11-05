@@ -42,6 +42,7 @@ import javax.naming.InvalidNameException;
 import javax.naming.ldap.LdapName;
 
 import org.apache.wicket.validation.IValidatable;
+import org.apache.wicket.validation.ValidationError;
 import org.apache.wicket.validation.validator.StringValidator;
 
 /**
@@ -52,11 +53,11 @@ public class BaseNameValidator extends StringValidator {
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected void onValidate(IValidatable<String> deviceName) {
+    public void validate(IValidatable<String> deviceName) {
 		try {
 			new LdapName("dn=" + deviceName.getValue());
 		} catch (InvalidNameException e) {
-			error(deviceName, "BaseNameValidator.invalid");
+			deviceName.error(new ValidationError().addKey("BaseNameValidator.invalid"));
 		}			
     }
 }

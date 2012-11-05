@@ -41,6 +41,7 @@ package org.dcm4chee.wizard.war.configuration.simple.validator;
 import java.util.HashMap;
 
 import org.apache.wicket.validation.IValidatable;
+import org.apache.wicket.validation.ValidationError;
 import org.apache.wicket.validation.validator.StringValidator;
 import org.dcm4chee.proxy.conf.Schedule;
 
@@ -60,8 +61,9 @@ public class DestinationAETitleValidator extends StringValidator {
     }
 
     @Override
-    protected void onValidate(IValidatable<String> aeTitle) {
+    public void validate(IValidatable<String> aeTitle) {
     	if (!aeTitle.getValue().equals(ignore) && forwardSchedules.containsKey(aeTitle.getValue()))
-    		error(aeTitle, "DestinationAETitleValidator.alreadyExists");
+    		aeTitle.error(new ValidationError()
+    			.addKey("DestinationAETitleValidator.alreadyExists"));
     }
 }

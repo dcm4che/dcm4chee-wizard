@@ -43,6 +43,7 @@ import java.util.Map;
 
 import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.tree.table.TreeColumn;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
@@ -56,12 +57,10 @@ import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ForwardScheduleM
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.RetryModel;
 import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeNode.TreeNodeType;
 
-import wickettree.table.TreeColumn;
-
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-public class CustomTreeColumn extends TreeColumn<ConfigTreeNode> {
+public class CustomTreeColumn extends TreeColumn<ConfigTreeNode,String> {
 
 	private static final long serialVersionUID = 1L;
 

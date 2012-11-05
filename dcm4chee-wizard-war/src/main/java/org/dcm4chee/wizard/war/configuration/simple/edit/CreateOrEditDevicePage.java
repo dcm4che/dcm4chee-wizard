@@ -45,7 +45,8 @@ import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
-import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.markup.head.CssHeaderItem;
+import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.CheckBox;
@@ -65,8 +66,8 @@ import org.dcm4che.data.Issuer;
 import org.dcm4che.net.Device;
 import org.dcm4chee.proxy.conf.ProxyDevice;
 import org.dcm4chee.wizard.common.behavior.FocusOnLoadBehavior;
-import org.dcm4chee.wizard.common.component.ExtendedWebPage;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
+import org.dcm4chee.wizard.common.component.ExtendedWebPage;
 import org.dcm4chee.wizard.war.common.component.ExtendedSecureWebPage;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.DeviceModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.InstitutionCodeModel;
@@ -87,7 +88,7 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
 
     private static Logger log = LoggerFactory.getLogger(CreateOrEditDevicePage.class);
     
-    private static final ResourceReference BaseCSS = new CssResourceReference(ExtendedWebPage.class, "base-style.css");
+    private static final ResourceReference baseCSS = new CssResourceReference(ExtendedWebPage.class, "base-style.css");
     
     // configuration type selection
 	private Model<ConfigurationType> typeModel;
@@ -537,7 +538,7 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
     
     @Override
     public void renderHead(IHeaderResponse response) {
-        if (CreateOrEditDevicePage.BaseCSS != null)
-        	response.renderCSSReference(CreateOrEditDevicePage.BaseCSS);
+    	if (CreateOrEditDevicePage.baseCSS != null) 
+    		response.render(CssHeaderItem.forReference(CreateOrEditDevicePage.baseCSS));
     }
  }

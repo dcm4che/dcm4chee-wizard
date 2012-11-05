@@ -91,10 +91,10 @@ public class ExtendedSwarmStrategy extends org.wicketstuff.security.swarm.strate
 
         final MarkupContainer[] lowestSecureParent = new MarkupContainer[1];
 
-        component.visitParents(MarkupContainer.class, new IVisitor<Component, Void>() {
-			public void component(Component component, IVisit<Void> visit) {
+        component.visitParents(MarkupContainer.class, new IVisitor<MarkupContainer, Void>() {
+			public void component(MarkupContainer component, IVisit<Void> visit) {
                 if(component instanceof ISecureComponent) {
-                    lowestSecureParent[0] = (MarkupContainer) component;
+                    lowestSecureParent[0] = component;
                     visit.stop();
                }
 			}

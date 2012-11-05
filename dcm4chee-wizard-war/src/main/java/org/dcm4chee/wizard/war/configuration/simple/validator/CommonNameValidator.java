@@ -39,6 +39,7 @@
 package org.dcm4chee.wizard.war.configuration.simple.validator;
 
 import org.apache.wicket.validation.IValidatable;
+import org.apache.wicket.validation.ValidationError;
 import org.apache.wicket.validation.validator.StringValidator;
 import org.dcm4chee.proxy.conf.ForwardRule;
 import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
@@ -59,10 +60,11 @@ public class CommonNameValidator extends StringValidator {
     }
     
     @Override
-    protected void onValidate(IValidatable<String> commonName) {
+    public void validate(IValidatable<String> commonName) {
     	if (!commonName.getValue().equals(ignore))
 			for (ForwardRule forwardRule : applicationEntity.getForwardRules())
 				if (forwardRule.getCommonName().equals(commonName.getValue()))
-					error(commonName, "CommonNameValidator.exists");
+					commonName.error(new ValidationError()
+						.addKey("CommonNameValidator.exists"));
     }
 }

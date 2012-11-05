@@ -46,7 +46,8 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.ajax.markup.html.form.AjaxFallbackButton;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
-import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.markup.head.CssHeaderItem;
+import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.CheckBox;
@@ -63,8 +64,8 @@ import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.validation.validator.RangeValidator;
 import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.net.Connection;
-import org.dcm4chee.wizard.common.component.ExtendedWebPage;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
+import org.dcm4chee.wizard.common.component.ExtendedWebPage;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ConnectionModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.DefaultableModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.DeviceModel;
@@ -86,7 +87,7 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
 
     private static Logger log = LoggerFactory.getLogger(CreateOrEditConnectionPage.class);
     
-    private static final ResourceReference BaseCSS = new CssResourceReference(ExtendedWebPage.class, "base-style.css");
+    private static final ResourceReference baseCSS = new CssResourceReference(ExtendedWebPage.class, "base-style.css");
     
     // mandatory
 	private Model<String> hostnameModel;
@@ -423,7 +424,7 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
     
     @Override
     public void renderHead(IHeaderResponse response) {
-        if (CreateOrEditConnectionPage.BaseCSS != null)
-        	response.renderCSSReference(CreateOrEditConnectionPage.BaseCSS);
+        if (CreateOrEditConnectionPage.baseCSS != null)
+    		response.render(CssHeaderItem.forReference(CreateOrEditConnectionPage.baseCSS));
     }
 }

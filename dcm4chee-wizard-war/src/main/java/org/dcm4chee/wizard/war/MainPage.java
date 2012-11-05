@@ -41,14 +41,16 @@ package org.dcm4chee.wizard.war;
 import java.util.Properties;
 
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.markup.head.CssHeaderItem;
+import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.resource.CssResourceReference;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.dcm4chee.wizard.common.component.ExtendedWebPage;
 import org.dcm4chee.wizard.common.component.ModuleSelectorPanel;
-import org.dcm4chee.wizard.common.component.secure.SecureWebApplication;
 import org.dcm4chee.wizard.common.component.secure.SecureExtendedWebPage;
+import org.dcm4chee.wizard.common.component.secure.SecureWebApplication;
 import org.dcm4chee.wizard.war.configuration.simple.tree.BasicConfigurationPanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +65,7 @@ public class MainPage extends SecureExtendedWebPage {
 	protected static Logger log = LoggerFactory.getLogger(MainPage.class);
 
 	private static final ResourceReference baseCSS = new PackageResourceReference(ExtendedWebPage.class, "base-style.css");
-	private static final ResourceReference tableTreeCSS = new PackageResourceReference(MainPage.class, "table-tree.css");
+	private static final ResourceReference tableTreeCSS = new CssResourceReference(MainPage.class, "table-tree.css");
 	
 	public MainPage() {
         super();
@@ -73,9 +75,9 @@ public class MainPage extends SecureExtendedWebPage {
     @Override
     public void renderHead(IHeaderResponse response) {
     	if (MainPage.baseCSS != null) 
-    		response.renderCSSReference(MainPage.baseCSS);
+    		response.render(CssHeaderItem.forReference(MainPage.baseCSS));
     	if (MainPage.tableTreeCSS != null)
-    		response.renderCSSReference(MainPage.tableTreeCSS);
+    		response.render(CssHeaderItem.forReference(MainPage.tableTreeCSS));
     }
 
     private void addModules(ModuleSelectorPanel selectorPanel) {

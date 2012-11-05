@@ -39,6 +39,7 @@
 package org.dcm4chee.wizard.war.configuration.simple.validator;
 
 import org.apache.wicket.validation.IValidatable;
+import org.apache.wicket.validation.ValidationError;
 import org.apache.wicket.validation.validator.StringValidator;
 
 /**
@@ -52,11 +53,10 @@ public class HostnameValidator extends StringValidator {
 	private String ValidHostnameRegex = "^(([a-zA-Z]|[a-zA-Z][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z]|[A-Za-z][A-Za-z0-9\\-]*[A-Za-z0-9])$";
 
     @Override
-    protected void onValidate(IValidatable<String> hostname) {
-    	if (hostname.getValue().matches(ValidHostnameRegex))
+	public void validate(IValidatable<String> hostname) {
+    	if (hostname.getValue().matches(ValidHostnameRegex)
+    			|| hostname.getValue().matches(ValidIpAddressRegex))
     		return;
-    	else if (hostname.getValue().matches(ValidIpAddressRegex))
-    		return;
-    	else error(hostname, "HostnameValidator.invalid");
+    	hostname.error(new ValidationError().addKey("HostnameValidator.invalid"));
     }
 }

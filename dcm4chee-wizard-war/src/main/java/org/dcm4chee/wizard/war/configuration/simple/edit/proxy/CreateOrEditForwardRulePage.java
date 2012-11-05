@@ -47,7 +47,8 @@ import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.ajax.markup.html.form.AjaxFallbackButton;
 import org.apache.wicket.extensions.ajax.markup.html.autocomplete.DefaultCssAutoCompleteTextField;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
-import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.markup.head.CssHeaderItem;
+import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.CheckBox;
@@ -64,8 +65,8 @@ import org.dcm4che.net.Dimse;
 import org.dcm4chee.proxy.conf.ForwardRule;
 import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
 import org.dcm4chee.proxy.conf.Schedule;
-import org.dcm4chee.wizard.common.component.ExtendedWebPage;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
+import org.dcm4chee.wizard.common.component.ExtendedWebPage;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.StringArrayModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ForwardRuleModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ProxyApplicationEntityModel;
@@ -88,7 +89,7 @@ public class CreateOrEditForwardRulePage extends SecureWebPage {
 
     private static Logger log = LoggerFactory.getLogger(CreateOrEditForwardRulePage.class);
 
-    private static final ResourceReference BaseCSS = new CssResourceReference(ExtendedWebPage.class, "base-style.css");
+    private static final ResourceReference baseCSS = new CssResourceReference(ExtendedWebPage.class, "base-style.css");
 
     // mandatory
 	private Model<String> commonNameModel;
@@ -273,7 +274,7 @@ public class CreateOrEditForwardRulePage extends SecureWebPage {
 
     @Override
     public void renderHead(IHeaderResponse response) {
-        if (CreateOrEditForwardRulePage.BaseCSS != null)
-        	response.renderCSSReference(CreateOrEditForwardRulePage.BaseCSS);
+        if (CreateOrEditForwardRulePage.baseCSS != null)
+    		response.render(CssHeaderItem.forReference(CreateOrEditForwardRulePage.baseCSS));
     }
  }

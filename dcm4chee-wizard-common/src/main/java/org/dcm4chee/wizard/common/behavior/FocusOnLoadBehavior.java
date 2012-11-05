@@ -42,7 +42,8 @@ import java.io.Serializable;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.behavior.Behavior;
-import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextField;
@@ -97,10 +98,11 @@ public class FocusOnLoadBehavior extends Behavior {
         return false;
     }
     
-    private boolean setFocusOnEmpty(IHeaderResponse headerResponse, Component component) {
+    private boolean setFocusOnEmpty(IHeaderResponse response, Component component) {
         Object object = component.getDefaultModelObject();
         if (object == null || object.toString().length() < 1) {
-            headerResponse.renderOnLoadJavaScript(getJavaScriptString(component));
+	    	response.render(OnDomReadyHeaderItem
+	    			.forScript(getJavaScriptString(component)));
             return true;
         }
         return false;
@@ -118,8 +120,9 @@ public class FocusOnLoadBehavior extends Behavior {
 
         private static final long serialVersionUID = 1L;
 
-        public void focus(IHeaderResponse headerResponse, Component component) {
-            headerResponse.renderOnLoadJavaScript(getJavaScriptString(component));
+        public void focus(IHeaderResponse response, Component component) {
+	    	response.render(OnDomReadyHeaderItem
+	    			.forScript(getJavaScriptString(component)));
         }
     }
 
@@ -136,9 +139,10 @@ public class FocusOnLoadBehavior extends Behavior {
 
         private static final long serialVersionUID = 1L;
 
-        public void focus(IHeaderResponse headerResponse, Component component) {
+        public void focus(IHeaderResponse response, Component component) {
             if (component instanceof TextField<?>) {
-                headerResponse.renderOnLoadJavaScript(getJavaScriptString(component)+";elem.select()");
+    	    	response.render(OnDomReadyHeaderItem
+    	    			.forScript(getJavaScriptString(component)+";elem.select()"));
             }
         }
     }

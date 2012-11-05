@@ -41,31 +41,16 @@ package org.dcm4chee.wizard.war.configuration.wizard;
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.panel.Panel;
-import org.apache.wicket.request.resource.PackageResourceReference;
-import org.apache.wicket.request.resource.ResourceReference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class WizardPanel extends Panel {
 
     private static final long serialVersionUID = 1L;
     
-    private static final ResourceReference CSS = new PackageResourceReference(WizardPanel.class, "folder-style.css");
-    
     private static final String MODULE_NAME = "wizard";
-
-    private static Logger log = LoggerFactory.getLogger(WizardPanel.class);
 
     public WizardPanel(final String id) {
         super(id);
-    }
-    
-    @Override
-    public void renderHead(IHeaderResponse response) {
-    	if (WizardPanel.CSS != null)
-    		response.renderCSSReference(WizardPanel.CSS);
     }
     
     public static String getModuleName() {
