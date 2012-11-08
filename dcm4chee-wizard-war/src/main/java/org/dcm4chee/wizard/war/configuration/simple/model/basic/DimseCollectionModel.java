@@ -92,9 +92,9 @@ public class DimseCollectionModel implements Serializable {
     
     public List<Dimse> getDimses() {
     	List<Dimse> result = new ArrayList<Dimse>();
-    	for (int i = 0; i < dimses.length; i++)
-    		if (dimses[i] != null)
-    			result.add(dimses[i]);
+    	for (Dimse dimse : dimses)
+    		if (dimses != null)
+    			result.add(dimse);
     	return result;
     }
 }
