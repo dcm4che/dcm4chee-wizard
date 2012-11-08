@@ -67,6 +67,7 @@ import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
 import org.dcm4chee.proxy.conf.Schedule;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
 import org.dcm4chee.wizard.common.component.ExtendedWebPage;
+import org.dcm4chee.wizard.war.configuration.simple.model.basic.DimseCollectionModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.StringArrayModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ForwardRuleModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ProxyApplicationEntityModel;
@@ -97,7 +98,7 @@ public class CreateOrEditForwardRulePage extends SecureWebPage {
 	
 	// optional
     private Model<String> callingAETitleModel;
-    private Model<Dimse> dimseModel;
+    private DimseCollectionModel dimsesModel;
     private Model<Boolean> exclusiveUseDefinedTCModel;
     private Model<String> scheduleDaysModel;
     private Model<String> scheduleHoursModel;
@@ -123,7 +124,7 @@ public class CreateOrEditForwardRulePage extends SecureWebPage {
 			commonNameModel = Model.of();
 		    destinationURIModel = new StringArrayModel(null);
 		    callingAETitleModel = Model.of();
-		    dimseModel = Model.of();
+		    dimsesModel = new DimseCollectionModel(null, 3);
 		    exclusiveUseDefinedTCModel = Model.of(false);
 		    scheduleDaysModel = Model.of();
 		    scheduleHoursModel = Model.of();
@@ -135,7 +136,7 @@ public class CreateOrEditForwardRulePage extends SecureWebPage {
 	        destinationURIModel = new StringArrayModel(forwardRule.getDestinationURI()
 	        		.toArray(new String[0]));
 	        callingAETitleModel = Model.of(forwardRule.getCallingAET());
-	        dimseModel = Model.of(forwardRule.getDimse());
+	        dimsesModel = new DimseCollectionModel(forwardRuleModel.getForwardRule(), 3);
 	        exclusiveUseDefinedTCModel = Model.of(forwardRule.isExclusiveUseDefinedTC());
 		    scheduleDaysModel = Model.of(forwardRule.getReceiveSchedule().getDays());
 		    scheduleHoursModel = Model.of(forwardRule.getReceiveSchedule().getHours());
@@ -185,10 +186,18 @@ public class CreateOrEditForwardRulePage extends SecureWebPage {
         ArrayList<Dimse> dimseList = 
         		new ArrayList<Dimse>();
         dimseList.addAll(Arrays.asList(Dimse.values())); 
-        DropDownChoice<Dimse> dimseDropDown = 
-        		new DropDownChoice<Dimse>("dimse", dimseModel, dimseList);
-        optionalContainer.add(dimseDropDown
-        		.setNullValid(false));
+        DropDownChoice<Dimse> dimseDropDown1 = 
+        		new DropDownChoice<Dimse>("dimse1", dimsesModel.getDimseModel(0), dimseList);
+        optionalContainer.add(dimseDropDown1
+        		.setNullValid(true));
+        DropDownChoice<Dimse> dimseDropDown2 = 
+        		new DropDownChoice<Dimse>("dimse2", dimsesModel.getDimseModel(1), dimseList);
+        optionalContainer.add(dimseDropDown2
+        		.setNullValid(true));
+        DropDownChoice<Dimse> dimseDropDown3 = 
+        		new DropDownChoice<Dimse>("dimse3", dimsesModel.getDimseModel(2), dimseList);
+        optionalContainer.add(dimseDropDown3
+        		.setNullValid(true));
 
         optionalContainer.add(new Label("exclusiveUseDefinedTC.label", new ResourceModel("dicom.edit.forwardRule.optional.exclusiveUseDefinedTC.label")))
         .add(new CheckBox("exclusiveUseDefinedTC", exclusiveUseDefinedTCModel));
@@ -231,7 +240,7 @@ public class CreateOrEditForwardRulePage extends SecureWebPage {
             		forwardRule.setCommonName(commonNameModel.getObject());
             		forwardRule.setDestinationURIs(Arrays.asList(destinationURIModel.getArray()));
             		forwardRule.setCallingAET(callingAETitleModel.getObject());
-            		forwardRule.setDimse(dimseModel.getObject());
+            		forwardRule.setDimse(dimsesModel.getDimses());
             		forwardRule.setExclusiveUseDefinedTC(exclusiveUseDefinedTCModel.getObject());
             		Schedule schedule = new Schedule();
             		schedule.setDays(scheduleDaysModel.getObject());
