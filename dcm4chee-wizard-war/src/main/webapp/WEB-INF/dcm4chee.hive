@@ -4,9 +4,9 @@ grant principal org.wicketstuff.security.hive.authorization.SimplePrincipal "Log
     permission ${ComponentPermission} "org.dcm4chee.wizard.war.MainPage", "render, enable";
 };
 
-grant principal org.wicketstuff.security.hive.authorization.SimplePrincipal "FolderRead"
+grant principal org.wicketstuff.security.hive.authorization.SimplePrincipal "Simple"
 {
-// KEY: swarm.principal.LdapRead
+// KEY: swarm.principal.Simple
 	permission ${ComponentPermission} "org.dcm4chee.wizard.war.configuration.simple.tree.BasicConfigurationPanel", "render, enable";
 	permission ${ComponentPermission} "org.dcm4chee.wizard.war.configuration.advanced.AdvancedConfigurationPanel", "render, enable";
 	permission ${ComponentPermission} "org.dcm4chee.wizard.war.configuration.wizard.WizardPanel", "render, enable";

@@ -213,10 +213,10 @@ public class DicomConfigurationSourcePanel extends Panel {
         BufferedReader reader = null;
         try {
             List<DicomConfigurationSourceModel> updatedList = new ArrayList<DicomConfigurationSourceModel>();
-            String fn = System.getProperty("dcm4chee-web3.cfg.path", "conf/dcm4chee-web3/");
+            String fn = System.getProperty("dcm4chee-wizard.cfg.path", "conf/dcm4chee-wizard/");
             if (fn == null)
                 throw new FileNotFoundException(
-                        "Web config path not found! Not specified with System property 'dcm4chee-web3.cfg.path'");
+                        "Web config path not found! Not specified with System property 'dcm4chee-wizard.cfg.path'");
             File configFile = new File(fn + "dicom-configuration.json");
             if (!configFile.isAbsolute())
                 configFile = new File(System.getProperty("jboss.server.home.dir"), configFile.getPath());

@@ -133,9 +133,9 @@ public class LoginContextSecurityHelper {
 
     @SuppressWarnings("unchecked")
     private static Map<String, Set<String>> readRolesFile() throws IOException {
-        String fn = System.getProperty("dcm4chee-web3.cfg.path", "conf/dcm4chee-web3/");
+        String fn = System.getProperty("dcm4chee-wizard.cfg.path", "conf/dcm4chee-wizard/");
         if (fn == null) 
-            throw new FileNotFoundException("Web config path not found! Not specified with System property 'dcm4chee-web3.cfg.path'");
+            throw new FileNotFoundException("Web config path not found! Not specified with System property 'dcm4chee-wizard.cfg.path'");
         File mappingFile = new File(fn + "roles.json");
         if (!mappingFile.isAbsolute())
             mappingFile = new File(System.getProperty(JBossASBasedServerConfig.PROP_KEY_JBOSSAS_SERVER_HOME_DIR), mappingFile.getPath());
