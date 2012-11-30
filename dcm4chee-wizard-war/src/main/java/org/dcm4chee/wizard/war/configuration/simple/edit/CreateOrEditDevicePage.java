@@ -123,6 +123,7 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
 	private Model<String> vendorDataModel;
 	// ProxyDevice only
 	private Model<Integer> forwardThreadsModel;
+	private Model<Integer> staleTimeoutModel;
 	
     public CreateOrEditDevicePage(final ModalWindow window, final DeviceModel deviceModel) {
         super();
@@ -163,6 +164,7 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
     			stationNameModel = Model.of();
     			vendorDataModel = Model.of("size 0");
     			forwardThreadsModel = Model.of(ProxyDevice.DEFAULT_FORWARD_THREADS);
+    			staleTimeoutModel = Model.of(60);
         	} else {
         		typeModel = Model.of(deviceModel.getDevice() instanceof ProxyDevice ? 
 	        			ConfigTreeProvider.ConfigurationType.Proxy : ConfigTreeProvider.ConfigurationType.Basic);
@@ -222,6 +224,8 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
 				vendorDataModel = Model.of("size " + deviceModel.getDevice().getVendorData().length);
 				forwardThreadsModel = Model.of(deviceModel.getDevice() instanceof ProxyDevice ? 
      					((ProxyDevice) deviceModel.getDevice()).getForwardThreads() : null);
+				staleTimeoutModel = Model.of(deviceModel.getDevice() instanceof ProxyDevice ? 
+     					((ProxyDevice) deviceModel.getDevice()).getConfigurationStaleTimeout() : null);
         	}
 		} catch (ConfigurationException ce) {
 			log.error(this.getClass().toString() + ": " + "Error retrieving device data: " + ce.getMessage());
@@ -305,7 +309,6 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
 			@Override
 			protected void onUpdate(AjaxRequestTarget target) {
 				target.add(optionalContainer.setVisible(this.getModelObject()));
-				
 			}
         });
         
@@ -419,7 +422,27 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
 			}
 		}.setType(Integer.class)
 		.add(new RangeValidator<Integer>(1,256)));
-        
+
+        optionalContainer.add(new Label("staleTimeout.label", new ResourceModel("dicom.edit.device.optional.staleTimeout.label")) {
+			
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public boolean isVisible() {
+				return typeModel.getObject().equals(ConfigurationType.Proxy);
+			}
+		}.setOutputMarkupPlaceholderTag(true))
+		.add(new TextField<Integer>("staleTimeout", staleTimeoutModel) {
+			
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public boolean isVisible() {
+				return typeModel.getObject().equals(ConfigurationType.Proxy);
+			}
+		}.setType(Integer.class)
+		.add(new RangeValidator<Integer>(0,Integer.MAX_VALUE)));
+
         WebMarkupContainer relatedDeviceRefsContainer = 
         		new WebMarkupContainer("relatedDeviceRefsContainer");
         optionalContainer.add(relatedDeviceRefsContainer);
@@ -499,8 +522,12 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
 	    				device.setSoftwareVersions(softwareVersionsModel.getArray());
 	    				device.setStationName(stationNameModel.getObject());
 
-	                    if (device instanceof ProxyDevice && forwardThreadsModel.getObject() != null)
-	                    	((ProxyDevice) device).setForwardThreads(forwardThreadsModel.getObject());
+	                    if (device instanceof ProxyDevice) {
+	                    	if (forwardThreadsModel.getObject() != null)
+	                    		((ProxyDevice) device).setForwardThreads(forwardThreadsModel.getObject());
+	                    	((ProxyDevice) device).setConfigurationStaleTimeout(
+	                    			staleTimeoutModel.getObject() != null ? staleTimeoutModel.getObject() : 60);
+	                    }
                     }
                     
                     if (deviceModel == null)
