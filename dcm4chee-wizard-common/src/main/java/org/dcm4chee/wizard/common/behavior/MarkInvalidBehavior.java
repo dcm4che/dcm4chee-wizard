@@ -61,7 +61,7 @@ public class MarkInvalidBehavior extends Behavior {
             FormComponent<?> fc = (FormComponent<?>)component;
             if (!fc.isValid()) {
                 FeedbackMessages fbMsg = fc.getFeedbackMessages();
-                msg = fbMsg != null ? msg = fbMsg.first().toString() : "";
+                msg = fbMsg != null ? msg = fbMsg.first().getMessage().toString() : "";
                 if (fbMsg != null) fbMsg.first().markRendered();
             }
         }
