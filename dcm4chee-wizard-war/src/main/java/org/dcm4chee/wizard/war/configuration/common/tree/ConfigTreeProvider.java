@@ -36,7 +36,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.wizard.war.configuration.simple.tree;
+package org.dcm4chee.wizard.war.configuration.common.tree;
 
 import java.io.IOException;
 import java.util.ArrayList;

@@ -10,5 +10,20 @@
 	<title>Advanced configuration</title>
 	</head>
 	<wicket:panel>
+		<div wicket:id="echo-window" />
+		<div wicket:id="edit-window" />
+		<div wicket:id="remove-confirmation" />
+		<div wicket:id="refresh-message" />
+		<div wicket:id="reload-message" />
+		<div style="clear: both; margin-top: 5px;" />
+		<form style="clear: both" wicket:id="form">
+			<div style="margin-top: 20px;">
+				<button wicket:id="createDevice">
+					<img wicket:id="createDeviceImg" alt="Create Device" />
+					<span wicket:id="createDeviceText" />
+				</button>
+				 <div class="tree" wicket:id="configTree" />
+			</div>
+		</form>
 	</wicket:panel>	
 </html>

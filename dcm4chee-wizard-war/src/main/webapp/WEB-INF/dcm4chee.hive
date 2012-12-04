@@ -2,16 +2,13 @@ grant principal org.wicketstuff.security.hive.authorization.SimplePrincipal "Log
 {
 // KEY: swarm.principal.LoginAllowed
     permission ${ComponentPermission} "org.dcm4chee.wizard.war.MainPage", "render, enable";
+    permission ${ComponentPermission} "org.wicketstuff.security.components.SecureWebPage", "render, enable";
 };
 
 grant principal org.wicketstuff.security.hive.authorization.SimplePrincipal "Simple"
 {
 // KEY: swarm.principal.Simple
-	permission ${ComponentPermission} "org.dcm4chee.wizard.war.configuration.simple.tree.BasicConfigurationPanel", "render, enable";
-	permission ${ComponentPermission} "org.dcm4chee.wizard.war.configuration.advanced.AdvancedConfigurationPanel", "render, enable";
-	permission ${ComponentPermission} "org.dcm4chee.wizard.war.configuration.wizard.WizardPanel", "render, enable";
-    permission ${ComponentPermission} "org.dcm4chee.wizard.war.configuration.profile.ProfilePanel", "render, enable";
-    permission ${ComponentPermission} "org.dcm4chee.wizard.war.configuration.source.DicomConfigurationSourcePanel", "render, enable";
+	permission ${ComponentPermission} "org.dcm4chee.wizard.war.configuration.simple.panel.BasicConfigurationPanel", "render, enable";
 	permission ${ComponentPermission} "org.dcm4chee.wizard.war.configuration.simple.edit.CreateOrEditDevicePage", "render, enable";
     permission ${ComponentPermission} "org.dcm4chee.wizard.war.configuration.simple.edit.CreateOrEditConnectionPage", "render, enable";
     permission ${ComponentPermission} "org.dcm4chee.wizard.war.configuration.simple.edit.CreateOrEditApplicationEntityPage", "render, enable";
@@ -21,7 +18,21 @@ grant principal org.wicketstuff.security.hive.authorization.SimplePrincipal "Sim
     permission ${ComponentPermission} "org.dcm4chee.wizard.war.configuration.simple.edit.proxy.CreateOrEditForwardSchedulePage", "render, enable";
 	permission ${ComponentPermission} "org.dcm4chee.wizard.war.configuration.simple.edit.proxy.CreateOrEditRetryPage", "render, enable";
 	permission ${ComponentPermission} "org.dcm4chee.wizard.war.configuration.simple.edit.proxy.CreateOrEditCoercionPage", "render, enable";
-	permission ${ComponentPermission} "org.dcm4chee.wizard.war.configuration.simple.tree.DicomEchoPage", "render, enable";
+	permission ${ComponentPermission} "org.dcm4chee.wizard.war.configuration.common.tree.DicomEchoPage", "render, enable";
+};
 
-    permission ${ComponentPermission} "org.wicketstuff.security.components.SecureWebPage", "render, enable";
+grant principal org.wicketstuff.security.hive.authorization.SimplePrincipal "Advanced"
+{
+// KEY: swarm.principal.Advanced
+	permission ${ComponentPermission} "org.dcm4chee.wizard.war.configuration.advanced.panel.AdvancedConfigurationPanel", "render, enable";
+	permission ${ComponentPermission} "org.dcm4chee.wizard.war.configuration.advanced.edit.CustomCreateOrEditPage", "render, enable";
+	permission ${ComponentPermission} "org.dcm4chee.wizard.war.configuration.common.tree.DicomEchoPage", "render, enable";
+};
+
+grant principal org.wicketstuff.security.hive.authorization.SimplePrincipal "Other"
+{
+// KEY: swarm.principal.Other
+	permission ${ComponentPermission} "org.dcm4chee.wizard.war.configuration.wizard.WizardPanel", "render, enable";
+    permission ${ComponentPermission} "org.dcm4chee.wizard.war.configuration.profile.ProfilePanel", "render, enable";
+    permission ${ComponentPermission} "org.dcm4chee.wizard.war.configuration.source.DicomConfigurationSourcePanel", "render, enable";
 };

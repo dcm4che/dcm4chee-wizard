@@ -36,7 +36,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.wizard.war.configuration.simple.tree;
+package org.dcm4chee.wizard.war.configuration.advanced.panel;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -82,6 +82,16 @@ import org.dcm4chee.wizard.common.component.ExtendedForm;
 import org.dcm4chee.wizard.common.component.MessageWindow;
 import org.dcm4chee.wizard.war.WizardApplication;
 import org.dcm4chee.wizard.war.common.component.ExtendedPanel;
+import org.dcm4chee.wizard.war.configuration.advanced.edit.CustomCreateOrEditPage;
+import org.dcm4chee.wizard.war.configuration.common.tree.ConfigTableTree;
+import org.dcm4chee.wizard.war.configuration.common.tree.ConfigTreeNode;
+import org.dcm4chee.wizard.war.configuration.common.tree.ConfigTreeProvider;
+import org.dcm4chee.wizard.war.configuration.common.tree.ConnectionPanel;
+import org.dcm4chee.wizard.war.configuration.common.tree.CustomTreeColumn;
+import org.dcm4chee.wizard.war.configuration.common.tree.DicomEchoPage;
+import org.dcm4chee.wizard.war.configuration.common.tree.LinkPanel;
+import org.dcm4chee.wizard.war.configuration.common.tree.ConfigTreeNode.TreeNodeType;
+import org.dcm4chee.wizard.war.configuration.common.tree.ConfigTreeProvider.ConfigurationType;
 import org.dcm4chee.wizard.war.configuration.simple.edit.ApplyTransferCapabilityProfilePage;
 import org.dcm4chee.wizard.war.configuration.simple.edit.CreateOrEditApplicationEntityPage;
 import org.dcm4chee.wizard.war.configuration.simple.edit.CreateOrEditConnectionPage;
@@ -99,21 +109,19 @@ import org.dcm4chee.wizard.war.configuration.simple.model.proxy.CoercionModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ForwardRuleModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ForwardScheduleModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.RetryModel;
-import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeNode.TreeNodeType;
-import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider.ConfigurationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-public class BasicConfigurationPanel extends ExtendedPanel {
+public class AdvancedConfigurationPanel extends ExtendedPanel {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String MODULE_NAME = "dicom";
+    private static final String MODULE_NAME = "advanced";
 
-    private static Logger log = LoggerFactory.getLogger(BasicConfigurationPanel.class);
+    private static Logger log = LoggerFactory.getLogger(AdvancedConfigurationPanel.class);
 
     private ExtendedForm form;
 
@@ -130,7 +138,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
     private String connectedDeviceName;
     private String reloadServiceEndpoint;
     
-    public BasicConfigurationPanel(final String id) {
+    public AdvancedConfigurationPanel(final String id) {
         super(id);
 
         try {
@@ -304,7 +312,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 
                     @Override
                     public Page createPage() {
-                        return new CreateOrEditDevicePage(editWindow, null);
+                        return new CustomCreateOrEditPage(editWindow, null, "CreateOrEditDevicePage");
                     }
                 }).show(target);
             }
@@ -323,7 +331,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
             createColumns();
         	configTree =
             		new ConfigTableTree("configTree", deviceColumns, 
-            				ConfigTreeProvider.init(BasicConfigurationPanel.this), Integer.MAX_VALUE);
+            				ConfigTreeProvider.init(AdvancedConfigurationPanel.this), Integer.MAX_VALUE);
         	renderTree();
         } catch (ConfigurationException ce) {
         	log.error(this.getClass().toString() + ": " + "Error creating tree: " + ce.getMessage());
@@ -448,7 +456,7 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 				                    public void onOk(AjaxRequestTarget target) {
 				                    }
 				                };
-				                BasicConfigurationPanel.this.
+				                AdvancedConfigurationPanel.this.
 				                	addOrReplace(reloadMessage.setInitialHeight(150)
 				                		.setWindowClosedCallback(windowClosedCallback));
 				                reloadMessage.show(target);
@@ -639,8 +647,9 @@ public class BasicConfigurationPanel extends ExtendedPanel {
 					        				if (type.equals(ConfigTreeNode.TreeNodeType.DEVICE)) {
 					        					try {
 						        					ConfigTreeProvider.get().loadDevice(rowModel.getObject());
-						        	                return new CreateOrEditDevicePage(editWindow, 
-						        	                		(DeviceModel) rowModel.getObject().getModel());
+						        	                return new CustomCreateOrEditPage(editWindow, 
+						        	                		(DeviceModel) rowModel.getObject().getModel(), 
+						        	                		"CreateOrEditDevicePage");
 					        					} catch (Exception e) {
 					        						log.error("Error loading device on edit", e);
 					        						return null;

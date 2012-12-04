@@ -36,45 +36,123 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.wizard.war.profile.transfercapability.xml;
+package org.dcm4chee.wizard.war.configuration.common.custom;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import org.apache.wicket.behavior.Behavior;
 
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-@XmlRootElement(name = "dicom")
+@XmlRootElement(name = "component")
 @XmlAccessorType(XmlAccessType.PROPERTY)
-public class Root implements Serializable {
+public class CustomComponent implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
-	private Map<String,Group> transferCapabilityGroups = new HashMap<String,Group>();
 
-	@XmlElements({
-		@XmlElement(name = "group")})
-	public List<Group> getTransferCapabilityGroups() {
-		return new ArrayList<Group>(transferCapabilityGroups.values());
+	private final String componentPackage = "org.apache.wicket.markup.html.form.";
+	
+	public enum Container {MANDATORY,OPTIONAL};
+	public enum Type {
+		TextField,
+		CheckBox, 
+		DropDown
+	};
+
+	private String name;
+	private Container container;
+	private Type type;
+	private boolean required;
+	private String validator;
+	private String options;
+
+	private boolean enabled = true;
+
+	private Behavior[] behaviors;
+	
+	@XmlElement
+	public String getName() {
+		return name;
 	}
 
-	public void setTransferCapabilityGroups(List<Group> transferCapabilityGroups) {
-		this.transferCapabilityGroups.clear();
-		if (transferCapabilityGroups != null)
-			for (Group group : transferCapabilityGroups)
-				this.transferCapabilityGroups.put(group.getName(), group);
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	@XmlElement
+	public Container getContainer() {
+		return container;
+	}
+
+	public void setContainer(Container container) {
+		this.container = container;
+	}
+
+	@XmlElement
+	public Type getType() {
+		return type;
+	}
+
+	public void setType(Type type) {
+		this.type = type;
+	}
+
+	public String getClassName() {
+		return componentPackage + type;
 	}
 	
-	public Map<String,Group> asMap() {
-		return transferCapabilityGroups;
+	@XmlElement
+	public boolean getRequired() {
+		return required;
+	}
+
+	public void setRequired(boolean required) {
+		this.required = required;
+	}
+
+	@XmlElement
+	public String getValidator() {
+		return validator;
+	}
+
+	public void setValidator(String validator) {
+		this.validator = validator;
+	}
+
+	@XmlElement
+	public String getOptions() {
+		return options;
+	}
+
+	public void setOptions(String options) {
+		this.options = options;
+	}
+
+	public List<String> getOptionList() {
+		return options == null ? null : Arrays.asList(options.split("\\|"));
+	}
+	
+	public boolean getEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled  = enabled;
+	}
+	
+	public Behavior[] getBehaviors() {
+		return behaviors;
+	}
+	
+	public void setBehaviors(Behavior... behaviors) {
+		this.behaviors = behaviors;
 	}
 }

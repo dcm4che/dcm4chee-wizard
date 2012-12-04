@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<component>
+		<name>dicom.edit.device.type</name>
+		<container>MANDATORY</container>
+		<type>DropDown</type>
+		<required>true</required>
+		<options>Basic|Proxy|Archive</options>
+	</component>
+	<component>
+		<name>dicom.edit.device.title</name>
+		<container>MANDATORY</container>
+		<type>TextField</type>
+		<required>true</required>
+		<validator>DeviceName</validator>
+	</component>
+	<component>
+		<name>dicom.edit.device.installed</name>
+		<container>MANDATORY</container>
+		<type>CheckBox</type>
+		<required>true</required>
+	</component>
+</configuration>

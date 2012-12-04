@@ -51,7 +51,8 @@ import org.dcm4chee.wizard.common.component.ExtendedWebPage;
 import org.dcm4chee.wizard.common.component.ModuleSelectorPanel;
 import org.dcm4chee.wizard.common.component.secure.SecureExtendedWebPage;
 import org.dcm4chee.wizard.common.component.secure.SecureWebApplication;
-import org.dcm4chee.wizard.war.configuration.simple.tree.BasicConfigurationPanel;
+import org.dcm4chee.wizard.war.configuration.advanced.panel.AdvancedConfigurationPanel;
+import org.dcm4chee.wizard.war.configuration.simple.panel.BasicConfigurationPanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,7 +84,7 @@ public class MainPage extends SecureExtendedWebPage {
     private void addModules(ModuleSelectorPanel selectorPanel) {
         
         selectorPanel.addModule(BasicConfigurationPanel.class);
-//        selectorPanel.addModule(AdvancedConfigurationPanel.class);
+        selectorPanel.addModule(AdvancedConfigurationPanel.class);
 //        selectorPanel.addModule(WizardPanel.class);
 //        selectorPanel.addModule(ProfilePanel.class);
 //        selectorPanel.addModule(DicomConfigurationSourcePanel.class);

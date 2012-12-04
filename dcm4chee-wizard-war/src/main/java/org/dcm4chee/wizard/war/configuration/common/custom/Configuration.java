@@ -36,27 +36,36 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.wizard.war.configuration.simple.tree;
+package org.dcm4chee.wizard.war.configuration.common.custom;
 
-import org.apache.wicket.behavior.AttributeAppender;
-import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.image.Image;
-import org.apache.wicket.markup.html.panel.Panel;
-import org.apache.wicket.model.IModel;
-import org.apache.wicket.request.resource.ResourceReference;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElements;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-public class ConnectionPanel extends Panel {
+@XmlRootElement(name = "configuration")
+@XmlAccessorType(XmlAccessType.PROPERTY)
+public class Configuration implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+	
+	private List<CustomComponent> components = new ArrayList<CustomComponent>();
 
-	public ConnectionPanel(String id, ResourceReference image, IModel<String> name, IModel<String> title) {
-		super(id);
-		add(new Image("connectionIcon", image)
-			.add(new AttributeAppender("title", title)));
-		add(new Label("connectionName", name)
-			.add(new AttributeAppender("title", title)));
+	@XmlElements({
+		@XmlElement(name = "component")})
+	public List<CustomComponent> getComponents() {
+		return components;
+	}
+
+	public void setComponents(List<CustomComponent> components) {
+		this.components = components;
 	}
 }

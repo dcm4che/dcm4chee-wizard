@@ -36,7 +36,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.wizard.war.configuration.simple.tree;
+package org.dcm4chee.wizard.war.configuration.common.tree;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,6 +47,7 @@ import org.apache.wicket.extensions.markup.html.repeater.tree.table.TreeColumn;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.dcm4chee.wizard.war.configuration.common.tree.ConfigTreeNode.TreeNodeType;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ApplicationEntityModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ConnectionModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.DeviceModel;
@@ -55,7 +56,6 @@ import org.dcm4chee.wizard.war.configuration.simple.model.proxy.CoercionModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ForwardRuleModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ForwardScheduleModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.RetryModel;
-import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeNode.TreeNodeType;
 
 /**
  * @author Robert David <robert.david@agfa.com>

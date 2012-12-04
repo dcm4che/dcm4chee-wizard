@@ -36,24 +36,27 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.wizard.war.configuration.advanced;
+package org.dcm4chee.wizard.war.configuration.common.tree;
 
+import org.apache.wicket.behavior.AttributeAppender;
+import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.image.Image;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.model.IModel;
+import org.apache.wicket.request.resource.ResourceReference;
 
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-public class AdvancedConfigurationPanel extends Panel {
+public class ConnectionPanel extends Panel {
 
-    private static final long serialVersionUID = 1L;
-    
-    private static final String MODULE_NAME = "advanced";
+	private static final long serialVersionUID = 1L;
 
-    public AdvancedConfigurationPanel(final String id) {
-        super(id);
-    }
-    
-    public static String getModuleName() {
-        return MODULE_NAME;
-    }
+	public ConnectionPanel(String id, ResourceReference image, IModel<String> name, IModel<String> title) {
+		super(id);
+		add(new Image("connectionIcon", image)
+			.add(new AttributeAppender("title", title)));
+		add(new Label("connectionName", name)
+			.add(new AttributeAppender("title", title)));
+	}
 }

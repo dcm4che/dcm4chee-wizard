@@ -36,14 +36,14 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.wizard.war.configuration.simple.tree;
+package org.dcm4chee.wizard.war.configuration.common.tree;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.dcm4chee.wizard.war.configuration.common.tree.ConfigTreeProvider.ConfigurationType;
 import org.dcm4chee.wizard.war.configuration.simple.model.ConfigNodeModel;
-import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider.ConfigurationType;
 
 /**
  * @author Robert David <robert.david@agfa.com>
