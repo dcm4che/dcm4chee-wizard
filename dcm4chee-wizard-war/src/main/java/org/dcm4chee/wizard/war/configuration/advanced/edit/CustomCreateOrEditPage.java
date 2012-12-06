@@ -232,92 +232,22 @@ public class CustomCreateOrEditPage extends ExtendedSecureWebPage {
             throw new RuntimeException(ce);
 		}
 
-        // TODO: add models
+        List<CustomComponent> customComponents =
+				ConfigManager.getConfigurationFor(configuration).getComponents();
+
         Map<String, IModel> models = new HashMap<String,IModel>();
-        models.put("dicom.edit.device.type", typeModel);
-        models.put("dicom.edit.device.title", deviceNameModel);
-        models.put("dicom.edit.device.installed", installedModel);
-       
-  
-        List<CustomComponent> components = 
-        		ConfigManager.filter(
-        				ConfigManager.getConfigurationFor(configuration)
-        						//getClass().getSimpleName())
-        				.getComponents(), 
-                		CustomComponent.Container.MANDATORY);
-        components.get(0).setEnabled(deviceModel == null); // type
-        components.get(1).setEnabled(deviceModel == null); // deviceName
-        
-        components.get(0).setBehaviors(new AjaxFormComponentUpdatingBehavior("onchange") {
-			
-				private static final long serialVersionUID = 1L;
-				
-				@Override
-				protected void onUpdate(AjaxRequestTarget target) {
-System.out.println("TYPE IS: " + typeModel.getObject());
-					target.add(form.get("proxy"));
-				}
-		});
-        form.add(new CustomComponentsPanel(components, models));
-        
-//        form.add(new Label("type.label", new ResourceModel("dicom.edit.device.type.label")));
-//        ArrayList<ConfigTreeProvider.ConfigurationType> configurationTypeList = 
-//        		new ArrayList<ConfigTreeProvider.ConfigurationType>();
-//        configurationTypeList.add(ConfigTreeProvider.ConfigurationType.Basic); 
-//        configurationTypeList.add(ConfigTreeProvider.ConfigurationType.Proxy);
-//        configurationTypeList.add(ConfigTreeProvider.ConfigurationType.Archive);
-//        DropDownChoice<ConfigTreeProvider.ConfigurationType> typeDropDown = 
-//        		new DropDownChoice<ConfigTreeProvider.ConfigurationType>("type", typeModel, configurationTypeList);
-//		form.add(typeDropDown
-//				.setNullValid(false)
-//				.setEnabled(deviceModel == null)
-//				.add(new AjaxFormComponentUpdatingBehavior("onchange") {
-//					
-//						private static final long serialVersionUID = 1L;
-//						
-//						@Override
-//						protected void onUpdate(AjaxRequestTarget target) {
-//							target.add(form.get("proxy"));
-//						}
-//				}));
-
-//        try {
-//			form.add(new Label("title.label", new ResourceModel("dicom.edit.device.title.label")))
-//			.add(new TextField<String>("title", deviceNameModel)
-//					.add(new DeviceNameValidator(
-//							getDicomConfigurationManager().listDevices(), 
-//							deviceNameModel.getObject()))
-//			        .setRequired(true).add(FocusOnLoadBehavior.newFocusAndSelectBehaviour())
-//			        .setEnabled(deviceModel == null));
-//		} catch (ConfigurationException ce) {
-//			log.error(this.getClass().toString() + ": " + "Error listing devices: " + ce.getMessage());
-//            log.debug("Exception", ce);
-//            throw new RuntimeException(ce);
-//		}
-
-//        form.add(new Label("installed.label", new ResourceModel("dicom.edit.device.installed.label")))
-//        .add(new CheckBox("installed", installedModel));
-
-        try {
-            form.add(new WebMarkupContainer("proxy") {
-            	
-    			private static final long serialVersionUID = 1L;
-
-    			@Override
-    			public boolean isVisible() {
-    				return typeModel.getObject().equals(ConfigurationType.Proxy.toString());
-    			}        	
-            }.add(new Label("schedulerInterval.label", new ResourceModel("dicom.edit.device.proxy.schedulerInterval.label")))
-			.add(new TextField<Integer>("schedulerInterval", schedulerIntervalModel)
-            		.setType(Integer.class)
-            		.setRequired(deviceModel != null &&
-	            			deviceModel.getDevice() instanceof ProxyDevice ? true : false))
-	            			.setOutputMarkupPlaceholderTag(true));
-		} catch (ConfigurationException ce) {
-			log.error(this.getClass().toString() + ": " + "Error retrieving device data: " + ce.getMessage());
-            log.debug("Exception", ce);
-            throw new RuntimeException(ce);
+        for (CustomComponent customComponent : customComponents) {
+			models.put(customComponent.getName(), Model.of());
 		}
+        
+        // check for storage class
+        
+//        models.put("dicom.edit.device.type", typeModel);
+//        models.put("dicom.edit.device.title", deviceNameModel);
+//        models.put("dicom.edit.device.installed", installedModel);
+
+        form.add(new CustomComponentsPanel(
+        		ConfigManager.filter(customComponents, CustomComponent.Container.MANDATORY), models));
 
         final Form<?> optionalContainer = new Form<Object>("optional");
         form.add(optionalContainer
@@ -325,8 +255,8 @@ System.out.println("TYPE IS: " + typeModel.getObject());
         		.setOutputMarkupPlaceholderTag(true)
         		.setVisible(false));
 
-        optionalContainer.add(new Label("description.label", new ResourceModel("dicom.edit.device.optional.description.label")))
-        .add(new TextField<String>("description", descriptionModel));
+        optionalContainer.add(new CustomComponentsPanel(
+        		ConfigManager.filter(customComponents, CustomComponent.Container.OPTIONAL), models));
 
         form.add(new Label("toggleOptional.label", new ResourceModel("dicom.edit.toggleOptional.label")))
         .add(new AjaxCheckBox("toggleOptional", new Model<Boolean>()) {
@@ -339,135 +269,7 @@ System.out.println("TYPE IS: " + typeModel.getObject());
 				
 			}
         });
-        
-        optionalContainer.add(new Label("deviceSerialNumber.label", 
-        		new ResourceModel("dicom.edit.device.optional.deviceSerialNumber.label")))
-        .add(new TextField<String>("deviceSerialNumber", deviceSerialNumberModel));
 
-        optionalContainer.add(new Label("institutionAddress.label", 
-        		new ResourceModel("dicom.edit.device.optional.institutionAddress.label")))
-        .add(new TextArea<String>("institutionAddress", institutionAddressModel));
-        
-        TextField<String> codeValueTextField = new TextField<String>("institutionCodeValue", institutionCodeModel.getCodeFieldModel(0));
-        optionalContainer.add(new Label("institutionCodeValue.label", 
-        		new ResourceModel("dicom.edit.device.optional.institutionCodeValue.label")))
-        .add(codeValueTextField);
-
-        TextField<String> codingSchemeDesignatorTextField = new TextField<String>("institutionCodingSchemeDesignator", institutionCodeModel.getCodeFieldModel(1));
-        optionalContainer.add(new Label("institutionCodingSchemeDesignator.label", 
-        		new ResourceModel("dicom.edit.device.optional.institutionCodingSchemeDesignator.label")))
-        .add(codingSchemeDesignatorTextField);
-
-        TextField<String> codingSchemeVersionTextField = new TextField<String>("institutionCodingSchemeVersion", institutionCodeModel.getCodeFieldModel(2));
-        optionalContainer.add(new Label("institutionCodingSchemeVersion.label", 
-        		new ResourceModel("dicom.edit.device.optional.institutionCodingSchemeVersion.label")))
-        .add(codingSchemeVersionTextField);
-        
-        TextField<String> codeMeaningTextField = new TextField<String>("institutionCodeMeaning", institutionCodeModel.getCodeFieldModel(3));
-        optionalContainer.add(new Label("institutionCodeMeaning.label", 
-        		new ResourceModel("dicom.edit.device.optional.institutionCodeMeaning.label")))
-        .add(codeMeaningTextField);
-        
-        optionalContainer.add(new CodeValidator(codeValueTextField, codingSchemeDesignatorTextField, 
-        		codingSchemeVersionTextField, codeMeaningTextField));
-       
-        optionalContainer.add(new Label("institutionalDepartmentName.label", 
-        		new ResourceModel("dicom.edit.device.optional.institutionalDepartmentName.label")))
-        .add(new TextArea<String>("institutionalDepartmentName", institutionalDepartmentNameModel));
-
-        optionalContainer.add(new Label("institutionName.label", 
-        		new ResourceModel("dicom.edit.device.optional.institutionName.label")))
-        .add(new TextArea<String>("institutionName", institutionNameModel));
-
-        optionalContainer.add(new Label("issuerOfAccessionNumber.label", 
-        		new ResourceModel("dicom.edit.device.optional.issuerOfAccessionNumber.label")))
-        .add(new TextField<String>("issuerOfAccessionNumber", issuerOfAccessionNumberModel));
-
-        optionalContainer.add(new Label("issuerOfAdmissionID.label", 
-        		new ResourceModel("dicom.edit.device.optional.issuerOfAdmissionID.label")))
-        .add(new TextField<String>("issuerOfAdmissionID", issuerOfAdmissionIDModel));
-
-        optionalContainer.add(new Label("issuerOfContainerIdentifier.label", 
-        		new ResourceModel("dicom.edit.device.optional.issuerOfContainerIdentifier.label")))
-        .add(new TextField<String>("issuerOfContainerIdentifier", issuerOfContainerIdentifierModel));
-        
-        optionalContainer.add(new Label("issuerOfPatientID.label", 
-        		new ResourceModel("dicom.edit.device.optional.issuerOfPatientID.label")))
-        .add(new TextField<String>("issuerOfPatientID", issuerOfPatientIDModel));
-
-        optionalContainer.add(new Label("issuerOfServiceEpisodeID.label", 
-        		new ResourceModel("dicom.edit.device.optional.issuerOfServiceEpisodeID.label")))
-        .add(new TextField<String>("issuerOfServiceEpisodeID", issuerOfServiceEpisodeIDModel));
-
-        optionalContainer.add(new Label("issuerOfSpecimenIdentifier.label", 
-        		new ResourceModel("dicom.edit.device.optional.issuerOfSpecimenIdentifier.label")))
-        .add(new TextField<String>("issuerOfSpecimenIdentifier", issuerOfSpecimenIdentifierModel));
-        
-        optionalContainer.add(new Label("manufacturer.label", 
-        		new ResourceModel("dicom.edit.device.optional.manufacturer.label")))
-        .add(new TextField<String>("manufacturer", manufacturerModel));
-
-        optionalContainer.add(new Label("manufacturerModelName.label", 
-        		new ResourceModel("dicom.edit.device.optional.manufacturerModelName.label")))
-        .add(new TextField<String>("manufacturerModelName", manufacturerModelNameModel));
-
-        optionalContainer.add(new Label("orderFillerIdentifier.label", 
-        		new ResourceModel("dicom.edit.device.optional.orderFillerIdentifier.label")))
-        .add(new TextField<String>("orderFillerIdentifier", orderFillerIdentifierModel));
-
-        optionalContainer.add(new Label("orderPlacerIdentifier.label", 
-        		new ResourceModel("dicom.edit.device.optional.orderPlacerIdentifier.label")))
-        .add(new TextField<String>("orderPlacerIdentifier", orderPlacerIdentifierModel));
-        
-        optionalContainer.add(new Label("primaryDeviceTypes.label", 
-        		new ResourceModel("dicom.edit.device.optional.primaryDeviceTypes.label")))
-        .add(new TextArea<String>("primaryDeviceTypes", primaryDeviceTypesModel));
-
-        optionalContainer.add(new Label("softwareVersions.label", 
-        		new ResourceModel("dicom.edit.device.optional.softwareVersions.label")))
-        .add(new TextArea<String>("softwareVersions", softwareVersionsModel));
-
-        optionalContainer.add(new Label("stationName.label", 
-        		new ResourceModel("dicom.edit.device.optional.stationName.label")))
-        .add(new TextField<String>("stationName", stationNameModel));
-
-        optionalContainer.add(new Label("forwardThreads.label", new ResourceModel("dicom.edit.device.optional.forwardThreads.label")) {
-			
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public boolean isVisible() {
-				return typeModel.getObject().equals(ConfigurationType.Proxy);
-			}
-		}.setOutputMarkupPlaceholderTag(true))
-		.add(new TextField<Integer>("forwardThreads", forwardThreadsModel) {
-			
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public boolean isVisible() {
-				return typeModel.getObject().equals(ConfigurationType.Proxy);
-			}
-		}.setType(Integer.class)
-		.add(new RangeValidator<Integer>(1,256)));
-        
-        WebMarkupContainer relatedDeviceRefsContainer = 
-        		new WebMarkupContainer("relatedDeviceRefsContainer");
-        optionalContainer.add(relatedDeviceRefsContainer);
-        relatedDeviceRefsContainer.add(new Label("relatedDeviceRefs.label", 
-        		new ResourceModel("dicom.edit.device.relatedDeviceRefs.label")))
-        .add(new TextArea<String>("relatedDeviceRefs", relatedDeviceRefsModel)
-        		.setEnabled(false));
-        relatedDeviceRefsContainer.setVisible(relatedDeviceRefsModel.getArray().length > 0);
-
-        WebMarkupContainer vendorDataContainer = 
-        		new WebMarkupContainer("vendorDataContainer");
-        optionalContainer.add(vendorDataContainer);
-        vendorDataContainer.add(new Label("vendorData.label", 
-    			new ResourceModel("dicom.edit.applicationEntity.vendorData.label")))
-    	.add(new Label("vendorData", vendorDataModel));      
-			vendorDataContainer.setVisible(!vendorDataModel.getObject().equals("size 0"));
-    	
         form.add(new AjaxButton("submit", new ResourceModel("saveBtn"), form) {
 
             private static final long serialVersionUID = 1L;

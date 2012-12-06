@@ -112,9 +112,10 @@ public class ConfigManager {
     
     public synchronized static List<CustomComponent> 
     	filter(List<CustomComponent> customComponents, CustomComponent.Container container) {
+    	List<CustomComponent> result = new ArrayList<CustomComponent>(customComponents.size());
         for (CustomComponent customComponent : customComponents)
-        	if (!customComponent.getContainer().equals(container))
-        		customComponents.remove(customComponent);
-		return customComponents;
+        	if (customComponent.getContainer().equals(container))
+        		result.add(customComponent);
+		return result;
     }
 }

@@ -19,135 +19,13 @@
 		</div>
 		<form wicket:id="form">
 			<div class="edit-table-panel">
-			<!-- 
-				<div class="edit-table-row">
-					<span class="edit-desc" wicket:id="title.label" />
-					<input class="edit-value" wicket:id="title" type="text" />
-				</div>
-				 -->
-				 
 				<div wicket:id="customComponents" />
-				<!-- 
-				<div class="edit-table-row">
-					<span class="edit-desc" wicket:id="type.label" />
-					<select class="edit-value" wicket:id="type" />
-				</div>
-				 -->
-				<!-- 
-				<div class="edit-table-row">
-					<span class="edit-desc" wicket:id="installed.label" />
-					<input class="edit-value" wicket:id="installed" type="checkbox" />
-				</div>
-				 -->
-				<div class="edit-table-row" wicket:id="proxy">
-					<span class="edit-desc" wicket:id="schedulerInterval.label" />
-					<input class="edit-value" wicket:id="schedulerInterval" type="text" />
-				</div>
 				<div  class="edit-buttons">
 					<span class="edit-desc" wicket:id="toggleOptional.label" />
 					<input class="edit-value" wicket:id="toggleOptional" type="checkbox" />
 				</div>
 				<form wicket:id="optional">
-					<div class="edit-table-row">
-						<span class="edit-desc" wicket:id="description.label" />
-						<input class="edit-value" wicket:id="description" type="text" />
-					</div>		
-					<div class="edit-table-row">
-						<span class="edit-desc" wicket:id="deviceSerialNumber.label" />
-						<input class="edit-value" wicket:id="deviceSerialNumber" type="text" />
-					</div>		
-					<div class="edit-table-row" style="height: 45px;">
-						<span class="edit-desc" wicket:id="institutionAddress.label" />
-						<textarea class="edit-value" wicket:id="institutionAddress" rows="1" />
-					</div>
-					<div class="edit-table-row">
-						<span class="edit-desc" wicket:id="institutionCodeValue.label" />
-						<input class="edit-value" wicket:id="institutionCodeValue" type="text" />
-					</div>		
-					<div class="edit-table-row">
-						<span class="edit-desc" wicket:id="institutionCodingSchemeDesignator.label" />
-						<input class="edit-value" wicket:id="institutionCodingSchemeDesignator" type="text" />
-					</div>		
-					<div class="edit-table-row">
-						<span class="edit-desc" wicket:id="institutionCodingSchemeVersion.label" />
-						<input class="edit-value" wicket:id="institutionCodingSchemeVersion" type="text" />
-					</div>		
-					<div class="edit-table-row">
-						<span class="edit-desc" wicket:id="institutionCodeMeaning.label" />
-						<input class="edit-value" wicket:id="institutionCodeMeaning" type="text" />
-					</div>		
-					<div class="edit-table-row" style="height: 45px;">
-						<span class="edit-desc" wicket:id="institutionalDepartmentName.label" />
-						<textarea class="edit-value" wicket:id="institutionalDepartmentName" rows="1" />
-					</div>
-					<div class="edit-table-row" style="height: 45px;">
-						<span class="edit-desc" wicket:id="institutionName.label" />
-						<textarea class="edit-value" wicket:id="institutionName" rows="1" />
-					</div>
-					<div class="edit-table-row">
-						<span class="edit-desc" wicket:id="issuerOfAccessionNumber.label" />
-						<input class="edit-value" wicket:id="issuerOfAccessionNumber" type="text" />
-					</div>
-					<div class="edit-table-row">
-						<span class="edit-desc" wicket:id="issuerOfAdmissionID.label" />
-						<input class="edit-value" wicket:id="issuerOfAdmissionID" type="text" />
-					</div>
-					<div class="edit-table-row">
-						<span class="edit-desc" wicket:id="issuerOfContainerIdentifier.label" />
-						<input class="edit-value" wicket:id="issuerOfContainerIdentifier" type="text" />
-					</div>
-					<div class="edit-table-row">
-						<span class="edit-desc" wicket:id="issuerOfPatientID.label" />
-						<input class="edit-value" wicket:id="issuerOfPatientID" type="text" />
-					</div>
-					<div class="edit-table-row">
-						<span class="edit-desc" wicket:id="issuerOfServiceEpisodeID.label" />
-						<input class="edit-value" wicket:id="issuerOfServiceEpisodeID" type="text" />
-					</div>
-					<div class="edit-table-row">
-						<span class="edit-desc" wicket:id="issuerOfSpecimenIdentifier.label" />
-						<input class="edit-value" wicket:id="issuerOfSpecimenIdentifier" type="text" />
-					</div>
-					<div class="edit-table-row">
-						<span class="edit-desc" wicket:id="manufacturer.label" />
-						<input class="edit-value" wicket:id="manufacturer" type="text" />
-					</div>
-					<div class="edit-table-row">
-						<span class="edit-desc" wicket:id="manufacturerModelName.label" />
-						<input class="edit-value" wicket:id="manufacturerModelName" type="text" />
-					</div>
-					<div class="edit-table-row">
-						<span class="edit-desc" wicket:id="orderFillerIdentifier.label" />
-						<input class="edit-value" wicket:id="orderFillerIdentifier" type="text" />
-					</div>
-					<div class="edit-table-row">
-						<span class="edit-desc" wicket:id="orderPlacerIdentifier.label" />
-						<input class="edit-value" wicket:id="orderPlacerIdentifier" type="text" />
-					</div>
-					<div class="edit-table-row" style="height: 45px;">
-						<span class="edit-desc" wicket:id="primaryDeviceTypes.label" />
-						<textarea class="edit-value" wicket:id="primaryDeviceTypes" rows="1" />
-					</div>
-					<div class="edit-table-row" style="height: 45px;">
-						<span class="edit-desc" wicket:id="softwareVersions.label" />
-						<textarea class="edit-value" wicket:id="softwareVersions" rows="1" />
-					</div>
-					<div class="edit-table-row">
-						<span class="edit-desc" wicket:id="stationName.label" />
-						<input class="edit-value" wicket:id="stationName" type="text" />
-					</div>
-					<div class="edit-table-row">
-						<span class="edit-desc" wicket:id="forwardThreads.label" />
-						<input class="edit-value" wicket:id="forwardThreads" type="text" />
-					</div>
-					<div class="edit-table-row" style="height: 45px;" wicket:id="relatedDeviceRefsContainer">
-						<span class="edit-desc" wicket:id="relatedDeviceRefs.label" />
-						<textarea class="edit-value" wicket:id="relatedDeviceRefs" rows="1" />
-					</div>
-					<div class="edit-table-row" wicket:id="vendorDataContainer">
-						<span class="edit-desc" wicket:id="vendorData.label" />
-						<span class="edit-value" wicket:id="vendorData" />
-					</div>
+					<div wicket:id="customComponents" />
 				</form>
 				<div class="edit-buttons">
 					<input type="submit" wicket:id="submit" />

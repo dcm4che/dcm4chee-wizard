@@ -58,6 +58,8 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.validation.IValidator;
+import org.apache.wicket.validation.validator.PatternValidator;
+import org.apache.wicket.validation.validator.StringValidator;
 
 /**
  * @author Robert David <robert.david@agfa.com>
@@ -89,11 +91,11 @@ public class CustomComponentsPanel extends Panel {
 				
 //				customComponent.setName(customComponent.getType().toString());//getWicketId(customComponent));
 
-if (customComponent.getType().equals(CustomComponent.Type.TextField))
+if (customComponent.getComponentType().equals(CustomComponent.ComponentType.TextField))
 				item.add(new TextFieldFragment(customComponent, models.get(customComponent.getName())));
-    	else if (customComponent.getType().equals(CustomComponent.Type.CheckBox))
+    	else if (customComponent.getComponentType().equals(CustomComponent.ComponentType.CheckBox))
     		item.add(new CheckBoxFragment(customComponent, models.get(customComponent.getName())));
-    	else if (customComponent.getType().equals(CustomComponent.Type.DropDown))
+    	else if (customComponent.getComponentType().equals(CustomComponent.ComponentType.DropDown))
     		item.add(new DropDownFragment(customComponent, models.get(customComponent.getName())));
     	else
     		item.add(new EmptyFragment());
@@ -119,31 +121,17 @@ if (customComponent.getType().equals(CustomComponent.Type.TextField))
 			super(id, tagName, panel);
 		}
 		
-		@SuppressWarnings({ "rawtypes", "unchecked" })
+		@SuppressWarnings({ "unchecked" })
 		FormComponent<?> addModifiers(CustomComponent customComponent, FormComponent<?> formComponent) {
 			formComponent
 				.setRequired(customComponent.getRequired())
-				.add(new AttributeModifier("title", new ResourceModel(customComponent.getName() + ".tooltip")))
-				.setEnabled(customComponent.getEnabled());
-System.out.println("Model is: " + formComponent.getModel().getObject() + " for " + formComponent.getId());
+				.add(new AttributeModifier("title", new ResourceModel(customComponent.getName() + ".tooltip")));
 
-			String prefix = "org.dcm4chee.wizard.war.configuration.simple.validator.";
-			String postfix = "Validator";
-			if (customComponent.getValidator() != null) {
-System.out.println("Trying to add validator: " + 
-		prefix + customComponent.getValidator() + postfix);
-//				try {
-//					formComponent.add((IValidator) 
-//							Class.forName(prefix + customComponent.getValidator() + postfix)
-//							.newInstance());
-//				} catch (Exception e) {
-//					throw new RuntimeException("Error instanciating Validator for "
-//							 + prefix + customComponent.getValidator() + postfix, e);
-//				}
-			}
-			if (customComponent.getBehaviors() != null)
-				for (Behavior behavior : customComponent.getBehaviors())
-					formComponent.add(behavior);
+System.out.println("Model is: " + formComponent.getModel() + " for " + formComponent.getId());
+
+			if (this instanceof TextFieldFragment && customComponent.getValidator() != null)
+				((FormComponent<String>) formComponent)
+					.add( new PatternValidator(customComponent.getValidator()));
 			return formComponent;
 		}
 	}

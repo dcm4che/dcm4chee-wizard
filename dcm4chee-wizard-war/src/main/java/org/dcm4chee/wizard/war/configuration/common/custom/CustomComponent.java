@@ -47,8 +47,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.apache.wicket.behavior.Behavior;
-
 /**
  * @author Robert David <robert.david@agfa.com>
  */
@@ -61,23 +59,37 @@ public class CustomComponent implements Serializable {
 	private final String componentPackage = "org.apache.wicket.markup.html.form.";
 	
 	public enum Container {MANDATORY,OPTIONAL};
-	public enum Type {
+	
+	public enum ComponentType {
 		TextField,
 		CheckBox, 
 		DropDown
 	};
+	
+	public enum DataType {
+		Text,
+		Number,
+		Boolean, 
+		TextRows
+	};
+
+	public enum ObjectType {
+		Device,
+		Connection,
+		AE, 
+		TransferCapability
+	};
 
 	private String name;
 	private Container container;
-	private Type type;
+	private ComponentType componentType;
+	private DataType dataType;
+//	private ObjectType objectType;
+	private String storeTo;
 	private boolean required;
 	private String validator;
 	private String options;
 
-	private boolean enabled = true;
-
-	private Behavior[] behaviors;
-	
 	@XmlElement
 	public String getName() {
 		return name;
@@ -97,16 +109,52 @@ public class CustomComponent implements Serializable {
 	}
 
 	@XmlElement
-	public Type getType() {
-		return type;
+	public ComponentType getComponentType() {
+		return componentType;
 	}
 
-	public void setType(Type type) {
-		this.type = type;
+	public void setComponentType(ComponentType componentType) {
+		this.componentType = componentType;
 	}
 
 	public String getClassName() {
-		return componentPackage + type;
+		return componentPackage + componentType;
+	}
+	
+//	@XmlElement
+//	public String getDataType() {
+//		return dataType;
+//	}
+//
+//	public void setDataType(String dataType) {
+//		this.dataType = dataType;
+//	}
+
+	@XmlElement
+	public DataType getDataType() {
+		return dataType;
+	}
+
+	public void setDataType(DataType dataType) {
+		this.dataType = dataType;
+	}
+
+//	@XmlElement
+//	public ObjectType getObjectType() {
+//		return objectType;
+//	}
+//
+//	public void setObjectType(ObjectType objectType) {
+//		this.objectType = objectType;
+//	}
+
+	@XmlElement
+	public String getStoreTo() {
+		return storeTo;
+	}
+
+	public void setStoreTo(String storeTo) {
+		this.storeTo = storeTo;
 	}
 	
 	@XmlElement
@@ -138,21 +186,5 @@ public class CustomComponent implements Serializable {
 
 	public List<String> getOptionList() {
 		return options == null ? null : Arrays.asList(options.split("\\|"));
-	}
-	
-	public boolean getEnabled() {
-		return enabled;
-	}
-
-	public void setEnabled(boolean enabled) {
-		this.enabled  = enabled;
-	}
-	
-	public Behavior[] getBehaviors() {
-		return behaviors;
-	}
-	
-	public void setBehaviors(Behavior... behaviors) {
-		this.behaviors = behaviors;
 	}
 }
