@@ -40,7 +40,6 @@ package org.dcm4chee.wizard.common.login.context;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -65,9 +64,9 @@ import net.sf.json.JSONObject;
 
 import org.apache.wicket.Application;
 import org.apache.wicket.protocol.http.WebApplication;
+import org.dcm4che.util.StringUtils;
 import org.dcm4chee.wizard.common.component.secure.SecureWebApplication;
 import org.dcm4chee.wizard.common.login.secure.SecureSession;
-import org.jboss.bootstrap.api.as.config.JBossASBasedServerConfig;
 import org.jboss.security.SecurityContextAssociation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -133,12 +132,18 @@ public class LoginContextSecurityHelper {
 
     @SuppressWarnings("unchecked")
     private static Map<String, Set<String>> readRolesFile() throws IOException {
-        String fn = System.getProperty("dcm4chee-wizard.cfg.path", "conf/dcm4chee-wizard/");
-        if (fn == null) 
-            throw new FileNotFoundException("Wizard config path not found! Not specified with System property 'dcm4chee-wizard.cfg.path'");
-        File mappingFile = new File(fn + "roles.json");
+        String fn = System.getProperty("dcm4chee-wizard.cfg.path"); 
+        if (fn == null) { 
+            log.warn("Wizard config path not found! Not specified with System property 'dcm4chee-wizard.cfg.path'");
+            fn = JBossAS7SystemProperties.JBOSS_SERVER_CONFIG_DIR + "/dcm4chee-wizard/";
+            log.warn("Using default config path of: " + fn);
+        }
+        File mappingFile = new File(StringUtils.replaceSystemProperties(fn) + "roles.json");
         if (!mappingFile.isAbsolute())
-            mappingFile = new File(System.getProperty(JBossASBasedServerConfig.PROP_KEY_JBOSSAS_SERVER_HOME_DIR), mappingFile.getPath());
+            mappingFile = new File(
+            		JBossAS7SystemProperties.JBOSS_SERVER_BASE_DIR, 
+            		mappingFile.getPath());
+log.warn("Resolved config path to: " + fn);
         Map<String, Set<String>> mappings = new HashMap<String, Set<String>>();
         String line;
         BufferedReader reader = null;

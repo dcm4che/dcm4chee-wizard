@@ -277,69 +277,66 @@ public class CustomCreateOrEditPage extends ExtendedSecureWebPage {
             @Override
             protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
                 try {
-                	Device device = null;
-                	if (deviceModel != null) 
-                		device = deviceModel.getDevice();
-                	else 
-                		device = typeModel.getObject().equals(ConfigurationType.Proxy.toString()) ? 
-                				new ProxyDevice(deviceNameModel.getObject()) : 
-                         		new Device(deviceNameModel.getObject());
-                    device.setInstalled(installedModel.getObject());
-                    if (device instanceof ProxyDevice) 
-                    	((ProxyDevice) device).setSchedulerInterval(schedulerIntervalModel.getObject());
+//                	Device device = null;
+//                	if (deviceModel != null) 
+//                		device = deviceModel.getDevice();
+//                	else 
+//                		device = typeModel.getObject().equals(ConfigurationType.Proxy.toString()) ? 
+//                				new ProxyDevice(deviceNameModel.getObject()) : 
+//                         		new Device(deviceNameModel.getObject());
+//                    device.setInstalled(installedModel.getObject());
+//                    if (device instanceof ProxyDevice) 
+//                    	((ProxyDevice) device).setSchedulerInterval(schedulerIntervalModel.getObject());
 
-//                    for (String s : authorizedNodeCertificateReferenceModel.getArray()) {
-//                    	for (X509Certificate c : device..getAllAuthorizedNodeCertificates()) {
-//                    		if c.getSigAlgName().equals(s)
-//                    			device.setAuthorizedNodeCertificates(ref, certs)
-//                    	}
-//                    device.setAuthorizedNodeCertificates(authorizedNodeCertificateReferenceModel.getArray());
+                	
+                	// extract class from storeTo
+                	// extract method from storeTo
+                	
+                	
+                	// check object from model, cast to class if not null
+                	// else create new instance
+                    
+                    // call method to store value from model
+
+//                    if (optionalContainer.isVisible()) {
+//	    				device.setDescription(descriptionModel.getObject());
+//	    				device.setDeviceSerialNumber(deviceSerialNumberModel.getObject());
+//	    				device.setInstitutionAddresses(institutionAddressModel.getArray());
+//	    				device.setInstitutionCodes(institutionCodeModel.getCode() == null ? 
+//	    						new Code[] {} : new Code[] {institutionCodeModel.getCode()});
+//		    			device.setInstitutionalDepartmentNames(institutionalDepartmentNameModel.getArray());
+//	    				device.setInstitutionNames(institutionNameModel.getArray());    				
+//	    				device.setIssuerOfAccessionNumber(issuerOfAccessionNumberModel.getObject() == null ? 
+//	    						null : new Issuer(issuerOfAccessionNumberModel.getObject()));
+//	    				device.setIssuerOfAdmissionID(issuerOfAdmissionIDModel.getObject() == null ? 
+//	    						null : new Issuer(issuerOfAdmissionIDModel.getObject()));
+//	    				device.setIssuerOfContainerIdentifier(issuerOfContainerIdentifierModel.getObject() == null ? 
+//	    						null : new Issuer(issuerOfContainerIdentifierModel.getObject()));
+//	    				device.setIssuerOfPatientID(issuerOfPatientIDModel.getObject() == null ? 
+//	    						null : new Issuer(issuerOfPatientIDModel.getObject()));
+//	    				device.setIssuerOfServiceEpisodeID(issuerOfServiceEpisodeIDModel.getObject() == null ? 
+//	    						null : new Issuer(issuerOfServiceEpisodeIDModel.getObject()));
+//	    				device.setIssuerOfSpecimenIdentifier(issuerOfSpecimenIdentifierModel.getObject() == null ? 
+//	    						null : new Issuer(issuerOfSpecimenIdentifierModel.getObject()));
+//	    				device.setManufacturer(manufacturerModel.getObject());
+//	    				device.setManufacturerModelName(manufacturerModelNameModel.getObject());
+//	    				device.setOrderFillerIdentifier(orderFillerIdentifierModel.getObject() == null ? 
+//	    						null : new Issuer(orderFillerIdentifierModel.getObject()));
+//	    				device.setOrderPlacerIdentifier(orderPlacerIdentifierModel.getObject() == null ? 
+//	    						null : new Issuer(orderPlacerIdentifierModel.getObject()));
+//	    				device.setPrimaryDeviceTypes(primaryDeviceTypesModel.getArray());
+//	    				device.setRelatedDeviceRefs(relatedDeviceRefsModel.getArray());
+//	    				device.setSoftwareVersions(softwareVersionsModel.getArray());
+//	    				device.setStationName(stationNameModel.getObject());
+//
+//	                    if (device instanceof ProxyDevice && forwardThreadsModel.getObject() != null)
+//	                    	((ProxyDevice) device).setForwardThreads(forwardThreadsModel.getObject());
 //                    }
-                    
-//                    device.setThisNodeCertificates(ref, certs)
-//                    device.re
-                    
-                    // this node cert -> eigenes
-
-                    if (optionalContainer.isVisible()) {
-	    				device.setDescription(descriptionModel.getObject());
-	    				device.setDeviceSerialNumber(deviceSerialNumberModel.getObject());
-	    				device.setInstitutionAddresses(institutionAddressModel.getArray());
-	    				device.setInstitutionCodes(institutionCodeModel.getCode() == null ? 
-	    						new Code[] {} : new Code[] {institutionCodeModel.getCode()});
-		    			device.setInstitutionalDepartmentNames(institutionalDepartmentNameModel.getArray());
-	    				device.setInstitutionNames(institutionNameModel.getArray());    				
-	    				device.setIssuerOfAccessionNumber(issuerOfAccessionNumberModel.getObject() == null ? 
-	    						null : new Issuer(issuerOfAccessionNumberModel.getObject()));
-	    				device.setIssuerOfAdmissionID(issuerOfAdmissionIDModel.getObject() == null ? 
-	    						null : new Issuer(issuerOfAdmissionIDModel.getObject()));
-	    				device.setIssuerOfContainerIdentifier(issuerOfContainerIdentifierModel.getObject() == null ? 
-	    						null : new Issuer(issuerOfContainerIdentifierModel.getObject()));
-	    				device.setIssuerOfPatientID(issuerOfPatientIDModel.getObject() == null ? 
-	    						null : new Issuer(issuerOfPatientIDModel.getObject()));
-	    				device.setIssuerOfServiceEpisodeID(issuerOfServiceEpisodeIDModel.getObject() == null ? 
-	    						null : new Issuer(issuerOfServiceEpisodeIDModel.getObject()));
-	    				device.setIssuerOfSpecimenIdentifier(issuerOfSpecimenIdentifierModel.getObject() == null ? 
-	    						null : new Issuer(issuerOfSpecimenIdentifierModel.getObject()));
-	    				device.setManufacturer(manufacturerModel.getObject());
-	    				device.setManufacturerModelName(manufacturerModelNameModel.getObject());
-	    				device.setOrderFillerIdentifier(orderFillerIdentifierModel.getObject() == null ? 
-	    						null : new Issuer(orderFillerIdentifierModel.getObject()));
-	    				device.setOrderPlacerIdentifier(orderPlacerIdentifierModel.getObject() == null ? 
-	    						null : new Issuer(orderPlacerIdentifierModel.getObject()));
-	    				device.setPrimaryDeviceTypes(primaryDeviceTypesModel.getArray());
-	    				device.setRelatedDeviceRefs(relatedDeviceRefsModel.getArray());
-	    				device.setSoftwareVersions(softwareVersionsModel.getArray());
-	    				device.setStationName(stationNameModel.getObject());
-
-	                    if (device instanceof ProxyDevice && forwardThreadsModel.getObject() != null)
-	                    	((ProxyDevice) device).setForwardThreads(forwardThreadsModel.getObject());
-                    }
-                    
-                    if (deviceModel == null)
-                    	ConfigTreeProvider.get().persistDevice(device);
-                    else
-                    	ConfigTreeProvider.get().mergeDevice(device);                   
+//                    
+//                    if (deviceModel == null)
+//                    	ConfigTreeProvider.get().persistDevice(device);
+//                    else
+//                    	ConfigTreeProvider.get().mergeDevice(device);                   
                     window.close(target);
         		} catch (Exception e) {
         			log.error(this.getClass().toString() + ": " + "Error modifying device: " + e.getMessage());
