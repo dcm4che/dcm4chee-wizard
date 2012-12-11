@@ -39,6 +39,7 @@
 package org.dcm4chee.wizard.war.configuration.advanced.edit;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -74,18 +75,12 @@ import org.slf4j.LoggerFactory;
  */
 public class CustomCreateOrEditPage extends ExtendedSecureWebPage {
     
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
     private static Logger log = LoggerFactory.getLogger(CustomCreateOrEditPage.class);
     
     private static final ResourceReference baseCSS = new CssResourceReference(ExtendedWebPage.class, "base-style.css");
     
-//    // mandatory
-//    private Model<String> deviceNameModel;
-//	private IModel<Boolean> installedModel;
-//	// ProxyDevice only
-//	private Model<Integer> schedulerIntervalModel;
-	
 	List<CustomComponent> customComponents;
 	Map<String, IModel> models;
 
@@ -99,15 +94,6 @@ public class CustomCreateOrEditPage extends ExtendedSecureWebPage {
         super();
         init(window, model, configuration);
     }
-    
-//    void addComponents() {
-//        form.add(new CustomComponentPanel(
-//        		ConfigManager.filter(customComponents, CustomComponent.Container.MANDATORY, true), 
-//        		models, this));
-//        optionalContainer.add(new CustomComponentPanel(
-//        		ConfigManager.filter(customComponents, CustomComponent.Container.OPTIONAL, true), 
-//        		models, this));
-//    }
     
     @Override
     public void renderHead(IHeaderResponse response) {
@@ -145,15 +131,8 @@ public class CustomCreateOrEditPage extends ExtendedSecureWebPage {
         				models, this));
         
         form.add((typeContainer = 
-    	        new WebMarkupContainer("type") {
-    	        	
-    				private static final long serialVersionUID = 1L;
-    	
-//    				@Override
-//    				public boolean isVisible() {
-//    					return size() > 0;
-//    				}
-    	        }).setOutputMarkupId(true)
+    	        new WebMarkupContainer("type"))
+    	        .setOutputMarkupId(true)
     	        .setOutputMarkupPlaceholderTag(true));
 
         typeContainer.add(new CustomComponentPanel(
@@ -161,15 +140,8 @@ public class CustomCreateOrEditPage extends ExtendedSecureWebPage {
         		models, this));
         
         optionalContainer.add((optionalTypeContainer = 
-    	        new WebMarkupContainer("type") {
-    	        	
-    				private static final long serialVersionUID = 1L;
-    	
-//    				@Override
-//    				public boolean isVisible() {
-//    					return size() > 0;
-//    				}
-    	        }).setOutputMarkupId(true)
+    	        new WebMarkupContainer("type"))
+    	        .setOutputMarkupId(true)
     	        .setOutputMarkupPlaceholderTag(true));
         
         optionalTypeContainer.add(new CustomComponentPanel(
@@ -193,9 +165,7 @@ public class CustomCreateOrEditPage extends ExtendedSecureWebPage {
 
             @Override
             protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
-                try {
-                	System.out.println("SAVE CALLED");
-                	
+
                 	
 //                	Device device = null;
 //                	if (deviceModel != null) 
@@ -221,35 +191,56 @@ public class CustomCreateOrEditPage extends ExtendedSecureWebPage {
                     Object paramsObj[] = {};
                     
                 	for (CustomComponent customComponent : customComponents) {
+                        try {
+//                		System.out.println("CALLING CLASS: " + customComponent.getStoreClass());
 
-System.out.println("CALLING CLASS: " + customComponent.getStoreClass());
-System.out.println("CALLING METHOD: " + customComponent.getStoreMethod(customComponent.getDataClass()));
+//                			System.out.println("CALLING METHOD: " + customComponent.getStoreMethod(customComponent.getDataClass()));
 
-	                	Object object = 
-	                			model == null ? 
-	                					customComponent.getClass().newInstance() : model;
+//                			Object object = null;
+//							object = model == null ? 
+//									customComponent.getStoreClass().newInstance() : model;
+							Method method = null;
+							try {
+System.out.println("Data class is: " + customComponent.getDataClass());
+								method = customComponent.getStoreMethod(customComponent.getDataClass());
+System.out.println("Tried method with class parameter " + customComponent.getDataClass() + 
+		", resulted in " + method);
+//							} catch (NoSuchMethodException e) {
+//								method = getMethodWithPrimitive(customComponent);
+							} catch (Exception e) {
+								System.out.println("OTHER EXCEPTION HAPPENED: " + e.getMessage() + " " + e.getClass());
+								
+							}
+System.out.println("Method fetching succeeded"); 
+                			Object object = null;
+							object = model == null ? 
+									customComponent.getStoreClass().newInstance() : model;
+							method.invoke(object, paramsObj);
 
-	                	Method method = customComponent.getStoreMethod(customComponent.getDataClass());
-	                	method.invoke(object, paramsObj);
-
-                	
-                	}
                 	
                 	// extract method from storeTo
                 	
                 	
                 	// check object from model, cast to class if not null
                 	// else create new instance
-                    
+
                     // call method to store value from model
                     window.close(target);
-        		} catch (Exception e) {
-        			log.error(this.getClass().toString() + ": " + "Error modifying device: " + e.getMessage());
-                    log.debug("Exception", e);
-                    throw new RuntimeException(e);
-        		}
-            }
-
+//                	} catch (NoSuchMethodException e) {
+//                	} catch (SecurityException e) {
+//                	} catch (ClassNotFoundException e) {
+//                	} catch (InstantiationException e) {
+//                	} catch (IllegalAccessException e) {
+//					} catch (InvocationTargetException e) {
+					} catch (Exception e) {
+	        			log.error(this.getClass().toString() + ": " + 
+	        					"Error reflecting on: " + customComponent.getName() + ": " + e.getMessage());
+	                    log.debug("Exception", e);
+//	                    throw new RuntimeException(e);
+	        		}
+                }
+        	}
+            
             @Override
             protected void onError(AjaxRequestTarget target, Form<?> form) {
                 if (target != null)
@@ -271,4 +262,23 @@ System.out.println("CALLING METHOD: " + customComponent.getStoreMethod(customCom
 			}
         }.setDefaultFormProcessing(false));
     }
+            
+//    private Method getMethodWithPrimitive(CustomComponent customComponent) throws ClassNotFoundException {
+//		Method method = null;
+//		
+//System.out.println("getMethodWithPrimitive: " + customComponent.getDataClass());
+//		
+//		if (customComponent.getDataClass().equals(Boolean.class))
+//			try {
+//				method = customComponent.getStoreMethod(boolean.class);
+//System.out.println("getMethodWithPrimitive: " + method);
+//			} catch (Exception e) {
+//    			log.error(this.getClass().toString()
+//    					+ ": " + "Error getting method signature for " 
+//    					+ customComponent.getName() + ": " + e.getMessage());
+//                log.debug("Exception", e);
+//                throw new RuntimeException(e);
+//			}
+//		return method;
+//    }
  }

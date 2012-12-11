@@ -48,6 +48,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.dcm4chee.wizard.war.util.ClassUtils;
+
 /**
  * @author Robert David <robert.david@agfa.com>
  */
@@ -161,7 +163,7 @@ System.out.println("Name prefix: " + name.substring(0, name.lastIndexOf(".")));
 	}
 
 	public Class<?> getDataClass() throws ClassNotFoundException {
-		return Class.forName(dataType);
+		return ClassUtils.forName(dataType);
 	}
 	
 //	@XmlElement

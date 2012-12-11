@@ -19,7 +19,7 @@
 		<configurationType>Basic</configurationType>
 		<componentType>CheckBox</componentType>
 		<required>true</required>
-		<dataType>boolean</dataType>
+		 <dataType>boolean</dataType>
 		<storeTo>org.dcm4che.net.Device.setInstalled</storeTo>
 	</component>
 	<component>
