@@ -171,12 +171,6 @@ log.warn("Resolved config path to: " + fn);
         String loginAllowedRolename = 
                 SecureWebApplication.get()
                 .getInitParameter("LoginAllowedRolename");
-        // TODO: this is a workaround because of wicket tests in dcm4chee-web
-        if (loginAllowedRolename == null)
-            loginAllowedRolename =
-            		SecureWebApplication.get()
-                .getServletContext()
-                .getInitParameter("LoginAllowedRolename");
         return loginAllowedRolename == null ? false : 
             subject.getPrincipals().contains(new SimplePrincipal(loginAllowedRolename)); 
     }

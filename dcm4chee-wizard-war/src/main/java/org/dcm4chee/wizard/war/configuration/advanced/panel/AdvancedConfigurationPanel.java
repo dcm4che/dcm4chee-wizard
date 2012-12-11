@@ -82,6 +82,7 @@ import org.dcm4chee.wizard.common.component.ExtendedForm;
 import org.dcm4chee.wizard.common.component.MessageWindow;
 import org.dcm4chee.wizard.war.WizardApplication;
 import org.dcm4chee.wizard.war.common.component.ExtendedPanel;
+import org.dcm4chee.wizard.war.configuration.advanced.edit.CreateOrEditDevicePage;
 import org.dcm4chee.wizard.war.configuration.advanced.edit.CustomCreateOrEditPage;
 import org.dcm4chee.wizard.war.configuration.common.tree.ConfigTableTree;
 import org.dcm4chee.wizard.war.configuration.common.tree.ConfigTreeNode;
@@ -95,7 +96,6 @@ import org.dcm4chee.wizard.war.configuration.common.tree.ConfigTreeProvider.Conf
 import org.dcm4chee.wizard.war.configuration.simple.edit.ApplyTransferCapabilityProfilePage;
 import org.dcm4chee.wizard.war.configuration.simple.edit.CreateOrEditApplicationEntityPage;
 import org.dcm4chee.wizard.war.configuration.simple.edit.CreateOrEditConnectionPage;
-import org.dcm4chee.wizard.war.configuration.simple.edit.CreateOrEditDevicePage;
 import org.dcm4chee.wizard.war.configuration.simple.edit.CreateOrEditTransferCapabilityPage;
 import org.dcm4chee.wizard.war.configuration.simple.edit.proxy.CreateOrEditCoercionPage;
 import org.dcm4chee.wizard.war.configuration.simple.edit.proxy.CreateOrEditForwardRulePage;
@@ -312,7 +312,8 @@ public class AdvancedConfigurationPanel extends ExtendedPanel {
 
                     @Override
                     public Page createPage() {
-                        return new CustomCreateOrEditPage(editWindow, null, "CreateOrEditDevicePage");
+                        return new CreateOrEditDevicePage(editWindow, null, 
+                        		"org.dcm4chee.wizard.war.configuration.advanced.edit.CreateOrEditDevicePage");
                     }
                 }).show(target);
             }
@@ -647,9 +648,9 @@ public class AdvancedConfigurationPanel extends ExtendedPanel {
 					        				if (type.equals(ConfigTreeNode.TreeNodeType.DEVICE)) {
 					        					try {
 						        					ConfigTreeProvider.get().loadDevice(rowModel.getObject());
-						        	                return new CustomCreateOrEditPage(editWindow, 
+						        	                return new CreateOrEditDevicePage(editWindow, 
 						        	                		(DeviceModel) rowModel.getObject().getModel(), 
-						        	                		"CreateOrEditDevicePage");
+						        	                		"org.dcm4chee.wizard.war.configuration.advanced.edit.CreateOrEditDevicePage");
 					        					} catch (Exception e) {
 					        						log.error("Error loading device on edit", e);
 					        						return null;

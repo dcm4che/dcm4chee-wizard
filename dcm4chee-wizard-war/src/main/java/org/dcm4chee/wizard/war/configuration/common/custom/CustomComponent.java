@@ -39,6 +39,7 @@
 package org.dcm4chee.wizard.war.configuration.common.custom;
 
 import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 
@@ -58,20 +59,26 @@ public class CustomComponent implements Serializable {
 
 	private final String componentPackage = "org.apache.wicket.markup.html.form.";
 	
-	public enum Container {MANDATORY,OPTIONAL};
-	
+	public enum Container {Mandatory,Optional};
+
+	public enum ConfigurationType {
+		Basic,
+		Proxy, 
+		Archive
+	};
+
 	public enum ComponentType {
 		TextField,
 		CheckBox, 
 		DropDown
 	};
 	
-	public enum DataType {
-		Text,
-		Number,
-		Boolean, 
-		TextRows
-	};
+//	public enum DataType {
+//		Text,
+//		Number,
+//		Boolean, 
+//		TextRows
+//	};
 
 	public enum ObjectType {
 		Device,
@@ -82,8 +89,9 @@ public class CustomComponent implements Serializable {
 
 	private String name;
 	private Container container;
+	private ConfigurationType configurationType;
 	private ComponentType componentType;
-	private DataType dataType;
+	private String dataType;
 //	private ObjectType objectType;
 	private String storeTo;
 	private boolean required;
@@ -99,6 +107,11 @@ public class CustomComponent implements Serializable {
 		this.name = name;
 	}
 
+	public String getNamePrefix() {
+System.out.println("Name prefix: " + name.substring(0, name.lastIndexOf(".")));
+		return name.substring(0, name.lastIndexOf("."));
+	}
+
 	@XmlElement
 	public Container getContainer() {
 		return container;
@@ -106,6 +119,14 @@ public class CustomComponent implements Serializable {
 
 	public void setContainer(Container container) {
 		this.container = container;
+	}
+
+	public ConfigurationType getConfigurationType() {
+		return configurationType;
+	}
+
+	public void setConfigurationType(ConfigurationType configurationType) {
+		this.configurationType = configurationType;
 	}
 
 	@XmlElement
@@ -131,14 +152,18 @@ public class CustomComponent implements Serializable {
 //	}
 
 	@XmlElement
-	public DataType getDataType() {
+	public String getDataType() {
 		return dataType;
 	}
 
-	public void setDataType(DataType dataType) {
+	public void setDataType(String dataType) {
 		this.dataType = dataType;
 	}
 
+	public Class<?> getDataClass() throws ClassNotFoundException {
+		return Class.forName(dataType);
+	}
+	
 //	@XmlElement
 //	public ObjectType getObjectType() {
 //		return objectType;
@@ -157,6 +182,18 @@ public class CustomComponent implements Serializable {
 		this.storeTo = storeTo;
 	}
 	
+	public Class<?> getStoreClass() throws ClassNotFoundException {
+System.out.println("CLASS Name: " + storeTo.substring(0, storeTo.lastIndexOf(".")));
+		return Class.forName(storeTo.substring(0, storeTo.lastIndexOf(".")));
+	}
+	
+	public Method getStoreMethod(Class<?> parameter) 
+			throws NoSuchMethodException, SecurityException, ClassNotFoundException {
+System.out.println("METHOD Name: " + storeTo.substring(storeTo.lastIndexOf(".") + 1));
+		return getStoreClass()
+				.getDeclaredMethod(storeTo.substring(storeTo.lastIndexOf(".") + 1), parameter);
+	}
+
 	@XmlElement
 	public boolean getRequired() {
 		return required;
