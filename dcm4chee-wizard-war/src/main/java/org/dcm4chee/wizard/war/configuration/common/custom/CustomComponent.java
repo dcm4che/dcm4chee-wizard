@@ -75,13 +75,6 @@ public class CustomComponent implements Serializable {
 		DropDown
 	};
 	
-//	public enum DataType {
-//		Text,
-//		Number,
-//		Boolean, 
-//		TextRows
-//	};
-
 	public enum ObjectType {
 		Device,
 		Connection,
@@ -94,7 +87,7 @@ public class CustomComponent implements Serializable {
 	private ConfigurationType configurationType;
 	private ComponentType componentType;
 	private String dataType;
-//	private ObjectType objectType;
+	private String getFrom;
 	private String storeTo;
 	private boolean required;
 	private String validator;
@@ -110,7 +103,6 @@ public class CustomComponent implements Serializable {
 	}
 
 	public String getNamePrefix() {
-System.out.println("Name prefix: " + name.substring(0, name.lastIndexOf(".")));
 		return name.substring(0, name.lastIndexOf("."));
 	}
 
@@ -144,15 +136,6 @@ System.out.println("Name prefix: " + name.substring(0, name.lastIndexOf(".")));
 		return componentPackage + componentType;
 	}
 	
-//	@XmlElement
-//	public String getDataType() {
-//		return dataType;
-//	}
-//
-//	public void setDataType(String dataType) {
-//		this.dataType = dataType;
-//	}
-
 	@XmlElement
 	public String getDataType() {
 		return dataType;
@@ -166,14 +149,14 @@ System.out.println("Name prefix: " + name.substring(0, name.lastIndexOf(".")));
 		return ClassUtils.forName(dataType);
 	}
 	
-//	@XmlElement
-//	public ObjectType getObjectType() {
-//		return objectType;
-//	}
-//
-//	public void setObjectType(ObjectType objectType) {
-//		this.objectType = objectType;
-//	}
+	@XmlElement
+	public String getGetFrom() {
+		return getFrom;
+	}
+
+	public void setGetFrom(String getFrom) {
+		this.getFrom = getFrom;
+	}
 
 	@XmlElement
 	public String getStoreTo() {
@@ -183,17 +166,11 @@ System.out.println("Name prefix: " + name.substring(0, name.lastIndexOf(".")));
 	public void setStoreTo(String storeTo) {
 		this.storeTo = storeTo;
 	}
-	
-	public Class<?> getStoreClass() throws ClassNotFoundException {
-//System.out.println("CLASS Name: " + storeTo.substring(0, storeTo.lastIndexOf(".")));
-		return Class.forName(storeTo.substring(0, storeTo.lastIndexOf(".")));
-	}
-	
-	public Method getStoreMethod(Class<?> parameter) 
+
+	public Method getStoreMethod(Class<?> storeClass, Class<?> parameter) 
 			throws NoSuchMethodException, SecurityException, ClassNotFoundException {
-//System.out.println("METHOD Name: " + storeTo.substring(storeTo.lastIndexOf(".") + 1));
-		return getStoreClass()
-				.getDeclaredMethod(storeTo.substring(storeTo.lastIndexOf(".") + 1), parameter);
+System.out.println("METHOD Name: " + storeTo.substring(storeTo.lastIndexOf(".") + 1));
+		return storeClass.getDeclaredMethod(storeTo, parameter);
 	}
 
 	@XmlElement

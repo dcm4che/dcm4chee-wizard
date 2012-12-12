@@ -121,7 +121,6 @@ public class ConfigManager {
 			List<CustomComponent> customComponents,
 			CustomComponent.Container container,
 			boolean basic) {
-System.out.println("filter for: " + container + " " + basic);
     	List<CustomComponent> result = new ArrayList<CustomComponent>(customComponents.size());
         for (CustomComponent customComponent : customComponents)
         	if (container.equals(customComponent.getContainer())

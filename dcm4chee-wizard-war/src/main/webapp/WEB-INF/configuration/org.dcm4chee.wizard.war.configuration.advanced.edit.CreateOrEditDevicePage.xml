@@ -20,7 +20,11 @@
 		<componentType>CheckBox</componentType>
 		<required>true</required>
 		 <dataType>boolean</dataType>
+		 <getFrom>isInstalled</getFrom>
+		 <storeTo>setInstalled</storeTo>
+		 <!-- 
 		<storeTo>org.dcm4che.net.Device.setInstalled</storeTo>
+		 -->
 	</component>
 	<component>
 		<name>dicom.edit.device.proxy.schedulerInterval</name>
@@ -29,7 +33,8 @@
 		<componentType>TextField</componentType>
 		<required>true</required>
 		<dataType>java.lang.Integer</dataType>
-		<storeTo>org.dcm4che.net.Device.setSchedulerInterval</storeTo>
+		<getFrom>getSchedulerInterval</getFrom>
+		<storeTo>setSchedulerInterval</storeTo>
 	</component>
 	<component>
 		<name>dicom.edit.device.optional.description</name>
@@ -38,7 +43,8 @@
 		<componentType>TextField</componentType>
 		<required>false</required>
 		<dataType>java.lang.String</dataType>
-		<storeTo>org.dcm4che.net.Device.setDescription</storeTo>
+		<getFrom>getDescription</getFrom>
+		<storeTo>setDescription</storeTo>
 	</component>
 <!-- 
 	<component>

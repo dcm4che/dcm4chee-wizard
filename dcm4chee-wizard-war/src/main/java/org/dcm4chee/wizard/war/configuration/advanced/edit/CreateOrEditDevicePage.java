@@ -124,7 +124,7 @@ public class CreateOrEditDevicePage extends CustomCreateOrEditPage {
         		create = false;
         		typeModel = Model.of(deviceModel.getDevice() instanceof ProxyDevice ? 
 	        			ConfigTreeProvider.ConfigurationType.Proxy : ConfigTreeProvider.ConfigurationType.Basic);
-				deviceNameModel = Model.of(deviceModel.getDevice().getDeviceName());				
+				deviceNameModel = Model.of(deviceModel.getDevice().getDeviceName());
 				device = deviceModel.getDevice();
         	}
 		} catch (ConfigurationException ce) {
@@ -177,10 +177,18 @@ public class CreateOrEditDevicePage extends CustomCreateOrEditPage {
 		}
     }
     
-    public Serializable onBeforeSave() {
-    	if (device == null)
-    		device = new Device(deviceNameModel.getObject());
-    	return device;
+    public Serializable getStoreObject(Object model)  {
+    	try {
+        	if (device == null) {
+        		String deviceName = model == null ? 
+        				this.deviceNameModel.getObject() : ((DeviceModel) model).getDevice().getDeviceName();
+        		device = new Device(deviceName);
+        	}
+        	return device;
+		} catch (ConfigurationException e) {
+			e.printStackTrace();
+		}
+    	return null;
     }
 
     public void onAfterSave() throws ConfigurationException, IOException {

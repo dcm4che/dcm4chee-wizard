@@ -92,21 +92,35 @@ public abstract class CustomCreateOrEditPage extends ExtendedSecureWebPage {
 	WebMarkupContainer typeContainer;
 	WebMarkupContainer optionalTypeContainer;
 	
-    public CustomCreateOrEditPage(final ModalWindow window, final Serializable object, final String configuration) {
+    public CustomCreateOrEditPage(final ModalWindow window, final Serializable model, final String configuration) {
         super();
-        init(window, object, configuration);
-    }
-    
-    @Override
-    public void renderHead(IHeaderResponse response) {
-    	if (CustomCreateOrEditPage.baseCSS != null) 
-    		response.render(CssHeaderItem.forReference(CustomCreateOrEditPage.baseCSS));
-    }
-    
-    void init(final ModalWindow window, final Serializable object, String configuration) {
+        try {
+//			init(window, objectModel, configuration);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//    }
+//
+//    void init(final ModalWindow window, final Serializable objectModel, String configuration) 
+//    		throws NoSuchMethodException, SecurityException, ClassNotFoundException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 
     	setOutputMarkupId(true);
         add(form);
+
+        form.add((typeContainer = 
+    	        new WebMarkupContainer("type"))
+    	        .setOutputMarkupId(true)
+    	        .setOutputMarkupPlaceholderTag(true));
+
+        form.add(optionalContainer
+        		.setOutputMarkupId(true)
+        		.setOutputMarkupPlaceholderTag(true)
+        		.setVisible(false));
+
+        optionalContainer.add((optionalTypeContainer = 
+    	        new WebMarkupContainer("type"))
+    	        .setOutputMarkupId(true)
+    	        .setOutputMarkupPlaceholderTag(true));
 
         customComponents =
 				ConfigManager.getConfigurationFor(configuration).getComponents();     
@@ -116,36 +130,29 @@ public abstract class CustomCreateOrEditPage extends ExtendedSecureWebPage {
         
         models = new HashMap<String,IModel>();
         for (CustomComponent customComponent : customComponents) {
-			models.put(customComponent.getName(), Model.of());
+        	try {
+	        	models.put(customComponent.getName(), 
+	        			model == null || skip(customComponent) ? Model.of() : 
+	        				Model.of((Serializable) getStoreObject(model).getClass()
+	        				.getDeclaredMethod(customComponent.getGetFrom(), new Class[] {})
+		    				.invoke(getStoreObject(model), new Object[] {})));
+        	} catch (NoSuchMethodException nsme) {
+        		log.warn("Failed to get value for " + customComponent.getName());
+        	}
 		}
         
         form.add(new CustomComponentPanel(
         		ConfigManager.filter(customComponents, CustomComponent.Container.Mandatory, true), 
         		models, this));
-        
-        form.add(optionalContainer
-        		.setOutputMarkupId(true)
-        		.setOutputMarkupPlaceholderTag(true)
-        		.setVisible(false));
 
         optionalContainer.add(new CustomComponentPanel(
         		ConfigManager.filter(customComponents, CustomComponent.Container.Optional, true), 
         				models, this));
-        
-        form.add((typeContainer = 
-    	        new WebMarkupContainer("type"))
-    	        .setOutputMarkupId(true)
-    	        .setOutputMarkupPlaceholderTag(true));
 
         typeContainer.add(new CustomComponentPanel(
         		ConfigManager.filter(customComponents, CustomComponent.Container.Mandatory, false), 
         		models, this));
-        
-        optionalContainer.add((optionalTypeContainer = 
-    	        new WebMarkupContainer("type"))
-    	        .setOutputMarkupId(true)
-    	        .setOutputMarkupPlaceholderTag(true));
-        
+
         optionalTypeContainer.add(new CustomComponentPanel(
         		ConfigManager.filter(customComponents, CustomComponent.Container.Optional, false), 
         				models, this));
@@ -168,43 +175,48 @@ public abstract class CustomCreateOrEditPage extends ExtendedSecureWebPage {
             @Override
             protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
 
-				Serializable object = onBeforeSave();
+				Serializable object = getStoreObject(model);
 
 //                    Object paramsObj[] = {};
 
-					try {
-						for (Method m : customComponents.get(0).getStoreClass().getDeclaredMethods()) {
-							System.out.println(m.getName() + ": ");
-							for (Class c : m.getParameterTypes())
-								System.out.println("         -> " + c.getName());								
-						}
-					} catch (Exception e1) {
-						System.out.println("BOO");
-					}
+//					try {
+//						for (Method m : customComponents.get(0).getStoreClass().getDeclaredMethods()) {
+//							System.out.println(m.getName() + ": ");
+//							for (Class c : m.getParameterTypes())
+//								System.out.println("         -> " + c.getName());								
+//						}
+//					} catch (Exception e1) {
+//						System.out.println("BOO");
+//					}
 
 System.out.println("--------------------------------------"); 
                 	for (CustomComponent customComponent : customComponents) {
                         try {
-							if (object == null) 
-								customComponent.getStoreClass().newInstance();
-							
-							if (!customComponent.getStoreClass().equals(object.getClass()))
-								System.out.println("Wrong store class defined, is "
-										+ customComponent.getStoreClass() + ", but should be "
-										+ object.getClass());
+//							if (object == null) 
+//								customComponent.getStoreClass().newInstance();
+//							
+//							if (!customComponent.getStoreClass().equals(object.getClass()))
+//								System.out.println("Wrong store class defined, is "
+//										+ customComponent.getStoreClass() + ", but should be "
+//										+ object.getClass());
 							
 							if (skip(customComponent)) {
 System.out.println("Skipping: " + customComponent.getName());
 								continue;
 							}
 
-							Method method = null;
-								method = customComponent.getStoreMethod(customComponent.getDataClass());
- 
-System.out.println("Models is: " + models.get(customComponent.getName()));
+//							Method method = 
+//									customComponent.getStoreMethod(object.getClass(), customComponent.getDataClass());
+// 
+//System.out.println("Models is: " + models.get(customComponent.getName()));
 								
-							method.invoke(object, 
-									new Object[] { models.get(customComponent.getName()).getObject() });
+//							customComponent.getStoreMethod(
+//									object.getClass(), customComponent.getDataClass())
+System.out.println("Storing to object of class: " + object.getClass());
+							object.getClass().getDeclaredMethod(
+									customComponent.getStoreTo(), customComponent.getDataClass())
+							.invoke(object, 
+									new Object[] {models.get(customComponent.getName()).getObject()});
 
 //                	} catch (NoSuchMethodException e) {
 //                	} catch (SecurityException e) {
@@ -253,9 +265,20 @@ System.out.println("Models is: " + models.get(customComponent.getName()));
 			protected void onError(AjaxRequestTarget arg0, Form<?> arg1) {
 			}
         }.setDefaultFormProcessing(false));
+        
+		} catch (Exception e) {
+		e.printStackTrace();
+	}
+
     }
     
-    public abstract Serializable onBeforeSave();
+    @Override
+    public void renderHead(IHeaderResponse response) {
+    	if (CustomCreateOrEditPage.baseCSS != null) 
+    		response.render(CssHeaderItem.forReference(CustomCreateOrEditPage.baseCSS));
+    }
+
+    public abstract Serializable getStoreObject(Object model);
     
     public abstract void onAfterSave() throws ConfigurationException, IOException;
 
