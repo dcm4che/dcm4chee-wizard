@@ -185,13 +185,13 @@ System.out.println("Name prefix: " + name.substring(0, name.lastIndexOf(".")));
 	}
 	
 	public Class<?> getStoreClass() throws ClassNotFoundException {
-System.out.println("CLASS Name: " + storeTo.substring(0, storeTo.lastIndexOf(".")));
+//System.out.println("CLASS Name: " + storeTo.substring(0, storeTo.lastIndexOf(".")));
 		return Class.forName(storeTo.substring(0, storeTo.lastIndexOf(".")));
 	}
 	
 	public Method getStoreMethod(Class<?> parameter) 
 			throws NoSuchMethodException, SecurityException, ClassNotFoundException {
-System.out.println("METHOD Name: " + storeTo.substring(storeTo.lastIndexOf(".") + 1));
+//System.out.println("METHOD Name: " + storeTo.substring(storeTo.lastIndexOf(".") + 1));
 		return getStoreClass()
 				.getDeclaredMethod(storeTo.substring(storeTo.lastIndexOf(".") + 1), parameter);
 	}

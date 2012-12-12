@@ -38,6 +38,8 @@
 
 package org.dcm4chee.wizard.war.configuration.advanced.edit;
 
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -96,16 +98,11 @@ public class CreateOrEditDevicePage extends CustomCreateOrEditPage {
     
     private static final ResourceReference baseCSS = new CssResourceReference(ExtendedWebPage.class, "base-style.css");
     
-    // configuration type selection
 	private Model<ConfigurationType> typeModel;
-	
-    // mandatory
     private Model<String> deviceNameModel;
-//	private IModel<Boolean> installedModel;
-//	// ProxyDevice only
-//	private Model<Integer> schedulerIntervalModel;
     
-    List<CustomComponent> customComponents;
+    Device device;
+    boolean create;
 	
     public CreateOrEditDevicePage(final ModalWindow window, final DeviceModel deviceModel, final String configuration) {
         super(window, deviceModel, configuration);
@@ -120,17 +117,15 @@ public class CreateOrEditDevicePage extends CustomCreateOrEditPage {
 
         try {
         	if (deviceModel == null) {
+        		create = true;
         		typeModel = Model.of(ConfigTreeProvider.ConfigurationType.Basic);
     			deviceNameModel = Model.of();
-//    			installedModel = Model.of(true);
-//    			schedulerIntervalModel = Model.of(ProxyDevice.DEFAULT_SCHEDULER_INTERVAL);
         	} else {
+        		create = false;
         		typeModel = Model.of(deviceModel.getDevice() instanceof ProxyDevice ? 
 	        			ConfigTreeProvider.ConfigurationType.Proxy : ConfigTreeProvider.ConfigurationType.Basic);
-				deviceNameModel = Model.of(deviceModel.getDevice().getDeviceName());
-//				installedModel = Model.of(deviceModel.getDevice().isInstalled());
-//				schedulerIntervalModel = Model.of(deviceModel.getDevice() instanceof ProxyDevice ? 
-//	        					((ProxyDevice) deviceModel.getDevice()).getSchedulerInterval() : null);			
+				deviceNameModel = Model.of(deviceModel.getDevice().getDeviceName());				
+				device = deviceModel.getDevice();
         	}
 		} catch (ConfigurationException ce) {
 			log.error(this.getClass().toString() + ": " + "Error retrieving device data: " + ce.getMessage());
@@ -182,6 +177,19 @@ public class CreateOrEditDevicePage extends CustomCreateOrEditPage {
 		}
     }
     
+    public Serializable onBeforeSave() {
+    	if (device == null)
+    		device = new Device(deviceNameModel.getObject());
+    	return device;
+    }
+
+    public void onAfterSave() throws ConfigurationException, IOException {
+        if (create)
+        	ConfigTreeProvider.get().persistDevice(device);
+        else
+        	ConfigTreeProvider.get().mergeDevice(device);                   
+    }
+
     @Override
     public void renderHead(IHeaderResponse response) {
     	if (CreateOrEditDevicePage.baseCSS != null) 

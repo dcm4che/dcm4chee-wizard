@@ -16,13 +16,11 @@ public class ClassUtils {
 	    primitiveClasses.put("long", long.class);
 	    primitiveClasses.put("float", float.class);
 	    primitiveClasses.put("double", double.class);
+	    primitiveClasses.put("boolean", boolean.class);
 	}
 
 	public static Class<?> forName(String name) throws ClassNotFoundException {
-	    if (primitiveClasses.containsKey(name)) {
-	        return primitiveClasses.get(name);
-	    } else {
-	        return Class.forName(name);
-	    }
+		return primitiveClasses.containsKey(name) ? 
+				primitiveClasses.get(name) : Class.forName(name);
 	}
 }

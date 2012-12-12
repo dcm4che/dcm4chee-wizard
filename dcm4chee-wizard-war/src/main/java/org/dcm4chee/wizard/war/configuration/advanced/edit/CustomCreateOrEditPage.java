@@ -38,6 +38,7 @@
 
 package org.dcm4chee.wizard.war.configuration.advanced.edit;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -61,6 +62,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.resource.CssResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
+import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
 import org.dcm4chee.wizard.common.component.ExtendedWebPage;
 import org.dcm4chee.wizard.war.common.component.ExtendedSecureWebPage;
@@ -73,7 +75,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-public class CustomCreateOrEditPage extends ExtendedSecureWebPage {
+public abstract class CustomCreateOrEditPage extends ExtendedSecureWebPage {
     
 	private static final long serialVersionUID = 1L;
 
@@ -90,9 +92,9 @@ public class CustomCreateOrEditPage extends ExtendedSecureWebPage {
 	WebMarkupContainer typeContainer;
 	WebMarkupContainer optionalTypeContainer;
 	
-    public CustomCreateOrEditPage(final ModalWindow window, final Serializable model, final String configuration) {
+    public CustomCreateOrEditPage(final ModalWindow window, final Serializable object, final String configuration) {
         super();
-        init(window, model, configuration);
+        init(window, object, configuration);
     }
     
     @Override
@@ -101,7 +103,7 @@ public class CustomCreateOrEditPage extends ExtendedSecureWebPage {
     		response.render(CssHeaderItem.forReference(CustomCreateOrEditPage.baseCSS));
     }
     
-    void init(final ModalWindow window, final Serializable model, String configuration) {
+    void init(final ModalWindow window, final Serializable object, String configuration) {
 
     	setOutputMarkupId(true);
         add(form);
@@ -166,66 +168,44 @@ public class CustomCreateOrEditPage extends ExtendedSecureWebPage {
             @Override
             protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
 
-                	
-//                	Device device = null;
-//                	if (deviceModel != null) 
-//                		device = deviceModel.getDevice();
-//                	else 
-//                		device = typeModel.getObject().equals(ConfigurationType.Proxy.toString()) ? 
-//                				new ProxyDevice(deviceNameModel.getObject()) : 
-//                         		new Device(deviceNameModel.getObject());
-//                    device.setInstalled(installedModel.getObject());
-//                    if (device instanceof ProxyDevice) 
-//                    	((ProxyDevice) device).setSchedulerInterval(schedulerIntervalModel.getObject());
+				Serializable object = onBeforeSave();
 
-                	
-                	// extract class from storeTo
+//                    Object paramsObj[] = {};
 
-                	// list values of models
-                	for (Iterator i = models.keySet().iterator(); i.hasNext(); )
-                		System.out.println("Model value: " + models.get(i.next()).getObject());
-                	
-                	
-                	
-//                	Class params[] = {};
-                    Object paramsObj[] = {};
-                    
+					try {
+						for (Method m : customComponents.get(0).getStoreClass().getDeclaredMethods()) {
+							System.out.println(m.getName() + ": ");
+							for (Class c : m.getParameterTypes())
+								System.out.println("         -> " + c.getName());								
+						}
+					} catch (Exception e1) {
+						System.out.println("BOO");
+					}
+
+System.out.println("--------------------------------------"); 
                 	for (CustomComponent customComponent : customComponents) {
                         try {
-//                		System.out.println("CALLING CLASS: " + customComponent.getStoreClass());
-
-//                			System.out.println("CALLING METHOD: " + customComponent.getStoreMethod(customComponent.getDataClass()));
-
-//                			Object object = null;
-//							object = model == null ? 
-//									customComponent.getStoreClass().newInstance() : model;
-							Method method = null;
-							try {
-System.out.println("Data class is: " + customComponent.getDataClass());
-								method = customComponent.getStoreMethod(customComponent.getDataClass());
-System.out.println("Tried method with class parameter " + customComponent.getDataClass() + 
-		", resulted in " + method);
-//							} catch (NoSuchMethodException e) {
-//								method = getMethodWithPrimitive(customComponent);
-							} catch (Exception e) {
-								System.out.println("OTHER EXCEPTION HAPPENED: " + e.getMessage() + " " + e.getClass());
-								
+							if (object == null) 
+								customComponent.getStoreClass().newInstance();
+							
+							if (!customComponent.getStoreClass().equals(object.getClass()))
+								System.out.println("Wrong store class defined, is "
+										+ customComponent.getStoreClass() + ", but should be "
+										+ object.getClass());
+							
+							if (skip(customComponent)) {
+System.out.println("Skipping: " + customComponent.getName());
+								continue;
 							}
-System.out.println("Method fetching succeeded"); 
-                			Object object = null;
-							object = model == null ? 
-									customComponent.getStoreClass().newInstance() : model;
-							method.invoke(object, paramsObj);
 
-                	
-                	// extract method from storeTo
-                	
-                	
-                	// check object from model, cast to class if not null
-                	// else create new instance
+							Method method = null;
+								method = customComponent.getStoreMethod(customComponent.getDataClass());
+ 
+System.out.println("Models is: " + models.get(customComponent.getName()));
+								
+							method.invoke(object, 
+									new Object[] { models.get(customComponent.getName()).getObject() });
 
-                    // call method to store value from model
-                    window.close(target);
 //                	} catch (NoSuchMethodException e) {
 //                	} catch (SecurityException e) {
 //                	} catch (ClassNotFoundException e) {
@@ -236,9 +216,21 @@ System.out.println("Method fetching succeeded");
 	        			log.error(this.getClass().toString() + ": " + 
 	        					"Error reflecting on: " + customComponent.getName() + ": " + e.getMessage());
 	                    log.debug("Exception", e);
+	                    e.printStackTrace();
 //	                    throw new RuntimeException(e);
 	        		}
                 }
+                	System.out.println("--------------------------------------");                	
+                try {
+					onAfterSave();
+				} catch (Exception e) {
+        			log.error(this.getClass().toString() + ": " + 
+        					"Error persisting object: " + e.getMessage());
+        			log.debug("Exception", e);
+//					throw new RuntimeException(e);
+				}
+
+                window.close(target);
         	}
             
             @Override
@@ -262,23 +254,24 @@ System.out.println("Method fetching succeeded");
 			}
         }.setDefaultFormProcessing(false));
     }
-            
-//    private Method getMethodWithPrimitive(CustomComponent customComponent) throws ClassNotFoundException {
-//		Method method = null;
-//		
-//System.out.println("getMethodWithPrimitive: " + customComponent.getDataClass());
-//		
-//		if (customComponent.getDataClass().equals(Boolean.class))
-//			try {
-//				method = customComponent.getStoreMethod(boolean.class);
-//System.out.println("getMethodWithPrimitive: " + method);
-//			} catch (Exception e) {
-//    			log.error(this.getClass().toString()
-//    					+ ": " + "Error getting method signature for " 
-//    					+ customComponent.getName() + ": " + e.getMessage());
-//                log.debug("Exception", e);
-//                throw new RuntimeException(e);
-//			}
-//		return method;
-//    }
+    
+    public abstract Serializable onBeforeSave();
+    
+    public abstract void onAfterSave() throws ConfigurationException, IOException;
+
+    private boolean skip(CustomComponent customComponent) {
+    	if (!customComponent.getConfigurationType()
+    			.equals(CustomComponent.ConfigurationType.Basic)) {
+    		if (!typeContainer.isVisible())
+    			return true;
+    		if (customComponent.getContainer().equals(CustomComponent.Container.Optional)
+    				&& !optionalTypeContainer.isVisible())
+    			return true;
+    	} else {
+    		if (customComponent.getContainer().equals(CustomComponent.Container.Optional)
+    				&& !optionalContainer.isVisible())
+    			return true;
+    	}
+    	return false;
+    }
  }
