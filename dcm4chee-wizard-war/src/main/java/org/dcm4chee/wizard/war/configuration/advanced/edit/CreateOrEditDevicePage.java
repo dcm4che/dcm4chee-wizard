@@ -178,23 +178,20 @@ public class CreateOrEditDevicePage extends CustomCreateOrEditPage {
     }
 
     public Serializable getStoreObject(Object model)  {
-    	try {
-System.out.println("model == null: " + (model == null));
-
-        	if (model == null) {
-        		String deviceName = model == null ? 
-        				this.deviceNameModel.getObject() : ((DeviceModel) model).getDevice().getDeviceName();
-        		return (device = new Device(deviceName));
-        	} else
-        		return (device = ((DeviceModel) model).getDevice());
-		} catch (ConfigurationException e) {
-			e.printStackTrace();
-		}
-    	return null;
+    	if (model == null) {
+    		return deviceNameModel == null ? null : 
+    			(device = new Device(deviceNameModel.getObject()));
+    	} else
+			try {
+				return (device = ((DeviceModel) model).getDevice());
+			} catch (ConfigurationException e) {
+				log.error(this.getClass().toString() + ": " + "Error retrieving device from model: " + e.getMessage());
+	            log.debug("Exception", e);
+	            throw new RuntimeException(e);
+			}
     }
 
     public void save(Serializable object) throws ConfigurationException, IOException {
-System.out.println("onAfterSave: " + ((Device) object).isInstalled());
         if (create)
         	ConfigTreeProvider.get().persistDevice((Device) object);
         else
