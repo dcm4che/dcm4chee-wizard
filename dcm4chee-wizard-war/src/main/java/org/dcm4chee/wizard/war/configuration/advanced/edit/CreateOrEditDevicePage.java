@@ -41,48 +41,29 @@ package org.dcm4chee.wizard.war.configuration.advanced.edit;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
-import org.apache.wicket.ajax.markup.html.form.AjaxButton;
-import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.DropDownChoice;
-import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
-import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.resource.CssResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
-import org.apache.wicket.validation.validator.RangeValidator;
 import org.dcm4che.conf.api.ConfigurationException;
-import org.dcm4che.data.Code;
-import org.dcm4che.data.Issuer;
 import org.dcm4che.net.Device;
 import org.dcm4chee.proxy.conf.ProxyDevice;
 import org.dcm4chee.wizard.common.behavior.FocusOnLoadBehavior;
-import org.dcm4chee.wizard.common.component.ExtendedForm;
 import org.dcm4chee.wizard.common.component.ExtendedWebPage;
-import org.dcm4chee.wizard.war.common.component.ExtendedSecureWebPage;
-import org.dcm4chee.wizard.war.configuration.common.custom.ConfigManager;
-import org.dcm4chee.wizard.war.configuration.common.custom.CustomComponent;
-import org.dcm4chee.wizard.war.configuration.common.custom.CustomComponentPanel;
+import org.dcm4chee.wizard.war.configuration.common.custom.CustomCreateOrEditPage;
 import org.dcm4chee.wizard.war.configuration.common.tree.ConfigTreeProvider;
 import org.dcm4chee.wizard.war.configuration.common.tree.ConfigTreeProvider.ConfigurationType;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.DeviceModel;
-import org.dcm4chee.wizard.war.configuration.simple.model.basic.InstitutionCodeModel;
-import org.dcm4chee.wizard.war.configuration.simple.model.basic.StringArrayModel;
-import org.dcm4chee.wizard.war.configuration.simple.validator.CodeValidator;
 import org.dcm4chee.wizard.war.configuration.simple.validator.DeviceNameValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,11 +90,6 @@ public class CreateOrEditDevicePage extends CustomCreateOrEditPage {
 
         add(new WebMarkupContainer("create-device-title").setVisible(deviceModel == null));
         add(new WebMarkupContainer("edit-device-title").setVisible(deviceModel != null));
-
-//        setOutputMarkupId(true);
-//        final ExtendedForm form = new ExtendedForm("form");
-//        form.setResourceIdPrefix("dicom.edit.device.");
-//        add(form);
 
         try {
         	if (deviceModel == null) {

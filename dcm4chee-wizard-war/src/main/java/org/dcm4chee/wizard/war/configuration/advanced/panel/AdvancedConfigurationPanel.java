@@ -83,7 +83,7 @@ import org.dcm4chee.wizard.common.component.MessageWindow;
 import org.dcm4chee.wizard.war.WizardApplication;
 import org.dcm4chee.wizard.war.common.component.ExtendedPanel;
 import org.dcm4chee.wizard.war.configuration.advanced.edit.CreateOrEditDevicePage;
-import org.dcm4chee.wizard.war.configuration.advanced.edit.CustomCreateOrEditPage;
+import org.dcm4chee.wizard.war.configuration.common.custom.CustomCreateOrEditPage;
 import org.dcm4chee.wizard.war.configuration.common.tree.ConfigTableTree;
 import org.dcm4chee.wizard.war.configuration.common.tree.ConfigTreeNode;
 import org.dcm4chee.wizard.war.configuration.common.tree.ConfigTreeProvider;
