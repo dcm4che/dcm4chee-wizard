@@ -169,7 +169,6 @@ public class CustomComponent implements Serializable {
 
 	public Method getStoreMethod(Class<?> storeClass, Class<?> parameter) 
 			throws NoSuchMethodException, SecurityException, ClassNotFoundException {
-System.out.println("METHOD Name: " + storeTo.substring(storeTo.lastIndexOf(".") + 1));
 		return storeClass.getDeclaredMethod(storeTo, parameter);
 	}
 

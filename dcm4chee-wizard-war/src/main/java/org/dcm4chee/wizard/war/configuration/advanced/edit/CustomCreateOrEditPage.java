@@ -41,13 +41,10 @@ package org.dcm4chee.wizard.war.configuration.advanced.edit;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
@@ -84,6 +81,8 @@ public abstract class CustomCreateOrEditPage extends ExtendedSecureWebPage {
     private static final ResourceReference baseCSS = new CssResourceReference(ExtendedWebPage.class, "base-style.css");
     
 	List<CustomComponent> customComponents;
+
+	@SuppressWarnings("rawtypes")
 	Map<String, IModel> models;
 
 	final ExtendedForm form = new ExtendedForm("form");
@@ -92,21 +91,44 @@ public abstract class CustomCreateOrEditPage extends ExtendedSecureWebPage {
 	WebMarkupContainer typeContainer;
 	WebMarkupContainer optionalTypeContainer;
 	
-    public CustomCreateOrEditPage(final ModalWindow window, final Serializable model, final String configuration) {
+    @SuppressWarnings({ "rawtypes" })
+	public CustomCreateOrEditPage(final ModalWindow window, final Serializable model, final String configuration) {
         super();
-        try {
-//			init(window, objectModel, configuration);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//    }
-//
-//    void init(final ModalWindow window, final Serializable objectModel, String configuration) 
-//    		throws NoSuchMethodException, SecurityException, ClassNotFoundException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        
+//        try {
 
     	setOutputMarkupId(true);
         add(form);
 
+        customComponents =
+				ConfigManager.getConfigurationFor(configuration).getComponents();     
+
+        if (customComponents.size() > 0 )
+        	form.setResourceIdPrefix(customComponents.get(0).getNamePrefix());
+
+        models = new HashMap<String,IModel>();
+        
+        Serializable storeObject = getStoreObject(model);
+		
+        for (CustomComponent customComponent : customComponents) {
+        	try {
+	        	models.put(customComponent.getName(), 
+	        			storeObject == null ? Model.of() : 
+	        				new Model<Serializable>(
+	        						(Serializable) storeObject.getClass()
+	        						.getDeclaredMethod(customComponent.getGetFrom(), new Class[] {})
+	        						.invoke(getStoreObject(model), new Object[] {})));
+        	} catch (NoSuchMethodException nsme) {
+        		log.warn("Failed to get value for component: " + customComponent.getName());
+        	} catch (Exception e) {
+    			log.error(this.getClass().toString() + ": " + 
+    					"Error reflecting on value for component: " 
+    					+ customComponent.getName() + ": " + e.getMessage());
+                log.debug("Exception", e);
+//				throw new RuntimeException(e);
+			}
+		}
+        
         form.add((typeContainer = 
     	        new WebMarkupContainer("type"))
     	        .setOutputMarkupId(true)
@@ -122,25 +144,6 @@ public abstract class CustomCreateOrEditPage extends ExtendedSecureWebPage {
     	        .setOutputMarkupId(true)
     	        .setOutputMarkupPlaceholderTag(true));
 
-        customComponents =
-				ConfigManager.getConfigurationFor(configuration).getComponents();     
-
-        if (customComponents.size() > 0 )
-        	form.setResourceIdPrefix(customComponents.get(0).getNamePrefix());
-        
-        models = new HashMap<String,IModel>();
-        for (CustomComponent customComponent : customComponents) {
-        	try {
-	        	models.put(customComponent.getName(), 
-	        			model == null || skip(customComponent) ? Model.of() : 
-	        				Model.of((Serializable) getStoreObject(model).getClass()
-	        				.getDeclaredMethod(customComponent.getGetFrom(), new Class[] {})
-		    				.invoke(getStoreObject(model), new Object[] {})));
-        	} catch (NoSuchMethodException nsme) {
-        		log.warn("Failed to get value for " + customComponent.getName());
-        	}
-		}
-        
         form.add(new CustomComponentPanel(
         		ConfigManager.filter(customComponents, CustomComponent.Container.Mandatory, true), 
         		models, this));
@@ -177,64 +180,25 @@ public abstract class CustomCreateOrEditPage extends ExtendedSecureWebPage {
 
 				Serializable object = getStoreObject(model);
 
-//                    Object paramsObj[] = {};
-
-//					try {
-//						for (Method m : customComponents.get(0).getStoreClass().getDeclaredMethods()) {
-//							System.out.println(m.getName() + ": ");
-//							for (Class c : m.getParameterTypes())
-//								System.out.println("         -> " + c.getName());								
-//						}
-//					} catch (Exception e1) {
-//						System.out.println("BOO");
-//					}
-
-System.out.println("--------------------------------------"); 
-                	for (CustomComponent customComponent : customComponents) {
-                        try {
-//							if (object == null) 
-//								customComponent.getStoreClass().newInstance();
-//							
-//							if (!customComponent.getStoreClass().equals(object.getClass()))
-//								System.out.println("Wrong store class defined, is "
-//										+ customComponent.getStoreClass() + ", but should be "
-//										+ object.getClass());
-							
-							if (skip(customComponent)) {
-System.out.println("Skipping: " + customComponent.getName());
-								continue;
-							}
-
-//							Method method = 
-//									customComponent.getStoreMethod(object.getClass(), customComponent.getDataClass());
-// 
-//System.out.println("Models is: " + models.get(customComponent.getName()));
-								
-//							customComponent.getStoreMethod(
-//									object.getClass(), customComponent.getDataClass())
-System.out.println("Storing to object of class: " + object.getClass());
-							object.getClass().getDeclaredMethod(
-									customComponent.getStoreTo(), customComponent.getDataClass())
-							.invoke(object, 
-									new Object[] {models.get(customComponent.getName()).getObject()});
-
-//                	} catch (NoSuchMethodException e) {
-//                	} catch (SecurityException e) {
-//                	} catch (ClassNotFoundException e) {
-//                	} catch (InstantiationException e) {
-//                	} catch (IllegalAccessException e) {
-//					} catch (InvocationTargetException e) {
+				for (CustomComponent customComponent : customComponents) {
+					try {
+						if (!visible(customComponent))
+							continue;
+						
+						object.getClass().getDeclaredMethod(
+								customComponent.getStoreTo(), customComponent.getDataClass())
+								.invoke(object, 
+										new Object[] {models.get(customComponent.getName()).getObject()});
 					} catch (Exception e) {
 	        			log.error(this.getClass().toString() + ": " + 
 	        					"Error reflecting on: " + customComponent.getName() + ": " + e.getMessage());
 	                    log.debug("Exception", e);
-	                    e.printStackTrace();
-//	                    throw new RuntimeException(e);
+//						throw new RuntimeException(e);
 	        		}
                 }
-                	System.out.println("--------------------------------------");                	
+                	
                 try {
-					onAfterSave();
+					save(object);
 				} catch (Exception e) {
         			log.error(this.getClass().toString() + ": " + 
         					"Error persisting object: " + e.getMessage());
@@ -266,9 +230,9 @@ System.out.println("Storing to object of class: " + object.getClass());
 			}
         }.setDefaultFormProcessing(false));
         
-		} catch (Exception e) {
-		e.printStackTrace();
-	}
+//		} catch (Exception e) {
+//		e.printStackTrace();
+//	}
 
     }
     
@@ -280,21 +244,21 @@ System.out.println("Storing to object of class: " + object.getClass());
 
     public abstract Serializable getStoreObject(Object model);
     
-    public abstract void onAfterSave() throws ConfigurationException, IOException;
+    public abstract void save(Serializable object) throws ConfigurationException, IOException;
 
-    private boolean skip(CustomComponent customComponent) {
+    private boolean visible(CustomComponent customComponent) {
     	if (!customComponent.getConfigurationType()
     			.equals(CustomComponent.ConfigurationType.Basic)) {
     		if (!typeContainer.isVisible())
-    			return true;
+    			return false;
     		if (customComponent.getContainer().equals(CustomComponent.Container.Optional)
     				&& !optionalTypeContainer.isVisible())
-    			return true;
+    			return false;
     	} else {
     		if (customComponent.getContainer().equals(CustomComponent.Container.Optional)
     				&& !optionalContainer.isVisible())
-    			return true;
+    			return false;
     	}
-    	return false;
+    	return true;
     }
  }

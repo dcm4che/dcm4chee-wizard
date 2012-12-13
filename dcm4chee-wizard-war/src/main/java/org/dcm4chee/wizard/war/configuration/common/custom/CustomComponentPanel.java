@@ -43,10 +43,6 @@ import java.util.Map;
 
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
-import org.apache.wicket.MarkupContainer;
-import org.apache.wicket.behavior.AttributeAppender;
-import org.apache.wicket.behavior.Behavior;
-import org.apache.wicket.markup.html.WebComponent;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.DropDownChoice;
@@ -59,9 +55,7 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.model.StringResourceModel;
-import org.apache.wicket.validation.IValidator;
 import org.apache.wicket.validation.validator.PatternValidator;
-import org.apache.wicket.validation.validator.StringValidator;
 
 /**
  * @author Robert David <robert.david@agfa.com>
@@ -70,42 +64,30 @@ public class CustomComponentPanel extends Panel {
 	
 	private static final long serialVersionUID = 1L;
 	
-	private Map<String, IModel> models;
-	
-	public CustomComponentPanel(List<CustomComponent> customComponents, final Map<String,IModel> models, final Component relativeTo) {
+	public CustomComponentPanel(List<CustomComponent> customComponents, @SuppressWarnings("rawtypes") final Map<String,IModel> models, final Component relativeTo) {
 		super("customComponents");
-
-		this.models = models;
 
     	add(new ListView<CustomComponent>("componentList", customComponents) {
 
 			private static final long serialVersionUID = 1L;
     		
+			@SuppressWarnings("unchecked")
 			@Override
 			protected void populateItem(ListItem<CustomComponent> item) {
 				CustomComponent customComponent = 
-						(CustomComponent) item.getModelObject();
-				
-				// dicom.edit.device.title.label
-				// dicom.edit.device.title.tooltip
+						item.getModelObject();
 				
 				item.add(new Label("component.label", 
 						new StringResourceModel(customComponent.getName() + ".label", relativeTo, null)));
 				
-//				customComponent.setName(customComponent.getType().toString());//getWicketId(customComponent));
-
-System.out.println("Fetching model for: " + customComponent.getName());
-System.out.println("is: " + models.get(customComponent.getName()));
-				
-				
-if (customComponent.getComponentType().equals(CustomComponent.ComponentType.TextField))
-				item.add(new TextFieldFragment(customComponent, models.get(customComponent.getName())));
-    	else if (customComponent.getComponentType().equals(CustomComponent.ComponentType.CheckBox))
-    		item.add(new CheckBoxFragment(customComponent, models.get(customComponent.getName())));
-    	else if (customComponent.getComponentType().equals(CustomComponent.ComponentType.DropDown))
-    		item.add(new DropDownFragment(customComponent, models.get(customComponent.getName())));
-    	else
-    		item.add(new EmptyFragment());
+				if (customComponent.getComponentType().equals(CustomComponent.ComponentType.TextField))
+					item.add(new TextFieldFragment(customComponent, models.get(customComponent.getName())));
+				else if (customComponent.getComponentType().equals(CustomComponent.ComponentType.CheckBox))
+					item.add(new CheckBoxFragment(customComponent, models.get(customComponent.getName())));
+				else if (customComponent.getComponentType().equals(CustomComponent.ComponentType.DropDown))
+					item.add(new DropDownFragment(customComponent, models.get(customComponent.getName())));
+				else
+					item.add(new EmptyFragment());
 			}
     	});
 	}

@@ -176,26 +176,29 @@ public class CreateOrEditDevicePage extends CustomCreateOrEditPage {
             throw new RuntimeException(ce);
 		}
     }
-    
+
     public Serializable getStoreObject(Object model)  {
     	try {
-        	if (device == null) {
+System.out.println("model == null: " + (model == null));
+
+        	if (model == null) {
         		String deviceName = model == null ? 
         				this.deviceNameModel.getObject() : ((DeviceModel) model).getDevice().getDeviceName();
-        		device = new Device(deviceName);
-        	}
-        	return device;
+        		return (device = new Device(deviceName));
+        	} else
+        		return (device = ((DeviceModel) model).getDevice());
 		} catch (ConfigurationException e) {
 			e.printStackTrace();
 		}
     	return null;
     }
 
-    public void onAfterSave() throws ConfigurationException, IOException {
+    public void save(Serializable object) throws ConfigurationException, IOException {
+System.out.println("onAfterSave: " + ((Device) object).isInstalled());
         if (create)
-        	ConfigTreeProvider.get().persistDevice(device);
+        	ConfigTreeProvider.get().persistDevice((Device) object);
         else
-        	ConfigTreeProvider.get().mergeDevice(device);                   
+        	ConfigTreeProvider.get().mergeDevice((Device) object);                   
     }
 
     @Override
