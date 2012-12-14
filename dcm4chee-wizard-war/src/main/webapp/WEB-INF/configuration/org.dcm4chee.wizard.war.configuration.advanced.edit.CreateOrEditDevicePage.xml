@@ -22,9 +22,6 @@
 		 <dataType>boolean</dataType>
 		 <getFrom>isInstalled</getFrom>
 		 <storeTo>setInstalled</storeTo>
-		 <!-- 
-		<storeTo>org.dcm4che.net.Device.setInstalled</storeTo>
-		 -->
 	</component>
 	<component>
 		<name>dicom.edit.device.proxy.schedulerInterval</name>
@@ -45,117 +42,243 @@
 		<dataType>java.lang.String</dataType>
 		<getFrom>getDescription</getFrom>
 		<storeTo>setDescription</storeTo>
-	</component>
-<!-- 
+	</component> 
 	<component>
 		<name>dicom.edit.device.optional.deviceSerialNumber</name>
-		<container>OPTIONAL</container>
+		<container>Optional</container>
+		<configurationType>Basic</configurationType>
 		<componentType>TextField</componentType>
+		<required>false</required>
+		<dataType>java.lang.String</dataType>
+		<getFrom>getSerialNumber</getFrom>
+		<storeTo>setSerialNumber</storeTo>
 	</component>
+	<!-- 
 	<component>
 		<name>dicom.edit.device.optional.institutionAddress</name>
-		<container>OPTIONAL</container>
+		<container>Optional</container>
+		<configurationType>Basic</configurationType>
 		<componentType>TextField</componentType>
+		<required>false</required>
+		<dataType>org.dcm4chee.wizard.war.configuration.simple.model.basic.StringArrayModel</dataType>
+		<getFrom>getInstitutionAddress</getFrom>
+		<storeTo>setInstitutionAddress</storeTo>
 	</component>
+	 -->
+	<!-- 
 	<component>
 		<name>dicom.edit.device.optional.institutionCodeValue</name>
-		<container>OPTIONAL</container>
+		<container>Optional</container>
+		<configurationType>Basic</configurationType>
 		<componentType>TextField</componentType>
+		<required>false</required>
+		<dataType></dataType>
+		<getFrom>getInstitutionCodeValue</getFrom>
+		<storeTo>setInstitutionCodeValue</storeTo>
 	</component>
 	<component>
 		<name>dicom.edit.device.optional.institutionCodingSchemeDesignator</name>
-		<container>OPTIONAL</container>
+		<container>Optional</container>
+		<configurationType>Basic</configurationType>
 		<componentType>TextField</componentType>
+		<required>false</required>
+		<dataType></dataType>
+		<getFrom>getInstitutionCodingSchemeDesignator</getFrom>
+		<storeTo>setInstitutionCodingSchemeDesignator</storeTo>
 	</component>
 	<component>
 		<name>dicom.edit.device.optional.institutionCodingSchemeVersion</name>
-		<container>OPTIONAL</container>
+		<container>Optional</container>
+		<configurationType>Basic</configurationType>
 		<componentType>TextField</componentType>
+		<required>false</required>
+		<dataType></dataType>
+		<getFrom>getInstitutionCodingSchemeVersion</getFrom>
+		<storeTo>setInstitutionCodingSchemeVersion</storeTo>
 	</component>
 	<component>
 		<name>dicom.edit.device.optional.institutionCodeMeaning</name>
-		<container>OPTIONAL</container>
+		<container>Optional</container>
+		<configurationType>Basic</configurationType>
 		<componentType>TextField</componentType>
+		<required>false</required>
+		<dataType>j</dataType>
+		<getFrom>getInstitutionCodeMeaning</getFrom>
+		<storeTo>setInstitutionCodeMeaning</storeTo>
 	</component>
+	 -->
+	 <!-- 
 	<component>
 		<name>dicom.edit.device.optional.institutionalDepartmentName</name>
-		<container>OPTIONAL</container>
+		<container>Optional</container>
+		<configurationType>Basic</configurationType>
 		<componentType>TextField</componentType>
+		<required>false</required>
+		<dataType>org.dcm4chee.wizard.war.configuration.simple.model.basic.StringArrayModel</dataType>
+		<getFrom>getInstitutionalDepartmentName</getFrom>
+		<storeTo>setInstitutionalDepartmentName</storeTo>
 	</component>
 	<component>
 		<name>dicom.edit.device.optional.institutionName</name>
-		<container>OPTIONAL</container>
+		<container>Optional</container>
+		<configurationType>Basic</configurationType>
 		<componentType>TextField</componentType>
+		<required>false</required>
+		<dataType>org.dcm4chee.wizard.war.configuration.simple.model.basic.StringArrayModel</dataType>
+		<getFrom>getInstitutionName</getFrom>
+		<storeTo>setInstitutionName</storeTo>
 	</component>
+	 -->
 	<component>
 		<name>dicom.edit.device.optional.issuerOfAccessionNumber</name>
-		<container>OPTIONAL</container>
+		<container>Optional</container>
+		<configurationType>Basic</configurationType>
 		<componentType>TextField</componentType>
+		<required>false</required>
+		<dataType>java.lang.String</dataType>
+		<getFrom>getIssuerOfAccessionNumber</getFrom>
+		<storeTo>setIssuerOfAccessionNumber</storeTo>
 	</component>
 	<component>
 		<name>dicom.edit.device.optional.issuerOfAdmissionID</name>
-		<container>OPTIONAL</container>
+		<container>Optional</container>
+		<configurationType>Basic</configurationType>
 		<componentType>TextField</componentType>
+		<required>false</required>
+		<dataType>java.lang.String</dataType>
+		<getFrom>getIssuerOfAdmissionID</getFrom>
+		<storeTo>setIssuerOfAdmissionID</storeTo>
 	</component>
 	<component>
 		<name>dicom.edit.device.optional.issuerOfContainerIdentifier</name>
-		<container>OPTIONAL</container>
+		<container>Optional</container>
+		<configurationType>Basic</configurationType>
 		<componentType>TextField</componentType>
+		<required>false</required>
+		<dataType>java.lang.String</dataType>
+		<getFrom>getIssuerOfContainerIdentifier</getFrom>
+		<storeTo>setIssuerOfContainerIdentifier</storeTo>
 	</component>
 	<component>
 		<name>dicom.edit.device.optional.issuerOfPatientID</name>
-		<container>OPTIONAL</container>
+		<container>Optional</container>
+		<configurationType>Basic</configurationType>
 		<componentType>TextField</componentType>
+		<required>false</required>
+		<dataType>java.lang.String</dataType>
+		<getFrom>getIssuerOfPatientID</getFrom>
+		<storeTo>setIssuerOfPatientID</storeTo>
 	</component>
 	<component>
 		<name>dicom.edit.device.optional.issuerOfServiceEpisodeID</name>
-		<container>OPTIONAL</container>
+		<container>Optional</container>
+		<configurationType>Basic</configurationType>
 		<componentType>TextField</componentType>
+		<required>false</required>
+		<dataType>java.lang.String</dataType>
+		<getFrom>getIssuerOfServiceEpisodeID</getFrom>
+		<storeTo>setIssuerOfServiceEpisodeID</storeTo>
 	</component>
 	<component>
 		<name>dicom.edit.device.optional.issuerOfSpecimenIdentifier</name>
-		<container>OPTIONAL</container>
+		<container>Optional</container>
+		<configurationType>Basic</configurationType>
 		<componentType>TextField</componentType>
+		<required>false</required>
+		<dataType>java.lang.String</dataType>
+		<getFrom>getIssuerOfSpecimenIdentifier</getFrom>
+		<storeTo>setIssuerOfSpecimenIdentifier</storeTo>
 	</component>
 	<component>
 		<name>dicom.edit.device.optional.manufacturer</name>
-		<container>OPTIONAL</container>
+		<container>Optional</container>
+		<configurationType>Basic</configurationType>
 		<componentType>TextField</componentType>
+		<required>false</required>
+		<dataType>java.lang.String</dataType>
+		<getFrom>getManufacturer</getFrom>
+		<storeTo>setManufacturer</storeTo>
 	</component>
 	<component>
 		<name>dicom.edit.device.optional.manufacturerModelName</name>
-		<container>OPTIONAL</container>
+		<container>Optional</container>
+		<configurationType>Basic</configurationType>
 		<componentType>TextField</componentType>
+		<required>false</required>
+		<dataType>java.lang.String</dataType>
+		<getFrom>getManufacturerModelName</getFrom>
+		<storeTo>setManufacturerModelName</storeTo>
 	</component>
 	<component>
 		<name>dicom.edit.device.optional.orderFillerIdentifier</name>
-		<container>OPTIONAL</container>
+		<container>Optional</container>
+		<configurationType>Basic</configurationType>
 		<componentType>TextField</componentType>
+		<required>false</required>
+		<dataType>java.lang.String</dataType>
+		<getFrom>getOderFillerIdentifier</getFrom>
+		<storeTo>setOrderFillerIdentifier</storeTo>
 	</component>
 	<component>
 		<name>dicom.edit.device.optional.orderPlacerIdentifier</name>
-		<container>OPTIONAL</container>
+		<container>Optional</container>
+		<configurationType>Basic</configurationType>
 		<componentType>TextField</componentType>
+		<required>false</required>
+		<dataType>java.lang.String</dataType>
+		<getFrom>getOrderPlacerIdentifier</getFrom>
+		<storeTo>setOrderPlacerIdentifier</storeTo>
 	</component>
+	<!-- 
 	<component>
 		<name>dicom.edit.device.optional.primaryDeviceTypes</name>
-		<container>OPTIONAL</container>
+		<container>Optional</container>
+		<configurationType>Basic</configurationType>
 		<componentType>TextField</componentType>
+		<required>false</required>
+		<dataType>org.dcm4chee.wizard.war.configuration.simple.model.basic.StringArrayModel</dataType>
+		<getFrom>getPrimaryDeviceTypes</getFrom>
+		<storeTo>setPrimaryDeviceTypes</storeTo>
 	</component>
 	<component>
 		<name>dicom.edit.device.optional.softwareVersions</name>
-		<container>OPTIONAL</container>
+		<container>Optional</container>
+		<configurationType>Basic</configurationType>
 		<componentType>TextField</componentType>
+		<required>false</required>
+		<dataType>org.dcm4chee.wizard.war.configuration.simple.model.basic.StringArrayModel</dataType>
+		<getFrom>getSoftwareVersions</getFrom>
+		<storeTo>setSoftwareVersions</storeTo>
 	</component>
+	 -->
 	<component>
 		<name>dicom.edit.device.optional.stationName</name>
-		<container>OPTIONAL</container>
+		<container>Optional</container>
+		<configurationType>Basic</configurationType>
 		<componentType>TextField</componentType>
+		<required>false</required>
+		<dataType>java.lang.String</dataType>
+		<getFrom>getStationName</getFrom>
+		<storeTo>setStationName</storeTo>
 	</component>
 	<component>
 		<name>dicom.edit.device.optional.forwardThreads</name>
-		<container>OPTIONAL</container>
+		<container>Optional</container>
+		<configurationType>Proxy</configurationType>
 		<componentType>TextField</componentType>
+		<required>false</required>
+		<dataType>java.lang.Integer</dataType>
+		<getFrom>getForwardThreads</getFrom>
+		<storeTo>setForwardThreads</storeTo>
 	</component>
-	 -->
+	<component>
+		<name>dicom.edit.device.optional.staleTimeout</name>
+		<container>Optional</container>
+		<configurationType>Proxy</configurationType>
+		<componentType>TextField</componentType>
+		<required>false</required>
+		<dataType>java.lang.Integer</dataType>
+		<getFrom>getStaleTimeout</getFrom>
+		<storeTo>setStaleTimeout</storeTo>
+	</component>
 </configuration>

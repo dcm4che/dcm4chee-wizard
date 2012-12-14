@@ -91,8 +91,6 @@ public abstract class CustomCreateOrEditPage extends ExtendedSecureWebPage {
 	public CustomCreateOrEditPage(final ModalWindow window, final Serializable model, final String configuration) {
         super();
         
-//        try {
-
     	setOutputMarkupId(true);
         add(form);
 
@@ -108,14 +106,18 @@ public abstract class CustomCreateOrEditPage extends ExtendedSecureWebPage {
 		
         for (CustomComponent customComponent : customComponents) {
         	try {
-	        	models.put(customComponent.getName(), 
-	        			storeObject == null ? Model.of() : 
-	        				new Model<Serializable>(
-	        						(Serializable) storeObject.getClass()
-	        						.getDeclaredMethod(customComponent.getGetFrom(), new Class[] {})
-	        						.invoke(getStoreObject(model), new Object[] {})));
+        		if (storeObject == null)
+    	        	models.put(customComponent.getName(), Model.of());
+        		else {
+	        		Serializable value = 
+		        		(Serializable) storeObject.getClass()
+						.getDeclaredMethod(customComponent.getGetFrom(), new Class[] {})
+						.invoke(getStoreObject(model), new Object[] {});
+	        		models.put(customComponent.getName(), value == null ? Model.of() : Model.of(value));
+        		}			
         	} catch (NoSuchMethodException nsme) {
         		log.warn("Failed to get value for component: " + customComponent.getName());
+        		models.put(customComponent.getName(), Model.of());
         	} catch (Exception e) {
     			log.error(this.getClass().toString() + ": " + 
     					"Error reflecting on value for component: " 
@@ -180,7 +182,7 @@ public abstract class CustomCreateOrEditPage extends ExtendedSecureWebPage {
 					try {
 						if (!visible(customComponent))
 							continue;
-						
+
 						object.getClass().getDeclaredMethod(
 								customComponent.getStoreTo(), customComponent.getDataClass())
 								.invoke(object, 
@@ -225,11 +227,6 @@ public abstract class CustomCreateOrEditPage extends ExtendedSecureWebPage {
 			protected void onError(AjaxRequestTarget arg0, Form<?> arg1) {
 			}
         }.setDefaultFormProcessing(false));
-        
-//		} catch (Exception e) {
-//		e.printStackTrace();
-//	}
-
     }
     
     @Override

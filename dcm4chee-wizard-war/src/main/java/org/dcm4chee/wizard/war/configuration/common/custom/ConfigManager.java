@@ -127,7 +127,7 @@ public class ConfigManager {
         			&& !(basic ^ customComponent.getConfigurationType()
         				.equals(CustomComponent.ConfigurationType.Basic))) {
         		result.add(customComponent);
-        		System.out.println("filter: added " + customComponent.getName());
+//        		System.out.println("filter: added " + customComponent.getName());
         	}
 		return result;
 	}
