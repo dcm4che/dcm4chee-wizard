@@ -48,6 +48,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.dcm4chee.wizard.war.configuration.common.tree.ConfigTreeProvider.ConfigurationType;
 import org.dcm4chee.wizard.war.util.ClassUtils;
 
 /**
@@ -62,12 +63,6 @@ public class CustomComponent implements Serializable {
 	private final String componentPackage = "org.apache.wicket.markup.html.form.";
 	
 	public enum Container {Mandatory,Optional};
-
-	public enum ConfigurationType {
-		Basic,
-		Proxy, 
-		Archive
-	};
 
 	public enum ComponentType {
 		TextField,

@@ -47,7 +47,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
 import org.dcm4chee.wizard.war.WizardApplication;
-import org.dcm4chee.wizard.war.configuration.common.custom.CustomComponent.Container;
+import org.dcm4chee.wizard.war.configuration.common.tree.ConfigTreeProvider.ConfigurationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -125,7 +125,7 @@ public class ConfigManager {
         for (CustomComponent customComponent : customComponents)
         	if (container.equals(customComponent.getContainer())
         			&& !(basic ^ customComponent.getConfigurationType()
-        				.equals(CustomComponent.ConfigurationType.Basic))) {
+        				.equals(ConfigurationType.Basic))) {
         		result.add(customComponent);
 //        		System.out.println("filter: added " + customComponent.getName());
         	}

@@ -56,6 +56,8 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.model.StringResourceModel;
 import org.apache.wicket.validation.validator.PatternValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert David <robert.david@agfa.com>
@@ -63,6 +65,8 @@ import org.apache.wicket.validation.validator.PatternValidator;
 public class CustomComponentPanel extends Panel {
 	
 	private static final long serialVersionUID = 1L;
+	
+	private static Logger log = LoggerFactory.getLogger(CustomComponentPanel.class);
 	
 	public CustomComponentPanel(List<CustomComponent> customComponents, @SuppressWarnings("rawtypes") final Map<String,IModel> models, final Component relativeTo) {
 		super("customComponents");
@@ -110,10 +114,16 @@ public class CustomComponentPanel extends Panel {
 		
 		@SuppressWarnings({ "unchecked" })
 		FormComponent<?> addModifiers(CustomComponent customComponent, FormComponent<?> formComponent) {
-			formComponent
-				.setRequired(customComponent.getRequired())
-				.add(new AttributeModifier("title", new ResourceModel(customComponent.getName() + ".tooltip")))
-				.setOutputMarkupId(true);
+			try {
+				formComponent
+					.setRequired(customComponent.getRequired())
+					.setType(customComponent.getDataClass())
+					.add(new AttributeModifier("title", new ResourceModel(customComponent.getName() + ".tooltip")))
+					.setOutputMarkupId(true);
+			} catch (ClassNotFoundException e) {
+				log.error("Error adding modifiers to component " + customComponent.getName());
+				throw new RuntimeException(e);
+			}
 
 			if (this instanceof TextFieldFragment && customComponent.getValidator() != null)
 				((FormComponent<String>) formComponent)

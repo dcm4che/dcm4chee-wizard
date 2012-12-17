@@ -41,7 +41,6 @@ package org.dcm4chee.wizard.war.configuration.common.custom;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -66,6 +65,7 @@ import org.dcm4chee.wizard.common.behavior.MarkInvalidBehavior;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
 import org.dcm4chee.wizard.common.component.ExtendedWebPage;
 import org.dcm4chee.wizard.war.common.component.ExtendedSecureWebPage;
+import org.dcm4chee.wizard.war.configuration.common.tree.ConfigTreeProvider.ConfigurationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -107,7 +107,7 @@ public abstract class CustomCreateOrEditPage extends ExtendedSecureWebPage {
         models = new HashMap<String,IModel>();
         
         Serializable storeObject = getStoreObject(model);
-		
+System.out.println("Constructor: " + storeObject);
         for (CustomComponent customComponent : customComponents) {
         	try {
         		if (storeObject == null)
@@ -180,16 +180,16 @@ public abstract class CustomCreateOrEditPage extends ExtendedSecureWebPage {
             @Override
             protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
 
-				Serializable object = getStoreObject(model);
+				Serializable storeObject = getStoreObject(model);
 
 				for (CustomComponent customComponent : customComponents) {
 					try {
 						if (!visible(customComponent))
 							continue;
 
-						object.getClass().getDeclaredMethod(
+						storeObject.getClass().getDeclaredMethod(
 								customComponent.getStoreTo(), customComponent.getDataClass())
-								.invoke(object, 
+								.invoke(storeObject, 
 										new Object[] {models.get(customComponent.getName()).getObject()});
 					} catch (Exception e) {
 	        			log.error(this.getClass().toString() + ": " + 
@@ -200,7 +200,7 @@ public abstract class CustomCreateOrEditPage extends ExtendedSecureWebPage {
                 }
                 	
                 try {
-					save(object);
+					save(storeObject);
 				} catch (Exception e) {
         			log.error(this.getClass().toString() + ": " + 
         					"Error persisting object: " + e.getMessage());
@@ -246,7 +246,7 @@ public abstract class CustomCreateOrEditPage extends ExtendedSecureWebPage {
 
     private boolean visible(CustomComponent customComponent) {
     	if (!customComponent.getConfigurationType()
-    			.equals(CustomComponent.ConfigurationType.Basic)) {
+    			.equals(ConfigurationType.Basic)) {
     		if (!typeContainer.isVisible())
     			return false;
     		if (customComponent.getContainer().equals(CustomComponent.Container.Optional)
