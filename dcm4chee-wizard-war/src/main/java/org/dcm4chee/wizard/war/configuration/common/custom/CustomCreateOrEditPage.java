@@ -41,6 +41,7 @@ package org.dcm4chee.wizard.war.configuration.common.custom;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -48,6 +49,8 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
+import org.apache.wicket.feedback.FeedbackCollector;
+import org.apache.wicket.feedback.FeedbackMessage;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -59,6 +62,7 @@ import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.resource.CssResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.dcm4che.conf.api.ConfigurationException;
+import org.dcm4chee.wizard.common.behavior.MarkInvalidBehavior;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
 import org.dcm4chee.wizard.common.component.ExtendedWebPage;
 import org.dcm4chee.wizard.war.common.component.ExtendedSecureWebPage;
@@ -209,8 +213,9 @@ public abstract class CustomCreateOrEditPage extends ExtendedSecureWebPage {
             
             @Override
             protected void onError(AjaxRequestTarget target, Form<?> form) {
-                if (target != null)
-                    target.add(form);
+				for (FeedbackMessage feedbackMessage : new FeedbackCollector(getPage()).collect())
+					feedbackMessage.getReporter().add(new MarkInvalidBehavior());
+				ExtendedForm.addInvalidComponentsToAjaxRequestTarget(target, form);
             }
         });
 

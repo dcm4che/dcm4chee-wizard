@@ -60,6 +60,7 @@ import org.dcm4che.net.Device;
 import org.dcm4chee.proxy.conf.ProxyDevice;
 import org.dcm4chee.wizard.common.behavior.FocusOnLoadBehavior;
 import org.dcm4chee.wizard.common.component.ExtendedWebPage;
+import org.dcm4chee.wizard.war.configuration.common.custom.CustomComponent;
 import org.dcm4chee.wizard.war.configuration.common.custom.CustomCreateOrEditPage;
 import org.dcm4chee.wizard.war.configuration.common.tree.ConfigTreeProvider;
 import org.dcm4chee.wizard.war.configuration.common.tree.ConfigTreeProvider.ConfigurationType;
@@ -156,7 +157,11 @@ public class CreateOrEditDevicePage extends CustomCreateOrEditPage {
     public Serializable getStoreObject(Object model)  {
     	if (model == null) {
     		return deviceNameModel == null ? null : 
-    			(device = new Device(deviceNameModel.getObject()));
+    			(device = typeModel.getObject().equals(CustomComponent.ConfigurationType.Basic) ? 
+    					new Device(deviceNameModel.getObject()) : 
+    						typeModel.getObject().equals(CustomComponent.ConfigurationType.Proxy) ? 
+    								new ProxyDevice(deviceNameModel.getObject()) : 
+    									new Device(deviceNameModel.getObject()));    									
     	} else
 			try {
 				return (device = ((DeviceModel) model).getDevice());

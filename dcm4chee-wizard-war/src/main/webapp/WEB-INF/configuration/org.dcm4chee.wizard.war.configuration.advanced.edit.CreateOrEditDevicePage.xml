@@ -267,7 +267,7 @@
 		<configurationType>Proxy</configurationType>
 		<componentType>TextField</componentType>
 		<required>false</required>
-		<dataType>java.lang.Integer</dataType>
+		<dataType>int</dataType>
 		<getFrom>getForwardThreads</getFrom>
 		<storeTo>setForwardThreads</storeTo>
 	</component>

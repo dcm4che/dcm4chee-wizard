@@ -76,7 +76,6 @@ public class CustomComponentPanel extends Panel {
 			protected void populateItem(ListItem<CustomComponent> item) {
 				CustomComponent customComponent = 
 						item.getModelObject();
-				
 				item.add(new Label("component.label", 
 						new StringResourceModel(customComponent.getName() + ".label", relativeTo, null)));
 				
@@ -113,7 +112,8 @@ public class CustomComponentPanel extends Panel {
 		FormComponent<?> addModifiers(CustomComponent customComponent, FormComponent<?> formComponent) {
 			formComponent
 				.setRequired(customComponent.getRequired())
-				.add(new AttributeModifier("title", new ResourceModel(customComponent.getName() + ".tooltip")));
+				.add(new AttributeModifier("title", new ResourceModel(customComponent.getName() + ".tooltip")))
+				.setOutputMarkupId(true);
 
 			if (this instanceof TextFieldFragment && customComponent.getValidator() != null)
 				((FormComponent<String>) formComponent)
