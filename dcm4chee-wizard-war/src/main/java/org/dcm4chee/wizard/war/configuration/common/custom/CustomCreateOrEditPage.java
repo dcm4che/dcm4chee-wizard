@@ -44,9 +44,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.wicket.Session;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
+import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.feedback.FeedbackCollector;
 import org.apache.wicket.feedback.FeedbackMessage;
@@ -90,6 +92,8 @@ public abstract class CustomCreateOrEditPage extends ExtendedSecureWebPage {
 	
 	protected WebMarkupContainer typeContainer;
 	protected WebMarkupContainer optionalTypeContainer;
+	
+	protected Label storeError;
 	
     @SuppressWarnings({ "rawtypes" })
 	public CustomCreateOrEditPage(final ModalWindow window, final Serializable model, final String configuration) {
@@ -179,11 +183,11 @@ System.out.println("Constructor: " + storeObject);
 
             @Override
             protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
-
-				Serializable storeObject = getStoreObject(model);
-
-				for (CustomComponent customComponent : customComponents) {
-					try {
+				try {
+					storeError.setVisible(false);
+					Serializable storeObject = getStoreObject(model);
+	
+					for (CustomComponent customComponent : customComponents) {
 						if (!visible(customComponent))
 							continue;
 
@@ -191,29 +195,20 @@ System.out.println("Constructor: " + storeObject);
 								customComponent.getStoreTo(), customComponent.getDataClass())
 								.invoke(storeObject, 
 										new Object[] {models.get(customComponent.getName()).getObject()});
-					} catch (Exception e) {
-	        			log.error(this.getClass().toString() + ": " + 
-	        					"Error reflecting on: " + customComponent.getName() + ": " + e.getMessage());
-	                    log.debug("Exception", e);
-//						throw new RuntimeException(e);
-	        		}
-                }
-                	
-                try {
+	                }
 					save(storeObject);
+	                window.close(target);
 				} catch (Exception e) {
-        			log.error(this.getClass().toString() + ": " + 
-        					"Error persisting object: " + e.getMessage());
-        			log.debug("Exception", e);
-//					throw new RuntimeException(e);
+					storeError.setDefaultModelObject("Error: " + e.getMessage())
+					.setVisible(true);
+					target.add(form);
 				}
-
-                window.close(target);
         	}
             
             @Override
             protected void onError(AjaxRequestTarget target, Form<?> form) {
-				for (FeedbackMessage feedbackMessage : new FeedbackCollector(getPage()).collect())
+            	storeError.setVisible(false);
+            	for (FeedbackMessage feedbackMessage : new FeedbackCollector(getPage()).collect())
 					feedbackMessage.getReporter().add(new MarkInvalidBehavior());
 				ExtendedForm.addInvalidComponentsToAjaxRequestTarget(target, form);
             }
@@ -232,6 +227,11 @@ System.out.println("Constructor: " + storeObject);
 			protected void onError(AjaxRequestTarget arg0, Form<?> arg1) {
 			}
         }.setDefaultFormProcessing(false));
+        
+        form.add((storeError = new Label("storeError", new Model<String>("")))
+        	.setOutputMarkupId(true)
+        	.setOutputMarkupPlaceholderTag(true)
+        	.add(new AttributeAppender("class", " invalid")));
     }
     
     @Override

@@ -69,6 +69,7 @@ public class MarkInvalidBehavior extends Behavior {
 
     @Override
     public void onComponentTag(Component component, ComponentTag tag) {
+System.out.println("Marking invalid of " + component + " " + tag);
         if (msg != null) {
             tag.put("class", tag.getAttribute("class") + " invalid");
             tag.put("title", msg);
