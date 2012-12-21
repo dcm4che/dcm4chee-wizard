@@ -40,6 +40,7 @@ package org.dcm4chee.wizard.war.configuration.common.custom;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -191,10 +192,21 @@ System.out.println("Constructor: " + storeObject);
 						if (!visible(customComponent))
 							continue;
 
-						storeObject.getClass().getDeclaredMethod(
-								customComponent.getStoreTo(), customComponent.getDataClass())
-								.invoke(storeObject, 
-										new Object[] {models.get(customComponent.getName()).getObject()});
+						try {
+							storeObject.getClass().getDeclaredMethod(
+							customComponent.getStoreTo(), customComponent.getDataClass())
+							.invoke(storeObject, 
+									new Object[] {models.get(customComponent.getName()).getObject()});
+						} catch (IllegalArgumentException iae) {
+        					storeObject.getClass().getDeclaredMethod(
+        							customComponent.getStoreTo(), customComponent.getDataClass())
+        							.invoke(storeObject, 
+        									new Object[] {
+        										customComponent.getDataClass()
+        										.getDeclaredConstructor(java.lang.String.class)
+        										.newInstance(models.get(customComponent.getName()).getObject())
+        							});
+						}
 	                }
 					save(storeObject);
 	                window.close(target);
@@ -202,6 +214,7 @@ System.out.println("Constructor: " + storeObject);
 					storeError.setDefaultModelObject("Error: " + e.getMessage())
 					.setVisible(true);
 					target.add(form);
+					log.error("Error storing object", e);
 				}
         	}
             

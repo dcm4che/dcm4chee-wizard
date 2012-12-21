@@ -50,8 +50,8 @@
 		<componentType>TextField</componentType>
 		<required>false</required>
 		<dataType>java.lang.String</dataType>
-		<getFrom>getSerialNumber</getFrom>
-		<storeTo>setSerialNumber</storeTo>
+		<getFrom>getDeviceSerialNumber</getFrom>
+		<storeTo>setDeviceSerialNumber</storeTo>
 	</component>
 	<!-- 
 	<component>
@@ -135,7 +135,7 @@
 		<configurationType>Basic</configurationType>
 		<componentType>TextField</componentType>
 		<required>false</required>
-		<dataType>java.lang.String</dataType>
+		<dataType>org.dcm4che.data.Issuer</dataType>
 		<getFrom>getIssuerOfAccessionNumber</getFrom>
 		<storeTo>setIssuerOfAccessionNumber</storeTo>
 	</component>
@@ -145,7 +145,7 @@
 		<configurationType>Basic</configurationType>
 		<componentType>TextField</componentType>
 		<required>false</required>
-		<dataType>java.lang.String</dataType>
+		<dataType>org.dcm4che.data.Issuer</dataType>
 		<getFrom>getIssuerOfAdmissionID</getFrom>
 		<storeTo>setIssuerOfAdmissionID</storeTo>
 	</component>
@@ -155,7 +155,7 @@
 		<configurationType>Basic</configurationType>
 		<componentType>TextField</componentType>
 		<required>false</required>
-		<dataType>java.lang.String</dataType>
+		<dataType>org.dcm4che.data.Issuer</dataType>
 		<getFrom>getIssuerOfContainerIdentifier</getFrom>
 		<storeTo>setIssuerOfContainerIdentifier</storeTo>
 	</component>
@@ -165,7 +165,7 @@
 		<configurationType>Basic</configurationType>
 		<componentType>TextField</componentType>
 		<required>false</required>
-		<dataType>java.lang.String</dataType>
+		<dataType>org.dcm4che.data.Issuer</dataType>
 		<getFrom>getIssuerOfPatientID</getFrom>
 		<storeTo>setIssuerOfPatientID</storeTo>
 	</component>
@@ -175,7 +175,7 @@
 		<configurationType>Basic</configurationType>
 		<componentType>TextField</componentType>
 		<required>false</required>
-		<dataType>java.lang.String</dataType>
+		<dataType>org.dcm4che.data.Issuer</dataType>
 		<getFrom>getIssuerOfServiceEpisodeID</getFrom>
 		<storeTo>setIssuerOfServiceEpisodeID</storeTo>
 	</component>
@@ -185,7 +185,7 @@
 		<configurationType>Basic</configurationType>
 		<componentType>TextField</componentType>
 		<required>false</required>
-		<dataType>java.lang.String</dataType>
+		<dataType>org.dcm4che.data.Issuer</dataType>
 		<getFrom>getIssuerOfSpecimenIdentifier</getFrom>
 		<storeTo>setIssuerOfSpecimenIdentifier</storeTo>
 	</component>
@@ -215,7 +215,7 @@
 		<configurationType>Basic</configurationType>
 		<componentType>TextField</componentType>
 		<required>false</required>
-		<dataType>java.lang.String</dataType>
+		<dataType>org.dcm4che.data.Issuer</dataType>
 		<getFrom>getOderFillerIdentifier</getFrom>
 		<storeTo>setOrderFillerIdentifier</storeTo>
 	</component>
@@ -225,7 +225,7 @@
 		<configurationType>Basic</configurationType>
 		<componentType>TextField</componentType>
 		<required>false</required>
-		<dataType>java.lang.String</dataType>
+		<dataType>org.dcm4che.data.Issuer</dataType>
 		<getFrom>getOrderPlacerIdentifier</getFrom>
 		<storeTo>setOrderPlacerIdentifier</storeTo>
 	</component>
