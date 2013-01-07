@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/2002/08/xhtml/xhtml1-strict.dtd">
+ -->
 <configuration>
 <!-- 
 	<component>
@@ -277,8 +280,8 @@
 		<configurationType>Proxy</configurationType>
 		<componentType>TextField</componentType>
 		<required>false</required>
-		<dataType>java.lang.Integer</dataType>
-		<getFrom>getStaleTimeout</getFrom>
-		<storeTo>setStaleTimeout</storeTo>
+		<dataType>int</dataType>
+		<getFrom>getConfigurationStaleTimeout</getFrom>
+		<storeTo>setConfigurationStaleTimeout</storeTo>
 	</component>
 </configuration>

@@ -67,16 +67,6 @@ public class ConfigManager {
 	    	
 		    	return (Configuration) 
 					JAXBContext.newInstance(Configuration.class).createUnmarshaller().unmarshal(stream);
-			
-//		    	Configuration cs = (Configuration) 
-//				JAXBContext.newInstance(Configuration.class).createUnmarshaller().unmarshal(stream);
-//				System.out.println("Components:");
-//				for (Component c : cs.getComponents())
-//					System.out.println("Component: name=" + c.getName() + 
-//							", type=" + c.getType() + 
-//							", null=" + c.getNull() + 
-//							", regex=" + c.getRegex());
-
 		} catch (JAXBException je) {
 			log.error("Error processing configuration from xml file", je);
 		} catch (Exception e) {
@@ -87,36 +77,6 @@ public class ConfigManager {
 		return null;
     }
     
-//    @SuppressWarnings({ "rawtypes", "unchecked" })
-//	public synchronized static FormComponent getComponentFor(CustomComponent customComponent) {
-//    	try {
-//System.out.println("Custom component: " + customComponent.getName());
-//
-//    		Class<?> clazz = Class.forName(customComponent.getClassName());
-//    		FormComponent component = 
-//    				(FormComponent) clazz.getConstructor(String.class)
-//    				.newInstance(customComponent.getName());
-//    		component.setMarkupId(customComponent.getName());
-//    		component.setRequired(!customComponent.getRequired());
-//    		if (customComponent.getValidator() != null)
-//    			component.add(new PatternValidator(customComponent.getRegex()));
-//
-//    		return component;
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		return null;	
-//	}
-    
-//    public synchronized static List<CustomComponent> 
-//    	filter(List<CustomComponent> customComponents, CustomComponent.Container container) {
-//    	List<CustomComponent> result = new ArrayList<CustomComponent>(customComponents.size());
-//        for (CustomComponent customComponent : customComponents)
-//        	if (container.equals(customComponent.getContainer()))
-//        		result.add(customComponent);
-//		return result;
-//    }
-
 	public static List<CustomComponent> filter(
 			List<CustomComponent> customComponents,
 			CustomComponent.Container container,
@@ -127,7 +87,6 @@ public class ConfigManager {
         			&& !(basic ^ customComponent.getConfigurationType()
         				.equals(ConfigurationType.Basic))) {
         		result.add(customComponent);
-//        		System.out.println("filter: added " + customComponent.getName());
         	}
 		return result;
 	}

@@ -114,16 +114,16 @@ public class CustomComponentPanel extends Panel {
 		
 		@SuppressWarnings({ "unchecked" })
 		FormComponent<?> addModifiers(CustomComponent customComponent, FormComponent<?> formComponent) {
-//			try {
+			try {
 				formComponent
 					.setRequired(customComponent.getRequired())
-//					.setType(customComponent.getDataClass())
+					.setType(customComponent.getDataClass())
 					.add(new AttributeModifier("title", new ResourceModel(customComponent.getName() + ".tooltip")))
 					.setOutputMarkupId(true);
-//			} catch (ClassNotFoundException e) {
-//				log.error("Error adding modifiers to component " + customComponent.getName());
-//				throw new RuntimeException(e);
-//			}
+			} catch (ClassNotFoundException e) {
+				log.error("Error adding modifiers to component " + customComponent.getName());
+				throw new RuntimeException(e);
+			}
 
 			if (this instanceof TextFieldFragment && customComponent.getValidator() != null)
 				((FormComponent<String>) formComponent)

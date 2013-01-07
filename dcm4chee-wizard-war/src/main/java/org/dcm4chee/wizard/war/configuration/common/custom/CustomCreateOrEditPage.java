@@ -40,12 +40,11 @@ package org.dcm4chee.wizard.war.configuration.common.custom;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.wicket.Session;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
@@ -112,7 +111,6 @@ public abstract class CustomCreateOrEditPage extends ExtendedSecureWebPage {
         models = new HashMap<String,IModel>();
         
         Serializable storeObject = getStoreObject(model);
-System.out.println("Constructor: " + storeObject);
         for (CustomComponent customComponent : customComponents) {
         	try {
         		if (storeObject == null)
@@ -193,13 +191,13 @@ System.out.println("Constructor: " + storeObject);
 							continue;
 
 						try {
-							storeObject.getClass().getDeclaredMethod(
-							customComponent.getStoreTo(), customComponent.getDataClass())
+							getDeclaredMethod(storeObject.getClass(), 
+									customComponent.getStoreTo(), customComponent.getDataClass())
 							.invoke(storeObject, 
 									new Object[] {models.get(customComponent.getName()).getObject()});
 						} catch (IllegalArgumentException iae) {
-        					storeObject.getClass().getDeclaredMethod(
-        							customComponent.getStoreTo(), customComponent.getDataClass())
+							getDeclaredMethod(storeObject.getClass(), 
+									customComponent.getStoreTo(), customComponent.getDataClass())
         							.invoke(storeObject, 
         									new Object[] {
         										customComponent.getDataClass()
@@ -211,7 +209,8 @@ System.out.println("Constructor: " + storeObject);
 					save(storeObject);
 	                window.close(target);
 				} catch (Exception e) {
-					storeError.setDefaultModelObject("Error: " + e.getMessage())
+					storeError.setDefaultModelObject("Error: " + e + ": " + e.getMessage()
+							+ " Cause: " + e.getCause())
 					.setVisible(true);
 					target.add(form);
 					log.error("Error storing object", e);
@@ -271,5 +270,15 @@ System.out.println("Constructor: " + storeObject);
     			return false;
     	}
     	return true;
+    }
+    
+    private Method getDeclaredMethod(Class<?> storeObjectClass, String methodName, Class<?> inputType) throws NoSuchMethodException {
+		try {
+			return storeObjectClass.getDeclaredMethod(methodName, inputType);
+		} catch (NoSuchMethodException e) {
+			if (storeObjectClass.getSuperclass() != null)
+				return getDeclaredMethod(storeObjectClass.getSuperclass(), methodName, inputType);
+			else throw e;
+		}
     }
  }
