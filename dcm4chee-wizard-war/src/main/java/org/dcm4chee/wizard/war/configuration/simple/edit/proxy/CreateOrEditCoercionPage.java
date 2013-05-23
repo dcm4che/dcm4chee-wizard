@@ -263,8 +263,7 @@ public class CreateOrEditCoercionPage extends SecureSessionCheckPage {
                 } catch (Exception e) {
         			log.error(this.getClass().toString() + ": " + "Error modifying coercion: " + e.getMessage());
                     log.debug("Exception", e);
-//                    throw new ModalWindowRuntimeException(e.getLocalizedMessage());
-                    e.printStackTrace();
+                    throw new ModalWindowRuntimeException(e.getLocalizedMessage());
                 }
             }
 
