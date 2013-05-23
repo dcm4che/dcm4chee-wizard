@@ -58,13 +58,15 @@ public class TransferCapabilityValidator extends AbstractFormValidator {
 	private ApplicationEntity applicationEntity;
 	private TextField<String> sopClassTextField;
 	private DropDownChoice<Role> roleDropDown;
+	private TextField<String> commonNameTextField;
 
 	public TransferCapabilityValidator(ApplicationEntity applicationEntity, 
 			TextField<String> sopClassTextField, 
-			DropDownChoice<org.dcm4che.net.TransferCapability.Role> roleDropDown) {
+			DropDownChoice<org.dcm4che.net.TransferCapability.Role> roleDropDown, TextField<String> commonNameTextField) {
     	this.applicationEntity = applicationEntity;
 		this.sopClassTextField = sopClassTextField;
 		this.roleDropDown = roleDropDown;
+		this.commonNameTextField = commonNameTextField;
 		
 	}
 
@@ -73,6 +75,18 @@ public class TransferCapabilityValidator extends AbstractFormValidator {
 	}
 
 	public void validate(Form<?> form) {
+		String commonName = this.commonNameTextField.getInput();
+		if (commonName != null) {
+			commonName = commonName.toLowerCase();
+			if (commonNameTextField.getModelObject() != null && 
+					commonName.equals(commonNameTextField.getModelObject().toLowerCase()))
+				return;
+			for (TransferCapability transferCapability : this.applicationEntity.getTransferCapabilities()) {
+				if (transferCapability.getCommonName() != null && 
+						commonName.equals(transferCapability.getCommonName().toLowerCase()))
+					commonNameTextField.error(new StringResourceModel("TransferCapabilityValidator.commonName.invalid", form, null).getObject());
+			}			
+		}
 		String sopClass = this.sopClassTextField.getInput();
 		String role = this.roleDropDown.getInput().equals("0") ? "SCP" : "SCU";
 		if (sopClass.equals(sopClassTextField.getModelObject()) 
@@ -81,7 +95,7 @@ public class TransferCapabilityValidator extends AbstractFormValidator {
 		for (TransferCapability transferCapability : this.applicationEntity.getTransferCapabilities()) {
 			if (sopClass.equals(transferCapability.getSopClass())
 					&& role.equals(transferCapability.getRole().name()))
-					sopClassTextField.error(new StringResourceModel("TransferCapabilityValidator.invalid", form, null).getObject());
+					sopClassTextField.error(new StringResourceModel("TransferCapabilityValidator.sopClass-role.invalid", form, null).getObject());
 		}
 	}
 }

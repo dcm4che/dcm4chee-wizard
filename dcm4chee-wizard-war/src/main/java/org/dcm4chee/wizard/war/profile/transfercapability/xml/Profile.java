@@ -48,7 +48,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-@SuppressWarnings("restriction")
 @XmlRootElement(name = "dicomTransferCapability")
 public class Profile implements Serializable {
 

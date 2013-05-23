@@ -40,11 +40,13 @@ package org.dcm4chee.wizard.war.configuration.simple.edit;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.ajax.markup.html.form.AjaxFallbackButton;
+import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxButton;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
@@ -64,33 +66,35 @@ import org.apache.wicket.request.resource.ResourceReference;
 import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.net.ApplicationEntity;
 import org.dcm4che.net.Connection;
-import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
-import org.dcm4chee.proxy.conf.ProxyDevice;
+import org.dcm4chee.proxy.conf.ProxyAEExtension;
+import org.dcm4chee.proxy.conf.ProxyDeviceExtension;
 import org.dcm4chee.wizard.common.behavior.FocusOnLoadBehavior;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
-import org.dcm4chee.wizard.common.component.ExtendedWebPage;
-import org.dcm4chee.wizard.war.configuration.common.tree.ConfigTreeNode;
-import org.dcm4chee.wizard.war.configuration.common.tree.ConfigTreeProvider;
+import org.dcm4chee.wizard.common.component.MainWebPage;
+import org.dcm4chee.wizard.common.component.ModalWindowRuntimeException;
+import org.dcm4chee.wizard.common.component.secure.SecureSessionCheckPage;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ApplicationEntityModel;
-import org.dcm4chee.wizard.war.configuration.simple.model.basic.ConnectionReferenceModel;
+import org.dcm4chee.wizard.war.configuration.simple.model.basic.ConnectionModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.DeviceModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.StringArrayModel;
+import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeNode;
+import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider;
 import org.dcm4chee.wizard.war.configuration.simple.validator.AETitleValidator;
+import org.dcm4chee.wizard.war.configuration.simple.validator.ConnectionProtocolValidator;
 import org.dcm4chee.wizard.war.configuration.simple.validator.ConnectionReferenceValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wicketstuff.security.components.SecureWebPage;
 
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-public class CreateOrEditApplicationEntityPage extends SecureWebPage {
+public class CreateOrEditApplicationEntityPage extends SecureSessionCheckPage {
     
     private static final long serialVersionUID = 1L;
 
     private static Logger log = LoggerFactory.getLogger(CreateOrEditApplicationEntityPage.class);
     
-    private static final ResourceReference baseCSS = new CssResourceReference(ExtendedWebPage.class, "base-style.css");
+    private static final ResourceReference baseCSS = new CssResourceReference(MainWebPage.class, "base-style.css");
     
     private boolean isProxy = false;
     private String oldAETitle;
@@ -99,11 +103,12 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
     private Model<String> aeTitleModel;
     private Model<Boolean> associationAcceptorModel;
     private Model<Boolean> associationInitiatorModel;
-	private Model<ArrayList<ConnectionReferenceModel>> connectionReferencesModel;
+	private Model<ArrayList<ConnectionModel>> connectionReferencesModel;
 	// ProxyApplicationEntity only
 	private Model<Boolean> acceptDataOnFailedNegotiationModel;
 	private Model<Boolean> enableAuditLogModel;
 	private Model<String> spoolDirectoryModel;
+	private Model<Boolean> deleteFailedDataWithoutRetryConfigurationModel;
 
 	// optional
 	private StringArrayModel applicationClustersModel;
@@ -113,8 +118,14 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
 	private StringArrayModel callingAETitlesModel;
 	private StringArrayModel supportedCharacterSetsModel;
 	private Model<String> vendorDataModel;
-    
+	// ProxyApplicationEntity only
+	private Model<String> proxyPIXConsumerApplicationModel;
+	private Model<String> remotePIXManagerApplicationModel;
+	private Model<String> fallbackDestinationAETModel;
+	
 	private List<String> installedRendererChoices;
+
+	private List<String> hl7Applications;
 	
     public CreateOrEditApplicationEntityPage(final ModalWindow window, final ApplicationEntityModel aeModel, 
     		final ConfigTreeNode deviceNode) {
@@ -130,26 +141,29 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
 
         installedRendererChoices = new ArrayList<String>();
         installedRendererChoices.add(new ResourceModel("dicom.installed.true.text").wrapOnAssignment(this).getObject());
-        installedRendererChoices.add(new ResourceModel("dicom.installed.false.text").wrapOnAssignment(this).getObject());
+        installedRendererChoices.add(new ResourceModel("dicom.installed.false.text").wrapOnAssignment(this).getObject());        
 
-        ArrayList<ConnectionReferenceModel> connectionReferences = new ArrayList<ConnectionReferenceModel>();
+        ArrayList<ConnectionModel> connectionReferences = new ArrayList<ConnectionModel>();
 
         try {
 	        oldAETitle = aeModel == null ? 
 	        		null : aeModel.getApplicationEntity().getAETitle();
 
-	        isProxy = (((DeviceModel) deviceNode.getModel()).getDevice() instanceof ProxyDevice);
+	        isProxy = (((DeviceModel) deviceNode.getModel()).getDevice()
+	        		.getDeviceExtension(ProxyDeviceExtension.class) != null);
 
-	        connectionReferencesModel = new Model<ArrayList<ConnectionReferenceModel>>();
-	        connectionReferencesModel.setObject(new ArrayList<ConnectionReferenceModel>());
+        	hl7Applications = Arrays.asList(ConfigTreeProvider.get().getUniqueHL7ApplicationNames());
+	        
+	        connectionReferencesModel = new Model<ArrayList<ConnectionModel>>();
+	        connectionReferencesModel.setObject(new ArrayList<ConnectionModel>());
 			for (Connection connection : ((DeviceModel) deviceNode.getModel()).getDevice().listConnections()) {
-				ConnectionReferenceModel connectionReference = 
-						new ConnectionReferenceModel(connection.getCommonName(), connection.getHostname(), connection.getPort());
+				ConnectionModel connectionReference = new ConnectionModel(connection, 0);
 				connectionReferences.add(connectionReference);
 				if 	(aeModel != null && aeModel.getApplicationEntity().getConnections().contains(connection))
 					connectionReferencesModel.getObject().add(connectionReference);
 			}
-
+			
+			proxyPIXConsumerApplicationModel = Model.of();
 			if (aeModel == null) {
 		        aeTitleModel = Model.of();
 		        associationAcceptorModel = Model.of();
@@ -158,7 +172,8 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
 				acceptDataOnFailedNegotiationModel = Model.of(false);
 				enableAuditLogModel = Model.of(false);
 				spoolDirectoryModel = Model.of();
-
+				deleteFailedDataWithoutRetryConfigurationModel = Model.of(false);
+				
 		        applicationClustersModel = new StringArrayModel(null);
 				descriptionModel = Model.of();
 				installedModel = Model.of();
@@ -166,18 +181,25 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
 				callingAETitlesModel = new StringArrayModel(null);
 				supportedCharacterSetsModel = new StringArrayModel(null);
 				vendorDataModel = Model.of("size 0");
+				
+				remotePIXManagerApplicationModel = Model.of();
+				fallbackDestinationAETModel = Model.of();
 			} else {
+				ProxyAEExtension proxyAEExtension = aeModel.getApplicationEntity().getAEExtension(ProxyAEExtension.class);
+				
 		        aeTitleModel = Model.of(aeModel.getApplicationEntity().getAETitle());
 		        associationAcceptorModel = Model.of(aeModel.getApplicationEntity().isAssociationAcceptor());
 		        associationInitiatorModel = Model.of(aeModel.getApplicationEntity().isAssociationInitiator());       
 
 		        acceptDataOnFailedNegotiationModel = Model.of(isProxy ? 
-     					((ProxyApplicationEntity) aeModel.getApplicationEntity()).isAcceptDataOnFailedNegotiation() : false);
+		        		proxyAEExtension.isAcceptDataOnFailedAssociation() : false);
 				enableAuditLogModel = Model.of(isProxy ? 
-     					((ProxyApplicationEntity) aeModel.getApplicationEntity()).isEnableAuditLog() : false);
+						proxyAEExtension.isEnableAuditLog() : false);
 				spoolDirectoryModel = Model.of(isProxy ? 
-     					((ProxyApplicationEntity) aeModel.getApplicationEntity()).getSpoolDirectory() : null);
-
+						proxyAEExtension.getSpoolDirectory() : null);
+				deleteFailedDataWithoutRetryConfigurationModel = Model.of(isProxy ? 
+						proxyAEExtension.isDeleteFailedDataWithoutRetryConfiguration() : false);
+				
 		        applicationClustersModel = new StringArrayModel(aeModel.getApplicationEntity().getApplicationClusters());
 				descriptionModel = Model.of(aeModel.getApplicationEntity().getDescription());
 				installedModel = Model.of(aeModel.getApplicationEntity().getInstalled());
@@ -185,11 +207,17 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
 				callingAETitlesModel = new StringArrayModel(aeModel.getApplicationEntity().getPreferredCallingAETitles());
 				supportedCharacterSetsModel = new StringArrayModel(aeModel.getApplicationEntity().getSupportedCharacterSets());
 				vendorDataModel = Model.of("size " + aeModel.getApplicationEntity().getVendorData().length);				
+
+				if (isProxy) {
+					proxyPIXConsumerApplicationModel = Model.of(proxyAEExtension.getProxyPIXConsumerApplication());
+					remotePIXManagerApplicationModel = Model.of(proxyAEExtension.getRemotePIXManagerApplication());
+					fallbackDestinationAETModel = Model.of(proxyAEExtension.getFallbackDestinationAET());
+				}
 			}
 		} catch (ConfigurationException ce) {
 			log.error(this.getClass().toString() + ": " + "Error retrieving application entity data: " + ce.getMessage());
             log.debug("Exception", ce);
-            throw new RuntimeException(ce);
+            throw new ModalWindowRuntimeException(ce.getLocalizedMessage());
 		}
 		
         form.add(new Label("aeTitle.label", new ResourceModel("dicom.edit.applicationEntity.aeTitle.label")))
@@ -202,26 +230,35 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
         form.add(new Label("associationInitiator.label", new ResourceModel("dicom.edit.applicationEntity.associationInitiator.label")))
         .add(new CheckBox("associationInitiator", associationInitiatorModel));
         
-        form.add(new CheckBoxMultipleChoice<ConnectionReferenceModel>("connections", 
+        form.add(new CheckBoxMultipleChoice<ConnectionModel>("connections", 
         		connectionReferencesModel,
-        		new Model<ArrayList<ConnectionReferenceModel>>(connectionReferences), 
-        		new IChoiceRenderer<ConnectionReferenceModel>() {
+        		new Model<ArrayList<ConnectionModel>>(connectionReferences), 
+        		new IChoiceRenderer<ConnectionModel>() {
 
 					private static final long serialVersionUID = 1L;
 
-					public Object getDisplayValue(ConnectionReferenceModel connectionReference) {
-						String location = connectionReference.getHostname() 
-								+ ":" + connectionReference.getPort();
-						return connectionReference.getCommonName() != null ? 
-								connectionReference.getCommonName() + " (" + location + ")" : 
+					public Object getDisplayValue(ConnectionModel connectionReference) {
+						Connection connection = null;
+						try {
+							connection = connectionReference.getConnection();
+		                } catch (Exception e) {
+		        			log.error(this.getClass().toString() + ": " + "Error obtaining connection: " + e.getMessage());
+		                    log.debug("Exception", e);
+		                    throw new ModalWindowRuntimeException(e.getLocalizedMessage());
+		                }
+						String location = connection.getHostname() 
+								+ (connection.getPort() == -1 ? "" : ":" + connection.getPort());
+						return connection.getCommonName() != null ? 
+								connection.getCommonName() + " (" + location + ")" : 
 									location;
 					}
 
-					public String getIdValue(ConnectionReferenceModel model, int index) {
+					public String getIdValue(ConnectionModel model, int index) {
 						return String.valueOf(index);
 					}
-        		}).add(new ConnectionReferenceValidator()));
-
+			}).add(new ConnectionReferenceValidator())
+			.add(new ConnectionProtocolValidator(Connection.Protocol.DICOM)));
+        
         WebMarkupContainer proxyContainer = 
 	        new WebMarkupContainer("proxy") {
 	        	
@@ -250,6 +287,9 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
     		.setRequired(true)
     		.setVisible(isProxy));      
         
+        proxyContainer.add(new Label("deleteFailedDataWithoutRetryConfiguration.label", new ResourceModel("dicom.edit.applicationEntity.proxy.deleteFailedDataWithoutRetryConfiguration.label")))
+        .add(new CheckBox("deleteFailedDataWithoutRetryConfiguration", deleteFailedDataWithoutRetryConfigurationModel));
+
         final WebMarkupContainer optionalContainer = new WebMarkupContainer("optional");
         form.add(optionalContainer
         		.setOutputMarkupId(true)
@@ -292,7 +332,67 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
     	optionalContainer.add(new Label("vendorData.label", 
     			new ResourceModel("dicom.edit.applicationEntity.optional.vendorData.label")))
     	.add(new Label("vendorData", vendorDataModel));
-    	
+
+        WebMarkupContainer optionalProxyContainer = 
+        		new WebMarkupContainer("proxy");
+        optionalContainer.add(optionalProxyContainer.setVisible(isProxy));
+
+        final DropDownChoice<String> proxyPIXConsumerApplicationDropDownChoice = 
+        		new DropDownChoice<String>("proxyPIXConsumerApplication", proxyPIXConsumerApplicationModel, hl7Applications);
+        optionalProxyContainer.add(new Label("proxyPIXConsumerApplication.label", 
+        		new ResourceModel("dicom.edit.applicationEntity.optional.proxy.proxyPIXConsumerApplication.label")))
+        .add(proxyPIXConsumerApplicationDropDownChoice
+        		.setNullValid(true).setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true));
+
+		final TextField<String> proxyPIXConsumerApplicationTextField = 
+				new TextField<String>("proxyPIXConsumerApplication.freetext", proxyPIXConsumerApplicationModel);
+		optionalProxyContainer.add(proxyPIXConsumerApplicationTextField
+				.setVisible(false).setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true));
+
+log.error("proxyPIXConsumerApplicationModel: " + proxyPIXConsumerApplicationModel);
+log.error("hl7Applications: " + hl7Applications);
+
+		final Model<Boolean> toggleProxyPIXConsumerApplicationModel = Model.of(false);
+		if (aeModel != null && proxyPIXConsumerApplicationModel.getObject() != null 
+				&& !hl7Applications.contains(proxyPIXConsumerApplicationModel.getObject())) {
+			toggleProxyPIXConsumerApplicationModel.setObject(true);
+			proxyPIXConsumerApplicationTextField.setVisible(true);
+			proxyPIXConsumerApplicationDropDownChoice.setVisible(false);
+		}
+
+        optionalProxyContainer.add(new AjaxCheckBox("toggleProxyPIXConsumerApplication", toggleProxyPIXConsumerApplicationModel) {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			protected void onUpdate(AjaxRequestTarget target) {
+				proxyPIXConsumerApplicationDropDownChoice.setVisible(!toggleProxyPIXConsumerApplicationModel.getObject());
+				proxyPIXConsumerApplicationTextField.setVisible(toggleProxyPIXConsumerApplicationModel.getObject());
+				target.add(proxyPIXConsumerApplicationDropDownChoice);
+				target.add(proxyPIXConsumerApplicationTextField);
+			}
+        });
+
+        optionalProxyContainer.add(new Label("remotePIXManagerApplication.label", 
+        		new ResourceModel("dicom.edit.applicationEntity.optional.proxy.remotePIXManagerApplication.label")))
+        .add(new DropDownChoice<String>("remotePIXManagerApplication", remotePIXManagerApplicationModel, 
+        		hl7Applications).setNullValid(true));
+
+        List<String> uniqueAETitles = null;
+        if (isProxy)
+			try {
+				uniqueAETitles = Arrays.asList(ConfigTreeProvider.get().getUniqueAETitles());
+		        Collections.sort(uniqueAETitles);
+			} catch (ConfigurationException ce) {
+				log.error(this.getClass().toString() + ": " + "Error retrieving unique ae titles: " + ce.getMessage());
+	            log.debug("Exception", ce);
+	            throw new ModalWindowRuntimeException(ce.getLocalizedMessage());
+			}
+        
+        optionalProxyContainer.add(new Label("fallbackDestinationAET.label", new ResourceModel("dicom.edit.applicationEntity.optional.proxy.fallbackDestinationAET.label")))
+        .add(new DropDownChoice<String>("fallbackDestinationAET", fallbackDestinationAETModel, uniqueAETitles)
+        		.setNullValid(true));
+
         form.add(new Label("toggleOptional.label", new ResourceModel("dicom.edit.toggleOptional.label")))
         .add(new AjaxCheckBox("toggleOptional", new Model<Boolean>()) {
 			private static final long serialVersionUID = 1L;
@@ -303,29 +403,24 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
 			}
         });        
         
-        form.add(new AjaxFallbackButton("submit", new ResourceModel("saveBtn"), form) {
+        form.add(new IndicatingAjaxButton("submit", new ResourceModel("saveBtn"), form) {
 
             private static final long serialVersionUID = 1L;
 
             @Override
             protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
                 try {
-                	ApplicationEntity applicationEntity;
-                	if (isProxy)
-                		applicationEntity = aeModel == null ? 
-                				new ProxyApplicationEntity(aeTitleModel.getObject()) : (ProxyApplicationEntity) aeModel.getApplicationEntity();
-                	else
-	                	applicationEntity = aeModel == null ? 
-	                			new ApplicationEntity(aeTitleModel.getObject()) : aeModel.getApplicationEntity();
+                	ApplicationEntity applicationEntity = aeModel == null ? 
+                			new ApplicationEntity(aeTitleModel.getObject()) : aeModel.getApplicationEntity();
 
                     applicationEntity.setAETitle(aeTitleModel.getObject());
                     applicationEntity.setAssociationAcceptor(associationAcceptorModel.getObject());
                     applicationEntity.setAssociationInitiator(associationInitiatorModel.getObject());
                 	applicationEntity.getConnections().clear();
-                	for (ConnectionReferenceModel connectionReference : connectionReferencesModel.getObject()) 
+                	for (ConnectionModel connectionReference : connectionReferencesModel.getObject()) 
                 		for (Connection connection : ((DeviceModel) deviceNode.getModel()).getDevice().listConnections()) 
-                			if (connectionReference.getHostname().equals(connection.getHostname())
-                    				&& connectionReference.getPort().equals(connection.getPort()))
+                			if (connectionReference.getConnection().getHostname().equals(connection.getHostname())
+                    				&& connectionReference.getConnection().getPort() == connection.getPort())
                     			applicationEntity.addConnection(connection);
                 	
                 	applicationEntity.setApplicationClusters(applicationClustersModel.getArray());
@@ -336,24 +431,32 @@ public class CreateOrEditApplicationEntityPage extends SecureWebPage {
                     applicationEntity.setSupportedCharacterSets(supportedCharacterSetsModel.getArray());
 
                 	if (isProxy) {
-                    	ProxyApplicationEntity proxyApplicationEntity = 
-                    			(ProxyApplicationEntity) applicationEntity;
-                    	proxyApplicationEntity
-                    		.setAcceptDataOnFailedNegotiation(acceptDataOnFailedNegotiationModel.getObject());
-                    	proxyApplicationEntity.setEnableAuditLog(enableAuditLogModel.getObject());
-                    	proxyApplicationEntity.setSpoolDirectory(spoolDirectoryModel.getObject());
+                    	ProxyAEExtension proxyAEExtension = applicationEntity.getAEExtension(ProxyAEExtension.class);
+                		if (proxyAEExtension == null) {
+                			proxyAEExtension = new ProxyAEExtension();
+                			applicationEntity.addAEExtension(proxyAEExtension);
+                		}
+                		proxyAEExtension.setAcceptDataOnFailedAssociation(acceptDataOnFailedNegotiationModel.getObject());
+                		proxyAEExtension.setEnableAuditLog(enableAuditLogModel.getObject());
+                		proxyAEExtension.setSpoolDirectory(spoolDirectoryModel.getObject());
+                		proxyAEExtension.setDeleteFailedDataWithoutRetryConfiguration(deleteFailedDataWithoutRetryConfigurationModel.getObject());
+                		proxyAEExtension.setProxyPIXConsumerApplication(proxyPIXConsumerApplicationModel.getObject());
+                		proxyAEExtension.setRemotePIXManagerApplication(remotePIXManagerApplicationModel.getObject());
+                		proxyAEExtension.setFallbackDestinationAET(fallbackDestinationAETModel.getObject());                        
                 	}
-                    if (aeModel != null)
-                    	ConfigTreeProvider.get().unregisterAETitle(oldAETitle);
-                    else
+                    if (aeModel != null) {
+                    	if (!"*".equals(oldAETitle))
+                    		ConfigTreeProvider.get().unregisterAETitle(oldAETitle);
+                    } else
                     	((DeviceModel) deviceNode.getModel()).getDevice().addApplicationEntity(applicationEntity);
                     ConfigTreeProvider.get().mergeDevice(applicationEntity.getDevice());
-                    ConfigTreeProvider.get().registerAETitle(applicationEntity.getAETitle());
+                    if (!"*".equals(applicationEntity.getAETitle()))
+                    	ConfigTreeProvider.get().registerAETitle(applicationEntity.getAETitle());
                     window.close(target);
                 } catch (Exception e) {
         			log.error(this.getClass().toString() + ": " + "Error modifying application entity: " + e.getMessage());
                     log.debug("Exception", e);
-                    throw new RuntimeException(e);
+                    throw new ModalWindowRuntimeException(e.getLocalizedMessage());
                 }
             }
 

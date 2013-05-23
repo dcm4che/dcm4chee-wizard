@@ -40,15 +40,18 @@ package org.dcm4chee.wizard.war;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 
 import javax.security.auth.Subject;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
 import org.apache.wicket.Page;
+import org.apache.wicket.request.IRequestHandler;
 import org.apache.wicket.request.Request;
 import org.apache.wicket.request.Response;
+import org.apache.wicket.request.cycle.AbstractRequestCycleListener;
+import org.apache.wicket.request.cycle.RequestCycle;
+import org.dcm4chee.wizard.common.component.InternalErrorPage;
 import org.dcm4chee.wizard.common.component.secure.SecureWebApplication;
 import org.dcm4chee.wizard.common.login.context.LoginContextSecurityHelper;
 import org.dcm4chee.wizard.common.login.context.SSOLoginContext;
@@ -67,22 +70,30 @@ public class WizardApplication extends SecureWebApplication {
 
     private DicomConfigurationManager dicomConfigurationManager;
     private Root root;
-    private String connectedDeviceName;
-	private String reloadServiceEndpoint;
 
     @Override
     protected void init() {
         super.init();
+        
+        getRequestCycleListeners().add(new AbstractRequestCycleListener() {
+
+    			public IRequestHandler onException(RequestCycle cycle, Exception e) {
+
+					while (e.getCause() != null)
+						e = (Exception) e.getCause();
+					cycle.setResponsePage(new InternalErrorPage(e, null));
+					return cycle.getRequestHandlerScheduledAfterCurrent();
+    			}
+    		});
+        
         getDicomConfigurationManager();
         getTransferCapabilityProfiles();       
-        connectedDeviceName = System.getProperty("proxy.device.name");
-        reloadServiceEndpoint = getInitParameter("ReloadServiceEndpoint");
     }
 
     public synchronized DicomConfigurationManager getDicomConfigurationManager() {
 
         if (dicomConfigurationManager == null)
-            dicomConfigurationManager = new DicomConfigurationManager(getInitParameter("dicomConfigurationClass"));
+            dicomConfigurationManager = new DicomConfigurationManager(getInitParameter("ldapPropertiesURL"));
         return dicomConfigurationManager;
     }
 
@@ -101,14 +112,6 @@ public class WizardApplication extends SecureWebApplication {
 			}
         }
 		return root;
-    }
-    
-    public String getConnectedDeviceName() {
-    	return connectedDeviceName;
-    }
-    
-    public String getReloadServiceEndpoint() throws MalformedURLException {
-    	return reloadServiceEndpoint;
     }
     
     @Override

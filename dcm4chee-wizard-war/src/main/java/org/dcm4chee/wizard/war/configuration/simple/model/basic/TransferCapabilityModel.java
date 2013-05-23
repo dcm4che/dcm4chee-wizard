@@ -46,7 +46,7 @@ import org.dcm4chee.wizard.war.configuration.simple.model.ConfigNodeModel;
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-public class TransferCapabilityModel implements Serializable, ConfigNodeModel {
+public class TransferCapabilityModel extends ConfigNodeModel implements Serializable, Comparable<TransferCapabilityModel> {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -70,5 +70,23 @@ public class TransferCapabilityModel implements Serializable, ConfigNodeModel {
 	
 	public TransferCapability getTransferCapability() {
 		return transferCapability;
-	}	
+	}
+
+	@Override
+	public int compareTo(TransferCapabilityModel transferCapabilityModel) {
+		TransferCapability compareTo = transferCapabilityModel.getTransferCapability();
+		
+		String name1 = transferCapability.getCommonName() == null ? 
+				transferCapability.getSopClass() : transferCapability.getCommonName();
+		String name2 = compareTo.getCommonName() == null ? 
+				compareTo.getSopClass() : compareTo.getCommonName();
+
+		return (name1.equals(name2)) ? 
+			transferCapability.getRole().compareTo(compareTo.getRole()) :name1.compareTo(name2);
+	}
+	
+	@Override
+	public String getDescription() {
+		return transferCapability.getCommonName() == null ? toolTip : transferCapability.getCommonName();
+	}
 }

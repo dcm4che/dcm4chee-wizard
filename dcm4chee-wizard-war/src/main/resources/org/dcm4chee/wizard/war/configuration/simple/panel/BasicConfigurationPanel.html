@@ -18,12 +18,16 @@
 		<div style="clear: both; margin-top: 5px;" />
 		<form style="clear: both" wicket:id="form">
 			<div style="margin-top: 20px;">
-				<button wicket:id="createDevice">
+				<button wicket:id="createDevice" style="float: left;">
 					<img wicket:id="createDeviceImg" alt="Create Device" />
 					<span wicket:id="createDeviceText" />
 				</button>
-				 <div class="tree" wicket:id="configTree" />
+				<button wicket:id="export" style="float: right;">
+					<img wicket:id="exportImg" alt="Export" />
+					<span wicket:id="exportText" />
+				</button>
 			</div>
+			<div class="tree" wicket:id="configTree" style="clear: both;"/>
 		</form>
 	</wicket:panel>	
 </html>

@@ -14,12 +14,10 @@
 		<wicket:extend>
 		  	<div class="internal_error">
 				<div class="message-system">
-					<wicket:message key="application.internal_error">
-						[Internal error]
-					</wicket:message>
+					<div wicket:id="message-type" />
 				</div>
-                <div wicket:id="exception-message" />
-                <div wicket:id="exception-page" />
+                <div wicket:id="message-content" />
+                <div wicket:id="originating-page" />
 				<div>
 					<a wicket:id="home" class="hyperlink" href="#">
 						<span wicket:id="homeLabel" />

@@ -53,7 +53,7 @@ public class TransferSyntaxValidator extends StringValidator {
 
     @Override
     public void validate(IValidatable<String> transferSyntax) {
-    	for (String tsString : transferSyntax.getValue().split("\n"))
+    	for (String tsString : transferSyntax.getValue().split("\r\n"))
 	    	if (!tsString.matches(ValidTransferSyntax))
     			transferSyntax.error(new ValidationError()
     				.addKey("TransferSyntaxValidator.invalid"));

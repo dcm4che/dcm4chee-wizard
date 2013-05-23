@@ -39,8 +39,8 @@
 package org.dcm4chee.wizard.war.configuration.simple.model.basic;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.wicket.model.IModel;
 import org.dcm4che.net.Dimse;
@@ -82,18 +82,17 @@ public class DimseCollectionModel implements Serializable {
         }
 
         public void setObject(Dimse dimse) {
-        	if (dimse != null)
-        		model.dimses[index] = dimse;
+        	model.dimses[index] = dimse;
         }
 
         public void detach() {
         }
     }
     
-    public List<Dimse> getDimses() {
-    	List<Dimse> result = new ArrayList<Dimse>();
+    public Set<Dimse> getDimses() {
+    	Set<Dimse> result = new HashSet<Dimse>();
     	for (Dimse dimse : dimses)
-    		if (dimses != null)
+    		if (dimse != null)
     			result.add(dimse);
     	return result;
     }

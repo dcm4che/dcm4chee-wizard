@@ -45,7 +45,7 @@ import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.html.IComponentAwareHeaderContributor;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
-import org.dcm4chee.wizard.common.component.ExtendedWebPage;
+import org.dcm4chee.wizard.common.component.MainWebPage;
 
 /**
  * Ajax Call Decorator to show and hide a mask to prevent user input while ajax call is running.
@@ -59,63 +59,54 @@ public class MaskingAjaxCallDecorator extends Behavior implements IAjaxCallListe
 
     private static final long serialVersionUID = 1L;
     
-//    public IAjaxCallListener getAjaxCallListener() throws InstantiationException, IllegalAccessException {
-//        return new MaskingAjaxCallListener();
-//    }
-
     @Override
     public void renderHead(Component component, IHeaderResponse response) {
         response.render(JavaScriptHeaderItem.forReference(
-        		new JavaScriptResourceReference(ExtendedWebPage.class, "web3-utils.js")));
+        		new JavaScriptResourceReference(MainWebPage.class, "web3-utils.js")));
     }
 
-//    private class MaskingAjaxCallListener extends AjaxCallListener {
-//
-//        private static final long serialVersionUID = 1L;
+	@Override
+	public CharSequence getBeforeHandler(Component component) {
+		// TODO: 
+		System.out.println("AjaxCallListener: getBeforeHandler: for: " + component);
+		return "if(typeof showMask == 'function') { showMask(); };";
+	}
 
-		@Override
-		public CharSequence getBeforeHandler(Component component) {
-// TODO: 
-System.out.println("AjaxCallListener: getBeforeHandler: for: " + component);
-			return "if(typeof showMask == 'function') { showMask(); };";
-		}
+	@Override
+	public CharSequence getSuccessHandler(Component component) {
+		// TODO: 
+		System.out.println("AjaxCallListener: getBeforeHandler: for: " + component);
+		return "hideMask();";
+	}
 
-		@Override
-		public CharSequence getSuccessHandler(Component component) {
-			// TODO: 
-			System.out.println("AjaxCallListener: getBeforeHandler: for: " + component);
-			return "hideMask();";
-		}
+	@Override
+	public CharSequence getFailureHandler(Component component) {
+		// TODO: 
+		System.out.println("AjaxCallListener: getBeforeHandler: for: " + component);
+		return "hideMask();";
+	}
 
-		@Override
-		public CharSequence getFailureHandler(Component component) {
-			// TODO: 
-			System.out.println("AjaxCallListener: getBeforeHandler: for: " + component);
-			return "hideMask();";
-		}
-//    }
+	@Override
+	public CharSequence getAfterHandler(Component arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-		@Override
-		public CharSequence getAfterHandler(Component arg0) {
-			// TODO Auto-generated method stub
-			return null;
-		}
+	@Override
+	public CharSequence getBeforeSendHandler(Component arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-		@Override
-		public CharSequence getBeforeSendHandler(Component arg0) {
-			// TODO Auto-generated method stub
-			return null;
-		}
+	@Override
+	public CharSequence getCompleteHandler(Component arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-		@Override
-		public CharSequence getCompleteHandler(Component arg0) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public CharSequence getPrecondition(Component arg0) {
-			// TODO Auto-generated method stub
-			return null;
-		}
+	@Override
+	public CharSequence getPrecondition(Component arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

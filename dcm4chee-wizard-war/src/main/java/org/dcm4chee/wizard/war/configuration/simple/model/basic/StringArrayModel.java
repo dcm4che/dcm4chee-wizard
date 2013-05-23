@@ -56,14 +56,16 @@ public class StringArrayModel implements IModel<String> {
 	}
 	
 	public String getObject() {
-		StringBuffer transferSyntaxesString = new StringBuffer();
-		for (String transferSyntax : Arrays.asList(strings))
-			transferSyntaxesString.append(transferSyntax).append("\n");
-		return transferSyntaxesString.toString();
+		StringBuffer asString = new StringBuffer();
+		for (String string : Arrays.asList(strings))
+			asString.append(string).append("\n");
+		return asString.toString();
 	}
 
-	public void setObject(String transferSyntax) {
-		strings = transferSyntax == null ? new String[0] : transferSyntax.split("\n");
+	public void setObject(String string) {
+		strings = string == null ? new String[0] : string.split("\r\n");
+		for (int i = 0; i < strings.length; i++)
+			strings[i] = strings[i].trim();
 	}
 	
 	public void detach() {

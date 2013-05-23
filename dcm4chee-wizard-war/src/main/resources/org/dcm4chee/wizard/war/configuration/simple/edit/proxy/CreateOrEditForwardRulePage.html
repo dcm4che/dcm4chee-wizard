@@ -36,15 +36,19 @@
 							<div wicket:id="optional">
 			          			<div class="edit-table-row">
 								     <span class="edit-desc" wicket:id="callingAETitle.label" />
-								     <input class="edit-value" wicket:id="callingAETitle" type="text" />
+								     <select class="edit-value" wicket:id="callingAETitle" />
+								     <input class="edit-value" wicket:id="callingAETitle.freetext" type="text" />
+								     <input class="edit-value" wicket:id="toggleCallingAETitle" type="checkbox" />
 					  			</div>
-			          			<div class="edit-table-row" style="height: 80px;">
-								     <span class="edit-desc" wicket:id="dimse.label" />
-								     <div class="edit-value">
-								     <select wicket:id="dimse1" /><br />
-								     <select wicket:id="dimse2" /><br />
-								     <select wicket:id="dimse3" /><br />
-								     </div>
+			          			<div class="edit-table-row" style="height: 115px;">
+									<span class="edit-desc" wicket:id="dimse.label" />
+									<div class="edit-value">
+										<select wicket:id="dimse1" /><br />
+										<select wicket:id="dimse2" /><br />
+										<select wicket:id="dimse3" /><br />
+										<select wicket:id="dimse4" /><br />
+										<select wicket:id="dimse5" /><br />
+									</div>
 					  			</div>
 			          			<div class="edit-table-row">
 								     <span class="edit-desc" wicket:id="exclusiveUseDefinedTC.label" />
@@ -65,6 +69,18 @@
 			          			<div class="edit-table-row" style="height: 60px;">
 								     <span class="edit-desc" wicket:id="sopClass.label" />
 								     <textarea  class="edit-value" wicket:id="sopClass" />
+					  			</div>
+								<div class="edit-table-row">
+									<span class="edit-desc" wicket:id="runPIXQuery.label" />
+									<input class="edit-value" wicket:id="runPIXQuery" type="checkbox" />
+								</div>
+			          			<div class="edit-table-row">
+								     <span class="edit-desc" wicket:id="mpps2DoseSrTemplateURI.label" />
+								     <input class="edit-value" wicket:id="mpps2DoseSrTemplateURI" type="text" />
+					  			</div>
+			          			<div class="edit-table-row">
+								     <span class="edit-desc" wicket:id="description.label" />
+								     <input class="edit-value" wicket:id="description" type="text" />
 					  			</div>
 							</div>
 						</div>

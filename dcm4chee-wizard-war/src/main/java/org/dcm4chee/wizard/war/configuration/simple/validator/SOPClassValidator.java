@@ -53,7 +53,7 @@ public class SOPClassValidator extends StringValidator {
 
     @Override
     public void validate(IValidatable<String> validatable) {
-	  for (String sopClass : validatable.getValue().split("\n"))
+	for (String sopClass : validatable.getValue().split("\r\n"))
 		  if (!sopClass.matches(ValidSOPClass))
 			  validatable.error(new ValidationError().addKey("SOPClassValidator.invalid"));
     }

@@ -43,11 +43,13 @@ import java.util.ArrayList;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxFallbackButton;
+import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxButton;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
@@ -57,41 +59,54 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.resource.CssResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
-import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
+import org.dcm4che.conf.api.ConfigurationException;
+import org.dcm4chee.proxy.common.RetryObject;
+import org.dcm4chee.proxy.conf.ProxyAEExtension;
 import org.dcm4chee.proxy.conf.Retry;
-import org.dcm4chee.proxy.conf.RetryObject;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
-import org.dcm4chee.wizard.common.component.ExtendedWebPage;
-import org.dcm4chee.wizard.war.configuration.common.tree.ConfigTreeNode;
-import org.dcm4chee.wizard.war.configuration.common.tree.ConfigTreeProvider;
-import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ProxyApplicationEntityModel;
+import org.dcm4chee.wizard.common.component.MainWebPage;
+import org.dcm4chee.wizard.common.component.ModalWindowRuntimeException;
+import org.dcm4chee.wizard.common.component.secure.SecureSessionCheckPage;
+import org.dcm4chee.wizard.war.configuration.simple.model.basic.ApplicationEntityModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.RetryModel;
+import org.dcm4chee.wizard.war.configuration.simple.model.proxy.TimeIntervalModel;
+import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeNode;
+import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider;
+import org.dcm4chee.wizard.war.configuration.simple.validator.RetrySuffixValidator;
+import org.dcm4chee.wizard.war.configuration.simple.validator.TimeIntervalValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wicketstuff.security.components.SecureWebPage;
 
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-public class CreateOrEditRetryPage extends SecureWebPage {
+public class CreateOrEditRetryPage extends SecureSessionCheckPage {
     
     private static final long serialVersionUID = 1L;
 
     private static Logger log = LoggerFactory.getLogger(CreateOrEditRetryPage.class);
 
-    private static final ResourceReference baseCSS = new CssResourceReference(ExtendedWebPage.class, "base-style.css");
+    private static final ResourceReference baseCSS = new CssResourceReference(MainWebPage.class, "base-style.css");
     
     // mandatory
 	private IModel<RetryObject> suffixModel;
-    private Model<Integer> delayModel;
+    private TimeIntervalModel delayModel;
 	private Model<Integer> retriesModel;
+	private Model<Boolean> deleteAfterFinalRetryModel;
     
     public CreateOrEditRetryPage(final ModalWindow window, final RetryModel retryModel, 
     		final ConfigTreeNode aeNode) {
     	super();
 
-    	final ProxyApplicationEntity proxyApplicationEntity = 
-    			((ProxyApplicationEntityModel) aeNode.getModel()).getApplicationEntity();
+    	ProxyAEExtension proxyAEExtension = null;
+		try {
+			proxyAEExtension = ((ApplicationEntityModel) aeNode.getModel()).getApplicationEntity()
+			.getAEExtension(ProxyAEExtension.class);
+		} catch (ConfigurationException ce) {
+			log.error(this.getClass().toString() + ": " + "Error modifying retry: " + ce.getMessage());
+            log.debug("Exception", ce);
+            throw new ModalWindowRuntimeException(ce.getLocalizedMessage());
+		}
 
         add(new WebMarkupContainer("create-retry-title").setVisible(retryModel == null));
         add(new WebMarkupContainer("edit-retry-title").setVisible(retryModel != null));
@@ -103,12 +118,14 @@ public class CreateOrEditRetryPage extends SecureWebPage {
 
         if (retryModel == null) {
     		suffixModel = Model.of(RetryObject.AAssociateRJ);
-    		delayModel = Model.of(Retry.DEFAULT_DELAY);
+    		delayModel = new TimeIntervalModel(Retry.DEFAULT_DELAY);
     		retriesModel = Model.of(Retry.DEFAULT_RETRIES);
+    		deleteAfterFinalRetryModel = Model.of(false);
         } else {
 			suffixModel = Model.of(retryModel.getRetry().getRetryObject());
-			delayModel = Model.of(retryModel.getRetry().getDelay());
+			delayModel = new TimeIntervalModel(retryModel.getRetry().getDelay());
 			retriesModel = Model.of(retryModel.getRetry().getNumberOfRetries());
+			deleteAfterFinalRetryModel = Model.of(retryModel.getRetry().isDeleteAfterFinalRetry());
         }
 
         form.add(new Label("suffix.label", new ResourceModel("dicom.edit.retry.suffix.label")));
@@ -132,19 +149,25 @@ public class CreateOrEditRetryPage extends SecureWebPage {
 					}
         		});
         form.add(suffixDropDown
-        		.setNullValid(false));
+        		.setNullValid(false)
+        		.add(new RetrySuffixValidator(
+        				retryModel == null ? null : retryModel.getRetry().getRetryObject().getSuffix(), 
+                    			proxyAEExtension.getRetries())));
 
         form.add(new Label("delay.label", new ResourceModel("dicom.edit.retry.delay.label")))
-        .add(new TextField<Integer>("delay", delayModel)
-        		.setType(Integer.class)
+        .add(new TextField<String>("delay", delayModel)
         		.setRequired(true)
+        		.add(new TimeIntervalValidator())
         		.add(new AttributeModifier("title", new ResourceModel("dicom.edit.retry.delay.tooltip"))));
 
         form.add(new Label("retries.label", new ResourceModel("dicom.edit.retry.retries.label")))
         .add(new TextField<Integer>("retries", retriesModel)
         		.setType(Integer.class).setRequired(true));
 
-        form.add(new AjaxFallbackButton("submit", new ResourceModel("saveBtn"), form) {
+        form.add(new Label("deleteAfterFinalRetry.label", new ResourceModel("dicom.edit.retry.deleteAfterFinalRetry.label")))
+        .add(new CheckBox("deleteAfterFinalRetry", deleteAfterFinalRetryModel));
+
+        form.add(new IndicatingAjaxButton("submit", new ResourceModel("saveBtn"), form) {
 
             private static final long serialVersionUID = 1L;
 
@@ -153,19 +176,25 @@ public class CreateOrEditRetryPage extends SecureWebPage {
                 try {
                 	Retry retry = new Retry(
                 			suffixModel.getObject(),
-                			delayModel.getObject(),
-                			retriesModel.getObject());
+                			delayModel.getSeconds(),
+                			retriesModel.getObject(),
+                			deleteAfterFinalRetryModel.getObject());
+                	
+                	ProxyAEExtension proxyAEExtension = 
+                			((ApplicationEntityModel) aeNode.getModel()).getApplicationEntity()
+        					.getAEExtension(ProxyAEExtension.class);
 
             		if (retryModel != null)
-            			proxyApplicationEntity.getRetries().remove(retryModel.getRetry());
-            		proxyApplicationEntity.getRetries().add(retry);
+            			proxyAEExtension.getRetries().remove(retryModel.getRetry());
+            		proxyAEExtension.getRetries().add(retry);
 
-            		ConfigTreeProvider.get().mergeDevice(proxyApplicationEntity.getDevice());
+            		ConfigTreeProvider.get().mergeDevice(
+            				((ApplicationEntityModel) aeNode.getModel()).getApplicationEntity().getDevice());
                     window.close(target);
                 } catch (Exception e) {
         			log.error(this.getClass().toString() + ": " + "Error modifying retry: " + e.getMessage());
                     log.debug("Exception", e);
-                    throw new RuntimeException(e);
+                    throw new ModalWindowRuntimeException(e.getLocalizedMessage());
                 }
             }
 

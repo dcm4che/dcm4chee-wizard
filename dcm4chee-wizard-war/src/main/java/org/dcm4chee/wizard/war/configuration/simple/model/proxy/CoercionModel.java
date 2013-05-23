@@ -46,12 +46,12 @@ import org.dcm4chee.wizard.war.configuration.simple.model.ConfigNodeModel;
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-public class CoercionModel implements Serializable, ConfigNodeModel {
+public class CoercionModel extends ConfigNodeModel implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	public static String cssClass = "coercion";
-	public static String toolTip = "coercion";
+	public static String toolTip = "Coercion";
 
 	private AttributeCoercion attributeCoercion;
 	
@@ -61,6 +61,11 @@ public class CoercionModel implements Serializable, ConfigNodeModel {
 	
 	public AttributeCoercion getCoercion() {
 		return attributeCoercion;
+	}
+	
+	@Override
+	public String getDescription() {
+		return toolTip;
 	}
 }
 

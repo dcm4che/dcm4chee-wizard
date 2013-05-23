@@ -63,7 +63,19 @@ public class DeviceNameValidator extends BaseNameValidator {
     public void validate(IValidatable<String> deviceName) {
     	super.validate(deviceName);
     	if (!deviceName.getValue().equals(ignore)) {
-			if (deviceName.getValue().contains("/"))
+			if (deviceName.getValue().length() > 16)
+				deviceName.error(new ValidationError()
+					.addKey("DeviceNameValidator.size"));
+    		if (deviceName.getValue().contains("/")
+    				|| deviceName.getValue().contains(",")
+    				|| deviceName.getValue().contains("=")
+    				|| deviceName.getValue().contains("+")
+    				|| deviceName.getValue().contains("<")
+    				|| deviceName.getValue().contains(">")
+    				|| deviceName.getValue().contains("#")
+    				|| deviceName.getValue().contains(";")
+    				|| deviceName.getValue().contains("\\")
+    				|| deviceName.getValue().contains("\""))
 				deviceName.error(new ValidationError()
 					.addKey("DeviceNameValidator.invalid"));
     		if (deviceNames.contains(deviceName.getValue()))

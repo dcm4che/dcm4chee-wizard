@@ -45,6 +45,7 @@ import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.validation.AbstractFormValidator;
 import org.apache.wicket.model.StringResourceModel;
 import org.dcm4che.conf.api.ConfigurationException;
+import org.dcm4chee.wizard.common.component.ModalWindowRuntimeException;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ConnectionModel;
 
 /**
@@ -82,30 +83,33 @@ public class ConnectionValidator extends AbstractFormValidator {
 
 	public void validate(Form<?> form) {
 		try {
-			int portNumber = 1;
-			if (port.getValue() != null)
-				portNumber = Integer.parseInt(port.getValue());
-			
+			hostname.validate();
+			port.validate();
+			if (hostname.hasErrorMessage() || port.hasErrorMessage())
+				return;
+
 			if (!commonName.getValue().equals("") 
 					&& ignore != null  
 					&& !commonName.getValue().equals(ignore.getConnection().getCommonName())) {
 				for (ConnectionModel connectionModel : connectionModels) 
 					if (commonName.getValue().equals(connectionModel.getConnection().getCommonName()))
 						commonName.error(new StringResourceModel("ConnectionValidator.commonName.alreadyExists", hostname, null, new Object[0]).getObject());
-			} else {
-				if (ignore != null 
-					&& hostname.getValue().equals(ignore.getConnection().getHostname())
-					&& (portNumber == ignore.getConnection().getPort()))
-					return;
-				for (ConnectionModel connectionModel : connectionModels) 
-					if (hostname.getValue().equals(connectionModel.getConnection().getHostname())
-							&& portNumber == connectionModel.getConnection().getPort()) { 
-								hostname.error(new StringResourceModel("ConnectionValidator.port.alreadyExists", hostname, null, new Object[0]).getObject());
-								port.error(new StringResourceModel("ConnectionValidator.port.alreadyExists", hostname, null, new Object[0]).getObject());
-							}
 			}
+
+			int portNumber = !port.getValue().equals("") ? Integer.parseInt(port.getValue()) : -1;
+			if (ignore != null 
+			&& hostname.getValue().equals(ignore.getConnection().getHostname())
+			&& (portNumber == ignore.getConnection().getPort()))
+				return;
+
+			for (ConnectionModel connectionModel : connectionModels) 
+				if (hostname.getValue().equals(connectionModel.getConnection().getHostname())
+						&& portNumber == connectionModel.getConnection().getPort()) { 
+							hostname.error(new StringResourceModel("ConnectionValidator.port.alreadyExists", hostname, null, new Object[0]).getObject());
+							port.error(new StringResourceModel("ConnectionValidator.port.alreadyExists", hostname, null, new Object[0]).getObject());
+						}
 		} catch (ConfigurationException ce) {
-			throw new RuntimeException(ce);
+			throw new ModalWindowRuntimeException(ce.getLocalizedMessage());
 		}
 	}
 }

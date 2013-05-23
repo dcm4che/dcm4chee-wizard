@@ -44,28 +44,38 @@ import java.util.LinkedHashMap;
 
 import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.net.ApplicationEntity;
-import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
-import org.dcm4chee.proxy.conf.ProxyDevice;
+import org.dcm4che.net.Device;
+import org.dcm4che.net.audit.AuditLogger;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ApplicationEntityModel;
-import org.dcm4chee.wizard.war.configuration.simple.model.basic.DeviceModel;
+import org.dcm4chee.wizard.war.configuration.simple.model.basic.AuditLoggerModel;
+import org.dcm4chee.wizard.war.configuration.simple.model.basic.HL7DeviceModel;
 
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-public class ProxyDeviceModel extends DeviceModel {
+public class ProxyDeviceModel extends HL7DeviceModel {
 	
 	private static final long serialVersionUID = 1L;
-
-//	private ProxyDevice device;
 	
 	LinkedHashMap<String, ApplicationEntityModel> applicationEntities;
+	AuditLoggerModel auditLoggerModel;
 
-	public ProxyDeviceModel(ProxyDevice device) throws ConfigurationException {
+	public ProxyDeviceModel(Device device) throws ConfigurationException {
 		super(device);		
 		
-		setApplicationEntities(device.getApplicationEntities());		
+		setApplicationEntities(device.getApplicationEntities());
+		setAuditLogger(device.getDeviceExtension(AuditLogger.class));
 	}
 
+	public AuditLoggerModel getAuditLoggerModel() {
+		return auditLoggerModel;
+	}
+
+	private void setAuditLogger(AuditLogger auditLogger) throws ConfigurationException {
+		if (auditLogger != null)
+			this.auditLoggerModel = new AuditLoggerModel(auditLogger);
+	}
+ 	
 	@Override
 	public LinkedHashMap<String, ApplicationEntityModel> getApplicationEntities() {
 		return applicationEntities;
@@ -78,7 +88,7 @@ public class ProxyDeviceModel extends DeviceModel {
 			ApplicationEntity applicationEntity = i.next();
 			this.applicationEntities.put(
 					applicationEntity.getAETitle(), 
-					new ProxyApplicationEntityModel((ProxyApplicationEntity) applicationEntity));
+					new ProxyApplicationEntityModel((ApplicationEntity) applicationEntity));
 		}
 	}
 }

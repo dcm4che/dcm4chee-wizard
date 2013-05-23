@@ -41,6 +41,8 @@ package org.dcm4chee.wizard.war.configuration.simple.model.basic;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.dcm4che.conf.api.ConfigurationException;
@@ -51,7 +53,7 @@ import org.dcm4chee.wizard.war.configuration.simple.model.ConfigNodeModel;
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-public class ApplicationEntityModel implements Serializable, ConfigNodeModel {
+public class ApplicationEntityModel extends ConfigNodeModel implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -76,11 +78,37 @@ public class ApplicationEntityModel implements Serializable, ConfigNodeModel {
 
     private void setTransferCapabilities(Collection<TransferCapability> transferCapabilities) {
 		transferCapabilityModels = new ArrayList<TransferCapabilityModel>();
-		for (TransferCapability transferCapability : transferCapabilities) 
+		for (TransferCapability transferCapability : transferCapabilities)
 			transferCapabilityModels.add(new TransferCapabilityModel(transferCapability, aeTitle));
+		Collections.sort(transferCapabilityModels, new Comparator<TransferCapabilityModel>() {
+
+			@Override
+			public int compare(TransferCapabilityModel model1, TransferCapabilityModel model2) {
+				String commonName1 = model1.getTransferCapability().getCommonName();
+				String commonName2 = model2.getTransferCapability().getCommonName();
+				if (commonName1 == null)
+					return commonName2 == null ? 0 : 1;
+				else {
+					if (commonName2 == null)
+						return -1;
+					else {
+						if (commonName1.startsWith("SCU ") || commonName1.startsWith("SCP "))
+							commonName1 = commonName1.substring(4);
+						if (commonName2.startsWith("SCU ") || commonName2.startsWith("SCP "))
+							commonName2 = commonName2.substring(4);
+						return commonName1.toLowerCase().compareTo(commonName2.toLowerCase());
+					}
+				}
+			}
+		});
 	}
 
 	public List<TransferCapabilityModel> getTransferCapabilities() {
 		return transferCapabilityModels;
+	}
+
+	@Override
+	public String getDescription() {
+		return applicationEntity.getDescription() == null ? toolTip : applicationEntity.getDescription();
 	}
 }

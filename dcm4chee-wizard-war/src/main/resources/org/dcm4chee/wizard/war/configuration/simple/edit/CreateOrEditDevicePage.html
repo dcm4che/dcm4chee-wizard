@@ -129,12 +129,45 @@
 						<input class="edit-value" wicket:id="stationName" type="text" />
 					</div>
 					<div class="edit-table-row">
-						<span class="edit-desc" wicket:id="forwardThreads.label" />
-						<input class="edit-value" wicket:id="forwardThreads" type="text" />
+						<span class="edit-desc" wicket:id="trustStoreURL.label" />
+						<input class="edit-value" wicket:id="trustStoreURL" type="text" />
 					</div>
 					<div class="edit-table-row">
-						<span class="edit-desc" wicket:id="staleTimeout.label" />
-						<input class="edit-value" wicket:id="staleTimeout" type="text" />
+						<span class="edit-desc" wicket:id="trustStoreType.label" />
+						<select class="edit-value" wicket:id="trustStoreType" />
+					</div>
+					<div class="edit-table-row">
+						<span class="edit-desc" wicket:id="trustStorePin.label" />
+						<input class="edit-value" wicket:id="trustStorePin" type="text" />
+						<input class="edit-value" wicket:id="useTrustStorePinProperty" type="checkbox" />
+					</div>
+					<div class="edit-table-row">
+						<span class="edit-desc" wicket:id="keyStoreURL.label" />
+						<input class="edit-value" wicket:id="keyStoreURL" type="text" />
+					</div>
+					<div class="edit-table-row">
+						<span class="edit-desc" wicket:id="keyStoreType.label" />
+						<select class="edit-value" wicket:id="keyStoreType" />
+					</div>
+					<div class="edit-table-row">
+						<span class="edit-desc" wicket:id="keyStorePin.label" />
+						<input class="edit-value" wicket:id="keyStorePin" type="text" />
+						<input class="edit-value" wicket:id="useKeyStorePinProperty" type="checkbox" />
+					</div>
+					<div class="edit-table-row">
+						<span class="edit-desc" wicket:id="keyStoreKeyPin.label" />
+						<input class="edit-value" wicket:id="keyStoreKeyPin" type="text" />
+						<input class="edit-value" wicket:id="useKeyStoreKeyPinProperty" type="checkbox" />
+					</div>
+					<div wicket:id="optionalProxyContainer">
+						<div class="edit-table-row">
+							<span class="edit-desc" wicket:id="forwardThreads.label" />
+							<input class="edit-value" wicket:id="forwardThreads" type="text" />
+						</div>
+						<div class="edit-table-row">
+							<span class="edit-desc" wicket:id="staleTimeout.label" />
+							<input class="edit-value" wicket:id="staleTimeout" type="text" />
+						</div>
 					</div>
 					<div class="edit-table-row" style="height: 45px;" wicket:id="relatedDeviceRefsContainer">
 						<span class="edit-desc" wicket:id="relatedDeviceRefs.label" />

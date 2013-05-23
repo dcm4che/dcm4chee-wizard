@@ -41,5 +41,9 @@ package org.dcm4chee.wizard.war.configuration.simple.model;
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-public interface ConfigNodeModel {
+public abstract class ConfigNodeModel {
+	
+	public String getDescription() {
+		return "";
+	}
 }

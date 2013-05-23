@@ -5,12 +5,12 @@ import java.io.Serializable;
 import org.dcm4chee.proxy.conf.Retry;
 import org.dcm4chee.wizard.war.configuration.simple.model.ConfigNodeModel;
 
-public class RetryModel implements Serializable, ConfigNodeModel {
+public class RetryModel extends ConfigNodeModel implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	public static String cssClass = "retry";
-	public static String toolTip = "retry";
+	public static String toolTip = "Retry";
 
 	private Retry retry;
 	
@@ -20,5 +20,10 @@ public class RetryModel implements Serializable, ConfigNodeModel {
 	
 	public Retry getRetry() {
 		return retry;
+	}
+	
+	@Override
+	public String getDescription() {
+		return toolTip;
 	}
 }

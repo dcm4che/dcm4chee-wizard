@@ -43,7 +43,7 @@
 						</div>
 					</div>
 					<div wicket:id="proxy">
-						<div class="edit-table-row">
+						<div class="edit-table-row" style="height: 35px;">
 							<span class="edit-desc" wicket:id="acceptDataOnFailedNegotiation.label" /> 
 							<input class="edit-value" wicket:id="acceptDataOnFailedNegotiation" type="checkbox" />
 						</div>
@@ -54,6 +54,10 @@
 						<div class="edit-table-row">
 							<span class="edit-desc" wicket:id="spoolDirectory.label" /> 
 							<input class="edit-value" wicket:id="spoolDirectory" type="text" />
+						</div>
+						<div class="edit-table-row" style="height: 35px;">
+							<span class="edit-desc" wicket:id="deleteFailedDataWithoutRetryConfiguration.label" />
+							<input class="edit-value" wicket:id="deleteFailedDataWithoutRetryConfiguration" type="checkbox" />
 						</div>
 					</div>
 					<div  class="edit-buttons">
@@ -88,6 +92,22 @@
 						<div class="edit-table-row">
 							<span class="edit-desc" wicket:id="vendorData.label" />
 							<span class="edit-value" wicket:id="vendorData" />
+						</div>
+						<div wicket:id="proxy">
+							<div class="edit-table-row">
+								<span class="edit-desc" wicket:id="proxyPIXConsumerApplication.label" />
+								<select class="edit-value" wicket:id="proxyPIXConsumerApplication" />
+								<input class="edit-value" wicket:id="proxyPIXConsumerApplication.freetext" type="text" />
+								<input class="edit-value" wicket:id="toggleProxyPIXConsumerApplication" type="checkbox" />
+							</div>
+							<div class="edit-table-row">
+								<span class="edit-desc" wicket:id="remotePIXManagerApplication.label" />
+								<select class="edit-value" wicket:id="remotePIXManagerApplication" />
+							</div>
+		          			<div class="edit-table-row">
+							     <span class="edit-desc" wicket:id="fallbackDestinationAET.label" />
+							     <select class="edit-value" wicket:id="fallbackDestinationAET" />
+				  			</div>
 						</div>
 					</div>
 						<div class="edit-buttons">

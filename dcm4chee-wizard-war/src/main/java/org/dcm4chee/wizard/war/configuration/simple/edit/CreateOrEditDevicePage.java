@@ -39,11 +39,14 @@
 package org.dcm4chee.wizard.war.configuration.simple.edit;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
+import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxButton;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
@@ -64,31 +67,37 @@ import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.data.Code;
 import org.dcm4che.data.Issuer;
 import org.dcm4che.net.Device;
-import org.dcm4chee.proxy.conf.ProxyDevice;
+import org.dcm4che.net.audit.AuditRecordRepository;
+import org.dcm4che.net.hl7.HL7DeviceExtension;
+import org.dcm4chee.proxy.conf.ProxyDeviceExtension;
 import org.dcm4chee.wizard.common.behavior.FocusOnLoadBehavior;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
-import org.dcm4chee.wizard.common.component.ExtendedWebPage;
-import org.dcm4chee.wizard.war.common.component.ExtendedSecureWebPage;
-import org.dcm4chee.wizard.war.configuration.common.tree.ConfigTreeProvider;
-import org.dcm4chee.wizard.war.configuration.common.tree.ConfigTreeProvider.ConfigurationType;
+import org.dcm4chee.wizard.common.component.MainWebPage;
+import org.dcm4chee.wizard.common.component.ModalWindowRuntimeException;
+import org.dcm4chee.wizard.war.common.component.DicomConfigurationWebPage;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.DeviceModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.InstitutionCodeModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.StringArrayModel;
+import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider;
+import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider.ConfigurationType;
 import org.dcm4chee.wizard.war.configuration.simple.validator.CodeValidator;
 import org.dcm4chee.wizard.war.configuration.simple.validator.DeviceNameValidator;
+import org.dcm4chee.wizard.war.configuration.simple.validator.UrlValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
-    
+public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
+
     private static final long serialVersionUID = 1L;
 
     private static Logger log = LoggerFactory.getLogger(CreateOrEditDevicePage.class);
     
-    private static final ResourceReference baseCSS = new CssResourceReference(ExtendedWebPage.class, "base-style.css");
+    private static final ResourceReference baseCSS = new CssResourceReference(MainWebPage.class, "base-style.css");
+    
+    private List<String> keyStoreTypes = Arrays.asList(new String[] { "JKS", "PKCS12" });
     
     // configuration type selection
 	private Model<ConfigurationType> typeModel;
@@ -121,6 +130,17 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
 	private StringArrayModel softwareVersionsModel;
 	private Model<String> stationNameModel;
 	private Model<String> vendorDataModel;
+    private Model<String> trustStoreURLModel;
+    private Model<String> trustStoreTypeModel;
+    private Model<String> trustStorePinModel;
+    private Model<Boolean> useTrustStorePinProperty;
+    private Model<String> keyStoreURLModel;
+    private Model<String> keyStoreTypeModel;
+    private Model<String> keyStorePinModel;
+    private Model<Boolean> useKeyStorePinProperty;
+    private Model<String> keyStoreKeyPinModel;
+    private Model<Boolean> useKeyStoreKeyPinProperty;
+
 	// ProxyDevice only
 	private Model<Integer> forwardThreadsModel;
 	private Model<Integer> staleTimeoutModel;
@@ -141,7 +161,7 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
         		typeModel = Model.of(ConfigTreeProvider.ConfigurationType.Basic);
     			deviceNameModel = Model.of();
     			installedModel = Model.of(true);
-    			schedulerIntervalModel = Model.of(ProxyDevice.DEFAULT_SCHEDULER_INTERVAL);
+    			schedulerIntervalModel = Model.of(ProxyDeviceExtension.DEFAULT_SCHEDULER_INTERVAL);
     			descriptionModel = Model.of();
     			deviceSerialNumberModel = Model.of();
     			institutionAddressModel = new StringArrayModel(null);
@@ -163,15 +183,27 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
     			softwareVersionsModel = new StringArrayModel(null);
     			stationNameModel = Model.of();
     			vendorDataModel = Model.of("size 0");
-    			forwardThreadsModel = Model.of(ProxyDevice.DEFAULT_FORWARD_THREADS);
+    		    trustStoreURLModel = Model.of();
+    		    trustStoreTypeModel = Model.of();
+    		    trustStorePinModel = Model.of();
+    		    useTrustStorePinProperty = Model.of(false);
+    		    keyStoreURLModel = Model.of();
+    		    keyStoreTypeModel = Model.of();
+    		    keyStorePinModel = Model.of();
+    		    useKeyStorePinProperty = Model.of(false);
+    		    keyStoreKeyPinModel = Model.of();
+    		    useKeyStoreKeyPinProperty = Model.of(false);
+    			forwardThreadsModel = Model.of(ProxyDeviceExtension.DEFAULT_FORWARD_THREADS);
     			staleTimeoutModel = Model.of(60);
         	} else {
-        		typeModel = Model.of(deviceModel.getDevice() instanceof ProxyDevice ? 
-	        			ConfigTreeProvider.ConfigurationType.Proxy : ConfigTreeProvider.ConfigurationType.Basic);
-				deviceNameModel = Model.of(deviceModel.getDevice().getDeviceName());
+        		ProxyDeviceExtension proxyDeviceExtension = 
+        				deviceModel.getDevice().getDeviceExtension(ProxyDeviceExtension.class);
+        		typeModel = Model.of(proxyDeviceExtension == null ? 
+	        			ConfigTreeProvider.ConfigurationType.Basic : ConfigTreeProvider.ConfigurationType.Proxy);
+        		deviceNameModel = Model.of(deviceModel.getDevice().getDeviceName());
 				installedModel = Model.of(deviceModel.getDevice().isInstalled());
-				schedulerIntervalModel = Model.of(deviceModel.getDevice() instanceof ProxyDevice ? 
-	        					((ProxyDevice) deviceModel.getDevice()).getSchedulerInterval() : null);
+				schedulerIntervalModel = Model.of(proxyDeviceExtension == null ? 
+						null : proxyDeviceExtension.getSchedulerInterval());
 				descriptionModel = Model.of(deviceModel.getDevice().getDescription());
 				deviceSerialNumberModel = Model.of(deviceModel.getDevice().getDeviceSerialNumber());
 				institutionAddressModel = new StringArrayModel(deviceModel.getDevice().getInstitutionAddresses());
@@ -222,15 +254,28 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
 				softwareVersionsModel = new StringArrayModel(deviceModel.getDevice().getSoftwareVersions());
 				stationNameModel = Model.of(deviceModel.getDevice().getStationName());
 				vendorDataModel = Model.of("size " + deviceModel.getDevice().getVendorData().length);
-				forwardThreadsModel = Model.of(deviceModel.getDevice() instanceof ProxyDevice ? 
-     					((ProxyDevice) deviceModel.getDevice()).getForwardThreads() : null);
-				staleTimeoutModel = Model.of(deviceModel.getDevice() instanceof ProxyDevice ? 
-     					((ProxyDevice) deviceModel.getDevice()).getConfigurationStaleTimeout() : null);
+    		    trustStoreURLModel = Model.of(deviceModel.getDevice().getTrustStoreURL());
+    		    trustStoreTypeModel = Model.of(deviceModel.getDevice().getTrustStoreType());
+    		    trustStorePinModel = Model.of(deviceModel.getDevice().getTrustStorePinProperty() != null ? 
+    		    		deviceModel.getDevice().getTrustStorePinProperty() : deviceModel.getDevice().getTrustStorePin());
+    		    useTrustStorePinProperty = Model.of(deviceModel.getDevice().getTrustStorePinProperty() != null);
+    		    keyStoreURLModel = Model.of(deviceModel.getDevice().getKeyStoreURL());
+    		    keyStoreTypeModel = Model.of(deviceModel.getDevice().getKeyStoreType());
+    		    keyStorePinModel = Model.of(deviceModel.getDevice().getKeyStorePinProperty() != null ? 
+    		    		deviceModel.getDevice().getKeyStorePinProperty() : deviceModel.getDevice().getKeyStorePin());
+    		    useKeyStorePinProperty = Model.of(deviceModel.getDevice().getKeyStorePinProperty() != null);
+    		    keyStoreKeyPinModel = Model.of(deviceModel.getDevice().getKeyStoreKeyPinProperty() != null ? 
+    		    		deviceModel.getDevice().getKeyStoreKeyPinProperty() : deviceModel.getDevice().getKeyStoreKeyPin());
+    		    useKeyStoreKeyPinProperty = Model.of(deviceModel.getDevice().getKeyStoreKeyPinProperty() != null);
+				forwardThreadsModel = Model.of(proxyDeviceExtension == null ? 
+     					null : proxyDeviceExtension.getForwardThreads());
+				staleTimeoutModel = Model.of(proxyDeviceExtension == null ? 
+     					null : proxyDeviceExtension.getConfigurationStaleTimeout());
         	}
 		} catch (ConfigurationException ce) {
 			log.error(this.getClass().toString() + ": " + "Error retrieving device data: " + ce.getMessage());
             log.debug("Exception", ce);
-            throw new RuntimeException(ce);
+            throw new ModalWindowRuntimeException(ce.getLocalizedMessage());
 		}
 
         form.add(new Label("type.label", new ResourceModel("dicom.edit.device.type.label")));
@@ -238,7 +283,8 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
         		new ArrayList<ConfigTreeProvider.ConfigurationType>();
         configurationTypeList.add(ConfigTreeProvider.ConfigurationType.Basic); 
         configurationTypeList.add(ConfigTreeProvider.ConfigurationType.Proxy);
-        configurationTypeList.add(ConfigTreeProvider.ConfigurationType.Archive);
+//        configurationTypeList.add(ConfigTreeProvider.ConfigurationType.Archive);
+        configurationTypeList.add(ConfigTreeProvider.ConfigurationType.AuditRecordRepository);
         DropDownChoice<ConfigTreeProvider.ConfigurationType> typeDropDown = 
         		new DropDownChoice<ConfigTreeProvider.ConfigurationType>("type", typeModel, configurationTypeList);
 		form.add(typeDropDown
@@ -265,7 +311,7 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
 		} catch (ConfigurationException ce) {
 			log.error(this.getClass().toString() + ": " + "Error listing devices: " + ce.getMessage());
             log.debug("Exception", ce);
-            throw new RuntimeException(ce);
+            throw new ModalWindowRuntimeException(ce.getLocalizedMessage());
 		}
 
         form.add(new Label("installed.label", new ResourceModel("dicom.edit.device.installed.label")))
@@ -284,12 +330,13 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
 			.add(new TextField<Integer>("schedulerInterval", schedulerIntervalModel)
             		.setType(Integer.class)
             		.setRequired(deviceModel != null &&
-	            			deviceModel.getDevice() instanceof ProxyDevice ? true : false))
+	            			deviceModel.getDevice().getDeviceExtension(ProxyDeviceExtension.class) == null ? 
+	            					false : true))
 	            			.setOutputMarkupPlaceholderTag(true));
 		} catch (ConfigurationException ce) {
 			log.error(this.getClass().toString() + ": " + "Error retrieving device data: " + ce.getMessage());
             log.debug("Exception", ce);
-            throw new RuntimeException(ce);
+            throw new ModalWindowRuntimeException(ce.getLocalizedMessage());
 		}
 
         final Form<?> optionalContainer = new Form<Object>("optional");
@@ -403,45 +450,70 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
         		new ResourceModel("dicom.edit.device.optional.stationName.label")))
         .add(new TextField<String>("stationName", stationNameModel));
 
-        optionalContainer.add(new Label("forwardThreads.label", new ResourceModel("dicom.edit.device.optional.forwardThreads.label")) {
+        optionalContainer.add(new Label("trustStoreURL.label", 
+        		new ResourceModel("dicom.edit.device.optional.trustStoreURL.label")))
+        .add(new TextField<String>("trustStoreURL", trustStoreURLModel)
+        		.add(new UrlValidator()));
+
+        optionalContainer.add(new Label("trustStoreType.label", 
+        		new ResourceModel("dicom.edit.device.optional.trustStoreType.label")))
+        .add(new DropDownChoice<String>("trustStoreType", trustStoreTypeModel, keyStoreTypes)
+        		.setNullValid(true));
+
+        optionalContainer.add(new Label("trustStorePin.label", 
+        		new ResourceModel("dicom.edit.device.optional.trustStorePin.label")))
+        .add(new TextField<String>("trustStorePin", trustStorePinModel));
+
+        optionalContainer.add(new CheckBox("useTrustStorePinProperty", useTrustStorePinProperty));
+        		
+        optionalContainer.add(new Label("keyStoreURL.label", 
+        		new ResourceModel("dicom.edit.device.optional.keyStoreURL.label")))
+        .add(new TextField<String>("keyStoreURL", keyStoreURLModel)
+        		.add(new UrlValidator()));
+
+        optionalContainer.add(new Label("keyStoreType.label", 
+        		new ResourceModel("dicom.edit.device.optional.keyStoreType.label")))
+        .add(new DropDownChoice<String>("keyStoreType", keyStoreTypeModel, keyStoreTypes)
+        		.setNullValid(true));
+
+        optionalContainer.add(new Label("keyStorePin.label", 
+        		new ResourceModel("dicom.edit.device.optional.keyStorePin.label")))
+        .add(new TextField<String>("keyStorePin", keyStorePinModel));
+
+        optionalContainer.add(new CheckBox("useKeyStorePinProperty", useKeyStorePinProperty));
+
+        optionalContainer.add(new Label("keyStoreKeyPin.label", 
+        		new ResourceModel("dicom.edit.device.optional.keyStoreKeyPin.label")))
+        .add(new TextField<String>("keyStoreKeyPin", keyStoreKeyPinModel));
+
+        optionalContainer.add(new CheckBox("useKeyStoreKeyPinProperty", useKeyStoreKeyPinProperty));
+        
+        WebMarkupContainer optionalProxyContainer = 
+        		new WebMarkupContainer("optionalProxyContainer") {
 			
 			private static final long serialVersionUID = 1L;
 
 			@Override
 			public boolean isVisible() {
-				return typeModel.getObject().equals(ConfigurationType.Proxy);
+				return optionalContainer.isVisible() && 
+						typeModel.getObject().equals(ConfigurationType.Proxy);
 			}
-		}.setOutputMarkupPlaceholderTag(true))
-		.add(new TextField<Integer>("forwardThreads", forwardThreadsModel) {
-			
-			private static final long serialVersionUID = 1L;
+        };
+        optionalContainer.add(optionalProxyContainer
+        		.setOutputMarkupId(true)
+        		.setOutputMarkupPlaceholderTag(true));
+       
+        optionalProxyContainer.add(new Label("forwardThreads.label", new ResourceModel("dicom.edit.device.optional.forwardThreads.label"))
+        	.setOutputMarkupPlaceholderTag(true))
+		.add(new TextField<Integer>("forwardThreads", forwardThreadsModel)
+				.setType(Integer.class)
+				.add(new RangeValidator<Integer>(1,256)));
 
-			@Override
-			public boolean isVisible() {
-				return typeModel.getObject().equals(ConfigurationType.Proxy);
-			}
-		}.setType(Integer.class)
-		.add(new RangeValidator<Integer>(1,256)));
-
-        optionalContainer.add(new Label("staleTimeout.label", new ResourceModel("dicom.edit.device.optional.staleTimeout.label")) {
-			
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public boolean isVisible() {
-				return typeModel.getObject().equals(ConfigurationType.Proxy);
-			}
-		}.setOutputMarkupPlaceholderTag(true))
-		.add(new TextField<Integer>("staleTimeout", staleTimeoutModel) {
-			
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public boolean isVisible() {
-				return typeModel.getObject().equals(ConfigurationType.Proxy);
-			}
-		}.setType(Integer.class)
-		.add(new RangeValidator<Integer>(0,Integer.MAX_VALUE)));
+        optionalProxyContainer.add(new Label("staleTimeout.label", new ResourceModel("dicom.edit.device.optional.staleTimeout.label"))
+        	.setOutputMarkupPlaceholderTag(true))
+		.add(new TextField<Integer>("staleTimeout", staleTimeoutModel)
+				.setType(Integer.class)
+				.add(new RangeValidator<Integer>(0,Integer.MAX_VALUE)));
 
         WebMarkupContainer relatedDeviceRefsContainer = 
         		new WebMarkupContainer("relatedDeviceRefsContainer");
@@ -460,36 +532,39 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
     	.add(new Label("vendorData", vendorDataModel));      
 			vendorDataContainer.setVisible(!vendorDataModel.getObject().equals("size 0"));
     	
-        form.add(new AjaxButton("submit", new ResourceModel("saveBtn"), form) {
+        form.add(new IndicatingAjaxButton("submit", new ResourceModel("saveBtn"), form) {
 
             private static final long serialVersionUID = 1L;
 
             @Override
             protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
-                try {
+                try {                
                 	Device device = null;
-                	if (deviceModel != null) 
-                		device = deviceModel.getDevice();
-                	else 
-                		device = typeModel.getObject().equals(ConfigurationType.Proxy) ? 
-                				new ProxyDevice(deviceNameModel.getObject()) : 
-                         		new Device(deviceNameModel.getObject());
-                    device.setInstalled(installedModel.getObject());
-                    if (device instanceof ProxyDevice) 
-                    	((ProxyDevice) device).setSchedulerInterval(schedulerIntervalModel.getObject());
+                	ProxyDeviceExtension proxyDeviceExtension = null;
+                	AuditRecordRepository auditRecordRepository = null;
 
-//                    for (String s : authorizedNodeCertificateReferenceModel.getArray()) {
-//                    	for (X509Certificate c : device..getAllAuthorizedNodeCertificates()) {
-//                    		if c.getSigAlgName().equals(s)
-//                    			device.setAuthorizedNodeCertificates(ref, certs)
-//                    	}
-//                    device.setAuthorizedNodeCertificates(authorizedNodeCertificateReferenceModel.getArray());
-//                    }
+                	if (deviceModel != null) {
+                		device = deviceModel.getDevice();               		
+                		proxyDeviceExtension = device.getDeviceExtension(ProxyDeviceExtension.class);
+                		auditRecordRepository = device.getDeviceExtension(AuditRecordRepository.class);
+                	} else {
+                		device = new Device(deviceNameModel.getObject());
+                		if (typeModel.getObject().equals(ConfigurationType.Proxy)) {
+                    		proxyDeviceExtension = new ProxyDeviceExtension();
+                			device.addDeviceExtension(proxyDeviceExtension);
+                			proxyDeviceExtension.setSchedulerInterval(schedulerIntervalModel.getObject());
+                			device.addDeviceExtension(new HL7DeviceExtension());
+                		}
+                		
+                		if (typeModel.getObject().equals(ConfigurationType.AuditRecordRepository)) {
+                			auditRecordRepository = new AuditRecordRepository();
+                			device.addDeviceExtension(auditRecordRepository);
+                		}
+                	}
+                    device.setInstalled(installedModel.getObject());
                     
-//                    device.setThisNodeCertificates(ref, certs)
-//                    device.re
-                    
-                    // this node cert -> eigenes
+                    if (proxyDeviceExtension != null)
+        				proxyDeviceExtension.setSchedulerInterval(schedulerIntervalModel.getObject());
 
                     if (optionalContainer.isVisible()) {
 	    				device.setDescription(descriptionModel.getObject());
@@ -521,24 +596,39 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
 	    				device.setRelatedDeviceRefs(relatedDeviceRefsModel.getArray());
 	    				device.setSoftwareVersions(softwareVersionsModel.getArray());
 	    				device.setStationName(stationNameModel.getObject());
-
-	                    if (device instanceof ProxyDevice) {
+	        		    device.setTrustStoreURL(trustStoreURLModel.getObject());
+	        		    device.setTrustStoreType(trustStoreTypeModel.getObject());
+        		    	device.setTrustStorePinProperty(useTrustStorePinProperty.getObject() ? 
+        		    			trustStorePinModel.getObject() : null);
+        		    	device.setTrustStorePin(!useTrustStorePinProperty.getObject() ? 
+        		    			trustStorePinModel.getObject() : null);        		    	
+	        		    device.setKeyStoreURL(keyStoreURLModel.getObject());
+	        		    device.setKeyStoreType(keyStoreTypeModel.getObject());
+        		    	device.setKeyStorePinProperty(useKeyStorePinProperty.getObject() ? 
+        		    			keyStorePinModel.getObject() : null);
+        		    	device.setKeyStorePin(!useKeyStorePinProperty.getObject() ? 
+        		    			keyStorePinModel.getObject() : null);
+        		    	device.setKeyStoreKeyPinProperty(useKeyStoreKeyPinProperty.getObject() ? 
+        		    			keyStoreKeyPinModel.getObject() : null);
+        		    	device.setKeyStoreKeyPin(!useKeyStoreKeyPinProperty.getObject() ? 
+        		    			keyStoreKeyPinModel.getObject() : null);
+	                    if (proxyDeviceExtension != null) {
 	                    	if (forwardThreadsModel.getObject() != null)
-	                    		((ProxyDevice) device).setForwardThreads(forwardThreadsModel.getObject());
-	                    	((ProxyDevice) device).setConfigurationStaleTimeout(
+	                    		proxyDeviceExtension.setForwardThreads(forwardThreadsModel.getObject());
+	                    	proxyDeviceExtension.setConfigurationStaleTimeout(
 	                    			staleTimeoutModel.getObject() != null ? staleTimeoutModel.getObject() : 60);
 	                    }
                     }
-                    
+
                     if (deviceModel == null)
                     	ConfigTreeProvider.get().persistDevice(device);
                     else
-                    	ConfigTreeProvider.get().mergeDevice(device);                   
+                    	ConfigTreeProvider.get().mergeDevice(device);                    
                     window.close(target);
         		} catch (Exception e) {
         			log.error(this.getClass().toString() + ": " + "Error modifying device: " + e.getMessage());
                     log.debug("Exception", e);
-                    throw new RuntimeException(e);
+                    throw new ModalWindowRuntimeException(e.getLocalizedMessage());
         		}
             }
 
@@ -565,6 +655,7 @@ public class CreateOrEditDevicePage extends ExtendedSecureWebPage {
     
     @Override
     public void renderHead(IHeaderResponse response) {
+    	super.renderHead(response);
     	if (CreateOrEditDevicePage.baseCSS != null) 
     		response.render(CssHeaderItem.forReference(CreateOrEditDevicePage.baseCSS));
     }

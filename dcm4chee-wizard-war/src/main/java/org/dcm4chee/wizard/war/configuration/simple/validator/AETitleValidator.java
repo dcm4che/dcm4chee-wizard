@@ -45,7 +45,7 @@ import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.ValidationError;
 import org.apache.wicket.validation.validator.StringValidator;
 import org.dcm4che.conf.api.ConfigurationException;
-import org.dcm4chee.wizard.war.configuration.common.tree.ConfigTreeProvider;
+import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +60,6 @@ public class AETitleValidator extends StringValidator {
     private static Logger log = LoggerFactory.getLogger(AETitleValidator.class);
     
     private static final int MAX_AET_LEN = 16;
-    private static final int MAX_HL7_LEN = 250;
 
 	String ignore;
     
@@ -70,34 +69,22 @@ public class AETitleValidator extends StringValidator {
     
     /**
      * Check AET constrains (1-16 chars, ISO 646/G0 exclude 5C(backslash)).
-     * <p>
-     * Note: When AET contains a '^' this AE entity is not a DICOM AET but a HL7 receiving application/facility!<br/>
-     * In this case we check max length of 250 (DB field len).
-     * </p><p>
-     * We use resourceKey 'StringValidator.range' and 'PatternValidator' with corresponding variable maps 
-     * to get international messages for free.
-     * </p>
      */
     @Override
 	public void validate(IValidatable<String> v) {
         String s = v.getValue();
-        if ( s.indexOf('^') == -1 ) {
-            if ( s.length() > MAX_AET_LEN || s.trim().length() < 1) {
-            	v.error(new ValidationError()
-            		.addKey("StringValidator.range")
-            		.setVariables(getLengthVarMap(v, MAX_AET_LEN)));
-            }
-            if ( ! validateAEChars(s) ) {
-            	v.error(new ValidationError()
-        			.addKey("PatternValidator")
-        			.setVariables(getPatternVarMap(v)));
-            }
-        } else { //HL7 Target Application^Facility for HL7 Send (ST) max 250 chars (see DB AE.aet)
-            if ( s.length() > MAX_HL7_LEN ) {
-            	v.error(new ValidationError()
-        			.addKey("StringValidator.maximum")
-        			.setVariables(getLengthVarMap(v, MAX_HL7_LEN)));
-            }            
+        if (s.equals("*"))
+        	return;
+
+        if ( s.length() > MAX_AET_LEN || s.trim().length() < 1) {
+        	v.error(new ValidationError()
+        		.addKey("StringValidator.range")
+        		.setVariables(getLengthVarMap(v, MAX_AET_LEN)));
+        }
+        if ( ! validateAEChars(s) ) {
+        	v.error(new ValidationError()
+    			.addKey("PatternValidator")
+    			.setVariables(getPatternVarMap(v)));
         }
         
         if (!s.equals(ignore))
@@ -112,6 +99,7 @@ public class AETitleValidator extends StringValidator {
 				log.error("Error validating AE Title", e);
 			}
     }
+    
     /*
      * AE valid characters: DICOM DEFAULT CHARACTER REPERTOIRE ENCODING without backslash(5C), LF, FF, CR and ESC
      * (i.e. ISO 646 G0 excluding '\')

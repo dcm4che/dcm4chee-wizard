@@ -40,8 +40,10 @@ package org.dcm4chee.wizard.common.component;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.servlet.http.Cookie;
 
@@ -49,6 +51,8 @@ import org.apache.wicket.Session;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.ajax.markup.html.AjaxFallbackLink;
+import org.apache.wicket.ajax.markup.html.AjaxLink;
+import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.ChoiceRenderer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
@@ -61,6 +65,7 @@ import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.http.WebRequest;
 import org.apache.wicket.request.http.WebResponse;
 import org.apache.wicket.request.resource.PackageResourceReference;
+import org.dcm4chee.wizard.common.behavior.TooltipBehavior;
 import org.dcm4chee.wizard.common.component.secure.SecureAjaxTabbedPanel;
 import org.dcm4chee.wizard.common.login.secure.SecureSession;
 import org.wicketstuff.security.swarm.SwarmWebApplication;
@@ -90,8 +95,33 @@ public class ModuleSelectorPanel extends SecureAjaxTabbedPanel {
 		}
     };
 
+	final ModalWindow aboutWindow = new ModalWindow("aboutWindow");
+
+	AjaxLink<Object> aboutLink = new AjaxLink<Object>("aboutLink") {
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public void onClick(AjaxRequestTarget target) {
+        	aboutWindow.setTitle("").show(target);
+        }
+    };
+
     public ModuleSelectorPanel(String id) {
         super(id);
+        
+        Set<String> languages = new HashSet<String>();
+        languages.add("de");
+        languages.add("en");
+        
+        Set<String> customLanguages = new HashSet<String>();
+        String languageProperty = System.getProperty("org.dcm4chee.wizard.config.languages");
+        if (languageProperty != null) {
+        	for (String language : languageProperty.split("\\|"))
+        		if (languages.contains(language))
+        			customLanguages.add(language);
+        	languages = customLanguages;
+        }
+
         boolean found = false;
         List<Cookie> cookies = ((WebRequest) RequestCycle.get().getRequest()).getCookies();
         if (cookies != null)
@@ -102,12 +132,15 @@ public class ModuleSelectorPanel extends SecureAjaxTabbedPanel {
                     break;
                 }
 
+        if (languages.size() == 1)
+        	getSession().setLocale(new Locale(languages.iterator().next()));
+        	
         if (!found) {
-            Cookie cookie = new Cookie("WIZARDLOCALE", getSession().getLocale().getCountry().toLowerCase());
+            Cookie cookie = new Cookie("WIZARDLOCALE", getSession().getLocale().getLanguage());
             cookie.setMaxAge(Integer.MAX_VALUE);
             ((WebResponse) RequestCycle.get().getResponse()).addCookie(cookie);
         }
-        
+
         add(confirmLogout);
 
         try {
@@ -155,13 +188,9 @@ public class ModuleSelectorPanel extends SecureAjaxTabbedPanel {
                         ((SecureSession) Session.get()).getUsername()
                     })
         )));
-
-        List<String> languages = new ArrayList<String>();
-        languages.add("en");
-        languages.add("de");
-
+       
         final DropDownChoice<String> languageSelector = 
-            new DropDownChoice<String>("language", new Model<String>(), languages, new ChoiceRenderer<String>() {
+            new DropDownChoice<String>("language", new Model<String>(), new ArrayList<String>(languages), new ChoiceRenderer<String>() {
 
             private static final long serialVersionUID = 1L;
             
@@ -176,25 +205,34 @@ public class ModuleSelectorPanel extends SecureAjaxTabbedPanel {
 
             @Override
             protected void onSelectionChanged(String newSelection) {
-                Cookie c = new Cookie("WEB3LOCALE", newSelection);
-                c.setMaxAge(Integer.MAX_VALUE);
-                ((WebResponse) RequestCycle.get().getResponse()).addCookie(c);
+                Cookie cookie = new Cookie("WIZARDLOCALE", newSelection);
+                cookie.setMaxAge(Integer.MAX_VALUE);
+                ((WebResponse) RequestCycle.get().getResponse()).addCookie(cookie);
                 getSession().setLocale(new Locale(newSelection));
             }
         };
-        languageSelector.setDefaultModelObject(getSession().getLocale().getLanguage());
-        languageSelector.add(new AjaxFormComponentUpdatingBehavior("onchange") {
-            private static final long serialVersionUID = 1L;
-
-            protected void onUpdate(AjaxRequestTarget target) {
-                languageSelector.onSelectionChanged();
-                target.add(getPage().setOutputMarkupId(true));
-            }
-        });
+        
+        if (languages.size() > 1) {
+	        languageSelector.setDefaultModelObject(getSession().getLocale().getLanguage());
+	        languageSelector.add(new AjaxFormComponentUpdatingBehavior("onchange") {
+	            private static final long serialVersionUID = 1L;
+	
+	            protected void onUpdate(AjaxRequestTarget target) {
+	                languageSelector.onSelectionChanged();
+	                target.add(getPage().setOutputMarkupId(true));
+	            }
+	        });
+        } else
+            languageSelector.setVisible(false);
+        
         add(languageSelector);
 
-        add(new Image("img_logo", new PackageResourceReference(ModuleSelectorPanel.class, "images/logo.gif"))
-        );
+    	add(aboutWindow.setInitialWidth(600).setInitialHeight(400));
+
+        add(aboutLink
+        		.add(new Image("img_logo", new PackageResourceReference(ModuleSelectorPanel.class, "images/logo.gif")))
+        		.add(new TooltipBehavior("dicom."))
+        		.setEnabled(false));
     }
 
     public void addModule(final Class<? extends Panel> clazz) {
@@ -213,4 +251,9 @@ public class ModuleSelectorPanel extends SecureAjaxTabbedPanel {
         showLogout = show;
         return this;
     }
+    
+    public ModalWindow getAboutWindow() {
+    	aboutLink.setEnabled(true);
+    	return aboutWindow;
+    }    
 }

@@ -40,12 +40,12 @@ package org.dcm4chee.wizard.war.configuration.simple.edit.proxy;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
+import java.util.List;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.ajax.markup.html.form.AjaxFallbackButton;
-import org.apache.wicket.extensions.ajax.markup.html.autocomplete.DefaultCssAutoCompleteTextField;
+import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxButton;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
@@ -61,36 +61,38 @@ import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.resource.CssResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.dcm4che.conf.api.ConfigurationException;
+import org.dcm4che.net.ApplicationEntity;
 import org.dcm4che.net.Dimse;
 import org.dcm4chee.proxy.conf.ForwardRule;
-import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
+import org.dcm4chee.proxy.conf.ProxyAEExtension;
 import org.dcm4chee.proxy.conf.Schedule;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
-import org.dcm4chee.wizard.common.component.ExtendedWebPage;
-import org.dcm4chee.wizard.war.configuration.common.tree.ConfigTreeNode;
-import org.dcm4chee.wizard.war.configuration.common.tree.ConfigTreeProvider;
+import org.dcm4chee.wizard.common.component.MainWebPage;
+import org.dcm4chee.wizard.common.component.ModalWindowRuntimeException;
+import org.dcm4chee.wizard.common.component.secure.SecureSessionCheckPage;
+import org.dcm4chee.wizard.war.configuration.simple.model.basic.ApplicationEntityModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.DimseCollectionModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.StringArrayModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ForwardRuleModel;
-import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ProxyApplicationEntityModel;
-import org.dcm4chee.wizard.war.configuration.simple.validator.CommonNameValidator;
+import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeNode;
+import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider;
+import org.dcm4chee.wizard.war.configuration.simple.validator.ForwardRuleValidator;
 import org.dcm4chee.wizard.war.configuration.simple.validator.DestinationURIValidator;
 import org.dcm4chee.wizard.war.configuration.simple.validator.SOPClassValidator;
 import org.dcm4chee.wizard.war.configuration.simple.validator.ScheduleValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wicketstuff.security.components.SecureWebPage;
 
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-public class CreateOrEditForwardRulePage extends SecureWebPage {
+public class CreateOrEditForwardRulePage extends SecureSessionCheckPage {
     
     private static final long serialVersionUID = 1L;
 
     private static Logger log = LoggerFactory.getLogger(CreateOrEditForwardRulePage.class);
 
-    private static final ResourceReference baseCSS = new CssResourceReference(ExtendedWebPage.class, "base-style.css");
+    private static final ResourceReference baseCSS = new CssResourceReference(MainWebPage.class, "base-style.css");
 
     // mandatory
 	private Model<String> commonNameModel;
@@ -104,13 +106,22 @@ public class CreateOrEditForwardRulePage extends SecureWebPage {
     private Model<String> scheduleHoursModel;
     private Model<String> useCallingAETitleModel;
     private StringArrayModel sopClassModel;
+    private Model<Boolean> runPIXQueryModel;
+    private Model<String> mpps2DoseSrTemplateURIModel;
+    private Model<String> descriptionModel;
     
     public CreateOrEditForwardRulePage(final ModalWindow window, final ForwardRuleModel forwardRuleModel, 
     		final ConfigTreeNode aeNode) {
     	super();
 
-    	final ProxyApplicationEntity proxyApplicationEntity = 
-    			((ProxyApplicationEntityModel) aeNode.getModel()).getApplicationEntity();
+    	ApplicationEntity applicationEntity = null;
+		try {
+			applicationEntity = ((ApplicationEntityModel) aeNode.getModel()).getApplicationEntity();
+		} catch (ConfigurationException ce) {
+			log.error(this.getClass().toString() + ": " + "Error modifying retry: " + ce.getMessage());
+            log.debug("Exception", ce);
+            throw new ModalWindowRuntimeException(ce.getLocalizedMessage());
+		}
 
         add(new WebMarkupContainer("create-forwardRule-title").setVisible(forwardRuleModel == null));
         add(new WebMarkupContainer("edit-forwardRule-title").setVisible(forwardRuleModel != null));
@@ -120,34 +131,41 @@ public class CreateOrEditForwardRulePage extends SecureWebPage {
         form.setResourceIdPrefix("dicom.edit.forwardRule.");
         add(form);
 
+	    callingAETitleModel = Model.of();
 		if (forwardRuleModel == null) {
 			commonNameModel = Model.of();
 		    destinationURIModel = new StringArrayModel(null);
-		    callingAETitleModel = Model.of();
-		    dimsesModel = new DimseCollectionModel(null, 3);
+		    dimsesModel = new DimseCollectionModel(null, 5);
 		    exclusiveUseDefinedTCModel = Model.of(false);
 		    scheduleDaysModel = Model.of();
 		    scheduleHoursModel = Model.of();
 		    useCallingAETitleModel = Model.of();
 		    sopClassModel = new StringArrayModel(null);
+		    runPIXQueryModel = Model.of(false);
+		    mpps2DoseSrTemplateURIModel = Model.of();
+		    descriptionModel = Model.of();
 		} else {
 			ForwardRule forwardRule = forwardRuleModel.getForwardRule();
 	        commonNameModel = Model.of(forwardRule.getCommonName());
 	        destinationURIModel = new StringArrayModel(forwardRule.getDestinationURI()
 	        		.toArray(new String[0]));
-	        callingAETitleModel = Model.of(forwardRule.getCallingAET());
-	        dimsesModel = new DimseCollectionModel(forwardRuleModel.getForwardRule(), 3);
+        	if (forwardRule.getCallingAETs() != null && forwardRule.getCallingAETs().size() > 0)
+        		callingAETitleModel = Model.of(forwardRule.getCallingAETs().get(0));
+	        dimsesModel = new DimseCollectionModel(forwardRuleModel.getForwardRule(), 5);
 	        exclusiveUseDefinedTCModel = Model.of(forwardRule.isExclusiveUseDefinedTC());
 		    scheduleDaysModel = Model.of(forwardRule.getReceiveSchedule().getDays());
 		    scheduleHoursModel = Model.of(forwardRule.getReceiveSchedule().getHours());
 		    useCallingAETitleModel = Model.of(forwardRule.getUseCallingAET());
-			sopClassModel = new StringArrayModel(forwardRule.getSopClass()
-					.toArray(new String[0]));		
+			sopClassModel = new StringArrayModel(forwardRule.getSopClasses()
+					.toArray(new String[0]));
+			runPIXQueryModel = Model.of(forwardRule.isRunPIXQuery());
+		    mpps2DoseSrTemplateURIModel = Model.of(forwardRule.getMpps2DoseSrTemplateURI());
+		    descriptionModel = Model.of(forwardRule.getDescription());
 		}
 
         form.add(new Label("commonName.label", new ResourceModel("dicom.edit.forwardRule.commonName.label")))
 		.add(new TextField<String>("commonName", commonNameModel).setRequired(true)
-				.add(new CommonNameValidator(commonNameModel.getObject(), proxyApplicationEntity)));
+				.add(new ForwardRuleValidator(commonNameModel.getObject(), applicationEntity)));
 
         form.add(new Label("destinationURI.label", new ResourceModel("dicom.edit.forwardRule.destinationURI.label")))
         .add(new TextArea<String>("destinationURI", destinationURIModel).setRequired(true)
@@ -159,33 +177,61 @@ public class CreateOrEditForwardRulePage extends SecureWebPage {
         		.setOutputMarkupPlaceholderTag(true)
         		.setVisible(false));
 
-        optionalContainer.add(new Label("callingAETitle.label", new ResourceModel("dicom.edit.forwardRule.optional.callingAETitle.label")))
-                .add(new DefaultCssAutoCompleteTextField<String>("callingAETitle", callingAETitleModel) {
+        List<String> aeTitles = null;
+        try {
+        	aeTitles = Arrays.asList(ConfigTreeProvider.get().getUniqueAETitles()); 
+		} catch (ConfigurationException ce) {
+			log.error(this.getClass().toString() + ": " + "Error retrieving unique ae titles: " + ce.getMessage());
+			log.debug("Exception", ce);
+			throw new ModalWindowRuntimeException(ce.getLocalizedMessage());
+		}
 
-					private static final long serialVersionUID = 1L;
+		final DropDownChoice<String> callingAETitleDropDownChoice = 
+				new DropDownChoice<String>("callingAETitle", callingAETitleModel, aeTitles);
+		optionalContainer.add(new Label("callingAETitle.label", new ResourceModel("dicom.edit.forwardRule.optional.callingAETitle.label")))
+        .add(callingAETitleDropDownChoice
+        		.setNullValid(true).setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true));
 
-					ArrayList<String> choices = new ArrayList<String>();
-					
-					@Override
-					protected Iterator<String> getChoices(String input) {
-						choices.clear();
-						try {
-							for (String aeTitle : ConfigTreeProvider.get().getUniqueAETitles()) 
-								if (aeTitle.startsWith(input))
-									choices.add(aeTitle);
-						} catch (ConfigurationException ce) {
-		        			log.error(this.getClass().toString() + ": " + "Error retrieving unique ae titles: " + ce.getMessage());
-		                    log.debug("Exception", ce);
-		                    throw new RuntimeException(ce);
-						}
-						return choices.iterator();
-					}
-                });
-        
+		final TextField<String> callingAETitleTextField = 
+				new TextField<String>("callingAETitle.freetext", callingAETitleModel);
+		optionalContainer.add(callingAETitleTextField
+				.setVisible(false).setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true));
+
+	    final Model<Boolean> toggleCallingAETitleModel = Model.of(false);
+		if (forwardRuleModel != null && callingAETitleModel.getObject() != null 
+				&& !aeTitles.contains(callingAETitleModel.getObject())) {
+			toggleCallingAETitleModel.setObject(true);
+			callingAETitleTextField.setVisible(true);
+			callingAETitleDropDownChoice.setVisible(false);
+		}
+
+        optionalContainer.add(new AjaxCheckBox("toggleCallingAETitle", toggleCallingAETitleModel) {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			protected void onUpdate(AjaxRequestTarget target) {
+				callingAETitleDropDownChoice.setVisible(!toggleCallingAETitleModel.getObject());
+				callingAETitleTextField.setVisible(toggleCallingAETitleModel.getObject());
+				target.add(callingAETitleDropDownChoice);
+				target.add(callingAETitleTextField);
+			}
+        });
+
         optionalContainer.add(new Label("dimse.label", new ResourceModel("dicom.edit.forwardRule.optional.dimse.label")));
         ArrayList<Dimse> dimseList = 
         		new ArrayList<Dimse>();
-        dimseList.addAll(Arrays.asList(Dimse.values())); 
+        dimseList.addAll(Arrays.asList(Dimse.values()));
+
+        // remove DIMSEs not supported by proxy
+        dimseList.remove(Dimse.N_DELETE_RQ);
+        dimseList.remove(Dimse.N_DELETE_RSP);
+        dimseList.remove(Dimse.N_GET_RQ);
+        dimseList.remove(Dimse.N_GET_RSP);
+        dimseList.remove(Dimse.C_ECHO_RQ);
+        dimseList.remove(Dimse.C_ECHO_RSP);
+        dimseList.remove(Dimse.C_CANCEL_RQ);
+
         DropDownChoice<Dimse> dimseDropDown1 = 
         		new DropDownChoice<Dimse>("dimse1", dimsesModel.getDimseModel(0), dimseList);
         optionalContainer.add(dimseDropDown1
@@ -197,6 +243,14 @@ public class CreateOrEditForwardRulePage extends SecureWebPage {
         DropDownChoice<Dimse> dimseDropDown3 = 
         		new DropDownChoice<Dimse>("dimse3", dimsesModel.getDimseModel(2), dimseList);
         optionalContainer.add(dimseDropDown3
+        		.setNullValid(true));
+        DropDownChoice<Dimse> dimseDropDown4 = 
+        		new DropDownChoice<Dimse>("dimse4", dimsesModel.getDimseModel(3), dimseList);
+        optionalContainer.add(dimseDropDown4
+        		.setNullValid(true));
+        DropDownChoice<Dimse> dimseDropDown5 = 
+        		new DropDownChoice<Dimse>("dimse5", dimsesModel.getDimseModel(4), dimseList);
+        optionalContainer.add(dimseDropDown5
         		.setNullValid(true));
 
         optionalContainer.add(new Label("exclusiveUseDefinedTC.label", new ResourceModel("dicom.edit.forwardRule.optional.exclusiveUseDefinedTC.label")))
@@ -217,6 +271,15 @@ public class CreateOrEditForwardRulePage extends SecureWebPage {
         .add(new TextArea<String>("sopClass", sopClassModel)
         		.add(new SOPClassValidator()));
 
+        optionalContainer.add(new Label("runPIXQuery.label", new ResourceModel("dicom.edit.forwardRule.optional.runPIXQuery.label")))
+        .add(new CheckBox("runPIXQuery", runPIXQueryModel));
+
+        optionalContainer.add(new Label("mpps2DoseSrTemplateURI.label", new ResourceModel("dicom.edit.forwardRule.optional.mpps2DoseSrTemplateURI.label")))
+        .add(new TextField<String>("mpps2DoseSrTemplateURI", mpps2DoseSrTemplateURIModel));
+
+        optionalContainer.add(new Label("description.label", new ResourceModel("dicom.edit.forwardRule.optional.description.label")))
+        .add(new TextField<String>("description", descriptionModel));
+
         form.add(new Label("toggleOptional.label", new ResourceModel("dicom.edit.toggleOptional.label")))
         .add(new AjaxCheckBox("toggleOptional", new Model<Boolean>()) {
 			private static final long serialVersionUID = 1L;
@@ -227,7 +290,7 @@ public class CreateOrEditForwardRulePage extends SecureWebPage {
 			}
         });
 
-        form.add(new AjaxFallbackButton("submit", new ResourceModel("saveBtn"), form) {
+        form.add(new IndicatingAjaxButton("submit", new ResourceModel("saveBtn"), form) {
 
             private static final long serialVersionUID = 1L;
 
@@ -239,25 +302,33 @@ public class CreateOrEditForwardRulePage extends SecureWebPage {
 
             		forwardRule.setCommonName(commonNameModel.getObject());
             		forwardRule.setDestinationURIs(Arrays.asList(destinationURIModel.getArray()));
-            		forwardRule.setCallingAET(callingAETitleModel.getObject());
-            		forwardRule.setDimse(dimsesModel.getDimses());
+            		forwardRule.setCallingAETs(Arrays.asList(new String[] {callingAETitleModel.getObject()}));
+            		forwardRule.setDimse(new ArrayList<Dimse>(dimsesModel.getDimses()));
             		forwardRule.setExclusiveUseDefinedTC(exclusiveUseDefinedTCModel.getObject());
             		Schedule schedule = new Schedule();
             		schedule.setDays(scheduleDaysModel.getObject());
             		schedule.setHours(scheduleHoursModel.getObject());
             		forwardRule.setReceiveSchedule(schedule);
             		forwardRule.setUseCallingAET(useCallingAETitleModel.getObject());
-            		forwardRule.setSopClass(Arrays.asList(sopClassModel.getArray()));
-                    		
-            		if (forwardRuleModel == null)
-            			proxyApplicationEntity.getForwardRules().add(forwardRule);
+            		forwardRule.setSopClasses(Arrays.asList(sopClassModel.getArray()));
+            		forwardRule.setRunPIXQuery(runPIXQueryModel.getObject());
+            		forwardRule.setMpps2DoseSrTemplateURI(mpps2DoseSrTemplateURIModel.getObject());
+            		forwardRule.setDescription(descriptionModel.getObject());
+            		
+                	ProxyAEExtension proxyAEExtension = 
+                			((ApplicationEntityModel) aeNode.getModel()).getApplicationEntity()
+        					.getAEExtension(ProxyAEExtension.class);
 
-            		ConfigTreeProvider.get().mergeDevice(proxyApplicationEntity.getDevice());
+            		if (forwardRuleModel == null)
+            			proxyAEExtension.getForwardRules().add(forwardRule);
+
+            		ConfigTreeProvider.get().mergeDevice(
+            				((ApplicationEntityModel) aeNode.getModel()).getApplicationEntity().getDevice());
                     window.close(target);
                 } catch (Exception e) {
         			log.error(this.getClass().toString() + ": " + "Error modifying forward rule: " + e.getMessage());
                     log.debug("Exception", e);
-                    throw new RuntimeException(e);
+                    throw new ModalWindowRuntimeException(e.getLocalizedMessage());
                 }
             }
 

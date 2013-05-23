@@ -38,20 +38,23 @@
 
 package org.dcm4chee.wizard.war;
 
+import java.io.IOException;
 import java.util.Properties;
 
-import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.Page;
+import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
-import org.apache.wicket.model.Model;
+import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.model.StringResourceModel;
 import org.apache.wicket.request.resource.CssResourceReference;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
-import org.dcm4chee.wizard.common.component.ExtendedWebPage;
+import org.dcm4chee.wizard.common.component.MainWebPage;
 import org.dcm4chee.wizard.common.component.ModuleSelectorPanel;
-import org.dcm4chee.wizard.common.component.secure.SecureExtendedWebPage;
+import org.dcm4chee.wizard.common.component.secure.SecureMainWebPage;
+import org.dcm4chee.wizard.common.component.secure.SecureSessionCheckPage;
 import org.dcm4chee.wizard.common.component.secure.SecureWebApplication;
-import org.dcm4chee.wizard.war.configuration.advanced.panel.AdvancedConfigurationPanel;
 import org.dcm4chee.wizard.war.configuration.simple.panel.BasicConfigurationPanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,13 +62,13 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-public class MainPage extends SecureExtendedWebPage {
+public class MainPage extends SecureMainWebPage {
     
 	private static final long serialVersionUID = 1L;
 	
 	protected static Logger log = LoggerFactory.getLogger(MainPage.class);
 
-	private static final ResourceReference baseCSS = new PackageResourceReference(ExtendedWebPage.class, "base-style.css");
+	private static final ResourceReference baseCSS = new PackageResourceReference(MainWebPage.class, "base-style.css");
 	private static final ResourceReference tableTreeCSS = new CssResourceReference(MainPage.class, "table-tree.css");
 	
 	public MainPage() {
@@ -75,6 +78,7 @@ public class MainPage extends SecureExtendedWebPage {
 
     @Override
     public void renderHead(IHeaderResponse response) {
+    	super.renderHead(response);
     	if (MainPage.baseCSS != null) 
     		response.render(CssHeaderItem.forReference(MainPage.baseCSS));
     	if (MainPage.tableTreeCSS != null)
@@ -84,20 +88,49 @@ public class MainPage extends SecureExtendedWebPage {
     private void addModules(ModuleSelectorPanel selectorPanel) {
         
         selectorPanel.addModule(BasicConfigurationPanel.class);
-        selectorPanel.addModule(AdvancedConfigurationPanel.class);
+//        selectorPanel.addModule(AdvancedConfigurationPanel.class);
 //        selectorPanel.addModule(WizardPanel.class);
 //        selectorPanel.addModule(ProfilePanel.class);
 //        selectorPanel.addModule(DicomConfigurationSourcePanel.class);
         
-        try {
-            Properties properties = new Properties();
-            properties.load(((SecureWebApplication) getApplication()).getServletContext().getResourceAsStream("/META-INF/MANIFEST.MF"));
-            selectorPanel.get("img_logo").add(new AttributeModifier("title", 
-                    new Model<String>(
-                            properties.getProperty("Implementation-Title", "")
-                            + " : " + properties.getProperty("Implementation-Build", "")
-                            + " (" + properties.getProperty("SCM-Revision", "?")+")"
-                            )));            
-        } catch (Exception ignore) {}
-    }    
+        selectorPanel.getAboutWindow()
+        .setPageCreator(new ModalWindow.PageCreator() {
+
+        	private static final long serialVersionUID = 1L;
+
+        	@Override
+        	public Page createPage() {
+        		return new AboutPage();
+        	}
+        });
+    }
+    
+    private class AboutPage extends SecureSessionCheckPage {
+
+		private static final long serialVersionUID = 1L;
+		
+		public AboutPage() {
+			
+          Properties wizardProperties = new Properties();
+          try {
+        	  wizardProperties.load(((SecureWebApplication) getApplication()).getServletContext().getResourceAsStream("/META-INF/MANIFEST.MF"));
+          } catch (IOException e) {
+        	  log.error("Could not retrieve properties from /META-INF/MANIFEST.MF", e);
+          }
+
+          add(new Label("content",
+			new StringResourceModel("template", 
+					this, null, 
+					new Object[] {
+						wizardProperties.getProperty("Implementation-Title"),
+						wizardProperties.getProperty("Implementation-Version"),
+						wizardProperties.getProperty("Implementation-Vendor-Id"),
+						wizardProperties.getProperty("Implementation-Build"),
+						ProxyManifest.get().get("Implementation-Title"),
+						ProxyManifest.get().get("Implementation-Version"),
+						ProxyManifest.get().get("Implementation-Vendor-Id"),
+						ProxyManifest.get().get("Proxy-Implementation-Build")
+					})).setEscapeModelStrings(false));
+		}
+    }
 }

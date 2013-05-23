@@ -47,10 +47,11 @@ import java.util.List;
 import org.dcm4che.conf.api.AttributeCoercion;
 import org.dcm4che.conf.api.AttributeCoercions;
 import org.dcm4che.conf.api.ConfigurationException;
+import org.dcm4che.net.ApplicationEntity;
+import org.dcm4chee.proxy.conf.ForwardOption;
 import org.dcm4chee.proxy.conf.ForwardRule;
-import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
+import org.dcm4chee.proxy.conf.ProxyAEExtension;
 import org.dcm4chee.proxy.conf.Retry;
-import org.dcm4chee.proxy.conf.Schedule;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ApplicationEntityModel;
 
 /**
@@ -60,24 +61,27 @@ public class ProxyApplicationEntityModel extends ApplicationEntityModel {
 
 	private static final long serialVersionUID = 1L;
 	
-    private ProxyApplicationEntity applicationEntity;
+    private ApplicationEntity applicationEntity;
     
     private List<ForwardRuleModel> forwardRuleModels;
-    private List<ForwardScheduleModel> forwardScheduleModels;
+    private List<ForwardOptionModel> forwardOptionModels;
     private List<RetryModel> retryModels;
 	private List<CoercionModel> coercionModels;
     
-	public ProxyApplicationEntityModel(ProxyApplicationEntity applicationEntity) throws ConfigurationException {
+	public ProxyApplicationEntityModel(ApplicationEntity applicationEntity) throws ConfigurationException {
 		super(applicationEntity);
 		this.applicationEntity = applicationEntity;
-		setForwardRules(applicationEntity.getForwardRules());
-		setForwardSchedules(applicationEntity.getForwardSchedules());
-		setRetries(applicationEntity.getRetries());
-		setCoercions(applicationEntity.getAttributeCoercions());
+		
+		ProxyAEExtension proxyAEExtension = 
+				applicationEntity.getAEExtension(ProxyAEExtension.class);
+		setForwardRules(proxyAEExtension.getForwardRules());
+		setForwardOptions(proxyAEExtension.getForwardOptions());
+		setRetries(proxyAEExtension.getRetries());
+		setCoercions(proxyAEExtension.getAttributeCoercions());
 	}
 
 	@Override
-	public ProxyApplicationEntity getApplicationEntity() {
+	public ApplicationEntity getApplicationEntity() {
 		return applicationEntity;
 	}
 	
@@ -91,20 +95,20 @@ public class ProxyApplicationEntityModel extends ApplicationEntityModel {
 		return forwardRuleModels;
 	}
 
-	private void setForwardSchedules(HashMap<String, Schedule> forwardSchedules) {
-		forwardScheduleModels = new ArrayList<ForwardScheduleModel>();
-		Iterator<String> iterator = forwardSchedules.keySet().iterator();
+	private void setForwardOptions(HashMap<String, ForwardOption> hashMap) {
+		forwardOptionModels = new ArrayList<ForwardOptionModel>();
+		Iterator<String> iterator = hashMap.keySet().iterator();
 		while (iterator.hasNext()) { 
 			String destinationAETitle = iterator.next();
-			forwardScheduleModels
-				.add(new ForwardScheduleModel(
+			forwardOptionModels
+				.add(new ForwardOptionModel(
 						destinationAETitle, 
-						forwardSchedules.get(destinationAETitle)));
+						hashMap.get(destinationAETitle)));
 		}
 	}
 
-	public List<ForwardScheduleModel> getForwardSchedules() {
-		return forwardScheduleModels;
+	public List<ForwardOptionModel> getForwardOptions() {
+		return forwardOptionModels;
 	}
 	
 	private void setRetries(List<Retry> retries) {
@@ -119,8 +123,8 @@ public class ProxyApplicationEntityModel extends ApplicationEntityModel {
 
 	private void setCoercions(AttributeCoercions attributeCoercions) {
 		this.coercionModels = new ArrayList<CoercionModel>();
-		for (AttributeCoercion attributeCoercion : attributeCoercions.getAll())
-			this.coercionModels.add(new CoercionModel(attributeCoercion));
+		for (Iterator<AttributeCoercion> i = attributeCoercions.iterator(); i.hasNext(); )
+			this.coercionModels.add(new CoercionModel(i.next()));
 	}
 
 	public List<CoercionModel> getCoercions() {

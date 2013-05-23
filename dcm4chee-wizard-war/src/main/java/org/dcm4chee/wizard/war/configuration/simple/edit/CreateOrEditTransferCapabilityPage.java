@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.ajax.markup.html.form.AjaxFallbackButton;
+import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxButton;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
@@ -61,13 +62,14 @@ import org.dcm4che.net.ApplicationEntity;
 import org.dcm4che.net.TransferCapability;
 import org.dcm4che.net.TransferCapability.Role;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
-import org.dcm4chee.wizard.common.component.ExtendedWebPage;
-import org.dcm4chee.wizard.war.common.component.ExtendedSecureWebPage;
-import org.dcm4chee.wizard.war.configuration.common.tree.ConfigTreeNode;
-import org.dcm4chee.wizard.war.configuration.common.tree.ConfigTreeProvider;
+import org.dcm4chee.wizard.common.component.MainWebPage;
+import org.dcm4chee.wizard.common.component.ModalWindowRuntimeException;
+import org.dcm4chee.wizard.war.common.component.DicomConfigurationWebPage;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ApplicationEntityModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.StringArrayModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.TransferCapabilityModel;
+import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeNode;
+import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider;
 import org.dcm4chee.wizard.war.configuration.simple.validator.SOPClassValidator;
 import org.dcm4chee.wizard.war.configuration.simple.validator.TransferCapabilityValidator;
 import org.dcm4chee.wizard.war.configuration.simple.validator.TransferSyntaxValidator;
@@ -77,13 +79,13 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-public class CreateOrEditTransferCapabilityPage extends ExtendedSecureWebPage {
+public class CreateOrEditTransferCapabilityPage extends DicomConfigurationWebPage {
     
     private static final long serialVersionUID = 1L;
 
     private static Logger log = LoggerFactory.getLogger(CreateOrEditTransferCapabilityPage.class);
 
-    private static final ResourceReference baseCSS = new CssResourceReference(ExtendedWebPage.class, "base-style.css");
+    private static final ResourceReference baseCSS = new CssResourceReference(MainWebPage.class, "base-style.css");
 
     // mandatory
 	private Model<String> sopClassModel;
@@ -143,10 +145,12 @@ public class CreateOrEditTransferCapabilityPage extends ExtendedSecureWebPage {
         		.add(new TransferSyntaxValidator())
         		.setRequired(true));
 
+        TextField<String> commonNameTextField = new TextField<String>("commonName", commonNameModel);
+        
 		form
 			.add(new TransferCapabilityValidator(
 					applicationEntity, 
-					sopClassTextField, roleDropDown));
+					sopClassTextField, roleDropDown, commonNameTextField));
 
         final WebMarkupContainer optionalContainer = new WebMarkupContainer("optional");
         form.add(optionalContainer
@@ -155,7 +159,7 @@ public class CreateOrEditTransferCapabilityPage extends ExtendedSecureWebPage {
         		.setVisible(false));
 
         optionalContainer.add(new Label("commonName.label", new ResourceModel("dicom.edit.transferCapability.optional.commonName.label")))
-        .add(new TextField<String>("commonName", commonNameModel));
+        .add(commonNameTextField);
 
         form.add(new Label("toggleOptional.label", new ResourceModel("dicom.edit.toggleOptional.label")))
         .add(new AjaxCheckBox("toggleOptional", new Model<Boolean>()) {
@@ -167,7 +171,7 @@ public class CreateOrEditTransferCapabilityPage extends ExtendedSecureWebPage {
 			}
         });
 
-        form.add(new AjaxFallbackButton("submit", new ResourceModel("saveBtn"), form) {
+        form.add(new IndicatingAjaxButton("submit", new ResourceModel("saveBtn"), form) {
 
             private static final long serialVersionUID = 1L;
 
@@ -182,7 +186,9 @@ public class CreateOrEditTransferCapabilityPage extends ExtendedSecureWebPage {
                     			transferCapabilityModel.getTransferCapability();
                     
                     if (transferCapabilityModel != null) {
-                    	applicationEntity.removeTransferCapability(transferCapability);
+                    	applicationEntity.removeTransferCapabilityFor(
+                    			transferCapability.getSopClass(),
+                    			transferCapability.getRole());
                 		transferCapability.setSopClass(sopClassModel.getObject());
                 		transferCapability.setRole(roleModel.getObject());
                 		transferCapability.setTransferSyntaxes(transferSyntaxModel.getArray());
@@ -195,7 +201,7 @@ public class CreateOrEditTransferCapabilityPage extends ExtendedSecureWebPage {
                 } catch (Exception e) {
         			log.error(this.getClass().toString() + ": " + "Error modifying transfer capability: " + e.getMessage());
                     log.debug("Exception", e);
-                    throw new RuntimeException(e);
+                    throw new ModalWindowRuntimeException(e.getLocalizedMessage());
                 }
             }
 

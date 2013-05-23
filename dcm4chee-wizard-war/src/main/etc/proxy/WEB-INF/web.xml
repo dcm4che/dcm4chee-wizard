@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_3_0.xsd"
-  version="3.0">
+  xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_3_0.xsd" version="3.0">
   <display-name>dcm4chee-wizard</display-name>
   <filter>
     <filter-name>wicket.dcm4chee-wizard</filter-name>
@@ -15,8 +14,16 @@
       <param-value>${config-class}</param-value>
     </init-param>
     <init-param>
-      <param-name>deviceName</param-name>
-      <param-value>${device-name}</param-value>
+      <param-name>ldapPropertiesURL</param-name>
+      <param-value>file:${jboss.server.config.dir}/dcm4chee-wizard/ldap.properties</param-value>
+    </init-param>
+    <init-param>
+      <param-name>wizardWarName</param-name>
+      <param-value>dcm4chee-wizard-war-${version}-${project-classifier}.war</param-value>
+    </init-param>
+    <init-param>
+      <param-name>proxyJarName</param-name>
+      <param-value>dcm4chee-proxy-service-1.0.0-SNAPSHOT.jar</param-value>
     </init-param>
     <init-param>
       <param-name>internalErrorPageClass</param-name>
@@ -35,17 +42,9 @@
       <param-value>DicomConfiguration</param-value>
     </init-param>
     <init-param>
-      <param-name>ConfigurationAETitle</param-name>
-      <param-value>MYAE</param-value>
-    </init-param>
-    <init-param>
       <param-name>CheckForChangesInterval</param-name>
       <!-- given in seconds -->
-      <param-value>20</param-value>
-    </init-param>
-    <init-param>
-      <param-name>ReloadServiceEndpoint</param-name>
-      <param-value>http://localhost:8080/dcm4chee-wizard/config/reload</param-value>
+      <param-value></param-value>
     </init-param>
   </filter>
   <filter-mapping>
@@ -61,23 +60,19 @@
   </session-config>
   <servlet>
     <servlet-name>dcm4chee-proxy</servlet-name>
-    <servlet-class>org.dcm4chee.proxy.service.ProxyServlet</servlet-class>
+    <servlet-class>org.dcm4chee.proxy.ProxyServlet</servlet-class>
     <init-param>
-      <param-name>dicomConfigurationClass</param-name>
-      <param-value>${config-class}</param-value>
+      <param-name>ldapPropertiesURL</param-name>
+      <param-value>file:${jboss.server.config.dir}/dcm4chee-wizard/ldap.properties</param-value>
     </init-param>
     <init-param>
       <param-name>deviceName</param-name>
-      <param-value>dcm4chee-proxy</param-value>
+      <param-value>${device-name}</param-value>
     </init-param>
     <init-param>
       <param-name>jmxName</param-name>
-      <param-value>dcm4che:service=dcm4chee-proxy</param-value>
+      <param-value>org.dcm4chee.proxy:type=Service</param-value>
     </init-param>
     <load-on-startup>1</load-on-startup>
   </servlet>
-  <servlet-mapping>
-    <servlet-name>javax.ws.rs.core.Application</servlet-name>
-    <url-pattern>/*</url-pattern>
-  </servlet-mapping>
 </web-app>

@@ -43,18 +43,18 @@ import java.util.Collection;
 import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.IValidator;
 import org.apache.wicket.validation.ValidationError;
-import org.dcm4chee.wizard.war.configuration.simple.model.basic.ConnectionReferenceModel;
+import org.dcm4chee.wizard.war.configuration.simple.model.basic.ConnectionModel;
 
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-public class ConnectionReferenceValidator implements IValidator<Collection<ConnectionReferenceModel>> {
+public class ConnectionReferenceValidator implements IValidator<Collection<ConnectionModel>> {
 
     private static final long serialVersionUID = 1L;
 
 	@Override
 	public void validate(
-			IValidatable<Collection<ConnectionReferenceModel>> validatable) {
+			IValidatable<Collection<ConnectionModel>> validatable) {
 		if (validatable.getValue().size() <= 0)
 			validatable.error(new ValidationError()
 				.addKey("ConnectionReferenceValidator.invalid"));

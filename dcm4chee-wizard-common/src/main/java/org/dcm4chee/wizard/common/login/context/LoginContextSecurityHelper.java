@@ -143,7 +143,6 @@ public class LoginContextSecurityHelper {
             mappingFile = new File(
             		JBossAS7SystemProperties.JBOSS_SERVER_BASE_DIR, 
             		mappingFile.getPath());
-log.warn("Resolved config path to: " + fn);
         Map<String, Set<String>> mappings = new HashMap<String, Set<String>>();
         String line;
         BufferedReader reader = null;

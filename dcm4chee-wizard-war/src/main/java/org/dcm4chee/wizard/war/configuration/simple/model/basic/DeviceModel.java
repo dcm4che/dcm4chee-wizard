@@ -54,12 +54,12 @@ import org.dcm4chee.wizard.war.configuration.simple.model.ConfigNodeModel;
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-public class DeviceModel implements Serializable, ConfigNodeModel {
+public class DeviceModel extends ConfigNodeModel implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 
 	public static String cssClass = "device";
-	public static String toolTip = "device";
+	public static String toolTip = "Device";
 	
 	private java.lang.String deviceName;
 	private Device device;
@@ -108,5 +108,11 @@ public class DeviceModel implements Serializable, ConfigNodeModel {
 			this.applicationEntities.put(
 					applicationEntity.getAETitle(), new ApplicationEntityModel(applicationEntity));
 		}
+	}
+
+	@Override
+	public String getDescription() {
+		return device == null || device.getDescription() == null ? 
+				toolTip + " " + deviceName: device.getDescription();
 	}
 }

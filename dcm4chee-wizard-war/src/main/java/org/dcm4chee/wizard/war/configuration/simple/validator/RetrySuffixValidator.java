@@ -41,14 +41,15 @@ package org.dcm4chee.wizard.war.configuration.simple.validator;
 import java.util.List;
 
 import org.apache.wicket.validation.IValidatable;
+import org.apache.wicket.validation.IValidator;
 import org.apache.wicket.validation.ValidationError;
-import org.apache.wicket.validation.validator.StringValidator;
+import org.dcm4chee.proxy.common.RetryObject;
 import org.dcm4chee.proxy.conf.Retry;
 
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-public class RetrySuffixValidator extends StringValidator {
+public class RetrySuffixValidator implements IValidator<RetryObject> {
 
     private static final long serialVersionUID = 1L;
 
@@ -61,11 +62,11 @@ public class RetrySuffixValidator extends StringValidator {
     }
 
     @Override
-    public void validate(IValidatable<String> suffix) {
-    	if (!suffix.getValue().equals(ignore))  { 
+    public void validate(IValidatable<RetryObject> validatable) {
+    	if (!validatable.getValue().getSuffix().equals(ignore))  { 
     		for (Retry retry : retries)
-    			if (retry.getRetryObject().getSuffix().equals(suffix.getValue())) {
-    				suffix.error(new ValidationError()
+    			if (retry.getRetryObject().getSuffix().equals(validatable.getValue().getSuffix())) {
+    				validatable.error(new ValidationError()
     					.addKey("RetrySuffixValidator.alreadyExists"));
     				return;
     			}

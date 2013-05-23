@@ -38,19 +38,27 @@
 
 package org.dcm4chee.wizard.war.configuration.simple.edit;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.ajax.markup.html.form.AjaxFallbackButton;
+import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxButton;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.CheckBox;
+import org.apache.wicket.markup.html.form.CheckBoxMultipleChoice;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
@@ -63,31 +71,37 @@ import org.apache.wicket.request.resource.CssResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.validation.validator.RangeValidator;
 import org.dcm4che.conf.api.ConfigurationException;
+import org.dcm4che.net.ApplicationEntity;
 import org.dcm4che.net.Connection;
+import org.dcm4che.net.hl7.HL7Application;
+import org.dcm4che.net.hl7.HL7DeviceExtension;
+import org.dcm4che.util.StringUtils;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
-import org.dcm4chee.wizard.common.component.ExtendedWebPage;
-import org.dcm4chee.wizard.war.configuration.common.tree.ConfigTreeNode;
-import org.dcm4chee.wizard.war.configuration.common.tree.ConfigTreeProvider;
+import org.dcm4chee.wizard.common.component.MainWebPage;
+import org.dcm4chee.wizard.common.component.ModalWindowRuntimeException;
+import org.dcm4chee.wizard.common.component.secure.SecureSessionCheckPage;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ConnectionModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.DefaultableModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.DeviceModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.StringArrayModel;
+import org.dcm4chee.wizard.war.configuration.simple.model.basic.TlsCipherSuiteCollectionModel;
+import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeNode;
+import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider;
 import org.dcm4chee.wizard.war.configuration.simple.validator.ConnectionValidator;
 import org.dcm4chee.wizard.war.configuration.simple.validator.HostnameValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wicketstuff.security.components.SecureWebPage;
 
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-public class CreateOrEditConnectionPage extends SecureWebPage {
+public class CreateOrEditConnectionPage extends SecureSessionCheckPage {
     
     private static final long serialVersionUID = 1L;
 
     private static Logger log = LoggerFactory.getLogger(CreateOrEditConnectionPage.class);
     
-    private static final ResourceReference baseCSS = new CssResourceReference(ExtendedWebPage.class, "base-style.css");
+    private static final ResourceReference baseCSS = new CssResourceReference(MainWebPage.class, "base-style.css");
     
     // mandatory
 	private Model<String> hostnameModel;
@@ -96,10 +110,11 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
     private Model<String> commonNameModel;
 	private Model<Boolean> installedModel;
 	private Model<Integer> portModel;
-	private StringArrayModel tlsCipherSuitesModel;
+	private TlsCipherSuiteCollectionModel tlsCipherSuitesModel;
 	private Model<String> httpProxyModel;
 	private Model<Boolean> tlsNeedClientAuthModel;
-	private StringArrayModel tlsProtocolModel;
+	private Model<Connection.Protocol> protocolModel;
+	private Model<ArrayList<String>> tlsProtocolModel;
 	private DefaultableModel<Integer> tcpBacklogModel;
 	private DefaultableModel<Integer> tcpConnectTimeoutModel;
 	private DefaultableModel<Integer> tcpCloseDelayModel;
@@ -120,7 +135,7 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
 	private DefaultableModel<Integer> idleTimeoutModel;
     
 	private List<String> installedRendererChoices;
-	
+
     public CreateOrEditConnectionPage(final ModalWindow window, final ConnectionModel connectionModel, 
 			final ConfigTreeNode deviceNode) {
         super();
@@ -137,7 +152,12 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
         installedRendererChoices.add(new ResourceModel("dicom.installed.true.text").wrapOnAssignment(this).getObject());
         installedRendererChoices.add(new ResourceModel("dicom.installed.false.text").wrapOnAssignment(this).getObject());
 
+        ArrayList<String> tlsProtocols;
+        ArrayList<String> tlsCipherSuites;
         try {
+            tlsProtocols = (ArrayList<String>) loadConfiguration("tls-protocols.txt");
+            tlsCipherSuites = (ArrayList<String>) loadConfiguration("tls-ciphersuites.txt");
+            
 	    	tcpBacklogModel = new DefaultableModel<Integer>(Connection.DEF_BACKLOG);
 	    	tcpConnectTimeoutModel = new DefaultableModel<Integer>(Connection.NO_TIMEOUT);
 	    	tcpCloseDelayModel = new DefaultableModel<Integer>(Connection.DEF_SOCKETDELAY);
@@ -153,16 +173,25 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
 	    	responseTimeoutModel = new DefaultableModel<Integer>(Connection.NO_TIMEOUT);
 	    	retrieveTimeoutModel = new DefaultableModel<Integer>(Connection.NO_TIMEOUT);
 	    	idleTimeoutModel = new DefaultableModel<Integer>(Connection.NO_TIMEOUT);
+	    	tlsProtocolModel = new Model<ArrayList<String>>();
+	    	tlsProtocolModel.setObject(new ArrayList<String>());
+	    	if (connectionModel != null) {
+	    		List<String> assignedTlsProtocols = 
+	    				Arrays.asList(connectionModel.getConnection().getTlsProtocols());
+				for (String tlsProtocol : tlsProtocols)
+					if (assignedTlsProtocols.contains(tlsProtocol))
+						tlsProtocolModel.getObject().add(tlsProtocol);
+	    	}
 
         	if (connectionModel == null) {
 		        hostnameModel = Model.of();
 	        	commonNameModel = Model.of();
 				installedModel = Model.of();
 		        portModel = Model.of(11112);
-		        tlsCipherSuitesModel = new StringArrayModel(null);
+		        tlsCipherSuitesModel = new TlsCipherSuiteCollectionModel(null, 3);
 		    	httpProxyModel = Model.of();
 		    	tlsNeedClientAuthModel = Model.of(true);
-		    	tlsProtocolModel = new StringArrayModel(new String[] { "TLSv1", "SSLv3" });
+		    	protocolModel = Model.of(Connection.Protocol.DICOM);
 		    	tcpNoDelayModel = Model.of(false);
 		    	blacklistedHostnameModel = new StringArrayModel(null);
 		    	packPDVModel = Model.of(true);
@@ -172,10 +201,10 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
 	        	commonNameModel = Model.of(connection.getCommonName());
 				installedModel = Model.of(connection.getInstalled());
 		        portModel = Model.of(connection.getPort());
-		        tlsCipherSuitesModel = new StringArrayModel(connection.getTlsCipherSuites());
+		        tlsCipherSuitesModel = new TlsCipherSuiteCollectionModel(connectionModel.getConnection(), 3);
 		    	httpProxyModel = Model.of(connection.getHttpProxy());
 		    	tlsNeedClientAuthModel = Model.of(connection.isTlsNeedClientAuth());
-		    	tlsProtocolModel = new StringArrayModel(connection.getTlsProtocols());
+		    	protocolModel = Model.of(connection.getProtocol());
 		    	tcpBacklogModel.setObject(connection.getBacklog());
 		    	tcpConnectTimeoutModel.setObject(connection.getConnectTimeout());
 		    	tcpCloseDelayModel.setObject(connection.getSocketCloseDelay());
@@ -198,7 +227,7 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
         } catch (ConfigurationException ce) {
 			log.error(this.getClass().toString() + ": " + "Error retrieving connection data: " + ce.getMessage());
             log.debug("Exception", ce);
-            throw new RuntimeException(ce);
+            throw new ModalWindowRuntimeException(ce.getLocalizedMessage());
 		}
 
         FormComponent<String> hostnameTextField;
@@ -206,6 +235,14 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
         .add(hostnameTextField = new TextField<String>("hostname", hostnameModel)
         		.add(new HostnameValidator())
         		.setRequired(true));
+
+        FormComponent<Integer> portTextField;
+		form.add(new Label("port.label", new ResourceModel("dicom.edit.connection.port.label")))
+        .add(portTextField = new TextField<Integer>("port", portModel)
+        		.setType(Integer.class)
+        		.add(new RangeValidator<Integer>(1,65535)));
+		if (portModel.getObject().equals(-1))
+			portTextField.setModelObject(null);
 
         final WebMarkupContainer optionalContainer = new WebMarkupContainer("optional");
         form.add(optionalContainer
@@ -234,16 +271,20 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
 						return String.valueOf(index);
 					}
         		}).setNullValid(true));
-        	
 
-        FormComponent<Integer> portTextField;
-		optionalContainer.add(new Label("port.label", new ResourceModel("dicom.edit.connection.optional.port.label")))
-        .add(portTextField = new TextField<Integer>("port", portModel)
-        		.setType(Integer.class)
-        		.add(new RangeValidator<Integer>(1,65535)));
-
-        optionalContainer.add(new Label("tlsCipherSuites.label", new ResourceModel("dicom.edit.connection.optional.tlsCipherSuites.label")))
-        .add(new TextArea<String>("tlsCipherSuites", tlsCipherSuitesModel));
+        optionalContainer.add(new Label("tlsCipherSuites.label", new ResourceModel("dicom.edit.connection.optional.tlsCipherSuites.label")));
+        DropDownChoice<String> tlsCipherSuiteDropDown1 = 
+        		new DropDownChoice<String>("tlsCipherSuite1", tlsCipherSuitesModel.getTlsCipherSuiteModel(0), tlsCipherSuites);
+        optionalContainer.add(tlsCipherSuiteDropDown1
+        		.setNullValid(true));
+        DropDownChoice<String> tlsCipherSuiteDropDown2 = 
+        		new DropDownChoice<String>("tlsCipherSuite2", tlsCipherSuitesModel.getTlsCipherSuiteModel(1), tlsCipherSuites);
+        optionalContainer.add(tlsCipherSuiteDropDown2
+        		.setNullValid(true));
+        DropDownChoice<String> tlsCipherSuiteDropDown3 = 
+        		new DropDownChoice<String>("tlsCipherSuite3", tlsCipherSuitesModel.getTlsCipherSuiteModel(2), tlsCipherSuites);
+        optionalContainer.add(tlsCipherSuiteDropDown3
+        		.setNullValid(true));
 
         optionalContainer.add(new Label("httpProxy.label", new ResourceModel("dicom.edit.connection.optional.httpProxy.label")))
         .add(new TextField<String>("httpProxy", httpProxyModel)
@@ -252,8 +293,29 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
         optionalContainer.add(new Label("tlsNeedClientAuth.label", new ResourceModel("dicom.edit.connection.optional.tlsNeedClientAuth.label")))
         .add(new CheckBox("tlsNeedClientAuth", tlsNeedClientAuthModel));
 
+        DropDownChoice<Connection.Protocol> protocolDropDown;
+        optionalContainer.add(new Label("protocol.label", new ResourceModel("dicom.edit.connection.optional.protocol.label")))
+        .add((protocolDropDown = new DropDownChoice<Connection.Protocol>("protocol", protocolModel, 
+        		  Arrays.asList(new Connection.Protocol[] {
+        				  Connection.Protocol.DICOM, 
+        				  Connection.Protocol.HL7, 
+        				  Connection.Protocol.SYSLOG_TLS, 
+        				  Connection.Protocol.SYSLOG_UDP}), 
+        		  new IChoiceRenderer<Connection.Protocol>() {
+ 
+					private static final long serialVersionUID = 1L;
+
+					public String getDisplayValue(Connection.Protocol object) {
+						return object.name();
+					}
+
+					public String getIdValue(Connection.Protocol object, int index) {
+						return String.valueOf(index);
+					}
+        		})).setNullValid(false));
+
         optionalContainer.add(new Label("tlsProtocol.label", new ResourceModel("dicom.edit.connection.optional.tlsProtocol.label")))
-        .add(new TextArea<String>("tlsProtocol", tlsProtocolModel));
+        .add(new CheckBoxMultipleChoice<String>("tlsProtocol", tlsProtocolModel, new Model<ArrayList<String>>(tlsProtocols)));
 
         optionalContainer.add(new Label("tcpBacklog.label", new ResourceModel("dicom.edit.connection.optional.tcpBacklog.label")))
         .add(new TextField<Integer>("tcpBacklog", tcpBacklogModel)
@@ -351,8 +413,30 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
         
 		form.add(new ConnectionValidator(((DeviceModel) deviceNode.getModel()).getConnections(), 
 				commonNameTextField, hostnameTextField, portTextField, connectionModel));
-        
-        form.add(new AjaxFallbackButton("submit", new ResourceModel("saveBtn"), form) {
+
+		if (connectionModel != null)
+			try {
+				Connection connection = connectionModel.getConnection();
+	        	for (ApplicationEntity ae : connection.getDevice().getApplicationEntities())
+	        		if (ae.getConnections().contains(connection))
+	        			protocolDropDown.setEnabled(false)
+	        				.add(new AttributeModifier("title", new ResourceModel("dicom.delete.connection.notAllowed")));
+	        	
+	        	HL7DeviceExtension hl7DeviceExtension = 
+	        			connection.getDevice().getDeviceExtension(HL7DeviceExtension.class);
+	        	if (hl7DeviceExtension != null) {
+	        		for (HL7Application hl7Application : hl7DeviceExtension.getHL7Applications())
+	        			if (hl7Application.getConnections().contains(connection))
+	        				protocolDropDown.setEnabled(false)
+	        				.add(new AttributeModifier("title", new ResourceModel("dicom.delete.connection.notAllowed")));
+	        	}
+			} catch (ConfigurationException ce) {
+	        	log.error(this.getClass().toString() + ": " + "Error checking connections in use: " + ce.getMessage());
+	        	log.debug("Exception", ce);
+	        	throw new ModalWindowRuntimeException(ce.getLocalizedMessage());
+			}
+
+        form.add(new IndicatingAjaxButton("submit", new ResourceModel("saveBtn"), form) {
 
             private static final long serialVersionUID = 1L;
 
@@ -365,12 +449,13 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
 
                     connection.setHostname(hostnameModel.getObject());
                     connection.setCommonName(commonNameModel.getObject());
-                    connection.setInstalled(installedModel.getObject());
-                    connection.setPort(portModel.getObject().intValue());
-                    connection.setTlsCipherSuites(tlsCipherSuitesModel.getArray());
+                    connection.setInstalled(installedModel.getObject());                    
+                    connection.setPort(portModel.getObject() == null ? -1 : portModel.getObject().intValue());
+                    connection.setTlsCipherSuites(tlsCipherSuitesModel.getTlsCipherSuites().toArray(new String[0]));                 
                     connection.setHttpProxy(httpProxyModel.getObject());
                     connection.setTlsNeedClientAuth(tlsNeedClientAuthModel.getObject());
-                    connection.setTlsProtocols(tlsProtocolModel.getArray());                    
+                    connection.setProtocol(protocolModel.getObject());
+                    connection.setTlsProtocols(tlsProtocolModel.getObject().toArray(new String[0]));
                     connection.setBacklog(tcpBacklogModel.getObject());
                     connection.setConnectTimeout(tcpConnectTimeoutModel.getObject());
                     connection.setSocketCloseDelay(tcpCloseDelayModel.getObject());
@@ -397,7 +482,7 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
                 } catch (Exception e) {
         			log.error(this.getClass().toString() + ": " + "Error modifying connection: " + e.getMessage());
                     log.debug("Exception", e);
-                    throw new RuntimeException(e);
+                    throw new ModalWindowRuntimeException(e.getLocalizedMessage());
                 }
             }
 
@@ -422,6 +507,36 @@ public class CreateOrEditConnectionPage extends SecureWebPage {
         }.setDefaultFormProcessing(false));
     }
     
+    private List<String> loadConfiguration(String filename) {
+    	String line;
+    	BufferedReader reader = null;
+    	try {
+    		List<String> tlsProtocols = new ArrayList<String>();
+    		String fn = System.getProperty("dcm4chee-wizard.cfg.path", "dcm4chee-wizard/");
+    		if (fn == null)
+    			throw new FileNotFoundException(
+    					"Web config path not found! Not specified with System property 'dcm4chee-wizard.cfg.path'");
+    		File configFile = new File(StringUtils.replaceSystemProperties(fn) + filename);    		
+            if (!configFile.isAbsolute())
+                configFile = new File(System.getProperty("jboss.server.config.dir"), configFile.getPath());
+            reader = new BufferedReader(new FileReader(configFile));
+            while ((line = reader.readLine()) != null)
+                tlsProtocols.add(line);
+            return tlsProtocols;
+        } catch (IOException ioe) {
+            log.error(this.getClass().toString() + ": " + "Error accessing " + filename, ioe);
+            log.debug("Exception", ioe);
+            throw new RuntimeException(ioe.getLocalizedMessage());
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException ignore) {
+                }
+            }
+        }
+    }
+
     @Override
     public void renderHead(IHeaderResponse response) {
         if (CreateOrEditConnectionPage.baseCSS != null)

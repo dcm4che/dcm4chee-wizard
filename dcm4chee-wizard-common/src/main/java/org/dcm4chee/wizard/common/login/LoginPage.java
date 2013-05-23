@@ -50,13 +50,13 @@ import org.apache.wicket.model.StringResourceModel;
 import org.apache.wicket.resource.loader.ClassStringResourceLoader;
 import org.apache.wicket.resource.loader.PackageStringResourceLoader;
 import org.dcm4chee.wizard.common.behavior.FocusOnLoadBehavior;
-import org.dcm4chee.wizard.common.component.ExtendedWebPage;
+import org.dcm4chee.wizard.common.component.MainWebPage;
 
 /**
  * @author Franz Willer <franz.willer@gmail.com>
  * @author Robert David <robert.david@agfa.com>
  */
-public class LoginPage extends ExtendedWebPage {
+public class LoginPage extends MainWebPage {
 
 	private static final long serialVersionUID = 1L;
 	

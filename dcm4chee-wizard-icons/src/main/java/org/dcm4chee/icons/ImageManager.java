@@ -70,34 +70,50 @@ public class ImageManager {
             new PackageResourceReference(ImageManager.class, "wizard/dicom/device.png");
     public static final ResourceReference IMAGE_WIZARD_DEVICE_ADD = 
             new PackageResourceReference(ImageManager.class, "wizard/dicom/device_add.png");
-        public static final ResourceReference IMAGE_WIZARD_CONNECTION = 
-            new PackageResourceReference(ImageManager.class, "wizard/dicom/connection.png");
-        public static final ResourceReference IMAGE_WIZARD_TRANSFER_CAPABILITY = 
+	public static final ResourceReference IMAGE_WIZARD_EXPORT = 
+			new PackageResourceReference(ImageManager.class, "wizard/dicom/export.png");
+    public static final ResourceReference IMAGE_WIZARD_CONNECTION = 
+    		new PackageResourceReference(ImageManager.class, "wizard/dicom/connection.png");
+    public static final ResourceReference IMAGE_WIZARD_TRANSFER_CAPABILITY = 
             new PackageResourceReference(ImageManager.class, "wizard/dicom/transfer_capability.png");
-        public static final ResourceReference IMAGE_WIZARD_APPLICATION_ENTITY = 
-                new PackageResourceReference(ImageManager.class, "wizard/dicom/application_entity.png");
-        public static final ResourceReference IMAGE_WIZARD_FOLDER_CONNECTIONS = 
-                new PackageResourceReference(ImageManager.class, "wizard/dicom/folder_connections.png");
-        public static final ResourceReference IMAGE_WIZARD_FOLDER_APPLICATION_ENTITIES = 
-                new PackageResourceReference(ImageManager.class, "wizard/dicom/folder_application_entities.png");
-        public static final ResourceReference IMAGE_WIZARD_FOLDER_TRANSFER_CAPABILITIES = 
-                new PackageResourceReference(ImageManager.class, "wizard/dicom/folder_transfer_capabilities.png");
-        public static final ResourceReference IMAGE_WIZARD_FOLDER_TRANSFER_CAPABILITY_TYPE = 
-                new PackageResourceReference(ImageManager.class, "wizard/dicom/folder_transfer_capability_type.png");
+    public static final ResourceReference IMAGE_WIZARD_APPLICATION_ENTITY = 
+    		new PackageResourceReference(ImageManager.class, "wizard/dicom/application_entity.png");
+    public static final ResourceReference IMAGE_WIZARD_AUDIT_LOGGER = 
+    		new PackageResourceReference(ImageManager.class, "wizard/dicom/audit_logger.png");
+    public static final ResourceReference IMAGE_WIZARD_FOLDER_CONNECTIONS = 
+            new PackageResourceReference(ImageManager.class, "wizard/dicom/folder_connections.png");
+    public static final ResourceReference IMAGE_WIZARD_FOLDER_APPLICATION_ENTITIES = 
+    		new PackageResourceReference(ImageManager.class, "wizard/dicom/folder_application_entities.png");
+    public static final ResourceReference IMAGE_WIZARD_FOLDER_AUDIT_LOGGERS = 
+            new PackageResourceReference(ImageManager.class, "wizard/dicom/folder_audit_loggers.png");
+    public static final ResourceReference IMAGE_WIZARD_FOLDER_TRANSFER_CAPABILITIES = 
+    		new PackageResourceReference(ImageManager.class, "wizard/dicom/folder_transfer_capabilities.png");
+    public static final ResourceReference IMAGE_WIZARD_FOLDER_TRANSFER_CAPABILITY_TYPE = 
+    		new PackageResourceReference(ImageManager.class, "wizard/dicom/folder_transfer_capability_type.png");
 
-        public static final ResourceReference IMAGE_WIZARD_FOLDER_PROXY_RULES = 
-                new PackageResourceReference(ImageManager.class, "wizard/proxy/folder_proxy_rules.png");
-        public static final ResourceReference IMAGE_WIZARD_FORWARD_RULE = 
-                new PackageResourceReference(ImageManager.class, "wizard/proxy/forward_rule.png");
-        public static final ResourceReference IMAGE_WIZARD_FORWARD_SCHEDULE = 
-                new PackageResourceReference(ImageManager.class, "wizard/proxy/forward_schedule.png");
-        public static final ResourceReference IMAGE_WIZARD_RETRY = 
-                new PackageResourceReference(ImageManager.class, "wizard/proxy/retry.png");
-        public static final ResourceReference IMAGE_WIZARD_COERCION = 
-                new PackageResourceReference(ImageManager.class, "wizard/proxy/coercion.png");
+    public static final ResourceReference IMAGE_WIZARD_FOLDER_HL7_APPLICATIONS = 
+    		new PackageResourceReference(ImageManager.class, "wizard/proxy/folder_hl7_applications.png");
+    public static final ResourceReference IMAGE_WIZARD_HL7_APPLICATION = 
+    		new PackageResourceReference(ImageManager.class, "wizard/proxy/hl7_application.png");
+    public static final ResourceReference IMAGE_WIZARD_FOLDER_PROXY_RULES = 
+    		new PackageResourceReference(ImageManager.class, "wizard/proxy/folder_proxy_rules.png");
+    public static final ResourceReference IMAGE_WIZARD_FORWARD_RULE = 
+    		new PackageResourceReference(ImageManager.class, "wizard/proxy/forward_rule.png");
+    public static final ResourceReference IMAGE_WIZARD_FORWARD_SCHEDULE = 
+    		new PackageResourceReference(ImageManager.class, "wizard/proxy/forward_schedule.png");
+    public static final ResourceReference IMAGE_WIZARD_RETRY = 
+    		new PackageResourceReference(ImageManager.class, "wizard/proxy/retry.png");
+    public static final ResourceReference IMAGE_WIZARD_COERCION = 
+    		new PackageResourceReference(ImageManager.class, "wizard/proxy/coercion.png");
 
-        public static final ResourceReference IMAGE_WIZARD_ECHO = 
-                new PackageResourceReference(ImageManager.class, "wizard/functions/echo.png");
-        public static final ResourceReference IMAGE_WIZARD_RELOAD = 
-                new PackageResourceReference(ImageManager.class, "wizard/functions/reload.png");
+    public static final ResourceReference IMAGE_WIZARD_ECHO = 
+    		new PackageResourceReference(ImageManager.class, "wizard/functions/echo.png");
+    public static final ResourceReference IMAGE_WIZARD_RUNNING = 
+    		new PackageResourceReference(ImageManager.class, "wizard/functions/running.png");
+    public static final ResourceReference IMAGE_WIZARD_NOT_RUNNING = 
+    		new PackageResourceReference(ImageManager.class, "wizard/functions/not_running.png");   
+    public static final ResourceReference IMAGE_WIZARD_RELOAD = 
+    		new PackageResourceReference(ImageManager.class, "wizard/functions/reload.png");
+    public static final ResourceReference IMAGE_WIZARD_RELOAD_WARNING = 
+    		new PackageResourceReference(ImageManager.class, "wizard/functions/reload_warning.png");
 }

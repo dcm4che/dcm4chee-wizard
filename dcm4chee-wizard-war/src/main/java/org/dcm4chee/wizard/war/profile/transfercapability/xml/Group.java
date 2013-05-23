@@ -55,7 +55,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-@SuppressWarnings("restriction")
 @XmlRootElement(name = "group")
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class Group implements Serializable {
@@ -84,7 +83,7 @@ public class Group implements Serializable {
 		this.transferCapabilityProfiles.clear();
 		if (transferCapabilityProfiles != null)
 			for (Profile profile : transferCapabilityProfiles)
-				this.transferCapabilityProfiles.put(profile.name, profile);
+				this.transferCapabilityProfiles.put(profile.SOPClass, profile);
 	}
 	
 	public Map<String,Profile> asMap() {

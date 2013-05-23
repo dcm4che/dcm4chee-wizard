@@ -1,4 +1,4 @@
-div.tree table { 
+div.tree table {
 	table-layout: auto;
 	border: thin; 
 	border-width: 1px; 
@@ -7,7 +7,7 @@ div.tree table {
 	width:100%; 
 	white-space: nowrap; 
 	background-color: #FFFFFF;
-	font-size: 12px; 
+	font-size: 12px;
 }
 
 div.tree table.left { width: 49%; float: left; margin-right: 2%; }
@@ -21,8 +21,6 @@ div.tree table tr td, div.tree table tr th {
 div.tree table tr.headers { 
 	background-color: #446666; 
 	color: white; 
-/*	width: 20px; 
-	height: 20px; */
 	text-align: left; 
 }
 
@@ -41,7 +39,10 @@ a.tree-junction-expanded {
 	background-image: url("../org.dcm4chee.icons.ImageManager/wizard/common/GREEN_collapse.png") !important;
 }
 
-span.tree-content {
+span.tree-content {}
+
+span.tree-label {
+	white-space: nowrap;
 }
 
 /* FOLDERS */
@@ -70,6 +71,22 @@ span.tree-content a:hover {}
 .transfer-capability .tree-folder-other {
 	background-position: 0px center !important;
 	background-image: url("../org.dcm4chee.icons.ImageManager/wizard/dicom/transfer_capability.png") !important;
+}
+
+.audit_logger .tree-folder-open, .audit_logger .tree-folder-closed, .audit_logger .tree-folder-other {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.icons.ImageManager/wizard/dicom/audit_logger.png") !important;
+}
+
+.audit_logger_INCOMPLETE .tree-folder-open, .audit_logger_INCOMPLETE .tree-folder-closed, .audit_logger_INCOMPLETE .tree-folder-other {
+	background-position: 0px center !important;
+
+	background-image: url("../org.dcm4chee.icons.ImageManager/wizard/dicom/audit_logger_INCOMPLETE.png") !important;
+}
+
+.hl7-application .tree-folder-open, .hl7-application .tree-folder-closed, .hl7-application .tree-folder-other {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.icons.ImageManager/wizard/proxy/hl7_application.png") !important;
 }
 
 .forward_rule .tree-folder-other, .forward_rule .tree-folder-open, .forward_rule .tree-folder-closed {
@@ -112,12 +129,22 @@ span.tree-content a:hover {}
 	background-image: url("../org.dcm4chee.icons.ImageManager/wizard/dicom/folder_transfer_capability_type.png") !important;
 }
 
+.folder_audit_loggers .tree-folder-other, .folder_audit_loggers .tree-folder-open, .folder_audit_loggers .tree-folder-closed {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.icons.ImageManager/wizard/dicom/folder_audit_loggers.png") !important;
+}
+
+.folder_hl7_applications .tree-folder-other, .folder_hl7_applications .tree-folder-open, .folder_hl7_applications .tree-folder-closed {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.icons.ImageManager/wizard/proxy/folder_hl7_applications.png") !important;
+}
+
 .folder_forward_rules .tree-folder-other, .folder_forward_rules .tree-folder-open, .folder_forward_rules .tree-folder-closed {
 	background-position: 0px center !important;
 	background-image: url("../org.dcm4chee.icons.ImageManager/wizard/proxy/folder_proxy_rules.png") !important;
 }
 
-.folder_forward_schedules .tree-folder-other, .folder_forward_schedules .tree-folder-open, .folder_forward_schedules .tree-folder-closed {
+.folder_forward_options .tree-folder-other, .folder_forward_options .tree-folder-open, .folder_forward_options .tree-folder-closed {
 	background-position: 0px center !important;
 	background-image: url("../org.dcm4chee.icons.ImageManager/wizard/proxy/folder_proxy_rules.png") !important;
 }

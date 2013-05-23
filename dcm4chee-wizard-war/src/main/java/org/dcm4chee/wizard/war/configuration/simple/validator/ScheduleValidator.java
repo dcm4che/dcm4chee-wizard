@@ -67,8 +67,12 @@ public class ScheduleValidator extends StringValidator {
         	testType = days;
         else if (type.equals(Type.HOURS)) 
         	testType = hours;
-        String regex = "^(" + testType + "{1,1}(\\-+" + testType + "+){0,1})(,(" + testType + "{1,1}(\\-+" + testType + "+){0,1}))*$";
-        if (!v.getValue().matches(regex))
-        	v.error(new ValidationError().addKey("ScheduleValidator.invalid"));
+        String regex = "^(" + testType + "{1,1}(\\-" + testType + "){0,1})(,(" + testType + "{1,1}(\\-" + testType + "){0,1}))*$";
+        if (!v.getValue().matches(regex)) {
+        	if (type.equals(Type.DAYS))
+        		v.error(new ValidationError().addKey("DaysScheduleValidator.invalid"));
+    		if (type.equals(Type.HOURS))
+    			v.error(new ValidationError().addKey("HoursScheduleValidator.invalid"));
+        }
     }
 }

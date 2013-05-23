@@ -9,6 +9,8 @@ import java.util.Map;
 
 import net.sf.json.JSONObject;
 
+import org.dcm4che.util.StringUtils;
+import org.dcm4chee.wizard.common.login.context.JBossAS7SystemProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,10 +23,17 @@ public class SopClassManager {
 	
 	private static void init() {
 		
-        String configPath = System.getProperty("dcm4chee-wizard.cfg.path", "conf/dcm4chee-wizard/");
-        File typesFile = new File(configPath + "transfer-capability-types.json");
+        String fn = System.getProperty("dcm4chee-wizard.cfg.path"); 
+        if (fn == null) { 
+            log.warn("Wizard config path not found! Not specified with System property 'dcm4chee-wizard.cfg.path'");
+            fn = JBossAS7SystemProperties.JBOSS_SERVER_CONFIG_DIR + "/dcm4chee-wizard/";
+            log.warn("Using default config path of: " + fn);
+        }
+        File typesFile = new File(StringUtils.replaceSystemProperties(fn) + "transfer-capability-types.json");
         if (!typesFile.isAbsolute())
-            typesFile = new File(System.getProperty("jboss.server.home.dir"), typesFile.getPath());
+        	typesFile = new File(
+            		JBossAS7SystemProperties.JBOSS_SERVER_BASE_DIR, 
+            		typesFile.getPath());
 
         sopClassTypeMap = new HashMap<String, String>();
         String line;

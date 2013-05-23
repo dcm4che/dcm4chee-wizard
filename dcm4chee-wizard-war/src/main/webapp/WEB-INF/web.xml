@@ -15,6 +15,18 @@
       <param-value>${config-class}</param-value>
     </init-param>
     <init-param>
+      <param-name>ldapPropertiesURL</param-name>
+      <param-value>file:${jboss.server.config.dir}/dcm4chee-wizard/ldap.properties</param-value>
+    </init-param>
+    <init-param>
+      <param-name>wizardWarName</param-name>
+      <param-value>dcm4chee-wizard-war-${version}-${project-classifier}.war</param-value>
+    </init-param>
+    <init-param>
+      <param-name>proxyJarName</param-name>
+      <param-value>dcm4chee-proxy-service-1.0.0-SNAPSHOT.jar</param-value>
+    </init-param>
+    <init-param>   
       <param-name>internalErrorPageClass</param-name>
       <param-value>org.dcm4chee.wizard.common.component.InternalErrorPage</param-value>
     </init-param>
@@ -31,17 +43,9 @@
       <param-value>DicomConfiguration</param-value>
     </init-param>
     <init-param>
-      <param-name>ConfigurationAETitle</param-name>
-      <param-value>MYAE</param-value>
-    </init-param>
-    <init-param>
       <param-name>CheckForChangesInterval</param-name>
 		<!-- given in seconds -->
-      <param-value>20</param-value>
-    </init-param>
-    <init-param>
-      <param-name>ReloadServiceEndpoint</param-name>
-      <param-value>http://localhost:8080/dcm4chee-wizard/config/reload</param-value>
+      <param-value></param-value>
     </init-param>
   </filter>
   <filter-mapping>

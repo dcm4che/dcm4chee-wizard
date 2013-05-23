@@ -12,7 +12,7 @@
      if (cookies != null) {
 	     int count = 0;
 	     for (int i = 0; i < cookies.length; i++) {
-	         if (cookies[i].getName().equals("WEB3LOCALE")) {
+	         if (cookies[i].getName().equals("WIZARDLOCALE")) {
 	             login.setLocale(cookies[i].getValue());
 	             count++;
 	             if (count==2)

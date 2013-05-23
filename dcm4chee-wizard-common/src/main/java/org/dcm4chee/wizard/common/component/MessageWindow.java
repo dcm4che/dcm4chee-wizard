@@ -61,7 +61,7 @@ public abstract class MessageWindow extends ModalWindow {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final ResourceReference baseCSS = new PackageResourceReference(ExtendedWebPage.class, "base-style.css");
+	private static final ResourceReference baseCSS = new PackageResourceReference(MainWebPage.class, "base-style.css");
 	
     public MessageWindow(String id, final IModel<?> message) {
 		super(id);

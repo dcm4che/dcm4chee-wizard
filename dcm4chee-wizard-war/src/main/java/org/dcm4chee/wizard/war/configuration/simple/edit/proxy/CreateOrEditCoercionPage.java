@@ -46,6 +46,7 @@ import java.util.List;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.ajax.markup.html.form.AjaxFallbackButton;
+import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxButton;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
@@ -53,6 +54,7 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
@@ -60,43 +62,57 @@ import org.apache.wicket.request.resource.CssResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.dcm4che.conf.api.AttributeCoercion;
 import org.dcm4che.conf.api.ConfigurationException;
+import org.dcm4che.net.ApplicationEntity;
 import org.dcm4che.net.Dimse;
 import org.dcm4che.net.TransferCapability.Role;
-import org.dcm4chee.proxy.conf.ProxyApplicationEntity;
+import org.dcm4chee.proxy.conf.ProxyAEExtension;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
-import org.dcm4chee.wizard.common.component.ExtendedWebPage;
-import org.dcm4chee.wizard.war.configuration.common.tree.ConfigTreeNode;
-import org.dcm4chee.wizard.war.configuration.common.tree.ConfigTreeProvider;
+import org.dcm4chee.wizard.common.component.MainWebPage;
+import org.dcm4chee.wizard.common.component.ModalWindowRuntimeException;
+import org.dcm4chee.wizard.common.component.secure.SecureSessionCheckPage;
+import org.dcm4chee.wizard.war.configuration.simple.model.basic.ApplicationEntityModel;
+import org.dcm4chee.wizard.war.configuration.simple.model.basic.StringArrayModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.CoercionModel;
-import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ProxyApplicationEntityModel;
+import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeNode;
+import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider;
+import org.dcm4chee.wizard.war.configuration.simple.validator.CoercionValidator;
 import org.dcm4chee.wizard.war.configuration.simple.validator.SOPClassValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wicketstuff.security.components.SecureWebPage;
 
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-public class CreateOrEditCoercionPage extends SecureWebPage {
+public class CreateOrEditCoercionPage extends SecureSessionCheckPage {
     
     private static final long serialVersionUID = 1L;
 
     private static Logger log = LoggerFactory.getLogger(CreateOrEditCoercionPage.class);
 
-    private static final ResourceReference baseCSS = new CssResourceReference(ExtendedWebPage.class, "base-style.css");
+    private static final ResourceReference baseCSS = new CssResourceReference(MainWebPage.class, "base-style.css");
     
     // mandatory
+    private Model<String> commonNameModel;
     private Model<Dimse> dimseModel;
     private Model<Role> transferRoleModel;
     private Model<String> labeledURIModel;
     
     // optional
     private Model<String> aeTitleModel;
-    private Model<String> sopClassModel;
+    private StringArrayModel sopClassesModel;
     
     public CreateOrEditCoercionPage(final ModalWindow window, final CoercionModel coercionModel, 
     		final ConfigTreeNode aeNode) {
     	super();
+
+    	ApplicationEntity applicationEntity = null;
+		try {
+			applicationEntity = ((ApplicationEntityModel) aeNode.getModel()).getApplicationEntity();
+		} catch (ConfigurationException ce) {
+			log.error(this.getClass().toString() + ": " + "Error modifying retry: " + ce.getMessage());
+            log.debug("Exception", ce);
+            throw new ModalWindowRuntimeException(ce.getLocalizedMessage());
+		}
 
         add(new WebMarkupContainer("create-coercion-title").setVisible(coercionModel == null));
         add(new WebMarkupContainer("edit-coercion-title").setVisible(coercionModel != null));
@@ -106,25 +122,35 @@ public class CreateOrEditCoercionPage extends SecureWebPage {
         form.setResourceIdPrefix("dicom.edit.coercion.");
         add(form);
 
+    	aeTitleModel = Model.of();
         if (coercionModel == null) {
+        	commonNameModel = Model.of();
             dimseModel = Model.of(org.dcm4che.net.Dimse.C_STORE_RQ);
             transferRoleModel = Model.of(org.dcm4che.net.TransferCapability.Role.SCP);
             labeledURIModel = Model.of();
-        	aeTitleModel = Model.of();
-        	sopClassModel = Model.of();
+        	sopClassesModel = new StringArrayModel(null);
         } else {
         	AttributeCoercion coercion = coercionModel.getCoercion();
-        	dimseModel = Model.of(coercion.getDimse());
+        	commonNameModel = Model.of(coercion.getCommonName());
+        	dimseModel = Model.of(coercion.getDIMSE());
         	transferRoleModel = Model.of(coercion.getRole());
         	labeledURIModel = Model.of(coercion.getURI());
-        	aeTitleModel = Model.of(coercion.getAETitle());
-			sopClassModel = Model.of(coercion.getSopClass());
+        	if (coercion.getAETitles() != null && coercion.getAETitles().length > 0)
+        		aeTitleModel = Model.of(coercion.getAETitles()[0]);
+			sopClassesModel = new StringArrayModel(coercion.getSOPClasses());
         }
         
+		form.add(new Label("commonName.label", new ResourceModel("dicom.edit.coercion.commonName.label")))
+		.add(new TextField<String>("commonName", commonNameModel).setRequired(true)
+				.add(new CoercionValidator(commonNameModel.getObject(), applicationEntity)));
+
         form.add(new Label("dimse.label", new ResourceModel("dicom.edit.coercion.dimse.label")));
         ArrayList<Dimse> dimseList = 
         		new ArrayList<Dimse>();
-        dimseList.addAll(Arrays.asList(Dimse.values())); 
+        dimseList.add(Dimse.C_STORE_RQ);
+        dimseList.add(Dimse.C_GET_RQ);
+        dimseList.add(Dimse.C_MOVE_RQ);
+        dimseList.add(Dimse.C_FIND_RQ);
         DropDownChoice<Dimse> dimseDropDown = 
         		new DropDownChoice<Dimse>("dimse", dimseModel, dimseList);
         form.add(dimseDropDown
@@ -156,15 +182,44 @@ public class CreateOrEditCoercionPage extends SecureWebPage {
 		} catch (ConfigurationException ce) {
 			log.error(this.getClass().toString() + ": " + "Error retrieving unique ae titles: " + ce.getMessage());
             log.debug("Exception", ce);
-            throw new RuntimeException(ce);
+            throw new ModalWindowRuntimeException(ce.getLocalizedMessage());
 		}
         Collections.sort(uniqueAETitles);
         
-        optionalContainer.add(new Label("aeTitle.label", new ResourceModel("dicom.edit.coercion.optional.aeTitle.label")))
-        .add(new DropDownChoice<String>("aeTitle", aeTitleModel, uniqueAETitles));
+		final DropDownChoice<String> aeTitleDropDownChoice = 
+				new DropDownChoice<String>("aeTitle", aeTitleModel, uniqueAETitles);
+		optionalContainer.add(new Label("aeTitle.label", new ResourceModel("dicom.edit.coercion.optional.aeTitle.label")))
+        .add(aeTitleDropDownChoice
+        		.setNullValid(true).setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true));
 
-        optionalContainer.add(new Label("sopClass.label", new ResourceModel("dicom.edit.coercion.optional.sopClass.label")))
-        .add(new TextField<String>("sopClass", sopClassModel)
+		final TextField<String> aeTitleTextField = 
+				new TextField<String>("aeTitle.freetext", aeTitleModel);
+		optionalContainer.add(aeTitleTextField
+				.setVisible(false).setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true));
+
+	    final Model<Boolean> toggleAETitleModel = Model.of(false);
+		if (coercionModel != null && aeTitleModel.getObject() != null 
+				&& !uniqueAETitles.contains(aeTitleModel.getObject())) {
+			toggleAETitleModel.setObject(true);
+			aeTitleTextField.setVisible(true);
+			aeTitleDropDownChoice.setVisible(false);
+		}
+
+        optionalContainer.add(new AjaxCheckBox("toggleAETitle", toggleAETitleModel) {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			protected void onUpdate(AjaxRequestTarget target) {
+				aeTitleDropDownChoice.setVisible(!toggleAETitleModel.getObject());
+				aeTitleTextField.setVisible(toggleAETitleModel.getObject());
+				target.add(aeTitleDropDownChoice);
+				target.add(aeTitleTextField);
+			}
+        });
+
+        optionalContainer.add(new Label("sopClasses.label", new ResourceModel("dicom.edit.coercion.optional.sopClasses.label")))
+        .add(new TextArea<String>("sopClasses", sopClassesModel)
         		.add(new SOPClassValidator()));
 
         form.add(new Label("toggleOptional.label", new ResourceModel("dicom.edit.toggleOptional.label")))
@@ -177,7 +232,7 @@ public class CreateOrEditCoercionPage extends SecureWebPage {
 			}
         });
 
-        form.add(new AjaxFallbackButton("submit", new ResourceModel("saveBtn"), form) {
+        form.add(new IndicatingAjaxButton("submit", new ResourceModel("saveBtn"), form) {
 
             private static final long serialVersionUID = 1L;
 
@@ -185,26 +240,31 @@ public class CreateOrEditCoercionPage extends SecureWebPage {
             protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
                 try {
                 	AttributeCoercion coercion = 
-                			new AttributeCoercion(sopClassModel.getObject(), 
+                			new AttributeCoercion(commonNameModel.getObject(), 
+                					sopClassesModel.getArray(), 
                 					dimseModel.getObject(), 
                 					transferRoleModel.getObject(), 
-                					aeTitleModel.getObject(), 
+                					aeTitleModel.getObject() == null ? 
+                							null : new String[] {aeTitleModel.getObject()}, 
                 					labeledURIModel.getObject());
 
-                	ProxyApplicationEntity proxyApplicationEntity = 
-                			((ProxyApplicationEntityModel) aeNode.getModel()).getApplicationEntity();
+                	ProxyAEExtension proxyAEExtension = 
+                			((ApplicationEntityModel) aeNode.getModel()).getApplicationEntity()
+                			.getAEExtension(ProxyAEExtension.class);
 
             		if (coercionModel != null)
-            			proxyApplicationEntity.getAttributeCoercions()
+            			proxyAEExtension.getAttributeCoercions()
             				.remove(coercionModel.getCoercion());
-            		proxyApplicationEntity.getAttributeCoercions().add(coercion);
+            		proxyAEExtension.getAttributeCoercions().add(coercion);
 
-            		ConfigTreeProvider.get().mergeDevice(proxyApplicationEntity.getDevice());
+            		ConfigTreeProvider.get().mergeDevice(
+            				((ApplicationEntityModel) aeNode.getModel()).getApplicationEntity().getDevice());
                     window.close(target);
                 } catch (Exception e) {
         			log.error(this.getClass().toString() + ": " + "Error modifying coercion: " + e.getMessage());
                     log.debug("Exception", e);
-                    throw new RuntimeException(e);
+//                    throw new ModalWindowRuntimeException(e.getLocalizedMessage());
+                    e.printStackTrace();
                 }
             }
 

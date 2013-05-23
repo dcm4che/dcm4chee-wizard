@@ -43,7 +43,7 @@ import java.util.HashMap;
 import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.ValidationError;
 import org.apache.wicket.validation.validator.StringValidator;
-import org.dcm4chee.proxy.conf.Schedule;
+import org.dcm4chee.proxy.conf.ForwardOption;
 
 /**
  * @author Robert David <robert.david@agfa.com>
@@ -53,16 +53,16 @@ public class DestinationAETitleValidator extends StringValidator {
     private static final long serialVersionUID = 1L;
 
     private String ignore;
-    private HashMap<String,Schedule> forwardSchedules;
+    private HashMap<String, ForwardOption> forwardOptions;
     
-    public DestinationAETitleValidator(String ignore, HashMap<String,Schedule> forwardSchedules) {
+    public DestinationAETitleValidator(String ignore, HashMap<String,ForwardOption> forwardOptions) {
     	this.ignore = ignore;
-    	this.forwardSchedules = forwardSchedules;
+    	this.forwardOptions = forwardOptions;
     }
 
     @Override
     public void validate(IValidatable<String> aeTitle) {
-    	if (!aeTitle.getValue().equals(ignore) && forwardSchedules.containsKey(aeTitle.getValue()))
+    	if (!aeTitle.getValue().equals(ignore) && forwardOptions.containsKey(aeTitle.getValue()))
     		aeTitle.error(new ValidationError()
     			.addKey("DestinationAETitleValidator.alreadyExists"));
     }

@@ -87,7 +87,7 @@ public abstract class ConfirmationWindow<T> extends ModalWindow {
     
     public MessageWindowPanel messageWindowPanel;
     
-    private static final ResourceReference baseCSS = new PackageResourceReference(ExtendedWebPage.class, "base-style.css");
+    private static final ResourceReference baseCSS = new PackageResourceReference(MainWebPage.class, "base-style.css");
 	
     public ConfirmationWindow(String id, String titleResource) {
         this(id);

@@ -56,7 +56,7 @@ import org.apache.wicket.markup.html.list.PropertyListView;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
-import org.dcm4chee.wizard.war.configuration.model.source.DicomConfigurationSourceModel;
+import org.dcm4chee.wizard.war.configuration.simple.model.source.DicomConfigurationSourceModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

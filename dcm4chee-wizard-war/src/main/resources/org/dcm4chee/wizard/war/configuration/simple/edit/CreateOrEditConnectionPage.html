@@ -24,6 +24,10 @@
 						<span class="edit-desc" wicket:id="hostname.label" />
 						<input class="edit-value" wicket:id="hostname" type="text" />
 					</div>
+					<div class="edit-table-row">
+						<span class="edit-desc" wicket:id="port.label" />
+						<input class="edit-value" wicket:id="port" type="text" />
+					</div>
 					<div  class="edit-buttons">
 						<span class="edit-desc" wicket:id="toggleOptional.label" />
 						<input class="edit-value" wicket:id="toggleOptional" type="checkbox" />
@@ -38,24 +42,30 @@
 							<select class="edit-value" wicket:id="installed" />
 						</div>
 						<div class="edit-table-row">
-							<span class="edit-desc" wicket:id="port.label" />
-							<input class="edit-value" wicket:id="port" type="text" />
+							<span class="edit-desc" wicket:id="protocol.label" />
+							<select class="edit-value" wicket:id="protocol" />
 						</div>
-						<div class="edit-table-row" style="height: 100px;">
+						<div class="edit-table-row" style="height: 115px;">
+							<span class="edit-desc" wicket:id="tlsProtocol.label" />
+							<div class="edit-value" wicket:id="tlsProtocol" style="padding: 5px;">
+        						<input type="checkbox" />
+        					</div>
+						</div>
+						<div class="edit-table-row" style="height: 70px;">
 							<span class="edit-desc" wicket:id="tlsCipherSuites.label" />
-							<textarea rows="3" class="edit-value" wicket:id="tlsCipherSuites" />
-						</div>
-						<div class="edit-table-row">
-							<span class="edit-desc" wicket:id="httpProxy.label" />
-							<input class="edit-value" wicket:id="httpProxy" type="text" />
-						</div>
+							<div class="edit-value">
+								<select wicket:id="tlsCipherSuite1" /><br />
+								<select wicket:id="tlsCipherSuite2" /><br />
+								<select wicket:id="tlsCipherSuite3" /><br />
+							</div>
+					  	</div>
 						<div class="edit-table-row">
 							<span class="edit-desc" wicket:id="tlsNeedClientAuth.label" />
 							<input class="edit-value" wicket:id="tlsNeedClientAuth" type="checkbox" />
 						</div>
-						<div class="edit-table-row" style="height: 100px;">
-							<span class="edit-desc" wicket:id="tlsProtocol.label" />
-							<textarea rows="3" class="edit-value" wicket:id="tlsProtocol" />
+						<div class="edit-table-row">
+							<span class="edit-desc" wicket:id="httpProxy.label" />
+							<input class="edit-value" wicket:id="httpProxy" type="text" />
 						</div>
 						<div class="edit-table-row">
 							<span class="edit-desc" wicket:id="tcpBacklog.label" />

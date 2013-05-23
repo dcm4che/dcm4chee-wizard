@@ -7,6 +7,7 @@
       xsi:schemaLocation="http://www.w3.org/1999/xhtml
                           http://www.w3.org/2002/08/xhtml/xhtml1-strict.xsd">
 	<wicket:panel>
+		<div wicket:id="aboutWindow" />
 		<div class="module-selector" style="margin-top: 12px;">
 			<table class="tabpanel">
 				<tr wicket:id="tabs-container" class="tab-row">
@@ -34,7 +35,9 @@
 		            </td>
 		            <td>
 		                <div class="menu-item">
-		                    <img wicket:id="img_logo" alt="dcm4che.org" />
+			                <a href="#" wicket:id="aboutLink">
+			                    <img wicket:id="img_logo" alt="dcm4che.org" />
+			                </a>
 		                </div>
 		            </td>
 	            </tr>

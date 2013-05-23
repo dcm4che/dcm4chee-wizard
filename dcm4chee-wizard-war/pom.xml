@@ -5,142 +5,54 @@
   <parent>
     <groupId>org.dcm4chee</groupId>
     <artifactId>dcm4chee-wizard</artifactId>
-    <version>0.0.1</version>
+    <version>1.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>dcm4chee-wizard-war</artifactId>
   <packaging>war</packaging>
   <name>WAR for dcm4chee-wizard</name>
   <description></description>
   <properties>
-  	<wicket.version>6.2.0</wicket.version>
-  	<wicket.security.version>6.0.0</wicket.security.version>
-  	<dcm4chee.proxy.version>1.0.0-SNAPSHOT</dcm4chee.proxy.version>
-    <dcm4che.version>3.0.0</dcm4che.version>
+    <wicket.version>6.7.0</wicket.version>
+    <wicket.security.version>6.7.0</wicket.security.version>
+    <dcm4chee.proxy.version>1.0.0-SNAPSHOT</dcm4chee.proxy.version>
+    <dcm4che.version>3.0.2-SNAPSHOT</dcm4che.version>
     <device-name>dcm4chee-proxy</device-name>
   </properties>
   <profiles>
     <profile>
-      <id>prefs</id>
+      <id>standalone</id>
+      <properties>
+      	<project-classifier>standalone</project-classifier>
+        <profile.dependencies>org.jboss.logmanager,org.slf4j.impl,org.dcm4che.core,org.dcm4che.net,org.dcm4che.net-hl7,org.dcm4che.conf.api,org.dcm4che.conf.ldap,org.dcm4che.conf.ldap-hl7,org.dcm4che.conf.ldap-audit,org.dcm4che.conf.prefs,org.dcm4che.conf.prefs-hl7,org.dcm4che.conf.prefs-audit,org.dcm4che.emf</profile.dependencies>
+        <web.xml.path>webapp</web.xml.path>
+      </properties>
+    </profile>
+    <profile>
+      <id>proxy</id>
+      <properties>
+        <project-classifier>proxy</project-classifier>
+        <profile.dependencies>org.jboss.logmanager,org.slf4j.impl,org.dcm4che.core,org.dcm4che.net,org.dcm4che.net-hl7,org.dcm4che.conf.api,org.dcm4che.conf.ldap,org.dcm4che.conf.ldap-hl7,org.dcm4che.conf.ldap-audit,org.dcm4che.conf.prefs,org.dcm4che.conf.prefs-hl7,org.dcm4che.conf.prefs-audit,org.dcm4che.emf</profile.dependencies>
+        <web.xml.path>etc/proxy</web.xml.path>
+      </properties>
+    </profile>
+    <profile>
+      <id>jdbc</id>
+      <properties>
+        <project-classifier>jdbc</project-classifier>
+        <profile.dependencies>org.jboss.logmanager,org.slf4j.impl,org.dcm4che.core,org.dcm4che.net,org.dcm4che.net-hl7,org.dcm4che.conf.api,org.dcm4che.conf.ldap,org.dcm4che.conf.ldap-hl7,org.dcm4che.conf.ldap-audit,org.dcm4che.conf.prefs,org.dcm4che.conf.prefs-hl7,org.dcm4che.conf.prefs-audit,org.dcm4che.emf,deployment.dcm4che-jdbc-prefs-ejb-1.0.0.jar</profile.dependencies>
+        <web.xml.path>webapp</web.xml.path>
+      </properties>
+    </profile>
+    <profile>
+      <id>jdbc-proxy</id>
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <config-class>org.dcm4che.conf.prefs.PreferencesDicomConfiguration</config-class>
-        <project-classifier>prefs</project-classifier>
-        <profile.dependencies>org.jboss.logmanager,org.slf4j.impl,org.dcm4che.core,org.dcm4che.net,org.dcm4che.conf.api,org.dcm4che.conf.prefs</profile.dependencies>
+        <project-classifier>jdbc-proxy</project-classifier>
+        <profile.dependencies>org.jboss.logmanager,org.slf4j.impl,org.dcm4che.core,org.dcm4che.net,org.dcm4che.net-hl7,org.dcm4che.conf.api,org.dcm4che.conf.ldap,org.dcm4che.conf.ldap-hl7,org.dcm4che.conf.ldap-audit,org.dcm4che.conf.prefs,org.dcm4che.conf.prefs-hl7,org.dcm4che.conf.prefs-audit,org.dcm4che.emf,deployment.dcm4che-jdbc-prefs-ejb-1.0.0.jar</profile.dependencies>
+        <web.xml.path>etc/proxy</web.xml.path>
       </properties>
-      <dependencies>
-        <dependency>
-          <artifactId>dcm4che-conf-prefs</artifactId>
-          <groupId>org.dcm4che</groupId>
-          <version>${dcm4che.version}</version>
-          <scope>provided</scope>
-        </dependency>
-      </dependencies>
-    </profile>
-    <profile>
-      <id>prefs-jdbc</id>
-      <properties>
-        <config-class>org.dcm4chee.proxy.conf.prefs.PreferencesProxyConfiguration</config-class>
-        <project-classifier>prefs-jdbc</project-classifier>
-        <profile.dependencies>org.jboss.logmanager,org.slf4j.impl,org.dcm4che.core,org.dcm4che.net,org.dcm4che.conf.api,org.dcm4che.conf.prefs,deployment.dcm4che-jdbc-prefs-1.0.0-SNAPSHOT.jar</profile.dependencies>
-		<web.xml.path>webapp</web.xml.path>
-      </properties>
-      <dependencies>
-        <dependency>
-          <artifactId>dcm4che-conf-prefs</artifactId>
-          <groupId>org.dcm4che</groupId>
-          <version>${dcm4che.version}</version>
-          <scope>provided</scope>
-        </dependency>
-      </dependencies>
-    </profile>
-    <profile>
-      <id>prefs-jdbc-proxy</id>
-      <properties>
-        <config-class>org.dcm4chee.proxy.conf.prefs.PreferencesProxyConfiguration</config-class>
-        <project-classifier>prefs-jdbc-proxy</project-classifier>
-        <profile.dependencies>org.jboss.logmanager,org.slf4j.impl,org.dcm4che.core,org.dcm4che.net,org.dcm4che.conf.api,org.dcm4che.conf.prefs,deployment.dcm4che-jdbc-prefs-1.0.0-SNAPSHOT.jar</profile.dependencies>
-		<web.xml.path>etc/proxy</web.xml.path>
-      </properties>
-      <dependencies>
-        <dependency>
-          <artifactId>dcm4che-conf-prefs</artifactId>
-          <groupId>org.dcm4che</groupId>
-          <version>${dcm4che.version}</version>
-          <scope>provided</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.jboss.jbossas</groupId>
-          <artifactId>jboss-as-resteasy</artifactId>
-          <version>6.1.0.Final</version>
-          <scope>provided</scope>
-        </dependency>
-      </dependencies>
-      <build>
-        <finalName>dcm4chee-wizard-war-${version}-${project-classifier}</finalName>
-        <testResources>
-          <testResource>
-            <directory>src/test/resources</directory>
-            <filtering>true</filtering>
-          </testResource>
-        </testResources>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <configuration>
-              <source>1.6</source>
-              <target>1.6</target>
-            </configuration>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-war-plugin</artifactId>
-            <version>2.2</version>
-            <configuration>
-              <archive>
-                <manifestEntries>
-                  <Dependencies>${profile.dependencies}</Dependencies>
-                </manifestEntries>
-              </archive>
-              <webResources>
-                <webResource>
-                  <directory>${basedir}/src/main/${web.xml.path}/WEB-INF</directory>
-                  <includes>
-                    <include>**/*</include>
-                  </includes>
-                  <targetPath>WEB-INF</targetPath>
-                  <filtering>true</filtering>
-                </webResource>
-                <webResource>
-                  <directory>${basedir}/src/main/etc</directory>
-                  <includes>
-                    <include>transferCapabilities.xml</include>
-                  </includes>
-                  <targetPath>WEB-INF</targetPath>
-                </webResource>
-              </webResources>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>ldap</id>
-      <properties>
-        <config-class>org.dcm4che.conf.ldap.ExtendedLdapDicomConfiguration</config-class>
-        <project-classifier>ldap</project-classifier>
-        <profile.dependencies>org.jboss.logmanager,org.slf4j.impl,org.dcm4che.core,org.dcm4che.net,org.dcm4che.conf.api,org.dcm4che.conf.ldap</profile.dependencies>
-      </properties>
-      <dependencies>
-        <dependency>
-          <artifactId>dcm4che-conf-ldap</artifactId>
-          <groupId>org.dcm4che</groupId>
-          <version>${dcm4che.version}</version>
-          <scope>provided</scope>
-        </dependency>
-      </dependencies>
     </profile>
   </profiles>
   <dependencies>
@@ -158,6 +70,54 @@
       <groupId>org.dcm4che</groupId>
       <artifactId>dcm4che-core</artifactId>
       <version>${dcm4che.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.dcm4che</groupId>
+      <artifactId>dcm4che-net</artifactId>
+      <version>${dcm4che.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.dcm4che</groupId>
+      <artifactId>dcm4che-net-hl7</artifactId>
+      <version>${dcm4che.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.dcm4che</groupId>
+      <artifactId>dcm4che-conf-ldap-audit</artifactId>
+      <version>${dcm4che.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.dcm4che</groupId>
+      <artifactId>dcm4che-conf-prefs-audit</artifactId>
+      <version>${dcm4che.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.dcm4che</groupId>
+      <artifactId>dcm4che-conf-api-hl7</artifactId>
+      <version>${dcm4che.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.dcm4che</groupId>
+      <artifactId>dcm4che-conf-ldap-hl7</artifactId>
+      <version>${dcm4che.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.dcm4che</groupId>
+      <artifactId>dcm4che-conf-prefs-hl7</artifactId>
+      <version>${dcm4che.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.jbossas</groupId>
+      <artifactId>jboss-as-resteasy</artifactId>
+      <version>6.1.0.Final</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -212,6 +172,12 @@
       <version>2.4</version>
       <classifier>jdk15</classifier>
     </dependency>
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>catalina</artifactId>
+      <version>6.0.13</version>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
   <build>
     <finalName>dcm4chee-wizard-war-${version}-${project-classifier}</finalName>
@@ -236,15 +202,19 @@
         <version>2.2</version>
         <configuration>
           <archive>
+            <manifest>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+            </manifest>
             <manifestEntries>
               <Dependencies>${profile.dependencies}</Dependencies>
+              <Implementation-Build>${buildNumber}</Implementation-Build>
             </manifestEntries>
           </archive>
           <webResources>
             <webResource>
-              <directory>${basedir}/src/main/webapp/WEB-INF</directory>
+              <directory>${basedir}/src/main/${web.xml.path}/WEB-INF</directory>
               <includes>
-                <include>web.xml</include>
+                <include>**/*</include>
               </includes>
               <targetPath>WEB-INF</targetPath>
               <filtering>true</filtering>
@@ -260,6 +230,27 @@
           </webResources>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>buildnumber-maven-plugin</artifactId>
+        <version>1.1</version>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <goals>
+              <goal>create</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <doCheck>false</doCheck>
+          <doUpdate>false</doUpdate>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
+  <scm>
+    <connection>scm:git:http://github.com/dcm4che/dcm4chee-wizard.git</connection>
+    <url>scm:git:http://github.com/dcm4che/dcm4chee-wizard.git</url>
+  </scm>
 </project>

@@ -46,6 +46,7 @@ import java.util.List;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.ajax.markup.html.form.AjaxFallbackButton;
+import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxButton;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
@@ -65,29 +66,30 @@ import org.dcm4che.net.ApplicationEntity;
 import org.dcm4che.net.TransferCapability;
 import org.dcm4che.net.TransferCapability.Role;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
-import org.dcm4chee.wizard.common.component.ExtendedWebPage;
+import org.dcm4chee.wizard.common.component.MainWebPage;
+import org.dcm4chee.wizard.common.component.ModalWindowRuntimeException;
+import org.dcm4chee.wizard.common.component.secure.SecureSessionCheckPage;
 import org.dcm4chee.wizard.war.WizardApplication;
-import org.dcm4chee.wizard.war.configuration.common.tree.ConfigTreeNode;
-import org.dcm4chee.wizard.war.configuration.common.tree.ConfigTreeProvider;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ApplicationEntityModel;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.TransferCapabilityModel;
+import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeNode;
+import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider;
 import org.dcm4chee.wizard.war.profile.transfercapability.xml.Group;
 import org.dcm4chee.wizard.war.profile.transfercapability.xml.Profile;
 import org.dcm4chee.wizard.war.profile.transfercapability.xml.Root;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wicketstuff.security.components.SecureWebPage;
 
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-public class ApplyTransferCapabilityProfilePage extends SecureWebPage {
+public class ApplyTransferCapabilityProfilePage extends SecureSessionCheckPage {
     
     private static final long serialVersionUID = 1L;
 
     private static Logger log = LoggerFactory.getLogger(ApplyTransferCapabilityProfilePage.class);
 
-    private static final ResourceReference baseCSS = new CssResourceReference(ExtendedWebPage.class, "base-style.css");
+    private static final ResourceReference baseCSS = new CssResourceReference(MainWebPage.class, "base-style.css");
     
     // mandatory
     private Model<Boolean> scuModel;
@@ -200,7 +202,7 @@ public class ApplyTransferCapabilityProfilePage extends SecureWebPage {
             }
         });
 
-        form.add(new AjaxFallbackButton("submit", new ResourceModel("saveBtn"), form) {
+        form.add(new IndicatingAjaxButton("submit", new ResourceModel("saveBtn"), form) {
 
             private static final long serialVersionUID = 1L;
 
@@ -210,16 +212,19 @@ public class ApplyTransferCapabilityProfilePage extends SecureWebPage {
                 	Profile profile = profileModel.getObject();               	
                 	if (scuModel.getObject()) {
     					TransferCapability transferCapability =
-    							new TransferCapability(profile.name, 
+    							new TransferCapability(Role.SCU + " " + profile.name, 
     									profile.SOPClass,
     									Role.SCU, 
     									profile.dicomTransferSyntaxes.toArray(new String[0]));
     					applicationEntity.addTransferCapability(transferCapability);
                 	}
-                	
+
+                	if (scuModel.getObject() || scpModel.getObject())
+                		ConfigTreeProvider.get().mergeDevice(applicationEntity.getDevice());
+
                 	if (scpModel.getObject()) {
     					TransferCapability transferCapability =
-    							new TransferCapability(profile.name, 
+    							new TransferCapability(Role.SCP + " " + profile.name, 
     									profile.SOPClass,
     									Role.SCP, 
     									profile.dicomTransferSyntaxes.toArray(new String[0]));
@@ -233,7 +238,7 @@ public class ApplyTransferCapabilityProfilePage extends SecureWebPage {
                 } catch (Exception e) {
         			log.error(this.getClass().toString() + ": " + "Error modifying transfer capability: " + e.getMessage());
                     log.debug("Exception", e);
-                    throw new RuntimeException(e);
+                    throw new ModalWindowRuntimeException(e.getLocalizedMessage());
                 }
             }
 

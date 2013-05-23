@@ -58,6 +58,8 @@ public class BaseNameValidator extends StringValidator {
 			new LdapName("dn=" + deviceName.getValue());
 		} catch (InvalidNameException e) {
 			deviceName.error(new ValidationError().addKey("BaseNameValidator.invalid"));
-		}			
+		} catch (IllegalArgumentException e) {
+			deviceName.error(new ValidationError().addKey("BaseNameValidator.invalid"));
+		}
     }
 }

@@ -47,7 +47,7 @@ import org.dcm4chee.wizard.war.configuration.simple.model.ConfigNodeModel;
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-public class ConnectionModel implements Serializable, ConfigNodeModel {
+public class ConnectionModel extends ConfigNodeModel implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -72,5 +72,10 @@ public class ConnectionModel implements Serializable, ConfigNodeModel {
 
 	public Connection getConnection() throws ConfigurationException {
 		return connection;
-	}	
+	}
+
+	@Override
+	public String getDescription() {
+		return toolTip;
+	}
 }

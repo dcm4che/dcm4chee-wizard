@@ -44,13 +44,18 @@ import org.apache.wicket.ajax.markup.html.AjaxFallbackLink;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.ResourceModel;
+import org.apache.wicket.protocol.http.PageExpiredException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-public class InternalErrorPage extends ExtendedWebPage {
+public class InternalErrorPage extends MainWebPage {
     
 	private static final long serialVersionUID = 1L;
+	
+	private static Logger log = LoggerFactory.getLogger(InternalErrorPage.class);
 	
 	private Throwable throwable;
     private Page page;
@@ -69,18 +74,38 @@ public class InternalErrorPage extends ExtendedWebPage {
     protected void onBeforeRender() {
         super.onBeforeRender();
         
-        add(new Label("exception-message", new ResourceModel("application.internal_error.throwable").wrapOnAssignment(this).getObject() + (this.throwable == null ? "" : throwable.getLocalizedMessage())));
-        add(new Label("exception-page", new ResourceModel("application.internal_error.page").wrapOnAssignment(this).getObject() + (this.page == null ? "" : Page.class.toString())));
-        add( new AjaxFallbackLink<Object>("home") {
+		if (throwable != null) {
+			if (throwable instanceof PageExpiredException)
+				log.warn("Page expired", throwable);
+			else
+				log.error("Critical error", throwable);
+		}
+
+        ((MainWebPage) getPage()).getModuleSelectorPanel().setVisible(false);
+
+        if (throwable instanceof PageExpiredException) {
+	        add(new Label("message-type", new ResourceModel("application.page_expired_error").wrapOnAssignment(this).getObject() + (this.throwable == null ? "" : throwable.getLocalizedMessage())));
+	        add(new Label("message-content", new ResourceModel("application.page_expired_error.message").wrapOnAssignment(this).getObject())
+	        	.setEscapeModelStrings(false));      	
+        } else {
+	        add(new Label("message-type", new ResourceModel("application.internal_error").wrapOnAssignment(this).getObject() + (this.throwable == null ? "" : throwable.getLocalizedMessage())));
+	        add(new Label("message-content", new ResourceModel("application.internal_error.throwable").wrapOnAssignment(this).getObject() + (this.throwable == null ? "" : throwable.getLocalizedMessage())));
+        }
+        add(new Label("originating-page", new ResourceModel("application.internal_error.page").wrapOnAssignment(this).getObject() + (this.page == null ? "" : Page.class.toString())));
+
+        add(new AjaxFallbackLink<Object>("home") {
 
             private static final long serialVersionUID = 1L;
 
             @Override
             public void onClick(AjaxRequestTarget target) {
-                if (page != null && "0".equals(page.getId()))
-                    setResponsePage(getApplication().getHomePage());
-                else
-                    ModalWindow.closeCurrent(target);
+
+				if (throwable != null && 
+						(throwable instanceof ModalWindowRuntimeException
+						|| throwable instanceof PageExpiredException))
+				    ModalWindow.closeCurrent(target);
+				else
+					setResponsePage(getApplication().getHomePage());
             }
         }.add(new Label("homeLabel", new ResourceModel("application.home"))));
     }

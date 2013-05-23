@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/2002/08/xhtml/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.w3.org/1999/xhtml
+                          http://www.w3.org/2002/08/xhtml/xhtml1-strict.xsd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+	<div class="msgWindow">
+		<div wicket:id="create-audit-logger-title" class="edit-title">
+			<wicket:message key="dicom.edit.audit-logger.createAuditLogger.title" />
+		</div>
+		<div wicket:id="edit-audit-logger-title" class="edit-title">
+			<wicket:message key="dicom.edit.audit-logger.editAuditLogger.title" />
+		</div>
+		<form wicket:id="form">
+			<div class="edit-table-panel">
+				<div class="edit-content">
+					<div class="edit-table-row">
+						<span class="edit-desc" wicket:id="applicationName.label" /> 
+						<input class="edit-value" wicket:id="applicationName" type="text" />
+					</div>
+					<div class="edit-table-row" style="height: 100%;" >
+						<wicket:message key="dicom.edit.audit-logger.connections.title" />
+					</div>	
+					<div class="edit-table-row" style="height: 100%;" >
+						<div class="edit-desc" />
+						<div class="edit-value" style="border: 0px; margin: 6px 2px 6px;">
+							<div wicket:id="connections" />
+							<br />
+						</div>
+					</div>
+					<div class="edit-table-row">
+						<span class="edit-desc" wicket:id="arrDeviceName.label" />
+						<select class="edit-value" wicket:id="arrDeviceName" />
+					</div>
+					<div  class="edit-buttons">
+						<span class="edit-desc" wicket:id="toggleOptional.label" />
+						<input class="edit-value" wicket:id="toggleOptional" type="checkbox" />
+					</div>
+					<div wicket:id="optional">
+						<div class="edit-table-row">
+							<span class="edit-desc" wicket:id="auditEnterpriseSiteID.label" />
+							<input class="edit-value" wicket:id="auditEnterpriseSiteID" type="text" />
+						</div>
+						<div class="edit-table-row">
+							<span class="edit-desc" wicket:id="auditSourceID.label" />
+							<input class="edit-value" wicket:id="auditSourceID" type="text" />
+						</div>
+						<div class="edit-table-row" style="height: 45px;">
+							<span class="edit-desc" wicket:id="auditSourceTypeCodes.label" />
+							<textarea class="edit-value" wicket:id="auditSourceTypeCodes" rows="1" />
+						</div>
+						<div class="edit-table-row">
+							<span class="edit-desc" wicket:id="encoding.label" />
+							<input class="edit-value" wicket:id="encoding" type="text" />
+						</div>
+						<div class="edit-table-row">
+							<span class="edit-desc" wicket:id="facility.label" />
+							<select class="edit-value" wicket:id="facility" />
+						</div>
+						<div class="edit-table-row">
+							<span class="edit-desc" wicket:id="formatXML.label" />
+							<input class="edit-value" wicket:id="formatXML" type="checkbox" />
+						</div>
+						<div class="edit-table-row">
+							<span class="edit-desc" wicket:id="includeBOM.label" />
+							<input class="edit-value" wicket:id="includeBOM" type="checkbox" />
+						</div>
+						<div class="edit-table-row">
+							<span class="edit-desc" wicket:id="installed.label" />
+							<select class="edit-value" wicket:id="installed" />
+						</div>
+						<div class="edit-table-row">
+							<span class="edit-desc" wicket:id="messageID.label" />
+							<input class="edit-value" wicket:id="messageID" type="text" />
+						</div>
+						<div class="edit-table-row">
+							<span class="edit-desc" wicket:id="schemaURI.label" />
+							<input class="edit-value" wicket:id="schemaURI" type="text" />
+						</div>
+						<div class="edit-table-row">
+							<span class="edit-desc" wicket:id="timestampInUTC.label" />
+							<input class="edit-value" wicket:id="timestampInUTC" type="checkbox" />
+						</div>
+						<div class="edit-table-row">
+							<span class="edit-desc" wicket:id="majorFailureSeverity.label" />
+							<select class="edit-value" wicket:id="majorFailureSeverity" />
+						</div>
+						<div class="edit-table-row">
+							<span class="edit-desc" wicket:id="minorFailureSeverity.label" />
+							<select class="edit-value" wicket:id="minorFailureSeverity" />
+						</div>
+						<div class="edit-table-row">
+							<span class="edit-desc" wicket:id="seriousFailureSeverity.label" />
+							<select class="edit-value" wicket:id="seriousFailureSeverity" />
+						</div>
+						<div class="edit-table-row">
+							<span class="edit-desc" wicket:id="successSeverity.label" />
+							<select class="edit-value" wicket:id="successSeverity" />
+						</div>
+					</div>
+					<div class="edit-buttons">
+						<input type="submit" wicket:id="submit" />
+						<input type="submit" wicket:id="cancel" />
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</body>
+</html>
