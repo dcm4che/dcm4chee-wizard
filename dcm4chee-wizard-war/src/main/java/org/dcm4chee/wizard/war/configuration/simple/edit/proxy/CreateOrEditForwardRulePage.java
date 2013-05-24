@@ -302,7 +302,8 @@ public class CreateOrEditForwardRulePage extends SecureSessionCheckPage {
 
             		forwardRule.setCommonName(commonNameModel.getObject());
             		forwardRule.setDestinationURIs(Arrays.asList(destinationURIModel.getArray()));
-            		forwardRule.setCallingAETs(Arrays.asList(new String[] {callingAETitleModel.getObject()}));
+            		forwardRule.setCallingAETs(callingAETitleModel.getObject() == null ? 
+            				new ArrayList<String>() : Arrays.asList(new String[] {callingAETitleModel.getObject()}));
             		forwardRule.setDimse(new ArrayList<Dimse>(dimsesModel.getDimses()));
             		forwardRule.setExclusiveUseDefinedTC(exclusiveUseDefinedTCModel.getObject());
             		Schedule schedule = new Schedule();

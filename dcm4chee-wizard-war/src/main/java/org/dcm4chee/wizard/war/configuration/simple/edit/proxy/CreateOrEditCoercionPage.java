@@ -245,7 +245,7 @@ public class CreateOrEditCoercionPage extends SecureSessionCheckPage {
                 					dimseModel.getObject(), 
                 					transferRoleModel.getObject(), 
                 					aeTitleModel.getObject() == null ? 
-                							null : new String[] {aeTitleModel.getObject()}, 
+                							new String[0] : new String[] {aeTitleModel.getObject()}, 
                 					labeledURIModel.getObject());
 
                 	ProxyAEExtension proxyAEExtension = 
