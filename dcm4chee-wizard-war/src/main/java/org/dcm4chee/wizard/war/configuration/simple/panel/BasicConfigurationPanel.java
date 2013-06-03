@@ -626,8 +626,6 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
 												+ ". <br />" 
 												+ connection.getResponseMessage());
 
-								resultMessage = new StringResourceModel("dicom.reload.message.success", this, null);
-										
 								((WizardApplication) getApplication()).getDicomConfigurationManager()
 									.clearReload(rowModel.getObject().getName());
 							} catch (Exception e) {
@@ -635,22 +633,22 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
 								resultMessage = 
 										new StringResourceModel("dicom.reload.message.failed", this, null, 
 												new Object[] {e.getMessage()});
-							}
 			            	
-			            	reloadMessage = new MessageWindow("reload-message", resultMessage) {
-
-			                    private static final long serialVersionUID = 1L;
-
-			                    @Override
-			                    public void onOk(AjaxRequestTarget target) {
-			                    }
-			                };
-
-			                BasicConfigurationPanel.this.addOrReplace(reloadMessage);
-			                reloadMessage
-			                	.setWindowClosedCallback(windowClosedCallback)
-			                	.show(target);
-			                target.add(form);
+				            	reloadMessage = new MessageWindow("reload-message", resultMessage) {
+	
+				                    private static final long serialVersionUID = 1L;
+	
+				                    @Override
+				                    public void onOk(AjaxRequestTarget target) {
+				                    }
+				                };
+	
+				                BasicConfigurationPanel.this.addOrReplace(reloadMessage);
+				                reloadMessage
+				                	.setWindowClosedCallback(windowClosedCallback)
+				                	.show(target);
+				                target.add(form);			                
+							}
 			            }
 				};
 				cellItem.add(new LinkPanel(componentId, ajaxLink, ImageManager.IMAGE_WIZARD_RELOAD, reloadMessage))
