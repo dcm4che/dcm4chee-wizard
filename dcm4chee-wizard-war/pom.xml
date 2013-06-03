@@ -11,13 +11,6 @@
   <packaging>war</packaging>
   <name>WAR for dcm4chee-wizard</name>
   <description></description>
-  <properties>
-    <wicket.version>6.7.0</wicket.version>
-    <wicket.security.version>6.7.0</wicket.security.version>
-    <dcm4chee.proxy.version>1.0.0-SNAPSHOT</dcm4chee.proxy.version>
-    <dcm4che.version>3.0.2-SNAPSHOT</dcm4che.version>
-    <device-name>dcm4chee-proxy</device-name>
-  </properties>
   <profiles>
     <profile>
       <id>standalone</id>

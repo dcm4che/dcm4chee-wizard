@@ -7,13 +7,9 @@
     <artifactId>dcm4chee-wizard</artifactId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
-  <groupId>org.dcm4chee</groupId>
   <artifactId>dcm4chee-wizard-icons</artifactId>
   <packaging>jar</packaging>
   <description>Icon theme for dcm4chee web application modules</description>
-  <properties>
-  	<wicket.version>6.7.0</wicket.version>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>org.apache.wicket</groupId>

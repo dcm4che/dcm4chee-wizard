@@ -10,12 +10,6 @@
   <artifactId>dcm4chee-wizard-common</artifactId>
   <packaging>jar</packaging>
   <description>Common web components for dcm4chee-wizard</description>
-  <properties>
-  	<wicket.version>6.7.0</wicket.version>
-  	<wicket.security.version>6.7.0</wicket.security.version>
-    <dcm4chee.proxy.version>1.0.0-SNAPSHOT</dcm4chee.proxy.version>
-    <dcm4che.version>3.0.2-SNAPSHOT</dcm4che.version>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>org.apache.wicket</groupId>
