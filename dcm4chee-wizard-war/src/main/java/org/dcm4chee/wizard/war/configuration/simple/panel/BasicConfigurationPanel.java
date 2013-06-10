@@ -47,6 +47,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
@@ -625,7 +626,7 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
 												+ connection.getResponseCode() 
 												+ ". <br />" 
 												+ connection.getResponseMessage());
-
+								
 								((WizardApplication) getApplication()).getDicomConfigurationManager()
 									.clearReload(rowModel.getObject().getName());
 							} catch (Exception e) {
@@ -646,9 +647,9 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
 				                BasicConfigurationPanel.this.addOrReplace(reloadMessage);
 				                reloadMessage
 				                	.setWindowClosedCallback(windowClosedCallback)
-				                	.show(target);
-				                target.add(form);			                
+				                	.show(target);	                
 							}
+			                target.add(form);
 			            }
 				};
 				cellItem.add(new LinkPanel(componentId, ajaxLink, ImageManager.IMAGE_WIZARD_RELOAD, reloadMessage))
