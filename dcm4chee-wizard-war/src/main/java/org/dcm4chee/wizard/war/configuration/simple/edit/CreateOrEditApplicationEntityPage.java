@@ -349,9 +349,6 @@ public class CreateOrEditApplicationEntityPage extends SecureSessionCheckPage {
 		optionalProxyContainer.add(proxyPIXConsumerApplicationTextField
 				.setVisible(false).setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true));
 
-log.error("proxyPIXConsumerApplicationModel: " + proxyPIXConsumerApplicationModel);
-log.error("hl7Applications: " + hl7Applications);
-
 		final Model<Boolean> toggleProxyPIXConsumerApplicationModel = Model.of(false);
 		if (aeModel != null && proxyPIXConsumerApplicationModel.getObject() != null 
 				&& !hl7Applications.contains(proxyPIXConsumerApplicationModel.getObject())) {
@@ -373,11 +370,39 @@ log.error("hl7Applications: " + hl7Applications);
 			}
         });
 
+        final DropDownChoice<String> remotePIXManagerApplicationDropDownChoice = 
+        		new DropDownChoice<String>("remotePIXManagerApplication", remotePIXManagerApplicationModel, hl7Applications);
         optionalProxyContainer.add(new Label("remotePIXManagerApplication.label", 
         		new ResourceModel("dicom.edit.applicationEntity.optional.proxy.remotePIXManagerApplication.label")))
-        .add(new DropDownChoice<String>("remotePIXManagerApplication", remotePIXManagerApplicationModel, 
-        		hl7Applications).setNullValid(true));
+        .add(remotePIXManagerApplicationDropDownChoice
+        		.setNullValid(true).setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true));
 
+		final TextField<String> remotePIXManagerApplicationTextField = 
+				new TextField<String>("remotePIXManagerApplication.freetext", remotePIXManagerApplicationModel);
+		optionalProxyContainer.add(remotePIXManagerApplicationTextField
+				.setVisible(false).setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true));
+
+		final Model<Boolean> toggleRemotePIXManagerApplicationModel = Model.of(false);
+		if (aeModel != null && remotePIXManagerApplicationModel.getObject() != null 
+				&& !hl7Applications.contains(remotePIXManagerApplicationModel.getObject())) {
+			toggleRemotePIXManagerApplicationModel.setObject(true);
+			remotePIXManagerApplicationTextField.setVisible(true);
+			remotePIXManagerApplicationDropDownChoice.setVisible(false);
+		}
+
+        optionalProxyContainer.add(new AjaxCheckBox("toggleRemotePIXManagerApplication", toggleRemotePIXManagerApplicationModel) {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			protected void onUpdate(AjaxRequestTarget target) {
+				remotePIXManagerApplicationDropDownChoice.setVisible(!toggleRemotePIXManagerApplicationModel.getObject());
+				remotePIXManagerApplicationTextField.setVisible(toggleRemotePIXManagerApplicationModel.getObject());
+				target.add(remotePIXManagerApplicationDropDownChoice);
+				target.add(remotePIXManagerApplicationTextField);
+			}
+        });
+        
         List<String> uniqueAETitles = null;
         if (isProxy)
 			try {
@@ -389,9 +414,38 @@ log.error("hl7Applications: " + hl7Applications);
 	            throw new ModalWindowRuntimeException(ce.getLocalizedMessage());
 			}
         
-        optionalProxyContainer.add(new Label("fallbackDestinationAET.label", new ResourceModel("dicom.edit.applicationEntity.optional.proxy.fallbackDestinationAET.label")))
-        .add(new DropDownChoice<String>("fallbackDestinationAET", fallbackDestinationAETModel, uniqueAETitles)
-        		.setNullValid(true));
+        final DropDownChoice<String> fallbackDestinationAETDropDownChoice = 
+        		new DropDownChoice<String>("fallbackDestinationAET", fallbackDestinationAETModel, uniqueAETitles);        
+        optionalProxyContainer.add(new Label("fallbackDestinationAET.label", 
+        		new ResourceModel("dicom.edit.applicationEntity.optional.proxy.fallbackDestinationAET.label")))
+        .add(fallbackDestinationAETDropDownChoice
+        		.setNullValid(true).setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true));
+
+		final TextField<String> fallbackDestinationAETTextField = 
+				new TextField<String>("fallbackDestinationAET.freetext", fallbackDestinationAETModel);
+		optionalProxyContainer.add(fallbackDestinationAETTextField
+				.setVisible(false).setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true));
+
+		final Model<Boolean> toggleFallbackDestinationAETModel = Model.of(false);
+		if (aeModel != null && fallbackDestinationAETModel.getObject() != null 
+				&& !uniqueAETitles.contains(fallbackDestinationAETModel.getObject())) {
+			toggleFallbackDestinationAETModel.setObject(true);
+			fallbackDestinationAETTextField.setVisible(true);
+			fallbackDestinationAETDropDownChoice.setVisible(false);
+		}
+
+        optionalProxyContainer.add(new AjaxCheckBox("toggleFallbackDestinationAET", toggleFallbackDestinationAETModel) {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			protected void onUpdate(AjaxRequestTarget target) {
+				fallbackDestinationAETDropDownChoice.setVisible(!toggleFallbackDestinationAETModel.getObject());
+				fallbackDestinationAETTextField.setVisible(toggleFallbackDestinationAETModel.getObject());
+				target.add(fallbackDestinationAETDropDownChoice);
+				target.add(fallbackDestinationAETTextField);
+			}
+        });
 
         form.add(new Label("toggleOptional.label", new ResourceModel("dicom.edit.toggleOptional.label")))
         .add(new AjaxCheckBox("toggleOptional", new Model<Boolean>()) {
