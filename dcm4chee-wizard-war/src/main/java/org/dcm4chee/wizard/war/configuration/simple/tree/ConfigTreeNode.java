@@ -114,7 +114,9 @@ public class ConfigTreeNode implements Serializable, Comparable<ConfigTreeNode> 
 	}
 
 	public String getName() {
-		return nameResource == null ? name == null ? "" : name : nameResource.getObject();
+		return nameResource == null ? 
+				name == null ? "" : name 
+						: nameResource.getObject() == null ? "" : nameResource.getObject();
 	}
 
 	public TreeNodeType getNodeType() {
