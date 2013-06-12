@@ -267,7 +267,7 @@ public class CreateOrEditAuditLoggerPage extends SecureSessionCheckPage {
 
         optionalContainer.add(new Label("auditEnterpriseSiteID.label", 
         		new ResourceModel("dicom.edit.audit-logger.optional.auditEnterpriseSiteID.label")))
-        .add(new TextArea<String>("auditEnterpriseSiteID", auditEnterpriseSiteIDModel));
+        .add(new TextField<String>("auditEnterpriseSiteID", auditEnterpriseSiteIDModel));
      
         optionalContainer.add(new Label("auditSourceID.label", 
         		new ResourceModel("dicom.edit.audit-logger.optional.auditSourceID.label")))
