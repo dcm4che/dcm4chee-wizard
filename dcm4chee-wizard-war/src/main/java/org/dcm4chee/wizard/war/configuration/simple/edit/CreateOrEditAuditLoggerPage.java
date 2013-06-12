@@ -82,6 +82,7 @@ import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeNode;
 import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider;
 import org.dcm4chee.wizard.war.configuration.simple.validator.ConnectionProtocolValidator;
 import org.dcm4chee.wizard.war.configuration.simple.validator.ConnectionReferenceValidator;
+import org.dcm4chee.wizard.war.configuration.simple.validator.DeviceListValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -137,7 +138,8 @@ public class CreateOrEditAuditLoggerPage extends SecureSessionCheckPage {
         installedRendererChoices.add(new ResourceModel("dicom.installed.false.text").wrapOnAssignment(this).getObject());        
 
         ArrayList<ConnectionModel> connectionReferences = new ArrayList<ConnectionModel>();
-        
+        List<String> deviceList = null;
+
         try {
 	        connectionReferencesModel = new Model<ArrayList<ConnectionModel>>();
 	        connectionReferencesModel.setObject(new ArrayList<ConnectionModel>());
@@ -149,10 +151,14 @@ public class CreateOrEditAuditLoggerPage extends SecureSessionCheckPage {
 					connectionReferencesModel.getObject().add(connectionReference);
 			}
 
+			deviceList = 
+					((WizardApplication) getApplication()).getDicomConfigurationManager().listDevices();
+			Collections.sort(deviceList);
+
+        	arrDeviceNameModel = Model.of();
 	        if (auditLoggerModel == null) {
 	        	applicationNameModel = Model.of();
 	        	auditEnterpriseSiteIDModel = Model.of();
-	        	arrDeviceNameModel = Model.of();
 	        	auditSourceIDModel = Model.of();
 	        	auditSourceTypeCodesModel = new StringArrayModel(null);
 	        	encodingModel = Model.of("UTF-8");
@@ -171,7 +177,9 @@ public class CreateOrEditAuditLoggerPage extends SecureSessionCheckPage {
 	        	AuditLogger auditLogger = auditLoggerModel.getAuditLogger();
 	        	applicationNameModel = Model.of(auditLogger.getApplicationName());
 	        	auditEnterpriseSiteIDModel = Model.of(auditLogger.getAuditEnterpriseSiteID());
-	        	arrDeviceNameModel = Model.of(auditLogger.getAuditRecordRepositoryDevice().getDeviceName());
+	        	if (auditLogger.getAuditRecordRepositoryDevice() != null)
+	        		arrDeviceNameModel = Model.of(auditLogger.getAuditRecordRepositoryDevice().getDeviceName());        	
+				Collections.sort(deviceList);
 	        	auditSourceIDModel = Model.of(auditLogger.getAuditSourceID());
 	        	auditSourceTypeCodesModel = new StringArrayModel(auditLogger.getAuditSourceTypeCodes());
 	        	encodingModel = Model.of(auditLogger.getEncoding());
@@ -226,22 +234,20 @@ public class CreateOrEditAuditLoggerPage extends SecureSessionCheckPage {
         		}).add(new ConnectionReferenceValidator())
         		.add(new ConnectionProtocolValidator(Connection.Protocol.SYSLOG_TLS, Connection.Protocol.SYSLOG_UDP)));
 
-        List<String> deviceList = null;
-        try {
-			deviceList = 
-					((WizardApplication) getApplication()).getDicomConfigurationManager().listDevices();		
-			Collections.sort(deviceList);
-	    } catch (Exception e) {
-			log.error(this.getClass().toString() + ": " + "Error modifying HL7 application: " + e.getMessage());
-			log.debug("Exception", e);
-			throw new ModalWindowRuntimeException(e.getLocalizedMessage());
-	    }
+        DeviceListValidator deviceListValidator = null;
+		if (arrDeviceNameModel.getObject() != null && !deviceList.contains(arrDeviceNameModel.getObject())) {
+			deviceList.add(0, arrDeviceNameModel.getObject());
+			deviceListValidator = new DeviceListValidator();
+		}
 
-        form.add(new Label("arrDeviceName.label", new ResourceModel("dicom.edit.audit-logger.arrDeviceName.label")))
-        .add(new DropDownChoice<String>("arrDeviceName", arrDeviceNameModel, deviceList)
+        DropDownChoice<String> arrDeviceNameDropDownChoice;
+		form.add(new Label("arrDeviceName.label", new ResourceModel("dicom.edit.audit-logger.arrDeviceName.label")))
+        .add((arrDeviceNameDropDownChoice = new DropDownChoice<String>("arrDeviceName", arrDeviceNameModel, deviceList))
         		.setNullValid(false).setRequired(true));
         if (arrDeviceNameModel.getObject() == null)
         	arrDeviceNameModel.setObject(deviceList.get(0));
+        if (deviceListValidator != null)
+        	arrDeviceNameDropDownChoice.add(deviceListValidator);
 
         final WebMarkupContainer optionalContainer = new WebMarkupContainer("optional");
         form.add(optionalContainer
@@ -346,6 +352,7 @@ public class CreateOrEditAuditLoggerPage extends SecureSessionCheckPage {
                 			if (connectionReference.getConnection().getHostname().equals(connection.getHostname())
                     				&& connectionReference.getConnection().getPort() == connection.getPort())
                 				auditLogger.addConnection(connection);
+
                 	auditLogger.setAuditRecordRepositoryDevice(((WizardApplication) getApplication())
                 			.getDicomConfigurationManager().getDicomConfiguration().findDevice(arrDeviceNameModel.getObject()));
 

@@ -274,7 +274,7 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode,Stri
 		getDicomConfigurationManager().resetDevice(node.getName());
 	}
 
-	private DicomConfigurationManager getDicomConfigurationManager() {
+	public static DicomConfigurationManager getDicomConfigurationManager() {
 		return ((WizardApplication) Application.get()).getDicomConfigurationManager();
 	}
 
@@ -313,7 +313,7 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode,Stri
 	}
 
 	public ApplicationEntity getApplicationEntity(String aet) throws ConfigurationException {
-		return this.getDicomConfigurationManager().getApplicationEntity(aet);
+		return getDicomConfigurationManager().getApplicationEntity(aet);
 	}
 	
 	private void addDeviceSubnodes(ConfigTreeNode deviceNode) throws ConfigurationException {
