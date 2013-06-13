@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <%@ page import='java.net.InetAddress' %>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org">
-    <jsp:useBean id="login" scope="request" class="org.dcm4chee.web.common.login.LoginResources" />
+    <jsp:useBean id="login" scope="request" class="org.dcm4chee.wizard.common.login.LoginResources" />
     <% 
      String nodeInfo = System.getProperty("dcm4che.archive.nodename", InetAddress.getLocalHost().getHostName() );
      Cookie[] cookies = request.getCookies();
@@ -33,7 +33,7 @@
     <head>
 	    <title>${login.browser_title} (<%= nodeInfo %>)</title>
 	    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <link rel="stylesheet" type="text/css" href="wicket/resource/org.dcm4chee.web.common.base.BaseWicketPage/base-style.css" />
+        <link rel="stylesheet" type="text/css" href="wicket/resource/org.dcm4chee.wizard.common.component.MainWebPage/base-style.css" />
     </head>
     <body onload="<%= focus %>">
         <div class="tabpanel">
@@ -43,7 +43,7 @@
 		            </ul>
                 </div>
 		        <div class="tab-logo" style="float: right; margin-top: 15px; height: 43px; padding-right: 15px; padding-left: 15px;">
-		           <img alt="dcm4che.org" src="wicket/resource/org.dcm4chee.web.common.base.BaseWicketPage/images/logo.gif" /><br/>
+		           <img alt="dcm4che.org" src="wicket/resource/org.dcm4chee.wizard.common.component.MainWebPage/images/logo.gif" /><br/>
 		        </div>
 	       </div>
 	       <div class="module-panel"></div>
