@@ -164,6 +164,8 @@ public class CreateOrEditApplicationEntityPage extends SecureSessionCheckPage {
 			}
 			
 			proxyPIXConsumerApplicationModel = Model.of();
+			remotePIXManagerApplicationModel = Model.of();
+			fallbackDestinationAETModel = Model.of();
 			if (aeModel == null) {
 		        aeTitleModel = Model.of();
 		        associationAcceptorModel = Model.of();
@@ -180,10 +182,7 @@ public class CreateOrEditApplicationEntityPage extends SecureSessionCheckPage {
 				calledAETitlesModel = new StringArrayModel(null);
 				callingAETitlesModel = new StringArrayModel(null);
 				supportedCharacterSetsModel = new StringArrayModel(null);
-				vendorDataModel = Model.of("size 0");
-				
-				remotePIXManagerApplicationModel = Model.of();
-				fallbackDestinationAETModel = Model.of();
+				vendorDataModel = Model.of("size 0");				
 			} else {
 				ProxyAEExtension proxyAEExtension = aeModel.getApplicationEntity().getAEExtension(ProxyAEExtension.class);
 				
