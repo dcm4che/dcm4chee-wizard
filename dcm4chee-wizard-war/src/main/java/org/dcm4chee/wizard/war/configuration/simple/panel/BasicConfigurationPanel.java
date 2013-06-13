@@ -622,7 +622,7 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
 								connection.setRequestMethod("GET");
 
 								int responseCode = connection.getResponseCode();
-								if (responseCode < 201 || responseCode >= 300)
+								if (responseCode < 200 || responseCode >= 300)
 										throw new Exception("Expected response 2xx, but was " 
 												+ connection.getResponseCode() 
 												+ ". <br />" 
