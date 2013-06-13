@@ -621,8 +621,9 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
 										new URL(connectedDeviceUrl + (connectedDeviceUrl.endsWith("/") ? "restart" : "/restart")).openConnection();
 								connection.setRequestMethod("GET");
 
-								if (connection.getResponseCode() != 204)
-										throw new Exception("Expected response 204, but was " 
+								int responseCode = connection.getResponseCode();
+								if (responseCode < 201 || responseCode >= 300)
+										throw new Exception("Expected response 2xx, but was " 
 												+ connection.getResponseCode() 
 												+ ". <br />" 
 												+ connection.getResponseMessage());
@@ -634,7 +635,7 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
 								resultMessage = 
 										new StringResourceModel("dicom.reload.message.failed", this, null, 
 												new Object[] {e.getMessage()});
-			            	
+
 				            	reloadMessage = new MessageWindow("reload-message", resultMessage) {
 	
 				                    private static final long serialVersionUID = 1L;
@@ -643,11 +644,11 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
 				                    public void onOk(AjaxRequestTarget target) {
 				                    }
 				                };
-	
+				                
 				                BasicConfigurationPanel.this.addOrReplace(reloadMessage);
 				                reloadMessage
 				                	.setWindowClosedCallback(windowClosedCallback)
-				                	.show(target);	                
+				                	.show(target);
 							}
 			                target.add(form);
 			            }
@@ -1141,8 +1142,9 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
 				new URL(statusServiceEndpoint + (statusServiceEndpoint.endsWith("/") ? "running" : "/running")).openConnection();
 		connection.setRequestMethod("GET");
 
-		if (connection.getResponseCode() != 200)
-				throw new Exception("Expected response 200, but was " 
+		int responseCode = connection.getResponseCode();
+		if (responseCode < 200 || responseCode >= 300)
+				throw new Exception("Expected response 2xx, but was " 
 						+ connection.getResponseCode() 
 						+ "." 
 						+ connection.getResponseMessage());
