@@ -114,6 +114,15 @@
 			<role-name>*</role-name>
 		</auth-constraint>
 	</security-constraint>
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Static resources for proxy services
+            </web-resource-name>
+            <url-pattern>/proxy-application/*
+            </url-pattern>
+            <http-method>GET</http-method>
+        </web-resource-collection>
+    </security-constraint>
 	<login-config>
 		<auth-method>FORM</auth-method>
 		<realm-name>dcm4chee</realm-name>
