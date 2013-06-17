@@ -109,10 +109,17 @@ public abstract class MessageWindow extends ModalWindow {
                 	onOk(target);
                 	close(target);
                 }
+                @Override
+                public boolean isVisible() {
+                    return false;
+                }
+
             };
             okBtn.add(new MaskingAjaxCallDecorator());
             add(okBtn.add(new Label("okLabel", new ResourceModel("okBtn")))
-            		.setOutputMarkupId(true));
+                    .setOutputMarkupId(true)
+                    .setOutputMarkupPlaceholderTag(true));
+            this.setOutputMarkupId(true);
         }
 		
 	    @Override
