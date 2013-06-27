@@ -48,12 +48,11 @@ import org.apache.wicket.resource.loader.ClassStringResourceLoader;
 import org.apache.wicket.resource.loader.PackageStringResourceLoader;
 import org.dcm4chee.wizard.common.component.MainWebPage;
 import org.dcm4chee.wizard.common.component.ModuleSelectorPanel;
-import org.wicketstuff.security.components.SecureWebPage;
 
 /**
  * @author Robert David <robert.david@agfa.com>
  */
-public class SecureMainWebPage extends SecureWebPage {
+public class SecureMainWebPage extends SecureSessionCheckPage {
 
 	private static final long serialVersionUID = 1L;
 
