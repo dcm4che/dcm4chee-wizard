@@ -620,10 +620,11 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
 								connection = (HttpURLConnection) 
 										new URL(connectedDeviceUrl + (connectedDeviceUrl.endsWith("/") ? "restart" : "/restart")).openConnection();
 								connection.setRequestMethod("GET");
-
 								int responseCode = connection.getResponseCode();
-								if (responseCode < 200 || responseCode >= 300)
-										throw new Exception("Expected response 2xx, but was " 
+								connection.disconnect();
+								
+								if (responseCode != 204)
+										throw new Exception("Expected response 204, but was " 
 												+ connection.getResponseCode() 
 												+ ". <br />" 
 												+ connection.getResponseMessage());
@@ -1142,9 +1143,8 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
 				new URL(statusServiceEndpoint + (statusServiceEndpoint.endsWith("/") ? "running" : "/running")).openConnection();
 		connection.setRequestMethod("GET");
 
-		int responseCode = connection.getResponseCode();
-		if (responseCode < 200 || responseCode >= 300)
-				throw new Exception("Expected response 2xx, but was " 
+		if (connection.getResponseCode() != 200)
+				throw new Exception("Expected response 200, but was " 
 						+ connection.getResponseCode() 
 						+ "." 
 						+ connection.getResponseMessage());
