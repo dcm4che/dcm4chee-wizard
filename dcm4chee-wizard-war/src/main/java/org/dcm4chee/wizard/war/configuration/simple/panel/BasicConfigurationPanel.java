@@ -47,7 +47,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
@@ -98,10 +97,10 @@ import org.dcm4chee.icons.ImageManager;
 import org.dcm4chee.icons.behaviours.ImageSizeBehaviour;
 import org.dcm4chee.proxy.conf.ProxyAEExtension;
 import org.dcm4chee.wizard.common.behavior.TooltipBehavior;
-import org.dcm4chee.wizard.common.component.ConfirmationWindow;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
-import org.dcm4chee.wizard.common.component.MessageWindow;
 import org.dcm4chee.wizard.common.component.ModalWindowRuntimeException;
+import org.dcm4chee.wizard.common.component.secure.ConfirmationWindow;
+import org.dcm4chee.wizard.common.component.secure.MessageWindow;
 import org.dcm4chee.wizard.war.WizardApplication;
 import org.dcm4chee.wizard.war.common.component.DicomConfigurationPanel;
 import org.dcm4chee.wizard.war.configuration.simple.edit.ApplyTransferCapabilityProfilePage;
@@ -299,7 +298,7 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
 				}
             }
         };
-        add(removeConfirmation.setInitialHeight(150)
+        add(removeConfirmation.setInitialHeight(200)
         		.setWindowClosedCallback(windowClosedCallback));
 
         refreshMessage = new MessageWindow("refresh-message", 

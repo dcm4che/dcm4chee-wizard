@@ -36,7 +36,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.wizard.common.component;
+package org.dcm4chee.wizard.common.component.secure;
 
 import org.apache.wicket.Page;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -44,15 +44,13 @@ import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxLink;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
-import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
-import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
-import org.dcm4chee.wizard.common.behavior.MaskingAjaxCallDecorator;
+import org.dcm4chee.wizard.common.component.MainWebPage;
 
 /**
  * @author Robert David <robert.david@agfa.com>
@@ -81,15 +79,15 @@ public abstract class MessageWindow extends ModalWindow {
 
     public abstract void onOk(AjaxRequestTarget target);
     
-    public class MessagePage extends WebPage {
+    public class MessagePage extends SecureSessionCheckPage {
     	
 		private static final long serialVersionUID = 1L;
 
 		private IndicatingAjaxLink<Object> okBtn;
 		
 		public MessagePage(final IModel<?> message) {
-			
-            add(new Label("msg", new AbstractReadOnlyModel<Object>() {
+
+			add(new Label("msg", new AbstractReadOnlyModel<Object>() {
 
                 private static final long serialVersionUID = 1L;
 
@@ -109,13 +107,7 @@ public abstract class MessageWindow extends ModalWindow {
                 	onOk(target);
                 	close(target);
                 }
-                @Override
-                public boolean isVisible() {
-                    return false;
-                }
-
             };
-            okBtn.add(new MaskingAjaxCallDecorator());
             add(okBtn.add(new Label("okLabel", new ResourceModel("okBtn")))
                     .setOutputMarkupId(true)
                     .setOutputMarkupPlaceholderTag(true));
@@ -124,8 +116,7 @@ public abstract class MessageWindow extends ModalWindow {
 		
 	    @Override
 	    public void renderHead(IHeaderResponse response) {
-	    	response.render(OnDomReadyHeaderItem
-	    			.forScript("Wicket.Window.unloadConfirmation = false"));
+	    	super.renderHead(response);
 	    	if (MessageWindow.baseCSS != null)
 	    		response.render(CssHeaderItem.forReference(MessageWindow.baseCSS));
 	    }

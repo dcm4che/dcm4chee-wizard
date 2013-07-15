@@ -34,8 +34,14 @@
 	    <title>${login.browser_title} (<%= nodeInfo %>)</title>
 	    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <link rel="stylesheet" type="text/css" href="wicket/resource/org.dcm4chee.wizard.common.component.MainWebPage/base-style.css" />
+		<script>
+			function login_init() {
+				<%= focus %>
+				window.setTimeout("location.reload(true);", ${pageContext.session.maxInactiveInterval * 1000 - 5000});
+			}
+		</script>
     </head>
-    <body onload="<%= focus %>">
+    <body onload="login_init();">
         <div class="tabpanel">
             <div class="module-selector">
                 <div class="tab-row">

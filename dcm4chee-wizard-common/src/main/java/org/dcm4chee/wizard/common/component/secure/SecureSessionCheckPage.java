@@ -50,9 +50,13 @@ public class SecureSessionCheckPage extends SecureWebPage {
 
 	private static final long serialVersionUID = 1L;
 
+	private static final JavaScriptResourceReference reloadExpired = 
+			new JavaScriptResourceReference(SecureSessionCheckPage.class, "reload-expired.js");
+
 	@Override
     public void renderHead(IHeaderResponse response) {
-    	response.render(JavaScriptHeaderItem.forReference(
-    			new JavaScriptResourceReference(SecureSessionCheckPage.class, "reload-page.js")));
+		super.renderHead(response);
+    	if (SecureSessionCheckPage.reloadExpired != null)
+    		response.render(JavaScriptHeaderItem.forReference(reloadExpired));
     }
 }

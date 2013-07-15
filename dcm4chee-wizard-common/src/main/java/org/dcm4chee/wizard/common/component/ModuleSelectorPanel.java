@@ -66,6 +66,7 @@ import org.apache.wicket.request.http.WebRequest;
 import org.apache.wicket.request.http.WebResponse;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.dcm4chee.wizard.common.behavior.TooltipBehavior;
+import org.dcm4chee.wizard.common.component.secure.ConfirmationWindow;
 import org.dcm4chee.wizard.common.component.secure.SecureAjaxTabbedPanel;
 import org.dcm4chee.wizard.common.login.secure.SecureSession;
 import org.wicketstuff.security.swarm.SwarmWebApplication;

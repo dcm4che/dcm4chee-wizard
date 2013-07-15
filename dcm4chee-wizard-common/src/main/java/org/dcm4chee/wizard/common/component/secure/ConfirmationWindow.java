@@ -36,19 +36,15 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.wizard.common.component;
+package org.dcm4chee.wizard.common.component.secure;
 
 import org.apache.wicket.Page;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
-import org.apache.wicket.behavior.Behavior;
 import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxLink;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
-import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
-import org.apache.wicket.markup.html.IHeaderContributor;
-import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.AbstractReadOnlyModel;
@@ -57,7 +53,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
-import org.dcm4chee.wizard.common.behavior.MaskingAjaxCallDecorator;
+import org.dcm4chee.wizard.common.component.MainWebPage;
 
 /**
  * @author Franz Willer <franz.willer@gmail.com>
@@ -85,7 +81,7 @@ public abstract class ConfirmationWindow<T> extends ModalWindow {
     private boolean showCancel = false;
     private int state = UNCONFIRMED;
     
-    public MessageWindowPanel messageWindowPanel;
+    public ConfirmationPanel messageWindowPanel;
     
     private static final ResourceReference baseCSS = new PackageResourceReference(MainWebPage.class, "base-style.css");
 	
@@ -131,20 +127,19 @@ public abstract class ConfirmationWindow<T> extends ModalWindow {
         setInitialWidth(400);
         setInitialHeight(300);
         
-        messageWindowPanel = new MessageWindowPanel("panel");
+        messageWindowPanel = new ConfirmationPanel("panel");
         
         setPageCreator(new ModalWindow.PageCreator() {
             
             private static final long serialVersionUID = 1L;
               
             public Page createPage() {
-                return new ConfirmPage();
+                return new ConfirmationPage();
             }
         });
-        add(new DisableDefaultConfirmBehavior());
     }
 
-    public abstract void onConfirmation(AjaxRequestTarget target, T userObject);
+    public void onConfirmation(AjaxRequestTarget target, T userObject) {};
     public void onDecline(AjaxRequestTarget target, T userObject) {}
     public void onCancel(AjaxRequestTarget target, T userObject) {}
     public void onOk(AjaxRequestTarget target) {}
@@ -192,22 +187,23 @@ public abstract class ConfirmationWindow<T> extends ModalWindow {
         return state;
     }
 
-    public class ConfirmPage extends WebPage {
+    public class ConfirmationPage extends SecureSessionCheckPage {
     	
 		private static final long serialVersionUID = 1L;
 
-		public ConfirmPage() {
+		public ConfirmationPage() {
             add(messageWindowPanel);
         }
 		
 	    @Override
 	    public void renderHead(IHeaderResponse response) {
+	    	super.renderHead(response);
 	    	if (ConfirmationWindow.baseCSS != null)
 	    		response.render(CssHeaderItem.forReference(ConfirmationWindow.baseCSS));
 	    }
     }
     
-    public class MessageWindowPanel extends Panel {
+    public class ConfirmationPanel extends Panel {
         
         private static final long serialVersionUID = 1L;
         
@@ -220,12 +216,9 @@ public abstract class ConfirmationWindow<T> extends ModalWindow {
         
         private boolean logout = false;
         
-        public MessageWindowPanel(String id) {
+        public ConfirmationPanel(String id) {
             super(id);
             
-//            final MaskingAjaxCallBehavior macb = new MaskingAjaxCallBehavior();
-//            add(macb);
-
             add((msgLabel = new Label("msg", new AbstractReadOnlyModel<Object>() {
 
                 private static final long serialVersionUID = 1L;
@@ -265,7 +258,7 @@ public abstract class ConfirmationWindow<T> extends ModalWindow {
                         onConfirmation(target, userObject);
                         state = CONFIRMED;
                         if (hasStatus) {
-                            target.add(MessageWindowPanel.this);
+                            target.add(ConfirmationPanel.this);
                         } else {
                             msg = null;
                             close(target);
@@ -273,7 +266,7 @@ public abstract class ConfirmationWindow<T> extends ModalWindow {
                     } catch (Exception x) {
                         logout = true;
                         setStatus(new Model<String>(x.getMessage()));
-                        target.add(MessageWindowPanel.this);
+                        target.add(ConfirmationPanel.this);
                     }
                 }
                 
@@ -281,18 +274,7 @@ public abstract class ConfirmationWindow<T> extends ModalWindow {
                 public boolean isVisible() {
                     return !hasStatus;
                 }
-
-//                @Override
-//                protected IAjaxCallDecorator getAjaxCallDecorator() {
-//                    try {
-//                        return macb.getAjaxCallDecorator();
-//                    } catch (Exception e) {
-//                        log.error("Failed to get IAjaxCallDecorator", e);
-//                    }
-//                    return null;
-//                }
             };
-            confirmBtn.add(new MaskingAjaxCallDecorator());
             confirmBtn.add(new Label("confirmLabel", confirm));
             confirmBtn.setOutputMarkupId(true);
             add(confirmBtn);
@@ -306,7 +288,7 @@ public abstract class ConfirmationWindow<T> extends ModalWindow {
                     onDecline(target, userObject);
                     state = DECLINED;
                     if (hasStatus) {
-                        target.add(MessageWindowPanel.this);
+                        target.add(ConfirmationPanel.this);
                     } else {
                         msg = null;
                         close(target);
@@ -352,18 +334,7 @@ public abstract class ConfirmationWindow<T> extends ModalWindow {
                 public boolean isVisible() {
                     return hasStatus;
                 }
-                
-//                @Override
-//                protected IAjaxCallDecorator getAjaxCallDecorator() {
-//                    try {
-//                        return macb.getAjaxCallDecorator();
-//                    } catch (Exception e) {
-//                        log.error("Failed to get IAjaxCallDecorator", e);
-//                    }
-//                    return null;
-//                }
             });
-            okBtn.add(new MaskingAjaxCallDecorator());
             getOkBtn().add(new Label("okLabel", new ResourceModel("okBtn")));
             getOkBtn()
             .setOutputMarkupId(true)
@@ -392,17 +363,7 @@ public abstract class ConfirmationWindow<T> extends ModalWindow {
         }
     }
     
-    public MessageWindowPanel getMessageWindowPanel() {
+    public ConfirmationPanel getMessageWindowPanel() {
         return messageWindowPanel;
     }    
-
-    public class DisableDefaultConfirmBehavior extends Behavior implements IHeaderContributor {
-
-        private static final long serialVersionUID = 1L;
-
-        public void renderHead(IHeaderResponse response) {
-            response.render(OnDomReadyHeaderItem
-            		.forScript("Wicket.Window.unloadConfirmation = false"));
-        }
-    }
 }

@@ -48,9 +48,7 @@ import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.StringResourceModel;
 import org.apache.wicket.request.resource.CssResourceReference;
-import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
-import org.dcm4chee.wizard.common.component.MainWebPage;
 import org.dcm4chee.wizard.common.component.ModuleSelectorPanel;
 import org.dcm4chee.wizard.common.component.secure.SecureMainWebPage;
 import org.dcm4chee.wizard.common.component.secure.SecureSessionCheckPage;
@@ -68,7 +66,6 @@ public class MainPage extends SecureMainWebPage {
 	
 	protected static Logger log = LoggerFactory.getLogger(MainPage.class);
 
-	private static final ResourceReference baseCSS = new PackageResourceReference(MainWebPage.class, "base-style.css");
 	private static final ResourceReference tableTreeCSS = new CssResourceReference(MainPage.class, "table-tree.css");
 	
 	public MainPage() {
@@ -79,8 +76,6 @@ public class MainPage extends SecureMainWebPage {
     @Override
     public void renderHead(IHeaderResponse response) {
     	super.renderHead(response);
-    	if (MainPage.baseCSS != null) 
-    		response.render(CssHeaderItem.forReference(MainPage.baseCSS));
     	if (MainPage.tableTreeCSS != null)
     		response.render(CssHeaderItem.forReference(MainPage.tableTreeCSS));
     }

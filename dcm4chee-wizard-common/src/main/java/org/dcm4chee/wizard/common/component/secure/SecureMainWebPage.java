@@ -67,6 +67,7 @@ public class SecureMainWebPage extends SecureSessionCheckPage {
 
     @Override
     public void renderHead(IHeaderResponse response) {
+    	super.renderHead(response);
     	if (SecureMainWebPage.baseCSS != null)
     		response.render(CssHeaderItem.forReference(SecureMainWebPage.baseCSS));
     }
