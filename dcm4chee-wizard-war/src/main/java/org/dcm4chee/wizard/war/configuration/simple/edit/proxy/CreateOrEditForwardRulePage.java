@@ -47,8 +47,6 @@ import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.ajax.markup.html.form.AjaxFallbackButton;
 import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxButton;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
-import org.apache.wicket.markup.head.CssHeaderItem;
-import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.CheckBox;
@@ -58,8 +56,6 @@ import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
-import org.apache.wicket.request.resource.CssResourceReference;
-import org.apache.wicket.request.resource.ResourceReference;
 import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.net.ApplicationEntity;
 import org.dcm4che.net.Dimse;
@@ -67,7 +63,6 @@ import org.dcm4chee.proxy.conf.ForwardRule;
 import org.dcm4chee.proxy.conf.ProxyAEExtension;
 import org.dcm4chee.proxy.conf.Schedule;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
-import org.dcm4chee.wizard.common.component.MainWebPage;
 import org.dcm4chee.wizard.common.component.ModalWindowRuntimeException;
 import org.dcm4chee.wizard.common.component.secure.SecureSessionCheckPage;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ApplicationEntityModel;
@@ -76,8 +71,8 @@ import org.dcm4chee.wizard.war.configuration.simple.model.basic.StringArrayModel
 import org.dcm4chee.wizard.war.configuration.simple.model.proxy.ForwardRuleModel;
 import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeNode;
 import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider;
-import org.dcm4chee.wizard.war.configuration.simple.validator.ForwardRuleValidator;
 import org.dcm4chee.wizard.war.configuration.simple.validator.DestinationURIValidator;
+import org.dcm4chee.wizard.war.configuration.simple.validator.ForwardRuleValidator;
 import org.dcm4chee.wizard.war.configuration.simple.validator.SOPClassValidator;
 import org.dcm4chee.wizard.war.configuration.simple.validator.ScheduleValidator;
 import org.slf4j.Logger;
@@ -91,8 +86,6 @@ public class CreateOrEditForwardRulePage extends SecureSessionCheckPage {
     private static final long serialVersionUID = 1L;
 
     private static Logger log = LoggerFactory.getLogger(CreateOrEditForwardRulePage.class);
-
-    private static final ResourceReference baseCSS = new CssResourceReference(MainWebPage.class, "base-style.css");
 
     // mandatory
 	private Model<String> commonNameModel;
@@ -351,11 +344,5 @@ public class CreateOrEditForwardRulePage extends SecureSessionCheckPage {
 			@Override
 			protected void onError(AjaxRequestTarget arg0, Form<?> arg1) {
 			}}.setDefaultFormProcessing(false));
-    }
-
-    @Override
-    public void renderHead(IHeaderResponse response) {
-        if (CreateOrEditForwardRulePage.baseCSS != null)
-    		response.render(CssHeaderItem.forReference(CreateOrEditForwardRulePage.baseCSS));
     }
  }

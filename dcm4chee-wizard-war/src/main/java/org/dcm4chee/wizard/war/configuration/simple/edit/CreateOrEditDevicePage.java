@@ -48,8 +48,6 @@ import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxButton;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
-import org.apache.wicket.markup.head.CssHeaderItem;
-import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.CheckBox;
@@ -60,8 +58,6 @@ import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
-import org.apache.wicket.request.resource.CssResourceReference;
-import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.validation.validator.RangeValidator;
 import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.data.Code;
@@ -72,7 +68,6 @@ import org.dcm4che.net.hl7.HL7DeviceExtension;
 import org.dcm4chee.proxy.conf.ProxyDeviceExtension;
 import org.dcm4chee.wizard.common.behavior.FocusOnLoadBehavior;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
-import org.dcm4chee.wizard.common.component.MainWebPage;
 import org.dcm4chee.wizard.common.component.ModalWindowRuntimeException;
 import org.dcm4chee.wizard.war.common.component.DicomConfigurationWebPage;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.DeviceModel;
@@ -94,9 +89,7 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
     private static final long serialVersionUID = 1L;
 
     private static Logger log = LoggerFactory.getLogger(CreateOrEditDevicePage.class);
-    
-    private static final ResourceReference baseCSS = new CssResourceReference(MainWebPage.class, "base-style.css");
-    
+
     private List<String> keyStoreTypes = Arrays.asList(new String[] { "JKS", "PKCS12" });
     
     // configuration type selection
@@ -651,12 +644,5 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
 			protected void onError(AjaxRequestTarget arg0, Form<?> arg1) {
 			}
         }.setDefaultFormProcessing(false));
-    }
-    
-    @Override
-    public void renderHead(IHeaderResponse response) {
-    	super.renderHead(response);
-    	if (CreateOrEditDevicePage.baseCSS != null) 
-    		response.render(CssHeaderItem.forReference(CreateOrEditDevicePage.baseCSS));
     }
  }

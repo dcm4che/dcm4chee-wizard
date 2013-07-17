@@ -45,8 +45,6 @@ import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.ajax.markup.html.form.AjaxFallbackButton;
 import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxButton;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
-import org.apache.wicket.markup.head.CssHeaderItem;
-import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
@@ -55,14 +53,11 @@ import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
-import org.apache.wicket.request.resource.CssResourceReference;
-import org.apache.wicket.request.resource.ResourceReference;
 import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.net.ApplicationEntity;
 import org.dcm4che.net.TransferCapability;
 import org.dcm4che.net.TransferCapability.Role;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
-import org.dcm4chee.wizard.common.component.MainWebPage;
 import org.dcm4chee.wizard.common.component.ModalWindowRuntimeException;
 import org.dcm4chee.wizard.war.common.component.DicomConfigurationWebPage;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ApplicationEntityModel;
@@ -84,8 +79,6 @@ public class CreateOrEditTransferCapabilityPage extends DicomConfigurationWebPag
     private static final long serialVersionUID = 1L;
 
     private static Logger log = LoggerFactory.getLogger(CreateOrEditTransferCapabilityPage.class);
-
-    private static final ResourceReference baseCSS = new CssResourceReference(MainWebPage.class, "base-style.css");
 
     // mandatory
 	private Model<String> sopClassModel;
@@ -226,11 +219,5 @@ public class CreateOrEditTransferCapabilityPage extends DicomConfigurationWebPag
 		} catch (ConfigurationException e) {
 			log.error("Error creating TransferCapabilityValidator for sopClass TextField", e);
 		}
-    }
-    
-    @Override
-    public void renderHead(IHeaderResponse response) {
-    	if (CreateOrEditTransferCapabilityPage.baseCSS != null) 
-    		response.render(CssHeaderItem.forReference(CreateOrEditTransferCapabilityPage.baseCSS));
     }
  }

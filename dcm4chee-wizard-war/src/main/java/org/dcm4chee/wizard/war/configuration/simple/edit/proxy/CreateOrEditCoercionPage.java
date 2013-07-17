@@ -48,8 +48,6 @@ import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.ajax.markup.html.form.AjaxFallbackButton;
 import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxButton;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
-import org.apache.wicket.markup.head.CssHeaderItem;
-import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
@@ -58,8 +56,6 @@ import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
-import org.apache.wicket.request.resource.CssResourceReference;
-import org.apache.wicket.request.resource.ResourceReference;
 import org.dcm4che.conf.api.AttributeCoercion;
 import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.net.ApplicationEntity;
@@ -67,7 +63,6 @@ import org.dcm4che.net.Dimse;
 import org.dcm4che.net.TransferCapability.Role;
 import org.dcm4chee.proxy.conf.ProxyAEExtension;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
-import org.dcm4chee.wizard.common.component.MainWebPage;
 import org.dcm4chee.wizard.common.component.ModalWindowRuntimeException;
 import org.dcm4chee.wizard.common.component.secure.SecureSessionCheckPage;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ApplicationEntityModel;
@@ -89,8 +84,6 @@ public class CreateOrEditCoercionPage extends SecureSessionCheckPage {
 
     private static Logger log = LoggerFactory.getLogger(CreateOrEditCoercionPage.class);
 
-    private static final ResourceReference baseCSS = new CssResourceReference(MainWebPage.class, "base-style.css");
-    
     // mandatory
     private Model<String> commonNameModel;
     private Model<Dimse> dimseModel;
@@ -285,11 +278,5 @@ public class CreateOrEditCoercionPage extends SecureSessionCheckPage {
 			@Override
 			protected void onError(AjaxRequestTarget arg0, Form<?> arg1) {
 			}}.setDefaultFormProcessing(false));
-    }
-
-	@Override
-    public void renderHead(IHeaderResponse response) {
-		if (CreateOrEditCoercionPage.baseCSS != null) 
-			response.render(CssHeaderItem.forReference(CreateOrEditCoercionPage.baseCSS));
     }
 }

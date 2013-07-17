@@ -38,9 +38,13 @@
 
 package org.dcm4chee.wizard.common.component.secure;
 
+import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
+import org.apache.wicket.request.resource.CssResourceReference;
 import org.apache.wicket.request.resource.JavaScriptResourceReference;
+import org.apache.wicket.request.resource.ResourceReference;
+import org.dcm4chee.wizard.common.component.MainWebPage;
 import org.wicketstuff.security.components.SecureWebPage;
 
 /**
@@ -50,13 +54,17 @@ public class SecureSessionCheckPage extends SecureWebPage {
 
 	private static final long serialVersionUID = 1L;
 
+    private static final ResourceReference baseCSS = new CssResourceReference(MainWebPage.class, "base-style.css");
+
 	private static final JavaScriptResourceReference reloadExpired = 
 			new JavaScriptResourceReference(SecureSessionCheckPage.class, "reload-expired.js");
 
 	@Override
     public void renderHead(IHeaderResponse response) {
 		super.renderHead(response);
+    	if (SecureSessionCheckPage.baseCSS != null) 
+    		response.render(CssHeaderItem.forReference(SecureSessionCheckPage.baseCSS));
     	if (SecureSessionCheckPage.reloadExpired != null)
     		response.render(JavaScriptHeaderItem.forReference(reloadExpired));
-    }
+    }	
 }

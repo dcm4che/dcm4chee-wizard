@@ -47,8 +47,6 @@ import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.ajax.markup.html.form.AjaxFallbackButton;
 import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxButton;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
-import org.apache.wicket.markup.head.CssHeaderItem;
-import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.CheckBoxMultipleChoice;
@@ -59,15 +57,12 @@ import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
-import org.apache.wicket.request.resource.CssResourceReference;
-import org.apache.wicket.request.resource.ResourceReference;
 import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.net.Connection;
 import org.dcm4che.net.hl7.HL7Application;
 import org.dcm4che.net.hl7.HL7DeviceExtension;
 import org.dcm4chee.wizard.common.behavior.FocusOnLoadBehavior;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
-import org.dcm4chee.wizard.common.component.MainWebPage;
 import org.dcm4chee.wizard.common.component.ModalWindowRuntimeException;
 import org.dcm4chee.wizard.common.component.secure.SecureSessionCheckPage;
 import org.dcm4chee.wizard.war.configuration.simple.model.basic.ConnectionModel;
@@ -91,8 +86,6 @@ public class CreateOrEditHL7ApplicationPage extends SecureSessionCheckPage {
 
     private static Logger log = LoggerFactory.getLogger(CreateOrEditHL7ApplicationPage.class);
 
-    private static final ResourceReference baseCSS = new CssResourceReference(MainWebPage.class, "base-style.css");
-    
     // mandatory
     private Model<String> applicationNameModel;
 	private Model<ArrayList<ConnectionModel>> connectionReferencesModel;
@@ -298,11 +291,5 @@ public class CreateOrEditHL7ApplicationPage extends SecureSessionCheckPage {
 			@Override
 			protected void onError(AjaxRequestTarget arg0, Form<?> arg1) {
 			}}.setDefaultFormProcessing(false));
-    }
-
-	@Override
-    public void renderHead(IHeaderResponse response) {
-		if (CreateOrEditHL7ApplicationPage.baseCSS != null) 
-			response.render(CssHeaderItem.forReference(CreateOrEditHL7ApplicationPage.baseCSS));
     }
 }
