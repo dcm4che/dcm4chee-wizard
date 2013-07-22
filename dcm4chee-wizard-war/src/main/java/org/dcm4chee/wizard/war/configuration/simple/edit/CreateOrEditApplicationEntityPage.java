@@ -77,6 +77,7 @@ import org.dcm4chee.wizard.war.configuration.simple.tree.ConfigTreeProvider;
 import org.dcm4chee.wizard.war.configuration.simple.validator.AETitleValidator;
 import org.dcm4chee.wizard.war.configuration.simple.validator.ConnectionProtocolValidator;
 import org.dcm4chee.wizard.war.configuration.simple.validator.ConnectionReferenceValidator;
+import org.dcm4chee.wizard.war.util.TransferCapabilitiesUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -488,7 +489,9 @@ public class CreateOrEditApplicationEntityPage extends SecureSessionCheckPage {
                 		proxyAEExtension.setDeleteFailedDataWithoutRetryConfiguration(deleteFailedDataWithoutRetryConfigurationModel.getObject());
                 		proxyAEExtension.setProxyPIXConsumerApplication(proxyPIXConsumerApplicationModel.getObject());
                 		proxyAEExtension.setRemotePIXManagerApplication(remotePIXManagerApplicationModel.getObject());
-                		proxyAEExtension.setFallbackDestinationAET(fallbackDestinationAETModel.getObject());                        
+                		proxyAEExtension.setFallbackDestinationAET(fallbackDestinationAETModel.getObject());
+                		
+                		TransferCapabilitiesUtils.addTCsToAE(applicationEntity);
                 	}
                     if (aeModel != null) {
                     	if (!"*".equals(oldAETitle))
