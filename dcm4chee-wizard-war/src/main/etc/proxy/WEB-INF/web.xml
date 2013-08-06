@@ -121,6 +121,7 @@
             <url-pattern>/proxy-application/*
             </url-pattern>
             <http-method>GET</http-method>
+	    <http-method>POST</http-method>
         </web-resource-collection>
     </security-constraint>
 	<login-config>
