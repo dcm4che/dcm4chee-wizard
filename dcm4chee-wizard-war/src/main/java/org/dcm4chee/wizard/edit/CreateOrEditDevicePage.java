@@ -54,6 +54,7 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.IModel;
@@ -91,6 +92,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert David <robert.david@agfa.com>
+ * @author Michael Backhaus <michael.backhaus@agfa.com>
  */
 public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
 
@@ -109,6 +111,8 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
 
     // ProxyDevice only
     private Model<Integer> schedulerIntervalModel;
+    private Model<Integer> forwardThreadsModel;
+    private Model<Integer> staleTimeoutModel;
 
     // optional
     private Model<String> descriptionModel;
@@ -143,60 +147,24 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
     private Model<String> keyStoreKeyPinModel;
     private Model<Boolean> useKeyStoreKeyPinProperty;
 
-    // ProxyDevice only
-    private Model<Integer> forwardThreadsModel;
-    private Model<Integer> staleTimeoutModel;
-
     public CreateOrEditDevicePage(final ModalWindow window, final DeviceModel deviceModel) {
         super();
-
         add(new WebMarkupContainer("create-device-title").setVisible(deviceModel == null));
         add(new WebMarkupContainer("edit-device-title").setVisible(deviceModel != null));
-
         setOutputMarkupId(true);
         final ExtendedForm form = new ExtendedForm("form");
         form.setResourceIdPrefix("dicom.edit.device.");
         add(form);
-        try {
-            if (deviceModel == null) {
-                initBasicConfigurationTypeModel();
-            } else {
-                initDeviceModel(deviceModel);
-            }
-        } catch (ConfigurationException ce) {
-            log.error(this.getClass().toString() + ": " + "Error retrieving device data: " + ce.getMessage());
-            log.debug("Exception", ce);
-            throw new ModalWindowRuntimeException(ce.getLocalizedMessage());
-        }
+        if (deviceModel == null)
+            initBasicConfigurationTypeModel();
+        else
+            initDeviceModel(deviceModel);
         addTypeLabel(form);
         DropDownChoice<ConfigTreeProvider.ConfigurationType> typeDropDown = setConfigurationTypeList();
         addOnChangeUpdate(deviceModel, form, typeDropDown);
         addDeviceTitle(deviceModel, form);
         addInstalledLabel(form);
-
-        try {
-            form.add(new WebMarkupContainer("proxy") {
-
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public boolean isVisible() {
-                    return typeModel.getObject().equals(ConfigurationType.Proxy);
-                }
-            }.add(new Label("schedulerInterval.label", new ResourceModel(
-                    "dicom.edit.device.proxy.schedulerInterval.label")))
-                    .add(new TextField<Integer>("schedulerInterval", schedulerIntervalModel)
-                            .setType(Integer.class)
-                            .setRequired(
-                                    deviceModel != null
-                                            && proxyDevExt == null ? false
-                                            : true)).setOutputMarkupPlaceholderTag(true));
-        } catch (ConfigurationException ce) {
-            log.error(this.getClass().toString() + ": " + "Error retrieving device data: " + ce.getMessage());
-            log.debug("Exception", ce);
-            throw new ModalWindowRuntimeException(ce.getLocalizedMessage());
-        }
-
+        form.add(proxyWebMarkupContainer(deviceModel));
         final Form<?> optionalContainer = new Form<Object>("optional");
         form.add(optionalContainer.setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true).setVisible(false));
 
@@ -405,6 +373,28 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         addCancelButton(window, form);
     }
 
+    private WebMarkupContainer proxyWebMarkupContainer(final DeviceModel deviceModel) {
+        WebMarkupContainer proxyWMC = new WebMarkupContainer("proxy") {
+
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public boolean isVisible() {
+                return typeModel.getObject().equals(ConfigurationType.Proxy);
+            }
+        };
+        Label schedulerIntervalLabel = new Label("schedulerInterval.label", new ResourceModel(
+                "dicom.edit.device.proxy.schedulerInterval.label"));
+        proxyWMC.add(schedulerIntervalLabel);
+        FormComponent<Integer> schedulerIntervalTextField = new TextField<Integer>("schedulerInterval",
+                schedulerIntervalModel);
+        schedulerIntervalTextField.setType(Integer.class);
+        schedulerIntervalTextField.setRequired(true);
+        proxyWMC.add(schedulerIntervalTextField);
+        proxyWMC.setOutputMarkupPlaceholderTag(true);
+        return proxyWMC;
+    }
+
     private void addInstalledLabel(final ExtendedForm form) {
         form.add(new Label("installed.label", new ResourceModel("dicom.edit.device.installed.label"))).add(
                 new CheckBox("installed", installedModel));
@@ -442,77 +432,87 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         }
     }
 
-    private void initDeviceModel(final DeviceModel deviceModel) throws ConfigurationException {
-        Collection<DeviceExtension> devExt = deviceModel.getDevice().listDeviceExtensions();
-        if (devExt.contains(ProxyDeviceExtension.class))
-            typeModel = Model.of(ConfigTreeProvider.ConfigurationType.Proxy);
-        else if (devExt.contains(XCAiInitiatingGWCfg.class)
-                || devExt.contains(XCAInitiatingGWCfg.class)
-                || devExt.contains(XCAiRespondingGWCfg.class)
-                || devExt.contains(XCARespondingGWCfg.class)
-                || devExt.contains(XdsRegistry.class)
-                || devExt.contains(XdsRepository.class))
-            typeModel = Model.of(ConfigTreeProvider.ConfigurationType.XDS);
-        else
-            typeModel = Model.of(ConfigTreeProvider.ConfigurationType.Basic);
+    private void initDeviceModel(final DeviceModel deviceModel) {
+        try {
+            Collection<DeviceExtension> devExt = deviceModel.getDevice().listDeviceExtensions();
+            if (devExt.contains(ProxyDeviceExtension.class))
+                typeModel = Model.of(ConfigTreeProvider.ConfigurationType.Proxy);
+            else if (devExt.contains(XCAiInitiatingGWCfg.class) 
+                    || devExt.contains(XCAInitiatingGWCfg.class)
+                    || devExt.contains(XCAiRespondingGWCfg.class) 
+                    || devExt.contains(XCARespondingGWCfg.class)
+                    || devExt.contains(XdsRegistry.class) 
+                    || devExt.contains(XdsRepository.class))
+                typeModel = Model.of(ConfigTreeProvider.ConfigurationType.XDS);
+            else
+                typeModel = Model.of(ConfigTreeProvider.ConfigurationType.Basic);
 
-        deviceNameModel = Model.of(deviceModel.getDevice().getDeviceName());
-        installedModel = Model.of(deviceModel.getDevice().isInstalled());
+            deviceNameModel = Model.of(deviceModel.getDevice().getDeviceName());
+            installedModel = Model.of(deviceModel.getDevice().isInstalled());
 
-        descriptionModel = Model.of(deviceModel.getDevice().getDescription());
-        deviceSerialNumberModel = Model.of(deviceModel.getDevice().getDeviceSerialNumber());
-        institutionAddressModel = new StringArrayModel(deviceModel.getDevice().getInstitutionAddresses());
+            descriptionModel = Model.of(deviceModel.getDevice().getDescription());
+            deviceSerialNumberModel = Model.of(deviceModel.getDevice().getDeviceSerialNumber());
+            institutionAddressModel = new StringArrayModel(deviceModel.getDevice().getInstitutionAddresses());
 
-        Code code = null;
-        if (deviceModel.getDevice().getInstitutionCodes().length > 0)
-            code = deviceModel.getDevice().getInstitutionCodes()[0];
+            if (deviceModel.getDevice().getInstitutionCodes().length > 0) {
+                Code code = deviceModel.getDevice().getInstitutionCodes()[0];
+                institutionCodeModel = new InstitutionCodeModel(code);
+            }
 
-        institutionCodeModel = new InstitutionCodeModel(code);
-        institutionalDepartmentNameModel = new StringArrayModel(deviceModel.getDevice()
-                .getInstitutionalDepartmentNames());
-        institutionNameModel = new StringArrayModel(deviceModel.getDevice().getInstitutionNames());
-        if (deviceModel.getDevice().getIssuerOfAccessionNumber() == null)
-            issuerOfAccessionNumberModel = Model.of();
-        else
-            issuerOfAccessionNumberModel = Model.of(deviceModel.getDevice().getIssuerOfAccessionNumber()
-                    .toString());
-        if (deviceModel.getDevice().getIssuerOfAdmissionID() == null)
-            issuerOfAdmissionIDModel = Model.of();
-        else
-            issuerOfAdmissionIDModel = Model.of(deviceModel.getDevice().getIssuerOfAdmissionID().toString());
-        if (deviceModel.getDevice().getIssuerOfContainerIdentifier() == null)
-            issuerOfContainerIdentifierModel = Model.of();
-        else
-            issuerOfContainerIdentifierModel = Model.of(deviceModel.getDevice()
-                    .getIssuerOfContainerIdentifier().toString());
-        if (deviceModel.getDevice().getIssuerOfPatientID() == null)
-            issuerOfPatientIDModel = Model.of();
-        else
-            issuerOfPatientIDModel = Model.of(deviceModel.getDevice().getIssuerOfPatientID().toString());
-        if (deviceModel.getDevice().getIssuerOfServiceEpisodeID() == null)
-            issuerOfServiceEpisodeIDModel = Model.of();
-        else
-            issuerOfServiceEpisodeIDModel = Model.of(deviceModel.getDevice().getIssuerOfServiceEpisodeID()
-                    .toString());
-        if (deviceModel.getDevice().getIssuerOfSpecimenIdentifier() == null)
-            issuerOfSpecimenIdentifierModel = Model.of();
-        else
-            issuerOfSpecimenIdentifierModel = Model.of(deviceModel.getDevice().getIssuerOfSpecimenIdentifier()
-                    .toString());
-        manufacturerModel = Model.of(deviceModel.getDevice().getManufacturer());
-        manufacturerModelNameModel = Model.of(deviceModel.getDevice().getManufacturerModelName());
-        if (deviceModel.getDevice().getOrderFillerIdentifier() == null)
-            orderFillerIdentifierModel = Model.of();
-        else
-            orderFillerIdentifierModel = Model
-                    .of(deviceModel.getDevice().getOrderFillerIdentifier().toString());
-        if (deviceModel.getDevice().getOrderPlacerIdentifier() == null)
-            orderPlacerIdentifierModel = Model.of();
-        else
-            orderPlacerIdentifierModel = Model
-                    .of(deviceModel.getDevice().getOrderPlacerIdentifier().toString());
-        setDeviceConfiguration(deviceModel);
-        setProxyDevExtConfiguration(deviceModel);
+            institutionalDepartmentNameModel = new StringArrayModel(deviceModel.getDevice()
+                    .getInstitutionalDepartmentNames());
+            institutionNameModel = new StringArrayModel(deviceModel.getDevice().getInstitutionNames());
+            if (deviceModel.getDevice().getIssuerOfAccessionNumber() == null)
+                issuerOfAccessionNumberModel = Model.of();
+            else
+                issuerOfAccessionNumberModel = Model
+                        .of(deviceModel.getDevice().getIssuerOfAccessionNumber().toString());
+            if (deviceModel.getDevice().getIssuerOfAdmissionID() == null)
+                issuerOfAdmissionIDModel = Model.of();
+            else
+                issuerOfAdmissionIDModel = Model.of(deviceModel.getDevice().getIssuerOfAdmissionID().toString());
+            if (deviceModel.getDevice().getIssuerOfContainerIdentifier() == null)
+                issuerOfContainerIdentifierModel = Model.of();
+            else
+                issuerOfContainerIdentifierModel = Model.of(deviceModel.getDevice().getIssuerOfContainerIdentifier()
+                        .toString());
+            if (deviceModel.getDevice().getIssuerOfPatientID() == null)
+                issuerOfPatientIDModel = Model.of();
+            else
+                issuerOfPatientIDModel = Model.of(deviceModel.getDevice().getIssuerOfPatientID().toString());
+            if (deviceModel.getDevice().getIssuerOfServiceEpisodeID() == null)
+                issuerOfServiceEpisodeIDModel = Model.of();
+            else
+                issuerOfServiceEpisodeIDModel = Model.of(deviceModel.getDevice().getIssuerOfServiceEpisodeID()
+                        .toString());
+            if (deviceModel.getDevice().getIssuerOfSpecimenIdentifier() == null)
+                issuerOfSpecimenIdentifierModel = Model.of();
+            else
+                issuerOfSpecimenIdentifierModel = Model.of(deviceModel.getDevice().getIssuerOfSpecimenIdentifier()
+                        .toString());
+            manufacturerModel = Model.of(deviceModel.getDevice().getManufacturer());
+            manufacturerModelNameModel = Model.of(deviceModel.getDevice().getManufacturerModelName());
+            if (deviceModel.getDevice().getOrderFillerIdentifier() == null)
+                orderFillerIdentifierModel = Model.of();
+            else
+                orderFillerIdentifierModel = Model.of(deviceModel.getDevice().getOrderFillerIdentifier().toString());
+            if (deviceModel.getDevice().getOrderPlacerIdentifier() == null)
+                orderPlacerIdentifierModel = Model.of();
+            else
+                orderPlacerIdentifierModel = Model.of(deviceModel.getDevice().getOrderPlacerIdentifier().toString());
+            setDeviceConfiguration(deviceModel);
+            setProxyDevExtConfiguration(deviceModel);
+            setXdsDevExtConfiguration(deviceModel);
+        } catch (ConfigurationException ce) {
+            log.error(this.getClass().toString() + ": " + "Error retrieving device data: " + ce.getMessage());
+            log.debug("Exception", ce);
+            throw new ModalWindowRuntimeException(ce.getLocalizedMessage());
+        }
+    }
+
+    private void setXdsDevExtConfiguration(DeviceModel deviceModel) {
+        if (typeModel == Model.of(ConfigTreeProvider.ConfigurationType.XDS)) {
+        }
     }
 
     private void setDeviceConfiguration(final DeviceModel deviceModel) throws ConfigurationException {
@@ -555,7 +555,7 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         descriptionModel = Model.of();
         deviceSerialNumberModel = Model.of();
         institutionAddressModel = new StringArrayModel(null);
-        institutionCodeModel = new InstitutionCodeModel(null);
+        institutionCodeModel = new InstitutionCodeModel();
         institutionalDepartmentNameModel = new StringArrayModel(null);
         institutionNameModel = new StringArrayModel(null);
         issuerOfAccessionNumberModel = Model.of();
@@ -613,84 +613,19 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
             protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
                 try {
                     Device device = null;
-                    ProxyDeviceExtension proxyDeviceExtension = null;
-                    AuditRecordRepository auditRecordRepository = null;
-
+                    Collection<DeviceExtension> devExt = new ArrayList<>();
                     if (deviceModel != null) {
                         device = deviceModel.getDevice();
-                        proxyDeviceExtension = device.getDeviceExtension(ProxyDeviceExtension.class);
-                        auditRecordRepository = device.getDeviceExtension(AuditRecordRepository.class);
+                        devExt.addAll(device.listDeviceExtensions());
                     } else {
-                        device = new Device(deviceNameModel.getObject());
-                        if (typeModel.getObject().equals(ConfigurationType.Proxy)) {
-                            proxyDeviceExtension = new ProxyDeviceExtension();
-                            device.addDeviceExtension(proxyDeviceExtension);
-                            proxyDeviceExtension.setSchedulerInterval(schedulerIntervalModel.getObject());
-                            device.addDeviceExtension(new HL7DeviceExtension());
-                        }
-                        if (typeModel.getObject().equals(ConfigurationType.AuditRecordRepository)) {
-                            auditRecordRepository = new AuditRecordRepository();
-                            device.addDeviceExtension(auditRecordRepository);
-                        }
+                        device = initDeviceExtensions(devExt);
                     }
+
                     device.setInstalled(installedModel.getObject());
-
-                    if (proxyDeviceExtension != null)
-                        proxyDeviceExtension.setSchedulerInterval(schedulerIntervalModel.getObject());
-
                     if (optionalContainer.isVisible()) {
-                        device.setDescription(descriptionModel.getObject());
-                        device.setDeviceSerialNumber(deviceSerialNumberModel.getObject());
-                        device.setInstitutionAddresses(institutionAddressModel.getArray());
-                        device.setInstitutionCodes(institutionCodeModel.getCode() == null ? new Code[] {}
-                                : new Code[] { institutionCodeModel.getCode() });
-                        device.setInstitutionalDepartmentNames(institutionalDepartmentNameModel.getArray());
-                        device.setInstitutionNames(institutionNameModel.getArray());
-                        device.setIssuerOfAccessionNumber(issuerOfAccessionNumberModel.getObject() == null ? null
-                                : new Issuer(issuerOfAccessionNumberModel.getObject()));
-                        device.setIssuerOfAdmissionID(issuerOfAdmissionIDModel.getObject() == null ? null : new Issuer(
-                                issuerOfAdmissionIDModel.getObject()));
-                        device.setIssuerOfContainerIdentifier(issuerOfContainerIdentifierModel.getObject() == null ? null
-                                : new Issuer(issuerOfContainerIdentifierModel.getObject()));
-                        device.setIssuerOfPatientID(issuerOfPatientIDModel.getObject() == null ? null : new Issuer(
-                                issuerOfPatientIDModel.getObject()));
-                        device.setIssuerOfServiceEpisodeID(issuerOfServiceEpisodeIDModel.getObject() == null ? null
-                                : new Issuer(issuerOfServiceEpisodeIDModel.getObject()));
-                        device.setIssuerOfSpecimenIdentifier(issuerOfSpecimenIdentifierModel.getObject() == null ? null
-                                : new Issuer(issuerOfSpecimenIdentifierModel.getObject()));
-                        device.setManufacturer(manufacturerModel.getObject());
-                        device.setManufacturerModelName(manufacturerModelNameModel.getObject());
-                        device.setOrderFillerIdentifier(orderFillerIdentifierModel.getObject() == null ? null
-                                : new Issuer(orderFillerIdentifierModel.getObject()));
-                        device.setOrderPlacerIdentifier(orderPlacerIdentifierModel.getObject() == null ? null
-                                : new Issuer(orderPlacerIdentifierModel.getObject()));
-                        device.setPrimaryDeviceTypes(primaryDeviceTypesModel.getArray());
-                        device.setRelatedDeviceRefs(relatedDeviceRefsModel.getArray());
-                        device.setSoftwareVersions(softwareVersionsModel.getArray());
-                        device.setStationName(stationNameModel.getObject());
-                        device.setTrustStoreURL(trustStoreURLModel.getObject());
-                        device.setTrustStoreType(trustStoreTypeModel.getObject());
-                        device.setTrustStorePinProperty(useTrustStorePinProperty.getObject() ? trustStorePinModel
-                                .getObject() : null);
-                        device.setTrustStorePin(!useTrustStorePinProperty.getObject() ? trustStorePinModel.getObject()
-                                : null);
-                        device.setKeyStoreURL(keyStoreURLModel.getObject());
-                        device.setKeyStoreType(keyStoreTypeModel.getObject());
-                        device.setKeyStorePinProperty(useKeyStorePinProperty.getObject() ? keyStorePinModel.getObject()
-                                : null);
-                        device.setKeyStorePin(!useKeyStorePinProperty.getObject() ? keyStorePinModel.getObject() : null);
-                        device.setKeyStoreKeyPinProperty(useKeyStoreKeyPinProperty.getObject() ? keyStoreKeyPinModel
-                                .getObject() : null);
-                        device.setKeyStoreKeyPin(!useKeyStoreKeyPinProperty.getObject() ? keyStoreKeyPinModel
-                                .getObject() : null);
-                        if (proxyDeviceExtension != null) {
-                            if (forwardThreadsModel.getObject() != null)
-                                proxyDeviceExtension.setForwardThreads(forwardThreadsModel.getObject());
-                            proxyDeviceExtension.setConfigurationStaleTimeout(staleTimeoutModel.getObject() != null ? staleTimeoutModel
-                                    .getObject() : 60);
-                        }
+                        setDeviceAttributes(device);
+                        setProxyDeviceAttributes(devExt, device);
                     }
-
                     if (deviceModel == null)
                         ConfigTreeProvider.get().persistDevice(device);
                     else
@@ -701,6 +636,112 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
                     log.debug("Exception", e);
                     throw new ModalWindowRuntimeException(e.getLocalizedMessage());
                 }
+            }
+
+            private Device initDeviceExtensions(Collection<DeviceExtension> devExt) {
+                Device device = new Device(deviceNameModel.getObject());
+                if (typeModel.getObject().equals(ConfigurationType.Proxy))
+                    initProxyDeviceExtension(devExt, device);
+                if (typeModel.getObject().equals(ConfigurationType.AuditRecordRepository))
+                    initARRExtension(devExt, device);
+                if (typeModel.getObject().equals(ConfigurationType.XDS))
+                    initXdsExtensions(devExt, device);
+                return device;
+            }
+
+            private void initXdsExtensions(Collection<DeviceExtension> devExt, Device device) {
+                XCAiInitiatingGWCfg xcaiInit = new XCAiInitiatingGWCfg();
+                device.addDeviceExtension(xcaiInit);
+                devExt.add(xcaiInit);
+                XCAInitiatingGWCfg xcaInit = new XCAInitiatingGWCfg();
+                device.addDeviceExtension(xcaInit);
+                devExt.add(xcaInit);
+                XCAiRespondingGWCfg xcaiResp = new XCAiRespondingGWCfg();
+                device.addDeviceExtension(xcaiResp);
+                devExt.add(xcaiResp);
+                XCARespondingGWCfg xcaResp = new XCARespondingGWCfg();
+                device.addDeviceExtension(xcaResp);
+                devExt.add(xcaResp);
+                XdsRegistry xdsReg = new XdsRegistry();
+                device.addDeviceExtension(xdsReg);
+                devExt.add(xdsReg);
+                XdsRepository xdsRep = new XdsRepository();
+                device.addDeviceExtension(xdsRep);
+                devExt.add(xdsRep);
+            }
+
+            private void initARRExtension(Collection<DeviceExtension> devExt, Device device) {
+                AuditRecordRepository auditRecordRepository = new AuditRecordRepository();
+                device.addDeviceExtension(auditRecordRepository);
+                devExt.add(auditRecordRepository);
+            }
+
+            private void initProxyDeviceExtension(Collection<DeviceExtension> devExt, Device device) {
+                ProxyDeviceExtension proxyDeviceExtension = new ProxyDeviceExtension();
+                proxyDeviceExtension.setSchedulerInterval(schedulerIntervalModel.getObject());
+                device.addDeviceExtension(proxyDeviceExtension);
+                device.addDeviceExtension(new HL7DeviceExtension());
+                devExt.add(proxyDeviceExtension);
+            }
+
+            private void setProxyDeviceAttributes(Collection<DeviceExtension> devExt, Device device) {
+                if (devExt.contains(ProxyDeviceExtension.class)) {
+                    ProxyDeviceExtension proxyDevExt = device.getDeviceExtension(ProxyDeviceExtension.class);
+                    proxyDevExt.setSchedulerInterval(schedulerIntervalModel.getObject());
+                    proxyDevExt.setConfigurationStaleTimeout(
+                            staleTimeoutModel.getObject() != null 
+                                ? staleTimeoutModel.getObject() 
+                                : 60);
+                    if (forwardThreadsModel.getObject() != null)
+                        proxyDevExt.setForwardThreads(forwardThreadsModel.getObject());
+                }
+            }
+
+            private void setDeviceAttributes(Device device) {
+                device.setDescription(descriptionModel.getObject());
+                device.setDeviceSerialNumber(deviceSerialNumberModel.getObject());
+                device.setInstitutionAddresses(institutionAddressModel.getArray());
+                device.setInstitutionCodes(institutionCodeModel.getCode() == null ? new Code[] {}
+                        : new Code[] { institutionCodeModel.getCode() });
+                device.setInstitutionalDepartmentNames(institutionalDepartmentNameModel.getArray());
+                device.setInstitutionNames(institutionNameModel.getArray());
+                device.setIssuerOfAccessionNumber(issuerOfAccessionNumberModel.getObject() == null ? null
+                        : new Issuer(issuerOfAccessionNumberModel.getObject()));
+                device.setIssuerOfAdmissionID(issuerOfAdmissionIDModel.getObject() == null ? null : new Issuer(
+                        issuerOfAdmissionIDModel.getObject()));
+                device.setIssuerOfContainerIdentifier(issuerOfContainerIdentifierModel.getObject() == null ? null
+                        : new Issuer(issuerOfContainerIdentifierModel.getObject()));
+                device.setIssuerOfPatientID(issuerOfPatientIDModel.getObject() == null ? null : new Issuer(
+                        issuerOfPatientIDModel.getObject()));
+                device.setIssuerOfServiceEpisodeID(issuerOfServiceEpisodeIDModel.getObject() == null ? null
+                        : new Issuer(issuerOfServiceEpisodeIDModel.getObject()));
+                device.setIssuerOfSpecimenIdentifier(issuerOfSpecimenIdentifierModel.getObject() == null ? null
+                        : new Issuer(issuerOfSpecimenIdentifierModel.getObject()));
+                device.setManufacturer(manufacturerModel.getObject());
+                device.setManufacturerModelName(manufacturerModelNameModel.getObject());
+                device.setOrderFillerIdentifier(orderFillerIdentifierModel.getObject() == null ? null
+                        : new Issuer(orderFillerIdentifierModel.getObject()));
+                device.setOrderPlacerIdentifier(orderPlacerIdentifierModel.getObject() == null ? null
+                        : new Issuer(orderPlacerIdentifierModel.getObject()));
+                device.setPrimaryDeviceTypes(primaryDeviceTypesModel.getArray());
+                device.setRelatedDeviceRefs(relatedDeviceRefsModel.getArray());
+                device.setSoftwareVersions(softwareVersionsModel.getArray());
+                device.setStationName(stationNameModel.getObject());
+                device.setTrustStoreURL(trustStoreURLModel.getObject());
+                device.setTrustStoreType(trustStoreTypeModel.getObject());
+                device.setTrustStorePinProperty(useTrustStorePinProperty.getObject() ? trustStorePinModel
+                        .getObject() : null);
+                device.setTrustStorePin(!useTrustStorePinProperty.getObject() ? trustStorePinModel.getObject()
+                        : null);
+                device.setKeyStoreURL(keyStoreURLModel.getObject());
+                device.setKeyStoreType(keyStoreTypeModel.getObject());
+                device.setKeyStorePinProperty(useKeyStorePinProperty.getObject() ? keyStorePinModel.getObject()
+                        : null);
+                device.setKeyStorePin(!useKeyStorePinProperty.getObject() ? keyStorePinModel.getObject() : null);
+                device.setKeyStoreKeyPinProperty(useKeyStoreKeyPinProperty.getObject() ? keyStoreKeyPinModel
+                        .getObject() : null);
+                device.setKeyStoreKeyPin(!useKeyStoreKeyPinProperty.getObject() ? keyStoreKeyPinModel
+                        .getObject() : null);
             }
 
             @Override

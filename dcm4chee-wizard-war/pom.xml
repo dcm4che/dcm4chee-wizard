@@ -175,7 +175,11 @@
       <groupId>org.dcm4che</groupId>
       <artifactId>dcm4chee-xds2-conf</artifactId>
       <version>${dcm4chee.xds2.version}</version>
-      <scope>provided</scope>
+    </dependency>
+    <dependency>
+     <groupId>org.dcm4che</groupId>
+     <artifactId>dcm4chee-xds2-common</artifactId>
+     <version>${dcm4chee.xds2.version}</version>
     </dependency>
   </dependencies>
   <build>

@@ -38,17 +38,9 @@
 
 package org.dcm4chee.wizard.model.xds;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-
 import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.net.Device;
 import org.dcm4che.net.audit.AuditLogger;
-import org.dcm4che.net.hl7.HL7Application;
-import org.dcm4che.net.hl7.HL7DeviceExtension;
-import org.dcm4chee.wizard.model.AuditLoggerModel;
-import org.dcm4chee.wizard.model.hl7.HL7ApplicationModel;
 import org.dcm4chee.wizard.model.hl7.HL7DeviceModel;
 
 /**
@@ -58,34 +50,8 @@ public class XdsDeviceModel extends HL7DeviceModel {
 
     private static final long serialVersionUID = 1L;
 
-    LinkedHashMap<String, HL7ApplicationModel> hl7Applications = new LinkedHashMap<String, HL7ApplicationModel>();
-    AuditLoggerModel auditLoggerModel;
-    
-    public LinkedHashMap<String, HL7ApplicationModel> getHL7Applications() {
-        return hl7Applications;
-    }
-
-    private void setHL7Applications(Collection<HL7Application> hl7Applications) throws ConfigurationException {
-        Iterator<HL7Application> i = hl7Applications.iterator();
-        while (i.hasNext()) {
-            HL7Application hl7Application = i.next();
-            this.hl7Applications.put(hl7Application.getApplicationName(), new HL7ApplicationModel(hl7Application));
-        }
-    }
-
-    public AuditLoggerModel getAuditLoggerModel() {
-        return auditLoggerModel;
-    }
-
-    public void setAuditLogger(AuditLogger auditLogger) throws ConfigurationException {
-        if (auditLogger != null)
-            this.auditLoggerModel = new AuditLoggerModel(auditLogger);
-    }
-
     public XdsDeviceModel(Device device) throws ConfigurationException {
         super(device);
         setAuditLogger(device.getDeviceExtension(AuditLogger.class));
-        HL7DeviceExtension hl7devExt = device.getDeviceExtension(HL7DeviceExtension.class);
-        setHL7Applications(hl7devExt.getHL7Applications());
     }
 }

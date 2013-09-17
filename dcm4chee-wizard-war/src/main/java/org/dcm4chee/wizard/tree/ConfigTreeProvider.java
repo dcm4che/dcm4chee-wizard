@@ -40,6 +40,7 @@ package org.dcm4chee.wizard.tree;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
@@ -58,6 +59,7 @@ import org.dcm4che.conf.api.AttributeCoercion;
 import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.net.ApplicationEntity;
 import org.dcm4che.net.Device;
+import org.dcm4che.net.DeviceExtension;
 import org.dcm4che.net.audit.AuditRecordRepository;
 import org.dcm4che.net.hl7.HL7DeviceExtension;
 import org.dcm4chee.proxy.conf.ProxyAEExtension;
@@ -79,6 +81,12 @@ import org.dcm4chee.wizard.model.proxy.ProxyDeviceModel;
 import org.dcm4chee.wizard.model.proxy.RetryModel;
 import org.dcm4chee.wizard.model.xds.XdsDeviceModel;
 import org.dcm4chee.wizard.tcxml.Group;
+import org.dcm4chee.xds2.conf.XCAInitiatingGWCfg;
+import org.dcm4chee.xds2.conf.XCARespondingGWCfg;
+import org.dcm4chee.xds2.conf.XCAiInitiatingGWCfg;
+import org.dcm4chee.xds2.conf.XCAiRespondingGWCfg;
+import org.dcm4chee.xds2.conf.XdsRegistry;
+import org.dcm4chee.xds2.conf.XdsRepository;
 
 /**
  * @author Robert David
@@ -357,7 +365,8 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode, Str
         new ConfigTreeNode(deviceNode, new StringResourceModel("dicom.list.hl7Applications.label", forComponent, null),
                 ConfigTreeNode.TreeNodeType.CONTAINER_HL7_APPLICATIONS, null);
 
-        if (deviceNode.getConfigurationType().equals(ConfigurationType.Proxy)) {
+        ConfigurationType configurationType = deviceNode.getConfigurationType();
+        if (configurationType.equals(ConfigurationType.Proxy) || configurationType.equals(ConfigurationType.XDS)) {
             // CREATE AUDIT LOGGERS FOLDER
             new ConfigTreeNode(deviceNode,
                     new StringResourceModel("dicom.list.auditLoggers.label", forComponent, null),
@@ -454,9 +463,21 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode, Str
     }
 
     public ConfigurationType getConfigurationType(Device device) {
-        if (device.getDeviceExtension(ProxyDeviceExtension.class) != null)
+        Collection<DeviceExtension> devExt = device.listDeviceExtensions();
+        for (DeviceExtension de : devExt) {
+            if (de instanceof ProxyDeviceExtension)
+                return ConfigurationType.Proxy;
+        }
+        if (devExt.contains(ProxyDeviceExtension.class))
             return ConfigurationType.Proxy;
-        if (device.getDeviceExtension(AuditRecordRepository.class) != null)
+        if (devExt.contains(XCAiInitiatingGWCfg.class) 
+                || devExt.contains(XCAInitiatingGWCfg.class)
+                || devExt.contains(XCAiRespondingGWCfg.class) 
+                || devExt.contains(XCARespondingGWCfg.class)
+                || devExt.contains(XdsRegistry.class) 
+                || devExt.contains(XdsRepository.class))
+            return ConfigurationType.XDS;
+        if (devExt.contains(AuditRecordRepository.class))
             return ConfigurationType.AuditRecordRepository;
         return ConfigurationType.Basic;
     }

@@ -54,6 +54,7 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.catalina.connector.ClientAbortException;
 import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.Component;
 import org.apache.wicket.Page;
 import org.apache.wicket.ajax.AbstractAjaxTimerBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -263,11 +264,17 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                 }).show(target);
             }
         };
-        createDevice.add(new Image("createDeviceImg", ImageManager.IMAGE_WIZARD_DEVICE_ADD).add(new ImageSizeBehaviour(
-                "vertical-align: middle;")));
+
+        Component createDeviceImg = new Image("createDeviceImg", ImageManager.IMAGE_WIZARD_DEVICE_ADD);
+        createDeviceImg.add(new ImageSizeBehaviour("vertical-align: middle;"));
+        createDevice.add(createDeviceImg);
+
         createDevice.add(new TooltipBehavior("dicom."));
-        createDevice.add(new Label("createDeviceText", new ResourceModel("dicom.createDevice.text"))
-                .add(new AttributeAppender("style", Model.of("vertical-align: middle"), " ")));
+
+        Component createDeviceText = new Label("createDeviceText", new ResourceModel("dicom.createDevice.text"));
+        createDeviceText.add(new AttributeAppender("style", Model.of("vertical-align: middle"), " "));
+        createDevice.add(createDeviceText);
+
         form.add(createDevice);
     }
 

@@ -45,6 +45,7 @@ import org.dcm4che.data.Code;
 
 /**
  * @author Robert David <robert.david@agfa.com>
+ * @author Michael Backhaus <michael.backhaus@agfa.com>
  */
 public class InstitutionCodeModel implements Serializable {
 
@@ -52,9 +53,9 @@ public class InstitutionCodeModel implements Serializable {
 
     String[] fields = new String[4];
 
+    public InstitutionCodeModel() {}
+
     public InstitutionCodeModel(Code code) {
-        if (code == null)
-            return;
         fields[0] = code.getCodeValue();
         fields[1] = code.getCodingSchemeDesignator();
         fields[2] = code.getCodingSchemeVersion();
