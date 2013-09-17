@@ -12,15 +12,15 @@
  * License.
  *
  * The Original Code is part of dcm4che, an implementation of DICOM(TM) in
- * Java(TM), hosted at http://sourceforge.net/projects/dcm4che.
+ * Java(TM), hosted at https://github.com/dcm4che.
  *
  * The Initial Developer of the Original Code is
- * Agfa-Gevaert AG.
- * Portions created by the Initial Developer are Copyright (C) 2008
+ * Agfa Healthcare.
+ * Portions created by the Initial Developer are Copyright (C) 2012
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- * See listed authors below.
+ * See @authors listed below
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -50,7 +50,7 @@ import org.wicketstuff.security.swarm.strategies.SwarmStrategy;
  * @author Robert David <robert.david@agfa.com>
  */
 public class SecureAjaxTabbedPanel extends AjaxTabbedPanel<SecureTab> {
-    
+
     private static final long serialVersionUID = 1L;
 
     public SecureAjaxTabbedPanel(String id, List<SecureTab> tabs) {
@@ -60,15 +60,17 @@ public class SecureAjaxTabbedPanel extends AjaxTabbedPanel<SecureTab> {
     public SecureAjaxTabbedPanel(String id) {
         this(id, new ArrayList<SecureTab>());
     }
-    
+
     public void addModule(Class<? extends Panel> clazz, IModel<String> titleModel) {
-		if (SwarmStrategy.get().isClassAuthorized(clazz, ((SecureWebApplication) getApplication()).getActionFactory().getAction("RENDER")))  
-			((List<SecureTab>) super.getTabs()).add(new SecureTab(clazz, titleModel));       
+        if (SwarmStrategy.get().isClassAuthorized(clazz,
+                ((SecureWebApplication) getApplication()).getActionFactory().getAction("RENDER")))
+            ((List<SecureTab>) super.getTabs()).add(new SecureTab(clazz, titleModel));
     }
-    
+
     public void addModule(Panel panel, IModel<String> titleModel) {
-        if (SwarmStrategy.get().isClassAuthorized(panel.getClass(), ((SecureWebApplication) getApplication()).getActionFactory().getAction("RENDER"))) {
-        	((List<SecureTab>) super.getTabs()).add(new SecureTab(panel, titleModel));
+        if (SwarmStrategy.get().isClassAuthorized(panel.getClass(),
+                ((SecureWebApplication) getApplication()).getActionFactory().getAction("RENDER"))) {
+            ((List<SecureTab>) super.getTabs()).add(new SecureTab(panel, titleModel));
         }
     }
 }

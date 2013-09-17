@@ -12,15 +12,15 @@
  * License.
  *
  * The Original Code is part of dcm4che, an implementation of DICOM(TM) in
- * Java(TM), hosted at http://sourceforge.net/projects/dcm4che.
+ * Java(TM), hosted at https://github.com/dcm4che.
  *
  * The Initial Developer of the Original Code is
- * Agfa-Gevaert AG.
- * Portions created by the Initial Developer are Copyright (C) 2008
+ * Agfa Healthcare.
+ * Portions created by the Initial Developer are Copyright (C) 2012
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- * See listed authors below.
+ * See @authors listed below
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -54,12 +54,13 @@ import org.dcm4chee.wizard.common.component.ModuleSelectorPanel;
  */
 public class SecureMainWebPage extends SecureSessionCheckPage {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private static final org.apache.wicket.request.resource.ResourceReference baseCSS = new CssResourceReference(MainWebPage.class, "base-style.css");
-    
+    private static final org.apache.wicket.request.resource.ResourceReference baseCSS = new CssResourceReference(
+            MainWebPage.class, "base-style.css");
+
     private ModuleSelectorPanel selectorPanel;
-    
+
     public SecureMainWebPage() {
         super();
         initLayout();
@@ -67,14 +68,14 @@ public class SecureMainWebPage extends SecureSessionCheckPage {
 
     @Override
     public void renderHead(IHeaderResponse response) {
-    	super.renderHead(response);
-    	if (SecureMainWebPage.baseCSS != null)
-    		response.render(CssHeaderItem.forReference(SecureMainWebPage.baseCSS));
+        super.renderHead(response);
+        if (SecureMainWebPage.baseCSS != null)
+            response.render(CssHeaderItem.forReference(SecureMainWebPage.baseCSS));
     }
 
     private void initLayout() {
 
-        add( new Label("app_browser_title", new AbstractReadOnlyModel<Object>() {
+        add(new Label("app_browser_title", new AbstractReadOnlyModel<Object>() {
 
             private static final long serialVersionUID = 1L;
 
@@ -82,7 +83,7 @@ public class SecureMainWebPage extends SecureSessionCheckPage {
             public Object getObject() {
                 return getBrowserTitle();
             }
-        } ));
+        }));
 
         add(selectorPanel = new ModuleSelectorPanel("modules"));
     }
@@ -93,11 +94,11 @@ public class SecureMainWebPage extends SecureSessionCheckPage {
 
     protected String getBrowserTitle() {
         Class<?> clazz = Application.get().getHomePage();
-        String s = new ClassStringResourceLoader(clazz)
-        	.loadStringResource(this.getClass(), "application.browser_title", getSession().getLocale(), null, null);
-        if (s==null) {
-            s = new PackageStringResourceLoader()
-            	.loadStringResource(this.getClass(), "application.browser_title", getSession().getLocale(), null, null); 
+        String s = new ClassStringResourceLoader(clazz).loadStringResource(this.getClass(),
+                "application.browser_title", getSession().getLocale(), null, null);
+        if (s == null) {
+            s = new PackageStringResourceLoader().loadStringResource(this.getClass(), "application.browser_title",
+                    getSession().getLocale(), null, null);
         }
         return s == null ? "DCM4CHEE" : s;
     }

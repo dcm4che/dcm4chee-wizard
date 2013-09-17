@@ -12,15 +12,15 @@
  * License.
  *
  * The Original Code is part of dcm4che, an implementation of DICOM(TM) in
- * Java(TM), hosted at http://sourceforge.net/projects/dcm4che.
+ * Java(TM), hosted at https://github.com/dcm4che.
  *
  * The Initial Developer of the Original Code is
- * Agfa-Gevaert AG.
- * Portions created by the Initial Developer are Copyright (C) 2008
+ * Agfa Healthcare.
+ * Portions created by the Initial Developer are Copyright (C) 2012
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- * See listed authors below.
+ * See @authors listed below
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -49,35 +49,32 @@ import org.dcm4chee.wizard.common.component.ExtendedForm;
 
 /**
  * @author Franz Willer <franz.willer@gmail.com>
- * @version $Revision$ $Date$
- * @since Oct 31, 2009
  */
 public class TooltipBehavior extends Behavior {
 
     private static final long serialVersionUID = 1L;
-    
+
     private static final String POSTFIX = ".tooltip";
     private String prefix, id;
-    
+
     private transient Localizer localizer;
 
     private IModel<?> substitutionModel;
     private AbstractReadOnlyModel<Boolean> showTooltipModel;
-    
+
     private boolean generateComponentTreePrefix;
+
     /*
-     * Create a TooltipBehaviour with given prefix.
-     * <p>
-     * Format of resource key: <prefix><component id>.tooltip
+     * Create a TooltipBehaviour with given prefix. <p> Format of resource key:
+     * <prefix><component id>.tooltip
      */
     public TooltipBehavior(String prefix) {
         this.prefix = prefix;
     }
 
     /*
-     * Create a TooltipBehaviour with given prefix and a fixed id.
-     * <p>
-     * Format of resource key: <prefix><id>.tooltip
+     * Create a TooltipBehaviour with given prefix and a fixed id. <p> Format of
+     * resource key: <prefix><id>.tooltip
      */
     public TooltipBehavior(String prefix, String id) {
         this.prefix = prefix;
@@ -101,21 +98,20 @@ public class TooltipBehavior extends Behavior {
 
     public void onComponentTag(Component component, ComponentTag tag) {
         String currentTitle = tag.getAttribute("title");
-        tag.put("title", currentTitle != null ? (currentTitle + " ") : "" + 
-            getLocalizer().getStringIgnoreSettings(getResourceKey(component), component, substitutionModel, ""));
+        tag.put("title",
+                currentTitle != null ? (currentTitle + " ") : ""
+                        + getLocalizer().getStringIgnoreSettings(getResourceKey(component), component,
+                                substitutionModel, ""));
     }
 
     String getResourceKey(Component component) {
         if (generateComponentTreePrefix)
             prefix = generateComponentTreePrefix(component);
         StringBuilder sb = new StringBuilder();
-        if ( prefix != null ) 
+        if (prefix != null)
             sb.append(prefix);
         sb.append(id == null ? component.getId() : id);
-        sb.append(this.showTooltipModel == null ? "" 
-                : "."
-                    + (this.showTooltipModel.getObject() ?  "hide" : "show")
-        );
+        sb.append(this.showTooltipModel == null ? "" : "." + (this.showTooltipModel.getObject() ? "hide" : "show"));
         sb.append(POSTFIX);
         return sb.toString();
     }
@@ -129,13 +125,13 @@ public class TooltipBehavior extends Behavior {
             sb.insert(0, parent.getId());
             parent = parent.getParent();
         }
-        if ((prefix != null) && (!prefix.equals(""))) 
+        if ((prefix != null) && (!prefix.equals("")))
             sb.insert(0, prefix);
         return sb.toString();
     }
 
     public Localizer getLocalizer() {
-        if ( localizer == null )
+        if (localizer == null)
             localizer = Application.get().getResourceSettings().getLocalizer();
         return localizer;
     }
@@ -143,11 +139,11 @@ public class TooltipBehavior extends Behavior {
     public String getPrefix() {
         return prefix;
     }
-    
+
     public TooltipBehavior newWithSubstitution(IModel<?> model) {
         return new TooltipBehavior(prefix, id, model);
     }
-    
+
     public String getTooltip(Component component) {
         return getLocalizer().getStringIgnoreSettings(getResourceKey(component), component, substitutionModel, "");
     }

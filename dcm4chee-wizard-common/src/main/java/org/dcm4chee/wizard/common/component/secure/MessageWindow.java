@@ -12,15 +12,15 @@
  * License.
  *
  * The Original Code is part of dcm4che, an implementation of DICOM(TM) in
- * Java(TM), hosted at http://sourceforge.net/projects/dcm4che.
+ * Java(TM), hosted at https://github.com/dcm4che.
  *
  * The Initial Developer of the Original Code is
- * Agfa-Gevaert AG.
- * Portions created by the Initial Developer are Copyright (C) 2008
+ * Agfa Healthcare.
+ * Portions created by the Initial Developer are Copyright (C) 2012
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- * See listed authors below.
+ * See @authors listed below
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -57,37 +57,37 @@ import org.dcm4chee.wizard.common.component.MainWebPage;
  */
 public abstract class MessageWindow extends ModalWindow {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private static final ResourceReference baseCSS = new PackageResourceReference(MainWebPage.class, "base-style.css");
-	
+    private static final ResourceReference baseCSS = new PackageResourceReference(MainWebPage.class, "base-style.css");
+
     public MessageWindow(String id, final IModel<?> message) {
-		super(id);
-		
+        super(id);
+
         setInitialWidth(400);
         setInitialHeight(300);
-        
+
         setPageCreator(new ModalWindow.PageCreator() {
-            
+
             private static final long serialVersionUID = 1L;
-              
+
             public Page createPage() {
                 return new MessagePage(message);
             }
         });
-	}
+    }
 
     public abstract void onOk(AjaxRequestTarget target);
-    
+
     public class MessagePage extends SecureSessionCheckPage {
-    	
-		private static final long serialVersionUID = 1L;
 
-		private IndicatingAjaxLink<Object> okBtn;
-		
-		public MessagePage(final IModel<?> message) {
+        private static final long serialVersionUID = 1L;
 
-			add(new Label("msg", new AbstractReadOnlyModel<Object>() {
+        private IndicatingAjaxLink<Object> okBtn;
+
+        public MessagePage(final IModel<?> message) {
+
+            add(new Label("msg", new AbstractReadOnlyModel<Object>() {
 
                 private static final long serialVersionUID = 1L;
 
@@ -95,8 +95,7 @@ public abstract class MessageWindow extends ModalWindow {
                 public Object getObject() {
                     return message == null ? null : message.getObject();
                 }
-            }).setOutputMarkupId(true)
-            .setEscapeModelStrings(false));
+            }).setOutputMarkupId(true).setEscapeModelStrings(false));
 
             okBtn = new IndicatingAjaxLink<Object>("ok") {
 
@@ -104,21 +103,20 @@ public abstract class MessageWindow extends ModalWindow {
 
                 @Override
                 public void onClick(AjaxRequestTarget target) {
-                	onOk(target);
-                	close(target);
+                    onOk(target);
+                    close(target);
                 }
             };
-            add(okBtn.add(new Label("okLabel", new ResourceModel("okBtn")))
-                    .setOutputMarkupId(true)
+            add(okBtn.add(new Label("okLabel", new ResourceModel("okBtn"))).setOutputMarkupId(true)
                     .setOutputMarkupPlaceholderTag(true));
             this.setOutputMarkupId(true);
         }
-		
-	    @Override
-	    public void renderHead(IHeaderResponse response) {
-	    	super.renderHead(response);
-	    	if (MessageWindow.baseCSS != null)
-	    		response.render(CssHeaderItem.forReference(MessageWindow.baseCSS));
-	    }
+
+        @Override
+        public void renderHead(IHeaderResponse response) {
+            super.renderHead(response);
+            if (MessageWindow.baseCSS != null)
+                response.render(CssHeaderItem.forReference(MessageWindow.baseCSS));
+        }
     }
 }

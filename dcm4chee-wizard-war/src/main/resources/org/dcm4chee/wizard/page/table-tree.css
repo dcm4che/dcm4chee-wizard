@@ -1,0 +1,160 @@
+div.tree table {
+	table-layout: auto;
+	border: thin; 
+	border-width: 1px; 
+	border-style: solid; 
+	border-color: #000000; 
+	width:100%; 
+	white-space: nowrap; 
+	background-color: #FFFFFF;
+	font-size: 12px;
+}
+
+div.tree table.left { width: 49%; float: left; margin-right: 2%; }
+div.tree table.right { width: 49%; }
+
+div.tree table tr td, div.tree table tr th {
+	height: 25px;
+	padding-left: 10px;
+}
+
+div.tree table tr.headers { 
+	background-color: #446666; 
+	color: white; 
+	text-align: left; 
+}
+
+div.tree table tr.odd { background-color: #FFFFFF; }
+div.tree table tr.even { background-color: #E1E0DE; }
+
+
+/* JUNCTIONS */
+
+a.tree-junction-collapsed, a.tree-junction {
+	background-image: url("../org.dcm4chee.wizard.icons.ImageManager/common/GREEN_expand.png") !important;
+}
+
+a.tree-junction-expanded {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.wizard.icons.ImageManager/common/GREEN_collapse.png") !important;
+}
+
+span.tree-content {}
+
+span.tree-label {
+	white-space: nowrap;
+}
+
+/* FOLDERS */
+
+span.tree-content a {
+	color: black;
+}
+
+span.tree-content a:hover {}
+
+.device .tree-folder-open, .device .tree-folder-closed, .device .tree-folder-other {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.wizard.icons.ImageManager/dicom/device.png") !important;
+}
+
+.connection .tree-folder-open, .connection .tree-folder-closed, .connection .tree-folder-other {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.wizard.icons.ImageManager/dicom/connection.png") !important;
+}
+
+.application-entity .tree-folder-other, .application-entity .tree-folder-open, .application-entity .tree-folder-closed {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.wizard.icons.ImageManager/dicom/application_entity.png") !important;
+}
+
+.transfer-capability .tree-folder-other {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.wizard.icons.ImageManager/dicom/transfer_capability.png") !important;
+}
+
+.audit_logger .tree-folder-open, .audit_logger .tree-folder-closed, .audit_logger .tree-folder-other {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.wizard.icons.ImageManager/dicom/audit_logger.png") !important;
+}
+
+.audit_logger_INCOMPLETE .tree-folder-open, .audit_logger_INCOMPLETE .tree-folder-closed, .audit_logger_INCOMPLETE .tree-folder-other {
+	background-position: 0px center !important;
+
+	background-image: url("../org.dcm4chee.wizard.icons.ImageManager/dicom/audit_logger_INCOMPLETE.png") !important;
+}
+
+.hl7-application .tree-folder-open, .hl7-application .tree-folder-closed, .hl7-application .tree-folder-other {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.wizard.icons.ImageManager/proxy/hl7_application.png") !important;
+}
+
+.forward_rule .tree-folder-other, .forward_rule .tree-folder-open, .forward_rule .tree-folder-closed {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.wizard.icons.ImageManager/proxy/forward_rule.png") !important;
+}
+
+.forward_schedule .tree-folder-other, .forward_schedule .tree-folder-open, .forward_schedule .tree-folder-closed {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.wizard.icons.ImageManager/proxy/forward_schedule.png") !important;
+}
+
+.retry .tree-folder-other, .retry .tree-folder-open, .retry .tree-folder-closed {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.wizard.icons.ImageManager/proxy/retry.png") !important;
+}
+
+.coercion .tree-folder-other, .coercion .tree-folder-open, .coercion .tree-folder-closed {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.wizard.icons.ImageManager/proxy/coercion.png") !important;
+}
+
+.folder_connections .tree-folder-other, .folder_connections .tree-folder-open, .folder_connections .tree-folder-closed {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.wizard.icons.ImageManager/dicom/folder_connections.png") !important;
+}
+
+.folder_application_entities .tree-folder-other, .folder_application_entities .tree-folder-open, .folder_application_entities .tree-folder-closed {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.wizard.icons.ImageManager/dicom/folder_application_entities.png") !important;
+}
+
+.folder_transfer_capabilities .tree-folder-other, .folder_transfer_capabilities .tree-folder-open, .folder_transfer_capabilities .tree-folder-closed {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.wizard.icons.ImageManager/dicom/folder_transfer_capabilities.png") !important;
+}
+
+.folder_transfer_capability_type .tree-folder-other, .folder_transfer_capability_type .tree-folder-open, .folder_transfer_capability_type .tree-folder-closed {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.wizard.icons.ImageManager/dicom/folder_transfer_capability_type.png") !important;
+}
+
+.folder_audit_loggers .tree-folder-other, .folder_audit_loggers .tree-folder-open, .folder_audit_loggers .tree-folder-closed {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.wizard.icons.ImageManager/dicom/folder_audit_loggers.png") !important;
+}
+
+.folder_hl7_applications .tree-folder-other, .folder_hl7_applications .tree-folder-open, .folder_hl7_applications .tree-folder-closed {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.wizard.icons.ImageManager/proxy/folder_hl7_applications.png") !important;
+}
+
+.folder_forward_rules .tree-folder-other, .folder_forward_rules .tree-folder-open, .folder_forward_rules .tree-folder-closed {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.wizard.icons.ImageManager/proxy/folder_proxy_rules.png") !important;
+}
+
+.folder_forward_options .tree-folder-other, .folder_forward_options .tree-folder-open, .folder_forward_options .tree-folder-closed {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.wizard.icons.ImageManager/proxy/folder_proxy_rules.png") !important;
+}
+
+.folder_retries .tree-folder-other, .folder_retries .tree-folder-open, .folder_retries .tree-folder-closed {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.wizard.icons.ImageManager/proxy/folder_proxy_rules.png") !important;
+}
+
+.folder_coercions .tree-folder-other, .folder_coercions .tree-folder-open, .folder_coercions .tree-folder-closed {
+	background-position: 0px center !important;
+	background-image: url("../org.dcm4chee.wizard.icons.ImageManager/proxy/folder_proxy_rules.png") !important;
+}

@@ -12,15 +12,15 @@
  * License.
  *
  * The Original Code is part of dcm4che, an implementation of DICOM(TM) in
- * Java(TM), hosted at http://sourceforge.net/projects/dcm4che.
+ * Java(TM), hosted at https://github.com/dcm4che.
  *
  * The Initial Developer of the Original Code is
- * Agfa-Gevaert AG.
- * Portions created by the Initial Developer are Copyright (C) 2008
+ * Agfa Healthcare.
+ * Portions created by the Initial Developer are Copyright (C) 2012
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- * See listed authors below.
+ * See @authors listed below
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -60,10 +60,11 @@ public class SSOLoginContext extends LoginContext {
 
     SecureSession session;
     private Subject jaasSubject;
-    
+
     public SSOLoginContext() {
-        
+
     }
+
     public SSOLoginContext(SecureSession secureSession, Subject jaasSubject) {
         this.session = secureSession;
         this.jaasSubject = jaasSubject;
@@ -71,13 +72,14 @@ public class SSOLoginContext extends LoginContext {
 
     @Override
     public final org.wicketstuff.security.hive.authentication.Subject login() throws LoginException {
-    	
-    	if (jaasSubject == null)
-                    throw new LoginException("Insufficient information to login");
-            return getSubject(jaasSubject);
+
+        if (jaasSubject == null)
+            throw new LoginException("Insufficient information to login");
+        return getSubject(jaasSubject);
     }
-    
-    protected org.wicketstuff.security.hive.authentication.Subject getSubject(Subject jaasSubject) throws LoginException {
+
+    protected org.wicketstuff.security.hive.authentication.Subject getSubject(Subject jaasSubject)
+            throws LoginException {
         if (session == null) {
             try {
                 session = ((SecureSession) Session.get());
@@ -86,7 +88,7 @@ public class SSOLoginContext extends LoginContext {
                 throw new LoginException();
             }
         }
-//        session.setManageUsers(BaseCfgDelegate.getInstance().getManageUsers());
+        // session.setManageUsers(BaseCfgDelegate.getInstance().getManageUsers());
         if (!readHiveFile())
             return null;
 
@@ -100,7 +102,7 @@ public class SSOLoginContext extends LoginContext {
             } else
                 session.extendedLogin(subject);
         } catch (Exception e) {
-            log.error("Login failed for JAAS subject: "+jaasSubject, e);
+            log.error("Login failed for JAAS subject: " + jaasSubject, e);
             session.invalidate();
             return new DefaultSubject();
         }
@@ -114,7 +116,7 @@ public class SSOLoginContext extends LoginContext {
         } catch (Exception e) {
             log.error("Error processing hive file", e);
             session.invalidate();
-            return false ;
+            return false;
         }
     }
 }

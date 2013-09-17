@@ -12,15 +12,15 @@
  * License.
  *
  * The Original Code is part of dcm4che, an implementation of DICOM(TM) in
- * Java(TM), hosted at http://sourceforge.net/projects/dcm4che.
+ * Java(TM), hosted at https://github.com/dcm4che.
  *
  * The Initial Developer of the Original Code is
- * Agfa-Gevaert AG.
- * Portions created by the Initial Developer are Copyright (C) 2008
+ * Agfa Healthcare.
+ * Portions created by the Initial Developer are Copyright (C) 2012
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- * See listed authors below.
+ * See @authors listed below
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -67,7 +67,7 @@ public class SecureWebApplication extends SwarmWebApplication {
 
     private Class<? extends Page> homePage;
     private Class<? extends Page> signinPage;
-    
+
     private final static Logger log = LoggerFactory.getLogger(SecureWebApplication.class);
 
     public SecureWebApplication() {
@@ -76,13 +76,16 @@ public class SecureWebApplication extends SwarmWebApplication {
     @Override
     protected void init() {
         super.init();
-        
+
         signinPage = (Class<? extends Page>) getPageClass(getInitParameter("signinPageClass"), LoginPage.class);
         homePage = getPageClass(getInitParameter("homePageClass"), null);
-        Class<? extends Page> internalErrorPage = getPageClass(getInitParameter("internalErrorPageClass"), InternalErrorPage.class);
-        getApplicationSettings().setAccessDeniedPage(getPageClass(getInitParameter("accessDeniedPageClass"), AccessDeniedPage.class));
-        getApplicationSettings().setPageExpiredErrorPage(getPageClass(getInitParameter("pageExpiredPageClass"), getHomePage()));
-        if ( internalErrorPage != null ) {
+        Class<? extends Page> internalErrorPage = getPageClass(getInitParameter("internalErrorPageClass"),
+                InternalErrorPage.class);
+        getApplicationSettings().setAccessDeniedPage(
+                getPageClass(getInitParameter("accessDeniedPageClass"), AccessDeniedPage.class));
+        getApplicationSettings().setPageExpiredErrorPage(
+                getPageClass(getInitParameter("pageExpiredPageClass"), getHomePage()));
+        if (internalErrorPage != null) {
             getApplicationSettings().setInternalErrorPage(internalErrorPage);
             this.getExceptionSettings().setUnexpectedExceptionDisplay(IExceptionSettings.SHOW_INTERNAL_ERROR_PAGE);
         }
@@ -91,11 +94,11 @@ public class SecureWebApplication extends SwarmWebApplication {
     @SuppressWarnings("unchecked")
     private Class<? extends Page> getPageClass(String className, Class<? extends Page> def) {
         Class<?> clazz = null;
-        if ( className != null ) {
+        if (className != null) {
             try {
                 clazz = (Class<? extends Page>) Class.forName(className);
             } catch (Throwable t) {
-                log.error("Could not get Class "+className+"! use default:"+def, t);
+                log.error("Could not get Class " + className + "! use default:" + def, t);
             }
         }
         return (Class<? extends SecureWebPage>) (clazz == null ? def : clazz);
@@ -104,16 +107,16 @@ public class SecureWebApplication extends SwarmWebApplication {
     @Override
     public Class<? extends Page> getHomePage() {
         if (homePage == null) {
-            throw new RuntimeException("No HomePage is set!"+
-               " You have to set init-param 'homePageClass' in web.xml "+
-               "or subclass BaseWicketApplication and override getHomePage()!");
+            throw new RuntimeException("No HomePage is set!"
+                    + " You have to set init-param 'homePageClass' in web.xml "
+                    + "or subclass BaseWicketApplication and override getHomePage()!");
         }
         return homePage;
     }
 
     @Override
     protected Object getHiveKey() {
-        return "hive_"+getName();
+        return "hive_" + getName();
     }
 
     @Override
@@ -141,7 +144,7 @@ public class SecureWebApplication extends SwarmWebApplication {
     public Class<? extends Page> getLoginPage() {
         return signinPage;
     }
-    
+
     @Override
     public SecureSession newSession(Request request, Response response) {
         return new SecureSession(this, request);

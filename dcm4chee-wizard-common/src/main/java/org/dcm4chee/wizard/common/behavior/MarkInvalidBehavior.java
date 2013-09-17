@@ -12,15 +12,15 @@
  * License.
  *
  * The Original Code is part of dcm4che, an implementation of DICOM(TM) in
- * Java(TM), hosted at http://sourceforge.net/projects/dcm4che.
+ * Java(TM), hosted at https://github.com/dcm4che.
  *
  * The Initial Developer of the Original Code is
- * Agfa-Gevaert AG.
- * Portions created by the Initial Developer are Copyright (C) 2008
+ * Agfa Healthcare.
+ * Portions created by the Initial Developer are Copyright (C) 2012
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- * See listed authors below.
+ * See @authors listed below
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -46,23 +46,22 @@ import org.apache.wicket.markup.html.form.FormComponent;
 
 /**
  * @author Franz Willer <franz.willer@gmail.com>
- * @version $Revision$ $Date$
- * @since Oct 31, 2009
  */
 public class MarkInvalidBehavior extends Behavior {
     private static final long serialVersionUID = 5109347770809331652L;
 
     private String msg;
-    
+
     @Override
     public void beforeRender(Component component) {
         msg = null;
         if (component instanceof FormComponent<?>) {
-            FormComponent<?> fc = (FormComponent<?>)component;
+            FormComponent<?> fc = (FormComponent<?>) component;
             if (!fc.isValid()) {
                 FeedbackMessages fbMsg = fc.getFeedbackMessages();
                 msg = fbMsg != null ? msg = fbMsg.first().getMessage().toString() : "";
-                if (fbMsg != null) fbMsg.first().markRendered();
+                if (fbMsg != null)
+                    fbMsg.first().markRendered();
             }
         }
     }

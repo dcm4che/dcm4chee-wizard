@@ -12,15 +12,15 @@
  * License.
  *
  * The Original Code is part of dcm4che, an implementation of DICOM(TM) in
- * Java(TM), hosted at http://sourceforge.net/projects/dcm4che.
+ * Java(TM), hosted at https://github.com/dcm4che.
  *
  * The Initial Developer of the Original Code is
- * Agfa-Gevaert AG.
- * Portions created by the Initial Developer are Copyright (C) 2008
+ * Agfa Healthcare.
+ * Portions created by the Initial Developer are Copyright (C) 2012
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- * See listed authors below.
+ * See @authors listed below
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -52,18 +52,18 @@ import org.slf4j.LoggerFactory;
  * @author Robert David <robert.david@agfa.com>
  */
 public class InternalErrorPage extends MainWebPage {
-    
-	private static final long serialVersionUID = 1L;
-	
-	private static Logger log = LoggerFactory.getLogger(InternalErrorPage.class);
-	
-	private Throwable throwable;
+
+    private static final long serialVersionUID = 1L;
+
+    private static Logger log = LoggerFactory.getLogger(InternalErrorPage.class);
+
+    private Throwable throwable;
     private Page page;
 
     public InternalErrorPage() {
         super();
     }
-    
+
     public InternalErrorPage(final Throwable throwable, final Page page) {
         super();
         this.throwable = throwable;
@@ -73,25 +73,30 @@ public class InternalErrorPage extends MainWebPage {
     @Override
     protected void onBeforeRender() {
         super.onBeforeRender();
-        
-		if (throwable != null) {
-			if (throwable instanceof PageExpiredException)
-				log.warn("Page expired", throwable);
-			else
-				log.error("Critical error", throwable);
-		}
+
+        if (throwable != null) {
+            if (throwable instanceof PageExpiredException)
+                log.warn("Page expired", throwable);
+            else
+                log.error("Critical error", throwable);
+        }
 
         ((MainWebPage) getPage()).getModuleSelectorPanel().setVisible(false);
 
         if (throwable instanceof PageExpiredException) {
-	        add(new Label("message-type", new ResourceModel("application.page_expired_error").wrapOnAssignment(this).getObject() + (this.throwable == null ? "" : throwable.getLocalizedMessage())));
-	        add(new Label("message-content", new ResourceModel("application.page_expired_error.message").wrapOnAssignment(this).getObject())
-	        	.setEscapeModelStrings(false));      	
+            add(new Label("message-type", new ResourceModel("application.page_expired_error").wrapOnAssignment(this)
+                    .getObject() + (this.throwable == null ? "" : throwable.getLocalizedMessage())));
+            add(new Label("message-content", new ResourceModel("application.page_expired_error.message")
+                    .wrapOnAssignment(this).getObject()).setEscapeModelStrings(false));
         } else {
-	        add(new Label("message-type", new ResourceModel("application.internal_error").wrapOnAssignment(this).getObject() + (this.throwable == null ? "" : throwable.getLocalizedMessage())));
-	        add(new Label("message-content", new ResourceModel("application.internal_error.throwable").wrapOnAssignment(this).getObject() + (this.throwable == null ? "" : throwable.getLocalizedMessage())));
+            add(new Label("message-type", new ResourceModel("application.internal_error").wrapOnAssignment(this)
+                    .getObject() + (this.throwable == null ? "" : throwable.getLocalizedMessage())));
+            add(new Label("message-content", new ResourceModel("application.internal_error.throwable")
+                    .wrapOnAssignment(this).getObject()
+                    + (this.throwable == null ? "" : throwable.getLocalizedMessage())));
         }
-        add(new Label("originating-page", new ResourceModel("application.internal_error.page").wrapOnAssignment(this).getObject() + (this.page == null ? "" : Page.class.toString())));
+        add(new Label("originating-page", new ResourceModel("application.internal_error.page").wrapOnAssignment(this)
+                .getObject() + (this.page == null ? "" : Page.class.toString())));
 
         add(new AjaxFallbackLink<Object>("home") {
 
@@ -100,19 +105,17 @@ public class InternalErrorPage extends MainWebPage {
             @Override
             public void onClick(AjaxRequestTarget target) {
 
-				if (throwable != null && 
-						(throwable instanceof ModalWindowRuntimeException
-						|| throwable instanceof PageExpiredException))
-				    ModalWindow.closeCurrent(target);
-				else
-					setResponsePage(getApplication().getHomePage());
+                if (throwable != null
+                        && (throwable instanceof ModalWindowRuntimeException || throwable instanceof PageExpiredException))
+                    ModalWindow.closeCurrent(target);
+                else
+                    setResponsePage(getApplication().getHomePage());
             }
         }.add(new Label("homeLabel", new ResourceModel("application.home"))));
     }
-    
+
     @Override
     protected String getBrowserTitle() {
-        return super.getBrowserTitle()+":"+
-            this.getString("application.internal_error", null, "Internal Error");
+        return super.getBrowserTitle() + ":" + this.getString("application.internal_error", null, "Internal Error");
     }
 }

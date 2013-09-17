@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.dcm4chee</groupId>
     <artifactId>dcm4chee-wizard</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
   </parent>
   <artifactId>dcm4chee-wizard-common</artifactId>
   <packaging>jar</packaging>
@@ -47,24 +47,24 @@
       <version>1.0.2.Final</version>
       <scope>provided</scope>
     </dependency>
-   	<dependency>
-		<groupId>org.dcm4che</groupId>
- 		<artifactId>dcm4che-core</artifactId>
- 		<version>3.2.0</version>
-	</dependency>
-	<dependency>
-		<groupId>org.jboss.as</groupId>
-		<artifactId>jboss-as-ejb3</artifactId>
-		<version>7.1.1.Final</version>
-		<scope>provided</scope>
-	</dependency>
-	<dependency>
-		<groupId>org.glassfish</groupId>
-		<artifactId>javax.security.jacc</artifactId>
-		<version>3.1.1</version>
-		<scope>provided</scope>
-	</dependency>
-	<dependency>
+    <dependency>
+      <groupId>org.dcm4che</groupId>
+      <artifactId>dcm4che-core</artifactId>
+      <version>3.2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.as</groupId>
+      <artifactId>jboss-as-ejb3</artifactId>
+      <version>7.1.1.Final</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish</groupId>
+      <artifactId>javax.security.jacc</artifactId>
+      <version>3.1.1</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>net.sf.json-lib</groupId>
       <artifactId>json-lib</artifactId>
       <version>2.4</version>
@@ -72,7 +72,7 @@
     </dependency>
   </dependencies>
   <build>
-    <finalName>dcm4chee-wizard-war-${version}-${project-classifier}</finalName>
+    <finalName>dcm4chee-wizard-war-${project.version}-${project-classifier}</finalName>
     <testResources>
       <testResource>
         <directory>src/test/resources</directory>
@@ -81,11 +81,11 @@
     </testResources>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.1</version>
         <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
+          <source>1.7</source>
+          <target>1.7</target>
         </configuration>
       </plugin>
       <plugin>

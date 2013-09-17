@@ -12,15 +12,15 @@
  * License.
  *
  * The Original Code is part of dcm4che, an implementation of DICOM(TM) in
- * Java(TM), hosted at http://sourceforge.net/projects/dcm4che.
+ * Java(TM), hosted at https://github.com/dcm4che.
  *
  * The Initial Developer of the Original Code is
- * Agfa-Gevaert AG.
- * Portions created by the Initial Developer are Copyright (C) 2008
+ * Agfa Healthcare.
+ * Portions created by the Initial Developer are Copyright (C) 2012
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- * See listed authors below.
+ * See @authors listed below
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -53,16 +53,14 @@ import org.wicketstuff.security.extensions.markup.html.tabs.ISecureTab;
 
 /**
  * @author Robert David <robert.david@agfa.com>
- * @version $Revision$ $Date$
- * @since 06.09.2010
  */
 public class SecureTab implements ISecureTab {
 
     private static final long serialVersionUID = 1L;
-    
+
     private static Logger log = LoggerFactory.getLogger(SecureTab.class);
-    
-    private transient ClassStringResourceLoader classStringLoader; 
+
+    private transient ClassStringResourceLoader classStringLoader;
     private transient PackageStringResourceLoader pkgStringLoader;
     private static final String TAB_TITLE_EXT = ".tabTitle";
     private Class<? extends Panel> clazz;
@@ -70,12 +68,12 @@ public class SecureTab implements ISecureTab {
     private String tabTitlePropertyName;
     private Panel panel;
     private IModel<String> titleModel;
-    
+
     public SecureTab(Class<? extends Panel> clazz2) {
         clazz = clazz2;
         initialize();
     }
-    
+
     public SecureTab(Class<? extends Panel> clazz2, IModel<String> titleModel) {
         clazz = clazz2;
         this.titleModel = titleModel;
@@ -86,29 +84,31 @@ public class SecureTab implements ISecureTab {
         clazz = instance.getClass();
         panel = instance;
         this.titleModel = titleModel;
-        if ( titleModel == null)
+        if (titleModel == null)
             initialize();
     }
 
     private void initialize() {
-        clazzName = clazz.getName().substring(clazz.getName().lastIndexOf('.')+1);            
+        clazzName = clazz.getName().substring(clazz.getName().lastIndexOf('.') + 1);
         pkgStringLoader = new PackageStringResourceLoader();
         try {
             Method m = clazz.getDeclaredMethod("getModuleName");
-            tabTitlePropertyName = m.invoke(null)+TAB_TITLE_EXT;
+            tabTitlePropertyName = m.invoke(null) + TAB_TITLE_EXT;
         } catch (Exception e) {
-            log.warn("Panel class "+clazz+" has no static getModuleName() method declared! use classname instead!:"+clazzName);
-            tabTitlePropertyName = clazzName+TAB_TITLE_EXT;
+            log.warn("Panel class " + clazz + " has no static getModuleName() method declared! use classname instead!:"
+                    + clazzName);
+            tabTitlePropertyName = clazzName + TAB_TITLE_EXT;
         }
     }
 
     private ClassStringResourceLoader getClassStringLoader() {
-        if ( classStringLoader == null )
+        if (classStringLoader == null)
             classStringLoader = new ClassStringResourceLoader(clazz);
         return classStringLoader;
     }
+
     private PackageStringResourceLoader getPackageStringLoader() {
-        if ( pkgStringLoader == null )
+        if (pkgStringLoader == null)
             pkgStringLoader = new PackageStringResourceLoader();
         return pkgStringLoader;
     }
@@ -119,34 +119,34 @@ public class SecureTab implements ISecureTab {
 
     public Panel getPanel(String panelId) {
         try {
-            if ( panel == null ) {
+            if (panel == null) {
                 Constructor<? extends Panel> c = clazz.getConstructor(String.class);
                 panel = c.newInstance(panelId);
             }
             return panel;
-        } catch ( Exception x ) {
-            log.error("Can't instantiate Panel for "+panelId, x);
+        } catch (Exception x) {
+            log.error("Can't instantiate Panel for " + panelId, x);
             return null;
         }
     }
 
     /**
-     * Get title of the tab.
-     * Use ClassStringResourceLoader and PackageStringResourceLoader to get the title String.
-     * Using a ResourceModel at this point would fail because the panel isn't instantiated by
-     * the TabbedPane. 
-     * Therefore the title must be either configured in package.properties or &lt;clazz&gt;.properties! 
-     * Other ResourceLoaders will be ignored!
+     * Get title of the tab. Use ClassStringResourceLoader and
+     * PackageStringResourceLoader to get the title String. Using a
+     * ResourceModel at this point would fail because the panel isn't
+     * instantiated by the TabbedPane. Therefore the title must be either
+     * configured in package.properties or &lt;clazz&gt;.properties! Other
+     * ResourceLoaders will be ignored!
      */
     public IModel<String> getTitle() {
         if (titleModel == null) {
-            String t = getClassStringLoader()
-            		.loadStringResource(clazz, tabTitlePropertyName, Session.get().getLocale(), null, null);
-            if (t== null)
-                t = getPackageStringLoader()
-                		.loadStringResource(clazz, tabTitlePropertyName, Session.get().getLocale(), null, null); 
+            String t = getClassStringLoader().loadStringResource(clazz, tabTitlePropertyName,
+                    Session.get().getLocale(), null, null);
+            if (t == null)
+                t = getPackageStringLoader().loadStringResource(clazz, tabTitlePropertyName, Session.get().getLocale(),
+                        null, null);
             return new Model<String>(t == null ? clazzName : t);
-        } else 
+        } else
             return titleModel;
     }
 

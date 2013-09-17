@@ -12,15 +12,15 @@
  * License.
  *
  * The Original Code is part of dcm4che, an implementation of DICOM(TM) in
- * Java(TM), hosted at http://sourceforge.net/projects/dcm4che.
+ * Java(TM), hosted at https://github.com/dcm4che.
  *
  * The Initial Developer of the Original Code is
- * Agfa-Gevaert AG.
- * Portions created by the Initial Developer are Copyright (C) 2008
+ * Agfa Healthcare.
+ * Portions created by the Initial Developer are Copyright (C) 2012
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- * See listed authors below.
+ * See @authors listed below
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -60,7 +60,7 @@ import org.dcm4chee.wizard.common.component.MainWebPage;
  * @author Robert David <robert.david@agfa.com>
  */
 public abstract class ConfirmationWindow<T> extends ModalWindow {
-    
+
     private static final long serialVersionUID = 1L;
 
     public static final String FOCUS_ON_CONFIRM = "content:confirm";
@@ -76,22 +76,22 @@ public abstract class ConfirmationWindow<T> extends ModalWindow {
     private String focusElementId;
 
     private IModel<?> remark, confirm, decline, cancel;
-    
+
     protected boolean hasStatus;
     private boolean showCancel = false;
     private int state = UNCONFIRMED;
-    
+
     public ConfirmationPanel messageWindowPanel;
-    
+
     private static final ResourceReference baseCSS = new PackageResourceReference(MainWebPage.class, "base-style.css");
-	
+
     public ConfirmationWindow(String id, String titleResource) {
         this(id);
         setTitle(new ResourceModel(titleResource));
     }
-    
+
     public ConfirmationWindow(String id) {
-        
+
         this(id, new ResourceModel("yesBtn"), new ResourceModel("noBtn"), new ResourceModel("cancelBtn"));
 
         setCloseButtonCallback(new CloseButtonCallback() {
@@ -105,7 +105,7 @@ public abstract class ConfirmationWindow<T> extends ModalWindow {
             }
         });
         setWindowClosedCallback(new ModalWindow.WindowClosedCallback() {
-            
+
             private static final long serialVersionUID = 1L;
 
             public void onClose(AjaxRequestTarget target) {
@@ -126,24 +126,31 @@ public abstract class ConfirmationWindow<T> extends ModalWindow {
     protected void initContent() {
         setInitialWidth(400);
         setInitialHeight(300);
-        
+
         messageWindowPanel = new ConfirmationPanel("panel");
-        
+
         setPageCreator(new ModalWindow.PageCreator() {
-            
+
             private static final long serialVersionUID = 1L;
-              
+
             public Page createPage() {
                 return new ConfirmationPage();
             }
         });
     }
 
-    public void onConfirmation(AjaxRequestTarget target, T userObject) {};
-    public void onDecline(AjaxRequestTarget target, T userObject) {}
-    public void onCancel(AjaxRequestTarget target, T userObject) {}
-    public void onOk(AjaxRequestTarget target) {}
-    
+    public void onConfirmation(AjaxRequestTarget target, T userObject) {
+    };
+
+    public void onDecline(AjaxRequestTarget target, T userObject) {
+    }
+
+    public void onCancel(AjaxRequestTarget target, T userObject) {
+    }
+
+    public void onOk(AjaxRequestTarget target) {
+    }
+
     @Override
     public void show(final AjaxRequestTarget target) {
         hasStatus = false;
@@ -151,13 +158,15 @@ public abstract class ConfirmationWindow<T> extends ModalWindow {
         if (focusElementId != null)
             target.focusComponent(this.get(focusElementId));
     }
-    
+
     public void confirm(AjaxRequestTarget target, IModel<?> msg, T userObject) {
         confirm(target, msg, userObject, FOCUS_ON_DECLINE);
     }
+
     public void confirm(AjaxRequestTarget target, IModel<?> msg, T userObject, String focusElementId) {
         confirm(target, msg, userObject, focusElementId, false);
     }
+
     public void confirm(AjaxRequestTarget target, IModel<?> msg, T userObject, String focusElementId, boolean showCancel) {
         this.messageWindowPanel.msg = msg;
         this.userObject = userObject;
@@ -169,7 +178,7 @@ public abstract class ConfirmationWindow<T> extends ModalWindow {
     public void confirmWithCancel(AjaxRequestTarget target, IModel<?> msg, T userObject) {
         confirm(target, msg, userObject, FOCUS_ON_CANCEL, true);
     }
-    
+
     public void setStatus(IModel<?> statusMsg) {
         messageWindowPanel.msg = statusMsg;
         hasStatus = true;
@@ -178,47 +187,47 @@ public abstract class ConfirmationWindow<T> extends ModalWindow {
     public void setRemark(IModel<?> remark) {
         this.remark = remark;
     }
-    
+
     public T getUserObject() {
         return userObject;
-    }    
-    
+    }
+
     public int getState() {
         return state;
     }
 
     public class ConfirmationPage extends SecureSessionCheckPage {
-    	
-		private static final long serialVersionUID = 1L;
 
-		public ConfirmationPage() {
+        private static final long serialVersionUID = 1L;
+
+        public ConfirmationPage() {
             add(messageWindowPanel);
         }
-		
-	    @Override
-	    public void renderHead(IHeaderResponse response) {
-	    	super.renderHead(response);
-	    	if (ConfirmationWindow.baseCSS != null)
-	    		response.render(CssHeaderItem.forReference(ConfirmationWindow.baseCSS));
-	    }
+
+        @Override
+        public void renderHead(IHeaderResponse response) {
+            super.renderHead(response);
+            if (ConfirmationWindow.baseCSS != null)
+                response.render(CssHeaderItem.forReference(ConfirmationWindow.baseCSS));
+        }
     }
-    
+
     public class ConfirmationPanel extends Panel {
-        
+
         private static final long serialVersionUID = 1L;
-        
+
         private IndicatingAjaxLink<Object> confirmBtn;
         private AjaxLink<Object> okBtn;
-        
+
         private IModel<?> msg;
         private Label msgLabel;
         private Label remarkLabel;
-        
+
         private boolean logout = false;
-        
+
         public ConfirmationPanel(String id) {
             super(id);
-            
+
             add((msgLabel = new Label("msg", new AbstractReadOnlyModel<Object>() {
 
                 private static final long serialVersionUID = 1L;
@@ -227,9 +236,8 @@ public abstract class ConfirmationWindow<T> extends ModalWindow {
                 public Object getObject() {
                     return msg == null ? null : msg.getObject();
                 }
-            })).setOutputMarkupId(true)
-            .setEscapeModelStrings(false));
-            
+            })).setOutputMarkupId(true).setEscapeModelStrings(false));
+
             add((remarkLabel = new Label("remark", new AbstractReadOnlyModel<Object>() {
 
                 private static final long serialVersionUID = 1L;
@@ -238,7 +246,7 @@ public abstract class ConfirmationWindow<T> extends ModalWindow {
                 public Object getObject() {
                     return remark == null ? null : remark.getObject();
                 }
-            }){
+            }) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -269,7 +277,7 @@ public abstract class ConfirmationWindow<T> extends ModalWindow {
                         target.add(ConfirmationPanel.this);
                     }
                 }
-                
+
                 @Override
                 public boolean isVisible() {
                     return !hasStatus;
@@ -278,8 +286,8 @@ public abstract class ConfirmationWindow<T> extends ModalWindow {
             confirmBtn.add(new Label("confirmLabel", confirm));
             confirmBtn.setOutputMarkupId(true);
             add(confirmBtn);
-            
-            add(new AjaxLink<Object>("decline"){
+
+            add(new AjaxLink<Object>("decline") {
 
                 private static final long serialVersionUID = 1L;
 
@@ -294,13 +302,14 @@ public abstract class ConfirmationWindow<T> extends ModalWindow {
                         close(target);
                     }
                 }
+
                 @Override
                 public boolean isVisible() {
                     return !hasStatus;
                 }
             }.add(new Label("declineLabel", decline)));
-            
-            add(new AjaxLink<Object>("cancel"){
+
+            add(new AjaxLink<Object>("cancel") {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -310,40 +319,40 @@ public abstract class ConfirmationWindow<T> extends ModalWindow {
                     msg = null;
                     close(target);
                 }
+
                 @Override
                 public boolean isVisible() {
                     return !hasStatus && showCancel;
                 }
-            }.add(new Label("cancelLabel", cancel)) );
-            
+            }.add(new Label("cancelLabel", cancel)));
+
             add(okBtn = new IndicatingAjaxLink<Object>("ok") {
 
                 private static final long serialVersionUID = 1L;
 
                 @Override
                 public void onClick(AjaxRequestTarget target) {
-                    if (logout)   
+                    if (logout)
                         onConfirmation(target, userObject);
-                    else 
+                    else
                         onOk(target);
                     msg = null;
                     close(target);
                 }
-                
+
                 @Override
                 public boolean isVisible() {
                     return hasStatus;
                 }
             });
             getOkBtn().add(new Label("okLabel", new ResourceModel("okBtn")));
-            getOkBtn()
-            .setOutputMarkupId(true)
-            .setOutputMarkupPlaceholderTag(true);
+            getOkBtn().setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true);
             this.setOutputMarkupId(true);
         }
 
         /**
-         * Return always true because ModalWindow.beforeRender set visibility of content to false!
+         * Return always true because ModalWindow.beforeRender set visibility of
+         * content to false!
          */
         @Override
         public boolean isVisible() {
@@ -362,8 +371,8 @@ public abstract class ConfirmationWindow<T> extends ModalWindow {
             return remarkLabel;
         }
     }
-    
+
     public ConfirmationPanel getMessageWindowPanel() {
         return messageWindowPanel;
-    }    
+    }
 }

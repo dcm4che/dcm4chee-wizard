@@ -12,15 +12,15 @@
  * License.
  *
  * The Original Code is part of dcm4che, an implementation of DICOM(TM) in
- * Java(TM), hosted at http://sourceforge.net/projects/dcm4che.
+ * Java(TM), hosted at https://github.com/dcm4che.
  *
  * The Initial Developer of the Original Code is
- * Agfa-Gevaert AG.
- * Portions created by the Initial Developer are Copyright (C) 2008
+ * Agfa Healthcare.
+ * Portions created by the Initial Developer are Copyright (C) 2012
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- * See listed authors below.
+ * See @authors listed below
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -82,51 +82,51 @@ import org.xml.sax.helpers.DefaultHandler;
 public class ModuleSelectorPanel extends SecureAjaxTabbedPanel {
 
     private static final long serialVersionUID = 1L;
-    
+
     public boolean showLogout = true;
-    
+
     ConfirmationWindow<?> confirmLogout = new ConfirmationWindow<Object>("confirmLogout") {
 
         private static final long serialVersionUID = 1L;
 
-		@Override
-		public void onConfirmation(AjaxRequestTarget target, Object userObject) {
+        @Override
+        public void onConfirmation(AjaxRequestTarget target, Object userObject) {
             getSession().invalidate();
             return;
-		}
+        }
     };
 
-	final ModalWindow aboutWindow = new ModalWindow("aboutWindow");
+    final ModalWindow aboutWindow = new ModalWindow("aboutWindow");
 
-	AjaxLink<Object> aboutLink = new AjaxLink<Object>("aboutLink") {
+    AjaxLink<Object> aboutLink = new AjaxLink<Object>("aboutLink") {
         private static final long serialVersionUID = 1L;
 
         @Override
         public void onClick(AjaxRequestTarget target) {
-        	aboutWindow.setTitle("").show(target);
+            aboutWindow.setTitle("").show(target);
         }
     };
 
     public ModuleSelectorPanel(String id) {
         super(id);
-        
+
         Set<String> languages = new HashSet<String>();
         languages.add("de");
         languages.add("en");
-        
+
         Set<String> customLanguages = new HashSet<String>();
         String languageProperty = System.getProperty("org.dcm4chee.wizard.config.languages");
         if (languageProperty != null) {
-        	for (String language : languageProperty.split("\\|"))
-        		if (languages.contains(language))
-        			customLanguages.add(language);
-        	languages = customLanguages;
+            for (String language : languageProperty.split("\\|"))
+                if (languages.contains(language))
+                    customLanguages.add(language);
+            languages = customLanguages;
         }
 
         boolean found = false;
         List<Cookie> cookies = ((WebRequest) RequestCycle.get().getRequest()).getCookies();
         if (cookies != null)
-            for (Cookie cookie : cookies) 
+            for (Cookie cookie : cookies)
                 if (cookie.getName().equals("WIZARDLOCALE")) {
                     getSession().setLocale(new Locale(cookie.getValue()));
                     found = true;
@@ -134,8 +134,8 @@ public class ModuleSelectorPanel extends SecureAjaxTabbedPanel {
                 }
 
         if (languages.size() == 1)
-        	getSession().setLocale(new Locale(languages.iterator().next()));
-        	
+            getSession().setLocale(new Locale(languages.iterator().next()));
+
         if (!found) {
             Cookie cookie = new Cookie("WIZARDLOCALE", getSession().getLocale().getLanguage());
             cookie.setMaxAge(Integer.MAX_VALUE);
@@ -145,22 +145,23 @@ public class ModuleSelectorPanel extends SecureAjaxTabbedPanel {
         add(confirmLogout);
 
         try {
-            InputStream is = ((SwarmWebApplication) getApplication()).getServletContext().getResourceAsStream("/WEB-INF/web.xml");
+            InputStream is = ((SwarmWebApplication) getApplication()).getServletContext().getResourceAsStream(
+                    "/WEB-INF/web.xml");
             XMLReader parser = org.xml.sax.helpers.XMLReaderFactory.createXMLReader();
-            
+
             DefaultHandler dh = new DefaultHandler() {
-                
+
                 private StringBuffer current;
-    
+
                 @Override
-                public void characters (char ch[], int start, int length) throws SAXException {
+                public void characters(char ch[], int start, int length) throws SAXException {
                     current = new StringBuffer().append(ch, start, length);
                 }
-    
+
                 @Override
-                public void endElement (String uri, String localName, String qName) throws SAXException {
-                    if(qName.equals("auth-method"))
-                        if (current.toString().equals("BASIC")) 
+                public void endElement(String uri, String localName, String qName) throws SAXException {
+                    if (qName.equals("auth-method"))
+                        if (current.toString().equals("BASIC"))
                             showLogout = false;
                 }
             };
@@ -168,11 +169,11 @@ public class ModuleSelectorPanel extends SecureAjaxTabbedPanel {
             parser.parse(new InputSource(is));
         } catch (Exception ignore) {
         }
-        
+
         add(new AjaxFallbackLink<Object>("logout") {
-            
+
             private static final long serialVersionUID = 1L;
-            
+
             @Override
             public void onClick(final AjaxRequestTarget target) {
                 getSession().invalidate();
@@ -183,24 +184,20 @@ public class ModuleSelectorPanel extends SecureAjaxTabbedPanel {
             public boolean isVisible() {
                 return showLogout;
             }
-        }.add(new Label("logoutLabel", 
-            new StringResourceModel("logout", ModuleSelectorPanel.this, null, 
-                    new Object[] { 
-                        ((SecureSession) Session.get()).getUsername()
-                    })
-        )));
-       
-        final DropDownChoice<String> languageSelector = 
-            new DropDownChoice<String>("language", new Model<String>(), new ArrayList<String>(languages), new ChoiceRenderer<String>() {
+        }.add(new Label("logoutLabel", new StringResourceModel("logout", ModuleSelectorPanel.this, null,
+                new Object[] { ((SecureSession) Session.get()).getUsername() }))));
 
-            private static final long serialVersionUID = 1L;
-            
-            @Override
-            public String getDisplayValue(String object) {
-                Locale l = new Locale(object);
-                return l.getDisplayName(l);
-            }
-        }) {
+        final DropDownChoice<String> languageSelector = new DropDownChoice<String>("language", new Model<String>(),
+                new ArrayList<String>(languages), new ChoiceRenderer<String>() {
+
+                    private static final long serialVersionUID = 1L;
+
+                    @Override
+                    public String getDisplayValue(String object) {
+                        Locale l = new Locale(object);
+                        return l.getDisplayName(l);
+                    }
+                }) {
 
             private static final long serialVersionUID = 1L;
 
@@ -212,28 +209,27 @@ public class ModuleSelectorPanel extends SecureAjaxTabbedPanel {
                 getSession().setLocale(new Locale(newSelection));
             }
         };
-        
+
         if (languages.size() > 1) {
-	        languageSelector.setDefaultModelObject(getSession().getLocale().getLanguage());
-	        languageSelector.add(new AjaxFormComponentUpdatingBehavior("onchange") {
-	            private static final long serialVersionUID = 1L;
-	
-	            protected void onUpdate(AjaxRequestTarget target) {
-	                languageSelector.onSelectionChanged();
-	                target.add(getPage().setOutputMarkupId(true));
-	            }
-	        });
+            languageSelector.setDefaultModelObject(getSession().getLocale().getLanguage());
+            languageSelector.add(new AjaxFormComponentUpdatingBehavior("onchange") {
+                private static final long serialVersionUID = 1L;
+
+                protected void onUpdate(AjaxRequestTarget target) {
+                    languageSelector.onSelectionChanged();
+                    target.add(getPage().setOutputMarkupId(true));
+                }
+            });
         } else
             languageSelector.setVisible(false);
-        
+
         add(languageSelector);
 
-    	add(aboutWindow.setInitialWidth(600).setInitialHeight(400));
+        add(aboutWindow.setInitialWidth(600).setInitialHeight(400));
 
         add(aboutLink
-        		.add(new Image("img_logo", new PackageResourceReference(ModuleSelectorPanel.class, "images/logo.gif")))
-        		.add(new TooltipBehavior("dicom."))
-        		.setEnabled(false));
+                .add(new Image("img_logo", new PackageResourceReference(ModuleSelectorPanel.class, "images/logo.gif")))
+                .add(new TooltipBehavior("dicom.")).setEnabled(false));
     }
 
     public void addModule(final Class<? extends Panel> clazz) {
@@ -252,9 +248,9 @@ public class ModuleSelectorPanel extends SecureAjaxTabbedPanel {
         showLogout = show;
         return this;
     }
-    
+
     public ModalWindow getAboutWindow() {
-    	aboutLink.setEnabled(true);
-    	return aboutWindow;
-    }    
+        aboutLink.setEnabled(true);
+        return aboutWindow;
+    }
 }

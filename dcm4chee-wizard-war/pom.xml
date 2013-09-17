@@ -5,17 +5,17 @@
   <parent>
     <groupId>org.dcm4chee</groupId>
     <artifactId>dcm4chee-wizard</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
   </parent>
   <artifactId>dcm4chee-wizard-war</artifactId>
   <packaging>war</packaging>
-  <name>WAR for dcm4chee-wizard</name>
+  <name>dcm4chee-wizard-war</name>
   <description></description>
   <profiles>
     <profile>
       <id>standalone</id>
       <properties>
-      	<project-classifier>standalone</project-classifier>
+        <project-classifier>standalone</project-classifier>
         <profile.dependencies>org.jboss.logmanager,org.slf4j.impl,org.dcm4che.core,org.dcm4che.net,org.dcm4che.net-hl7,org.dcm4che.conf.api,org.dcm4che.conf.ldap,org.dcm4che.conf.ldap-hl7,org.dcm4che.conf.ldap-audit,org.dcm4che.conf.prefs,org.dcm4che.conf.prefs-hl7,org.dcm4che.conf.prefs-audit,org.dcm4che.emf</profile.dependencies>
         <web.xml.path>webapp</web.xml.path>
       </properties>
@@ -171,9 +171,15 @@
       <version>6.0.13</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.dcm4che</groupId>
+      <artifactId>dcm4chee-xds2-conf</artifactId>
+      <version>${dcm4chee.xds2.version}</version>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
   <build>
-    <finalName>dcm4chee-wizard-war-${version}-${project-classifier}</finalName>
+    <finalName>dcm4chee-wizard-war-${project.version}-${project-classifier}</finalName>
     <testResources>
       <testResource>
         <directory>src/test/resources</directory>
@@ -182,11 +188,11 @@
     </testResources>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.1</version>
         <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
+          <source>1.7</source>
+          <target>1.7</target>
         </configuration>
       </plugin>
       <plugin>

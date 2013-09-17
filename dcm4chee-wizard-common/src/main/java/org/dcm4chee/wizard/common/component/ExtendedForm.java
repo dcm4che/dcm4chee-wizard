@@ -12,15 +12,15 @@
  * License.
  *
  * The Original Code is part of dcm4che, an implementation of DICOM(TM) in
- * Java(TM), hosted at http://sourceforge.net/projects/dcm4che.
+ * Java(TM), hosted at https://github.com/dcm4che.
  *
  * The Initial Developer of the Original Code is
- * Agfa-Gevaert AG.
- * Portions created by the Initial Developer are Copyright (C) 2008
+ * Agfa Healthcare.
+ * Portions created by the Initial Developer are Copyright (C) 2012
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- * See listed authors below.
+ * See @authors listed below
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -34,7 +34,7 @@
  * the provisions above, a recipient may use your version of this file under
  * the terms of any one of the MPL, the GPL or the LGPL.
  *
- ***** END LICENSE BLOCK ***** */
+ * ***** END LICENSE BLOCK ***** */
 
 package org.dcm4chee.wizard.common.component;
 
@@ -65,13 +65,13 @@ public class ExtendedForm extends Form<Object> {
     private String resourceIdPrefix;
     private WebMarkupContainer parent;
     private boolean rendered;
-    
+
     MarkInvalidBehavior markInvalidBehaviour = new MarkInvalidBehavior();
-        
+
     public ExtendedForm(String id) {
         super(id);
     }
-    
+
     public ExtendedForm(String id, IModel<Object> model) {
         super(id, model);
     }
@@ -92,7 +92,7 @@ public class ExtendedForm extends Form<Object> {
     public void clearParent() {
         this.parent = null;
     }
-    
+
     public WebMarkupContainer createAjaxParent(String id) {
         super.add(this.parent = new WebMarkupContainer(id));
         this.parent.setOutputMarkupId(true);
@@ -107,55 +107,51 @@ public class ExtendedForm extends Form<Object> {
             parent.add(child);
         return this;
     }
-    
-    public static void addInvalidComponentsToAjaxRequestTarget(
-            final AjaxRequestTarget target, final Form<?> form) {
-    	
-        form.visitChildren(
-        		new IVisitor<Component, Void>() {
 
-		            public void component(Component component, IVisit<Void> visit) {
-		                if (component instanceof FormComponent<?>) {
-		                    FormComponent<?> formComponent = (FormComponent<?>) component;
-		                    if (!formComponent.isValid()) 
-		                        target.add(formComponent);
-		                }
-		            }
-        		});
+    public static void addInvalidComponentsToAjaxRequestTarget(final AjaxRequestTarget target, final Form<?> form) {
+
+        form.visitChildren(new IVisitor<Component, Void>() {
+
+            public void component(Component component, IVisit<Void> visit) {
+                if (component instanceof FormComponent<?>) {
+                    FormComponent<?> formComponent = (FormComponent<?>) component;
+                    if (!formComponent.isValid())
+                        target.add(formComponent);
+                }
+            }
+        });
     }
-    
-    public static void addFormComponentsToAjaxRequestTarget(
-            final AjaxRequestTarget target, final Form<?> form) {
-    	
-        form.visitChildren(
-        		new IVisitor<Component, Void>() {
 
-					public void component(Component component, IVisit<Void> visit) {
-		                if (component.getOutputMarkupId()) 
-		                    target.add(component);
-					}
-		        });
+    public static void addFormComponentsToAjaxRequestTarget(final AjaxRequestTarget target, final Form<?> form) {
+
+        form.visitChildren(new IVisitor<Component, Void>() {
+
+            public void component(Component component, IVisit<Void> visit) {
+                if (component.getOutputMarkupId())
+                    target.add(component);
+            }
+        });
     }
 
     class FormVisitor implements IVisitor<Component, Void>, Serializable {
-        
+
         private static final long serialVersionUID = 0L;
 
-		public void component(Component component, IVisit<Void> visit) {
-            if (componentHasNoTooltip(component)) 
-            	component.add(new TooltipBehavior(resourceIdPrefix, component.getId()).setGenerateComponentTreePrefix());
+        public void component(Component component, IVisit<Void> visit) {
+            if (componentHasNoTooltip(component))
+                component
+                        .add(new TooltipBehavior(resourceIdPrefix, component.getId()).setGenerateComponentTreePrefix());
             if (component instanceof FormComponent<?>) {
-            	component.add(markInvalidBehaviour);
-            	component.setOutputMarkupId(true);
+                component.add(markInvalidBehaviour);
+                component.setOutputMarkupId(true);
             }
-		}
+        }
     }
 
     public boolean componentHasNoTooltip(Component component) {
-        for (Behavior behavior : component.getBehaviors()) 
+        for (Behavior behavior : component.getBehaviors())
             if (behavior instanceof TooltipBehavior)
                 return false;
         return true;
     }
 }
-

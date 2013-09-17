@@ -12,15 +12,15 @@
  * License.
  *
  * The Original Code is part of dcm4che, an implementation of DICOM(TM) in
- * Java(TM), hosted at http://sourceforge.net/projects/dcm4che.
+ * Java(TM), hosted at https://github.com/dcm4che.
  *
  * The Initial Developer of the Original Code is
- * Agfa-Gevaert AG.
- * Portions created by the Initial Developer are Copyright (C) 2008
+ * Agfa Healthcare.
+ * Portions created by the Initial Developer are Copyright (C) 2012
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- * See listed authors below.
+ * See @authors listed below
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -54,12 +54,12 @@ import org.apache.wicket.resource.loader.PackageStringResourceLoader;
  */
 public class MainWebPage extends WebPage {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private static final ResourceReference baseCSS = new CssResourceReference(MainWebPage.class, "base-style.css");
-    
+    private static final ResourceReference baseCSS = new CssResourceReference(MainWebPage.class, "base-style.css");
+
     protected ModuleSelectorPanel selectorPanel;
-    
+
     public MainWebPage() {
         super();
         initLayout();
@@ -67,10 +67,10 @@ public class MainWebPage extends WebPage {
 
     @Override
     public void renderHead(IHeaderResponse response) {
-    	if (MainWebPage.baseCSS != null)
-    		response.render(CssHeaderItem.forReference(MainWebPage.baseCSS));
+        if (MainWebPage.baseCSS != null)
+            response.render(CssHeaderItem.forReference(MainWebPage.baseCSS));
     }
-    
+
     private void initLayout() {
 
         add(new Label("app_browser_title", new AbstractReadOnlyModel<Object>() {
@@ -81,7 +81,7 @@ public class MainWebPage extends WebPage {
             public Object getObject() {
                 return getBrowserTitle();
             }
-        } ));
+        }));
 
         add(selectorPanel = new ModuleSelectorPanel("modules"));
     }
@@ -92,11 +92,11 @@ public class MainWebPage extends WebPage {
 
     protected String getBrowserTitle() {
         Class<?> clazz = Application.get().getHomePage();
-        String s = new ClassStringResourceLoader(clazz)
-        	.loadStringResource(this.getClass(), "application.browser_title", getSession().getLocale(), null, null);
-        if (s==null) {
-            s = new PackageStringResourceLoader()
-            	.loadStringResource(this.getClass(), "application.browser_title", getSession().getLocale(), null, null); 
+        String s = new ClassStringResourceLoader(clazz).loadStringResource(this.getClass(),
+                "application.browser_title", getSession().getLocale(), null, null);
+        if (s == null) {
+            s = new PackageStringResourceLoader().loadStringResource(this.getClass(), "application.browser_title",
+                    getSession().getLocale(), null, null);
         }
         return s == null ? "DCM4CHEE" : s;
     }

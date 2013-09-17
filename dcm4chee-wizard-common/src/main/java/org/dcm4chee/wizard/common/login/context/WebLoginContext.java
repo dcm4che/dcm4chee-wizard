@@ -12,15 +12,15 @@
  * License.
  *
  * The Original Code is part of dcm4che, an implementation of DICOM(TM) in
- * Java(TM), hosted at http://sourceforge.net/projects/dcm4che.
+ * Java(TM), hosted at https://github.com/dcm4che.
  *
  * The Initial Developer of the Original Code is
- * Agfa-Gevaert AG.
- * Portions created by the Initial Developer are Copyright (C) 2008
+ * Agfa Healthcare.
+ * Portions created by the Initial Developer are Copyright (C) 2012
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- * See listed authors below.
+ * See @authors listed below
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -63,28 +63,31 @@ import org.wicketstuff.security.hive.authentication.UsernamePasswordContext;
 public class WebLoginContext extends UsernamePasswordContext {
 
     protected static Logger log = LoggerFactory.getLogger(WebLoginContext.class);
-    
+
     public WebLoginContext() {
     }
-    
+
     public WebLoginContext(String username, String password) {
         super(username, password);
     }
 
     @Override
-    protected org.wicketstuff.security.hive.authentication.Subject getSubject(String username, String password) throws LoginException {
+    protected org.wicketstuff.security.hive.authentication.Subject getSubject(String username, String password)
+            throws LoginException {
         WebApplication app = (WebApplication) Application.get();
         String webApplicationPolicy = app.getInitParameter("webApplicationPolicy");
-        if (webApplicationPolicy == null) webApplicationPolicy = "dcm4chee";
+        if (webApplicationPolicy == null)
+            webApplicationPolicy = "dcm4chee";
         String rolesGroupName = app.getInitParameter("rolesGroupName");
-        if (rolesGroupName == null) rolesGroupName = "Roles";
-        
+        if (rolesGroupName == null)
+            rolesGroupName = "Roles";
+
         LoginCallbackHandler handler = new LoginCallbackHandler(username, password);
         LoginContext context;
         SecureSession secureSession;
         try {
             secureSession = (SecureSession) Session.get();
-//            secureSession.setManageUsers(BaseCfgDelegate.getInstance().getManageUsers());
+            // secureSession.setManageUsers(BaseCfgDelegate.getInstance().getManageUsers());
             context = new LoginContext(webApplicationPolicy, handler);
             context.login();
             secureSession.setUsername(username);
@@ -105,7 +108,7 @@ public class WebLoginContext extends UsernamePasswordContext {
             }
             secureSession.extendedLogin(username, password, subject);
         } catch (Exception e) {
-            log.error("Login failed for user "+username, e);
+            log.error("Login failed for user " + username, e);
             ((SecureSession) Session.get()).invalidate();
             subject = new DefaultSubject();
         }
@@ -119,7 +122,7 @@ public class WebLoginContext extends UsernamePasswordContext {
         } catch (Exception e) {
             log.error("Error processing hive file", e);
             ((SecureSession) Session.get()).invalidate();
-            return false ;
+            return false;
         }
     }
 
@@ -138,9 +141,10 @@ public class WebLoginContext extends UsernamePasswordContext {
                 if (cb instanceof NameCallback) {
                     ((NameCallback) cb).setName(user);
                 } else if (cb instanceof PasswordCallback) {
-                    ((PasswordCallback)cb).setPassword(passwd.toCharArray());
+                    ((PasswordCallback) cb).setPassword(passwd.toCharArray());
                 } else {
-                    throw new UnsupportedCallbackException(cb, "Callback not supported! (only Name and Password Callback are supported)");
+                    throw new UnsupportedCallbackException(cb,
+                            "Callback not supported! (only Name and Password Callback are supported)");
                 }
             }
         }

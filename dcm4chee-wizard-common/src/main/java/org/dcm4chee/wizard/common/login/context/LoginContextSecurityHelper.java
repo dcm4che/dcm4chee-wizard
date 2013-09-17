@@ -12,15 +12,15 @@
  * License.
  *
  * The Original Code is part of dcm4che, an implementation of DICOM(TM) in
- * Java(TM), hosted at http://sourceforge.net/projects/dcm4che.
+ * Java(TM), hosted at https://github.com/dcm4che.
  *
  * The Initial Developer of the Original Code is
- * Agfa-Gevaert AG.
- * Portions created by the Initial Developer are Copyright (C) 2008
+ * Agfa Healthcare.
+ * Portions created by the Initial Developer are Copyright (C) 2012
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- * See listed authors below.
+ * See @authors listed below
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -78,49 +78,50 @@ import org.wicketstuff.security.hive.authorization.SimplePrincipal;
  * @author Robert David <robert.david@agfa.com>
  */
 public class LoginContextSecurityHelper {
-    
+
     private static String rolesGroupName;
-    
+
     protected static Logger log = LoggerFactory.getLogger(LoginContextSecurityHelper.class);
-    
+
     static Map<String, String> readSwarmPrincipals() throws MalformedURLException, IOException {
-        InputStream in = ((WebApplication) Application.get()).getServletContext().getResource("/WEB-INF/dcm4chee.hive").openStream();
-        BufferedReader dis = new BufferedReader (new InputStreamReader (in));
+        InputStream in = ((WebApplication) Application.get()).getServletContext().getResource("/WEB-INF/dcm4chee.hive")
+                .openStream();
+        BufferedReader dis = new BufferedReader(new InputStreamReader(in));
         HashMap<String, String> principals = new LinkedHashMap<String, String>();
         String line;
         String principal = null;
-        while ((line = dis.readLine()) != null) 
+        while ((line = dis.readLine()) != null)
             if (line.startsWith("grant principal ")) {
                 principal = line.substring(line.indexOf("\"") + 1, line.lastIndexOf("\""));
                 principals.put(principal, null);
-            } else if ((principal != null) && (line.trim().startsWith("// KEY:"))) { 
+            } else if ((principal != null) && (line.trim().startsWith("// KEY:"))) {
                 principals.put(principal, line.substring(line.indexOf("// KEY:") + 7).trim());
                 principal = null;
             }
         in.close();
         return principals;
     }
-    
+
     static DefaultSubject mapSwarmSubject(Subject jaasSubject, SecureSession session) throws IOException {
         getJaasRolesGroupName();
         DefaultSubject subject = new DefaultSubject();
         Map<String, Set<String>> mappings = null;
         Set<String> swarmPrincipals = new HashSet<String>();
         for (Principal principal : jaasSubject.getPrincipals()) {
-            if (!(principal instanceof Group) && (session != null)) 
-                session.setUsername(principal.getName());           
+            if (!(principal instanceof Group) && (session != null))
+                session.setUsername(principal.getName());
             if ((principal instanceof Group) && (rolesGroupName.equalsIgnoreCase(principal.getName()))) {
-                Enumeration<? extends Principal> members = ((Group) principal).members();                    
+                Enumeration<? extends Principal> members = ((Group) principal).members();
                 if (mappings == null) {
                     mappings = readRolesFile();
                 }
                 Set<String> set;
                 while (members.hasMoreElements()) {
                     Principal member = members.nextElement();
-                    if ((set = mappings.get(member.getName()) ) != null) {
-                        for (Iterator<String> i = set.iterator() ; i.hasNext() ;) {
+                    if ((set = mappings.get(member.getName())) != null) {
+                        for (Iterator<String> i = set.iterator(); i.hasNext();) {
                             String appRole = i.next();
-                            if (swarmPrincipals.add(appRole)) 
+                            if (swarmPrincipals.add(appRole))
                                 subject.addPrincipal(new SimplePrincipal(appRole));
                         }
                     }
@@ -132,17 +133,15 @@ public class LoginContextSecurityHelper {
 
     @SuppressWarnings("unchecked")
     private static Map<String, Set<String>> readRolesFile() throws IOException {
-        String fn = System.getProperty("dcm4chee-wizard.cfg.path"); 
-        if (fn == null) { 
+        String fn = System.getProperty("dcm4chee-wizard.cfg.path");
+        if (fn == null) {
             log.warn("Wizard config path not found! Not specified with System property 'dcm4chee-wizard.cfg.path'");
             fn = JBossAS7SystemProperties.JBOSS_SERVER_CONFIG_DIR + "/dcm4chee-wizard/";
             log.warn("Using default config path of: " + fn);
         }
-        File mappingFile = new File(StringUtils.replaceSystemProperties(fn) + "roles.json");
+        File mappingFile = new File(StringUtils.replaceSystemProperties(fn) + "/roles.json");
         if (!mappingFile.isAbsolute())
-            mappingFile = new File(
-            		JBossAS7SystemProperties.JBOSS_SERVER_BASE_DIR, 
-            		mappingFile.getPath());
+            mappingFile = new File(JBossAS7SystemProperties.JBOSS_SERVER_BASE_DIR, mappingFile.getPath());
         Map<String, Set<String>> mappings = new HashMap<String, Set<String>>();
         String line;
         BufferedReader reader = null;
@@ -161,49 +160,52 @@ public class LoginContextSecurityHelper {
             if (reader != null) {
                 try {
                     reader.close();
-                } catch (IOException ignore) {}
+                } catch (IOException ignore) {
+                }
             }
         }
     }
 
     static boolean checkLoginAllowed(DefaultSubject subject) {
-        String loginAllowedRolename = 
-                SecureWebApplication.get()
-                .getInitParameter("LoginAllowedRolename");
-        return loginAllowedRolename == null ? false : 
-            subject.getPrincipals().contains(new SimplePrincipal(loginAllowedRolename)); 
+        String loginAllowedRolename = SecureWebApplication.get().getInitParameter("LoginAllowedRolename");
+        return loginAllowedRolename == null ? false : subject.getPrincipals().contains(
+                new SimplePrincipal(loginAllowedRolename));
     }
 
     public static Subject getJaasSubject() {
         try {
-        	return SecurityContextAssociation.getSubject();
+            return SecurityContextAssociation.getSubject();
         } catch (Exception x) {
             log.error("Failed to get subject using org.jboss.security.SecurityContextAssociation.getSubject", x);
             return null;
         }
     }
-    
+
     public static String getJaasRolesGroupName() {
         if (rolesGroupName == null) {
             try {
                 rolesGroupName = ((WebApplication) Application.get()).getInitParameter("rolesGroupName");
-                if (rolesGroupName == null) rolesGroupName = "Roles";
+                if (rolesGroupName == null)
+                    rolesGroupName = "Roles";
             } catch (Exception x) {
                 log.error("Can't get InitParameter 'rolesGroupName' from Wicket Application!", x);
             }
         }
         return rolesGroupName;
     }
+
     public static final List<String> getJaasRoles() {
         getJaasRolesGroupName();
         List<String> roles = new ArrayList<String>();
         String rolesGroupName = ((WebApplication) Application.get()).getInitParameter("rolesGroupName");
-        if (rolesGroupName == null) rolesGroupName = "Roles";
+        if (rolesGroupName == null)
+            rolesGroupName = "Roles";
         try {
-            for (Principal principal : ((Subject) PolicyContext.getContext("javax.security.auth.Subject.container")).getPrincipals()) {
+            for (Principal principal : ((Subject) PolicyContext.getContext("javax.security.auth.Subject.container"))
+                    .getPrincipals()) {
                 if ((principal instanceof Group) && rolesGroupName.equalsIgnoreCase(principal.getName())) {
                     Enumeration<? extends Principal> members = ((Group) principal).members();
-                    while (members.hasMoreElements()) 
+                    while (members.hasMoreElements())
                         roles.add(members.nextElement().getName());
                 }
             }

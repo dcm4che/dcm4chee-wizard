@@ -12,15 +12,15 @@
  * License.
  *
  * The Original Code is part of dcm4che, an implementation of DICOM(TM) in
- * Java(TM), hosted at http://sourceforge.net/projects/dcm4che.
+ * Java(TM), hosted at https://github.com/dcm4che.
  *
  * The Initial Developer of the Original Code is
- * Agfa-Gevaert AG.
- * Portions created by the Initial Developer are Copyright (C) 2002-2005
+ * Agfa Healthcare.
+ * Portions created by the Initial Developer are Copyright (C) 2012
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- * See listed authors below.
+ * See @authors listed below
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -69,22 +69,24 @@ public class ExtendedSwarmStrategy extends org.wicketstuff.security.swarm.strate
 
     @Override
     public boolean isComponentAuthorized(Component component, WaspAction action) {
-      if(containsBehavior(component, SecurityBehavior.class))
+        if (containsBehavior(component, SecurityBehavior.class))
             return hasPermission(new ComponentPermission(buildHiveKey(component), (SwarmAction) action));
-       else
-            return hasPermission(new ComponentPermission(component, (SwarmAction) action)); 
+        else
+            return hasPermission(new ComponentPermission(component, (SwarmAction) action));
     }
 
-    private  String buildHiveKey(Component component) {
+    private String buildHiveKey(Component component) {
 
-        if(component == null)
-             throw new SecurityException(this.getClass() + ": Specified component is null");
+        if (component == null)
+            throw new SecurityException(this.getClass() + ": Specified component is null");
 
         MarkupContainer markupContainer = findLowestSecureContainer(component);
         String alias = SecureComponentHelper.alias(markupContainer.getClass());
         String relative = (String) component.getMetaData(new ComponentHiveKey(String.class));
-        if (relative == null|| "".equals(relative)) return alias;
-        else return alias + ":"+ relative;
+        if (relative == null || "".equals(relative))
+            return alias;
+        else
+            return alias + ":" + relative;
     }
 
     private MarkupContainer findLowestSecureContainer(Component component) {
@@ -92,32 +94,32 @@ public class ExtendedSwarmStrategy extends org.wicketstuff.security.swarm.strate
         final MarkupContainer[] lowestSecureParent = new MarkupContainer[1];
 
         component.visitParents(MarkupContainer.class, new IVisitor<MarkupContainer, Void>() {
-			public void component(MarkupContainer component, IVisit<Void> visit) {
-                if(component instanceof ISecureComponent) {
+            public void component(MarkupContainer component, IVisit<Void> visit) {
+                if (component instanceof ISecureComponent) {
                     lowestSecureParent[0] = component;
                     visit.stop();
-               }
-			}
-         });
+                }
+            }
+        });
 
-         if (null == lowestSecureParent[0]) {
-             try{
-               lowestSecureParent[0] = component.getPage();
-             } catch(IllegalStateException e) {
-                throw new SecurityException(this.getClass() + ": Unable to create alias for component: "+ component, e);
-             }
-         }
+        if (null == lowestSecureParent[0]) {
+            try {
+                lowestSecureParent[0] = component.getPage();
+            } catch (IllegalStateException e) {
+                throw new SecurityException(this.getClass() + ": Unable to create alias for component: " + component, e);
+            }
+        }
 
-         MarkupContainer markupContainer = lowestSecureParent[0];
-         return markupContainer;
+        MarkupContainer markupContainer = lowestSecureParent[0];
+        return markupContainer;
     }
 
     private boolean containsBehavior(org.apache.wicket.Component component, Class<SecurityBehavior> clazz) {
 
         List<? extends Behavior> behaviors = component.getBehaviors();
-        for(Behavior object : behaviors) {
-             if(object.getClass().isAssignableFrom(clazz)) 
-                    return true;
+        for (Behavior object : behaviors) {
+            if (object.getClass().isAssignableFrom(clazz))
+                return true;
         }
         return false;
     }

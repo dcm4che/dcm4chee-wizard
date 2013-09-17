@@ -12,15 +12,15 @@
  * License.
  *
  * The Original Code is part of dcm4che, an implementation of DICOM(TM) in
- * Java(TM), hosted at http://sourceforge.net/projects/dcm4che.
+ * Java(TM), hosted at https://github.com/dcm4che.
  *
  * The Initial Developer of the Original Code is
- * Agfa-Gevaert AG.
- * Portions created by the Initial Developer are Copyright (C) 2008
+ * Agfa Healthcare.
+ * Portions created by the Initial Developer are Copyright (C) 2012
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- * See listed authors below.
+ * See @authors listed below
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -54,11 +54,11 @@ import org.wicketstuff.security.WaspSession;
 public class SecureSession extends WaspSession {
 
     private static final long serialVersionUID = 1L;
-    
+
     private String username;
     private Map<String, String> allSwarmPrincipals;
     private boolean manageUsers;
-    
+
     public SecureSession(WaspApplication application, Request request) {
         super(application, request);
     }
@@ -69,10 +69,12 @@ public class SecureSession extends WaspSession {
 
     public void setUsername(String username) {
         this.username = username;
-        ((WebResponse) RequestCycle.get().getResponse()).addCookie(new Cookie("signInPanel.signInForm.username", username));
+        ((WebResponse) RequestCycle.get().getResponse()).addCookie(new Cookie("signInPanel.signInForm.username",
+                username));
     }
-    
-    public void extendedLogin(String username, String passwd, org.wicketstuff.security.hive.authentication.Subject subject) {
+
+    public void extendedLogin(String username, String passwd,
+            org.wicketstuff.security.hive.authentication.Subject subject) {
     }
 
     public void extendedLogin(org.wicketstuff.security.hive.authentication.Subject webSubject) {
@@ -81,11 +83,11 @@ public class SecureSession extends WaspSession {
     public void setAllSwarmPrincipals(Map<String, String> map) {
         this.allSwarmPrincipals = map;
     }
-    
+
     public Map<String, String> getAllSwarmPrincipals() {
         return allSwarmPrincipals;
     }
-    
+
     public void setManageUsers(boolean manageUsers) {
         this.manageUsers = manageUsers;
     }

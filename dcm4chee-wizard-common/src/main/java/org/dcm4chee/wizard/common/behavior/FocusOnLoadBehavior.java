@@ -12,15 +12,15 @@
  * License.
  *
  * The Original Code is part of dcm4che, an implementation of DICOM(TM) in
- * Java(TM), hosted at http://sourceforge.net/projects/dcm4che.
+ * Java(TM), hosted at https://github.com/dcm4che.
  *
  * The Initial Developer of the Original Code is
- * Agfa-Gevaert AG.
- * Portions created by the Initial Developer are Copyright (C) 2008
+ * Agfa Healthcare.
+ * Portions created by the Initial Developer are Copyright (C) 2012
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- * See listed authors below.
+ * See @authors listed below
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -50,35 +50,35 @@ import org.apache.wicket.markup.html.form.TextField;
 
 /**
  * @author Franz Willer <franz.willer@gmail.com>
- * @version $Revision$ $Date$
- * @since Nov 14, 2009
  */
 
 public class FocusOnLoadBehavior extends Behavior {
 
     private static final long serialVersionUID = 1L;
-    
+
     private FocusStrategy focusStrategy;
-    
-    public FocusOnLoadBehavior() {}
+
+    public FocusOnLoadBehavior() {
+    }
 
     public FocusOnLoadBehavior(FocusStrategy strategy) {
         focusStrategy = strategy;
     }
-    
+
     public static FocusOnLoadBehavior newSimpleFocusBehaviour() {
         FocusOnLoadBehavior fb = new FocusOnLoadBehavior();
         fb.focusStrategy = fb.new SimpleFocusStrategy();
         return fb;
     }
+
     public static FocusOnLoadBehavior newFocusAndSelectBehaviour() {
         FocusOnLoadBehavior fb = new FocusOnLoadBehavior();
         fb.focusStrategy = fb.new FocusAndSelectTextStrategy();
         return fb;
     }
-    
-    public void bind( Component component ) {
-        if ( focusStrategy == null ) {
+
+    public void bind(Component component) {
+        if (focusStrategy == null) {
             if (component instanceof FormComponent<?>) {
                 focusStrategy = new EmptyFocusStrategy();
             } else if (component instanceof Form<?>) {
@@ -89,7 +89,7 @@ public class FocusOnLoadBehavior extends Behavior {
     }
 
     @Override
-    public void renderHead(Component component, IHeaderResponse headerResponse ) {
+    public void renderHead(Component component, IHeaderResponse headerResponse) {
         super.renderHead(component, headerResponse);
         focusStrategy.focus(headerResponse, component);
     }
@@ -97,32 +97,30 @@ public class FocusOnLoadBehavior extends Behavior {
     public boolean isTemporary() {
         return false;
     }
-    
+
     private boolean setFocusOnEmpty(IHeaderResponse response, Component component) {
         Object object = component.getDefaultModelObject();
         if (object == null || object.toString().length() < 1) {
-	    	response.render(OnDomReadyHeaderItem
-	    			.forScript(getJavaScriptString(component)));
+            response.render(OnDomReadyHeaderItem.forScript(getJavaScriptString(component)));
             return true;
         }
         return false;
     }
+
     private String getJavaScriptString(Component component) {
-        return "self.focus();var elem=document.getElementById('"+
-                component.getMarkupId() + "');elem.focus()";
+        return "self.focus();var elem=document.getElementById('" + component.getMarkupId() + "');elem.focus()";
     }
 
     public interface FocusStrategy extends Serializable {
         void focus(IHeaderResponse headerResponse, Component component);
     }
-    
+
     public class SimpleFocusStrategy implements FocusStrategy {
 
         private static final long serialVersionUID = 1L;
 
         public void focus(IHeaderResponse response, Component component) {
-	    	response.render(OnDomReadyHeaderItem
-	    			.forScript(getJavaScriptString(component)));
+            response.render(OnDomReadyHeaderItem.forScript(getJavaScriptString(component)));
         }
     }
 
@@ -141,23 +139,22 @@ public class FocusOnLoadBehavior extends Behavior {
 
         public void focus(IHeaderResponse response, Component component) {
             if (component instanceof TextField<?>) {
-    	    	response.render(OnDomReadyHeaderItem
-    	    			.forScript(getJavaScriptString(component)+";elem.select()"));
+                response.render(OnDomReadyHeaderItem.forScript(getJavaScriptString(component) + ";elem.select()"));
             }
         }
     }
-    
+
     public class FirstEmptyTextfieldFocusStrategy implements FocusStrategy {
 
         private static final long serialVersionUID = 1L;
 
         public void focus(IHeaderResponse headerResponse, Component formComponent) {
-            Form<?> form = (Form<?>)formComponent;
+            Form<?> form = (Form<?>) formComponent;
             Component component;
-            for ( int i=0 ; i<form.size() ; i++) {
+            for (int i = 0; i < form.size(); i++) {
                 component = form.get(i);
                 if (component instanceof TextField<?>) {
-                    if ( setFocusOnEmpty(headerResponse, component) ) {
+                    if (setFocusOnEmpty(headerResponse, component)) {
                         component.setOutputMarkupId(true);
                         break;
                     }

@@ -12,15 +12,15 @@
  * License.
  *
  * The Original Code is part of dcm4che, an implementation of DICOM(TM) in
- * Java(TM), hosted at http://sourceforge.net/projects/dcm4che.
+ * Java(TM), hosted at https://github.com/dcm4che.
  *
  * The Initial Developer of the Original Code is
- * Agfa-Gevaert AG.
- * Portions created by the Initial Developer are Copyright (C) 2008
+ * Agfa Healthcare.
+ * Portions created by the Initial Developer are Copyright (C) 2012
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- * See listed authors below.
+ * See @authors listed below
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -58,21 +58,21 @@ import org.dcm4chee.wizard.common.component.MainWebPage;
  */
 public class LoginPage extends MainWebPage {
 
-	private static final long serialVersionUID = 1L;
-	
-	public LoginPage() {
+    private static final long serialVersionUID = 1L;
+
+    public LoginPage() {
         super();
-        
+
         selectorPanel.setShowLogoutLink(false);
-       
+
         String nodeInfo;
         try {
             nodeInfo = System.getProperty("dcm4che.archive.nodename", InetAddress.getLocalHost().getHostName());
         } catch (UnknownHostException e) {
             nodeInfo = "DCM4CHEE";
-        }       
-        add(new Label("loginLabel", new StringResourceModel("loginLabel", LoginPage.this, 
-                null, new Object[]{nodeInfo})));
+        }
+        add(new Label("loginLabel", new StringResourceModel("loginLabel", LoginPage.this, null,
+                new Object[] { nodeInfo })));
 
         add(new SignInPanel("signInPanel") {
 
@@ -84,18 +84,17 @@ public class LoginPage extends MainWebPage {
                 user.add(FocusOnLoadBehavior.newFocusAndSelectBehaviour());
             }
         }.add(new AttributeModifier("align", new Model<String>("left"))));
-        this.get("signInPanel:signInForm").add(new FocusOnLoadBehavior());        
+        this.get("signInPanel:signInForm").add(new FocusOnLoadBehavior());
     }
-    
+
     protected String getBrowserTitle() {
         Class<?> clazz = Application.get().getHomePage();
-        String s = new ClassStringResourceLoader(clazz)
-        	.loadStringResource(this.getClass(), "application.browser_title", getSession().getLocale(), null, null);
-        if (s==null) {
-            s = new PackageStringResourceLoader()
-            	.loadStringResource(this.getClass(), "application.browser_title", getSession().getLocale(), null, null); 
+        String s = new ClassStringResourceLoader(clazz).loadStringResource(this.getClass(),
+                "application.browser_title", getSession().getLocale(), null, null);
+        if (s == null) {
+            s = new PackageStringResourceLoader().loadStringResource(this.getClass(), "application.browser_title",
+                    getSession().getLocale(), null, null);
         }
-        return (s == null ? "DCM4CHEE" : s) + ": " + 
-            this.getString("application.login", null, "Login");
+        return (s == null ? "DCM4CHEE" : s) + ": " + this.getString("application.login", null, "Login");
     }
 }

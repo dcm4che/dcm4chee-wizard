@@ -12,15 +12,15 @@
  * License.
  *
  * The Original Code is part of dcm4che, an implementation of DICOM(TM) in
- * Java(TM), hosted at http://sourceforge.net/projects/dcm4che.
+ * Java(TM), hosted at https://github.com/dcm4che.
  *
  * The Initial Developer of the Original Code is
- * Agfa-Gevaert AG.
- * Portions created by the Initial Developer are Copyright (C) 2008
+ * Agfa Healthcare.
+ * Portions created by the Initial Developer are Copyright (C) 2012
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- * See listed authors below.
+ * See @authors listed below
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -59,8 +59,7 @@ public class SecurityBehavior extends Behavior {
 
     @Override
     public void bind(Component component) {
-        SecureComponentHelper.setSecurityCheck(
-            component, new ComponentSecurityCheck(component));
-            component.setMetaData(new ComponentHiveKey(String.class), hiveKey);
+        SecureComponentHelper.setSecurityCheck(component, new ComponentSecurityCheck(component));
+        component.setMetaData(new ComponentHiveKey(String.class), hiveKey);
     }
 }

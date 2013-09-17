@@ -12,15 +12,15 @@
  * License.
  *
  * The Original Code is part of dcm4che, an implementation of DICOM(TM) in
- * Java(TM), hosted at http://sourceforge.net/projects/dcm4che.
+ * Java(TM), hosted at https://github.com/dcm4che.
  *
  * The Initial Developer of the Original Code is
- * Agfa-Gevaert AG.
- * Portions created by the Initial Developer are Copyright (C) 2008
+ * Agfa Healthcare.
+ * Portions created by the Initial Developer are Copyright (C) 2012
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- * See listed authors below.
+ * See @authors listed below
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -52,19 +52,19 @@ import org.wicketstuff.security.components.SecureWebPage;
  */
 public class SecureSessionCheckPage extends SecureWebPage {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private static final ResourceReference baseCSS = new CssResourceReference(MainWebPage.class, "base-style.css");
 
-	private static final JavaScriptResourceReference reloadExpired = 
-			new JavaScriptResourceReference(SecureSessionCheckPage.class, "reload-expired.js");
+    private static final JavaScriptResourceReference reloadExpired = new JavaScriptResourceReference(
+            SecureSessionCheckPage.class, "reload-expired.js");
 
-	@Override
+    @Override
     public void renderHead(IHeaderResponse response) {
-		super.renderHead(response);
-    	if (SecureSessionCheckPage.baseCSS != null) 
-    		response.render(CssHeaderItem.forReference(SecureSessionCheckPage.baseCSS));
-    	if (SecureSessionCheckPage.reloadExpired != null)
-    		response.render(JavaScriptHeaderItem.forReference(reloadExpired));
-    }	
+        super.renderHead(response);
+        if (SecureSessionCheckPage.baseCSS != null)
+            response.render(CssHeaderItem.forReference(SecureSessionCheckPage.baseCSS));
+        if (SecureSessionCheckPage.reloadExpired != null)
+            response.render(JavaScriptHeaderItem.forReference(reloadExpired));
+    }
 }
