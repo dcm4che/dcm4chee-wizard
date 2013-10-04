@@ -40,7 +40,7 @@ package org.dcm4chee.wizard.edit;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -78,6 +78,7 @@ import org.dcm4chee.wizard.model.StringArrayModel;
 import org.dcm4chee.wizard.page.DicomConfigurationWebPage;
 import org.dcm4chee.wizard.tree.ConfigTreeProvider;
 import org.dcm4chee.wizard.tree.ConfigTreeProvider.ConfigurationType;
+import org.dcm4chee.wizard.validator.CodeValidator;
 import org.dcm4chee.wizard.validator.DeviceNameValidator;
 import org.dcm4chee.wizard.validator.UrlValidator;
 import org.dcm4chee.xds2.conf.XCAInitiatingGWCfg;
@@ -164,17 +165,31 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         addDeviceTitle(deviceModel, form);
         addInstalledLabel(form);
         form.add(proxyWebMarkupContainer(deviceModel));
+        final Form<?> optionalContainer = addOptionalContainer(form);
+        addSaveButton(window, deviceModel, form, optionalContainer);
+        addCancelButton(window, form);
+    }
 
+    private Form<?> addOptionalContainer(final ExtendedForm form) {
         final Form<?> optionalContainer = new Form<Object>("optional");
         optionalContainer.setOutputMarkupId(true);
         optionalContainer.setOutputMarkupPlaceholderTag(true);
         optionalContainer.setVisible(false);
+        addTextField(optionalContainer, 
+                "dicom.edit.device.optional.description.label", 
+                "description.label", 
+                "description", 
+                descriptionModel);
+        addToggleOptionalCheckBox(form, optionalContainer);
+        addOptionalParameters(optionalContainer);
+        addOptionalProxyContainer(optionalContainer);
+        addRelatedDeviceRefsContainer(optionalContainer);
+        addWebMarkupContainer(optionalContainer);
         form.add(optionalContainer);
+        return optionalContainer;
+    }
 
-        optionalContainer.add(new Label("description.label", new ResourceModel(
-                "dicom.edit.device.optional.description.label")));
-        optionalContainer.add(new TextField<String>("description", descriptionModel));
-
+    private void addToggleOptionalCheckBox(final ExtendedForm form, final Form<?> optionalContainer) {
         form.add(new Label("toggleOptional.label", new ResourceModel("dicom.edit.toggleOptional.label")));
         form.add(new AjaxCheckBox("toggleOptional", new Model<Boolean>()) {
 
@@ -185,7 +200,51 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
                 target.add(optionalContainer.setVisible(this.getModelObject()));
             }
         });
+    }
 
+    private void addWebMarkupContainer(final Form<?> optionalContainer) {
+        WebMarkupContainer vendorDataContainer = new WebMarkupContainer("vendorDataContainer");
+        optionalContainer.add(vendorDataContainer);
+        vendorDataContainer.add(new Label("vendorData.label", new ResourceModel(
+                "dicom.edit.applicationEntity.vendorData.label")));
+        vendorDataContainer.add(new Label("vendorData", vendorDataModel));
+        vendorDataContainer.setVisible(!vendorDataModel.getObject().equals("size 0"));
+    }
+
+    private void addRelatedDeviceRefsContainer(final Form<?> optionalContainer) {
+        WebMarkupContainer relatedDeviceRefsContainer = new WebMarkupContainer("relatedDeviceRefsContainer");
+        optionalContainer.add(relatedDeviceRefsContainer);
+        relatedDeviceRefsContainer.add(new Label("relatedDeviceRefs.label", new ResourceModel(
+                "dicom.edit.device.relatedDeviceRefs.label")));
+        relatedDeviceRefsContainer.add(new TextArea<String>("relatedDeviceRefs", relatedDeviceRefsModel)
+                .setEnabled(false));
+        relatedDeviceRefsContainer.setVisible(relatedDeviceRefsModel.getArray().length > 0);
+    }
+
+    private void addOptionalProxyContainer(final Form<?> optionalContainer) {
+        WebMarkupContainer optionalProxyContainer = new WebMarkupContainer("optionalProxyContainer") {
+
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public boolean isVisible() {
+                return optionalContainer.isVisible() && typeModel.getObject().equals(ConfigurationType.Proxy);
+            }
+        };
+        optionalContainer.add(optionalProxyContainer.setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true));
+
+        optionalProxyContainer.add(new Label("forwardThreads.label", new ResourceModel(
+                "dicom.edit.device.optional.forwardThreads.label")).setOutputMarkupPlaceholderTag(true));
+        optionalProxyContainer.add(new TextField<Integer>("forwardThreads", forwardThreadsModel).setType(Integer.class)
+                .add(new RangeValidator<Integer>(1, 256)));
+
+        optionalProxyContainer.add(new Label("staleTimeout.label", new ResourceModel(
+                "dicom.edit.device.optional.staleTimeout.label")).setOutputMarkupPlaceholderTag(true));
+        optionalProxyContainer.add(new TextField<Integer>("staleTimeout", staleTimeoutModel).setType(Integer.class)
+                .add(new RangeValidator<Integer>(0, Integer.MAX_VALUE)));
+    }
+
+    private void addOptionalParameters(final Form<?> optionalContainer) {
         addTextField(optionalContainer,
                 "dicom.edit.device.optional.deviceSerialNumber.label",
                 "deviceSerialNumber.label",
@@ -198,45 +257,50 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
                 "institutionAddress",
                 institutionAddressModel);
 
-        addTextField(optionalContainer, 
+        TextField<String> codeValueTextField = addTextField(optionalContainer, 
                 "dicom.edit.device.optional.institutionCodeValue.label", 
                 "institutionCodeValue.label", 
                 "institutionCodeValue", 
                 institutionCodeModel.getCodeFieldModel(0));
 
-        addTextField(optionalContainer, 
+        TextField<String> codingSchemeDesignatorTextField = addTextField(optionalContainer, 
                 "dicom.edit.device.optional.institutionCodingSchemeDesignator.label", 
                 "institutionCodingSchemeDesignator.label", 
                 "institutionCodingSchemeDesignator", 
                 institutionCodeModel.getCodeFieldModel(1));
 
-        addTextField(optionalContainer, 
+        TextField<String> codingSchemeVersionTextField = addTextField(optionalContainer, 
                 "dicom.edit.device.optional.institutionCodingSchemeVersion.label", 
                 "institutionCodingSchemeVersion.label", 
                 "institutionCodingSchemeVersion", 
                 institutionCodeModel.getCodeFieldModel(2));
 
-        addTextField(optionalContainer, 
+        TextField<String> codeMeaningTextField = addTextField(optionalContainer, 
                 "dicom.edit.device.optional.institutionCodeMeaning.label", 
                 "institutionCodeMeaning.label", 
                 "institutionCodeMeaning", 
                 institutionCodeModel.getCodeFieldModel(3));
 
-        //TODO
-//        optionalContainer.add(new CodeValidator(codeValueTextField, codingSchemeDesignatorTextField,
-//                codingSchemeVersionTextField, codeMeaningTextField));
+        optionalContainer.add(new CodeValidator(codeValueTextField, codingSchemeDesignatorTextField,
+                codingSchemeVersionTextField, codeMeaningTextField));
 
-        optionalContainer.add(new Label("institutionalDepartmentName.label", new ResourceModel(
-                "dicom.edit.device.optional.institutionalDepartmentName.label")));
-        optionalContainer.add(new TextArea<String>("institutionalDepartmentName", institutionalDepartmentNameModel));
+        addTextArea(optionalContainer, 
+                "dicom.edit.device.optional.institutionalDepartmentName.label", 
+                "institutionalDepartmentName.label", 
+                "institutionalDepartmentName", 
+                institutionalDepartmentNameModel);
 
-        optionalContainer.add(new Label("institutionName.label", new ResourceModel(
-                "dicom.edit.device.optional.institutionName.label")));
-        optionalContainer.add(new TextArea<String>("institutionName", institutionNameModel));
+        addTextArea(optionalContainer, 
+                "dicom.edit.device.optional.institutionName.label", 
+                "institutionName.label", 
+                "institutionName", 
+                institutionNameModel);
 
-        optionalContainer.add(new Label("issuerOfAccessionNumber.label", new ResourceModel(
-                "dicom.edit.device.optional.issuerOfAccessionNumber.label")));
-        optionalContainer.add(new TextField<String>("issuerOfAccessionNumber", issuerOfAccessionNumberModel));
+        addTextField(optionalContainer, 
+                "dicom.edit.device.optional.issuerOfAccessionNumber.label", 
+                "issuerOfAccessionNumber.label", 
+                "issuerOfAccessionNumber", 
+                issuerOfAccessionNumberModel);
 
         optionalContainer.add(new Label("issuerOfAdmissionID.label", new ResourceModel(
                 "dicom.edit.device.optional.issuerOfAdmissionID.label")));
@@ -321,57 +385,20 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         optionalContainer.add(new TextField<String>("keyStoreKeyPin", keyStoreKeyPinModel));
 
         optionalContainer.add(new CheckBox("useKeyStoreKeyPinProperty", useKeyStoreKeyPinProperty));
-
-        WebMarkupContainer optionalProxyContainer = new WebMarkupContainer("optionalProxyContainer") {
-
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public boolean isVisible() {
-                return optionalContainer.isVisible() && typeModel.getObject().equals(ConfigurationType.Proxy);
-            }
-        };
-        optionalContainer.add(optionalProxyContainer.setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true));
-
-        optionalProxyContainer.add(new Label("forwardThreads.label", new ResourceModel(
-                "dicom.edit.device.optional.forwardThreads.label")).setOutputMarkupPlaceholderTag(true));
-        optionalProxyContainer.add(new TextField<Integer>("forwardThreads", forwardThreadsModel).setType(Integer.class)
-                .add(new RangeValidator<Integer>(1, 256)));
-
-        optionalProxyContainer.add(new Label("staleTimeout.label", new ResourceModel(
-                "dicom.edit.device.optional.staleTimeout.label")).setOutputMarkupPlaceholderTag(true));
-        optionalProxyContainer.add(new TextField<Integer>("staleTimeout", staleTimeoutModel).setType(Integer.class)
-                .add(new RangeValidator<Integer>(0, Integer.MAX_VALUE)));
-
-        WebMarkupContainer relatedDeviceRefsContainer = new WebMarkupContainer("relatedDeviceRefsContainer");
-        optionalContainer.add(relatedDeviceRefsContainer);
-        relatedDeviceRefsContainer.add(new Label("relatedDeviceRefs.label", new ResourceModel(
-                "dicom.edit.device.relatedDeviceRefs.label")));
-        relatedDeviceRefsContainer.add(new TextArea<String>("relatedDeviceRefs", relatedDeviceRefsModel)
-                .setEnabled(false));
-        relatedDeviceRefsContainer.setVisible(relatedDeviceRefsModel.getArray().length > 0);
-
-        WebMarkupContainer vendorDataContainer = new WebMarkupContainer("vendorDataContainer");
-        optionalContainer.add(vendorDataContainer);
-        vendorDataContainer.add(new Label("vendorData.label", new ResourceModel(
-                "dicom.edit.applicationEntity.vendorData.label")));
-        vendorDataContainer.add(new Label("vendorData", vendorDataModel));
-        vendorDataContainer.setVisible(!vendorDataModel.getObject().equals("size 0"));
-
-        addSaveButton(window, deviceModel, form, optionalContainer);
-        addCancelButton(window, form);
     }
 
     private void addTextArea(Form<?> form, String resourceModelString, String labelString,
-            String textAreaString, StringArrayModel testAreaModel) {
+            String textAreaString, StringArrayModel textAreaModel) {
         form.add(new Label(labelString, new ResourceModel(resourceModelString)));
-        form.add(new TextArea<String>(textAreaString, testAreaModel));
+        form.add(new TextArea<String>(textAreaString, textAreaModel));
     }
 
-    private void addTextField(Form<?> form, String resourceModelString, String labelString,
+    private TextField<String> addTextField(Form<?> form, String resourceModelString, String labelString,
             String textFieldId, IModel<String> textFieldModel) {
         form.add(new Label(labelString, new ResourceModel(resourceModelString)));
-        form.add(new TextField<String>(textFieldId, textFieldModel));
+        TextField<String> textField = new TextField<String>(textFieldId, textFieldModel);
+        form.add(textField);
+        return textField;
     }
 
     private WebMarkupContainer proxyWebMarkupContainer(final DeviceModel deviceModel) {
@@ -435,18 +462,23 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
 
     private void initDeviceModel(final DeviceModel deviceModel) {
         try {
-            Collection<DeviceExtension> devExt = deviceModel.getDevice().listDeviceExtensions();
-            if (devExt.contains(ProxyDeviceExtension.class))
-                typeModel = Model.of(ConfigTreeProvider.ConfigurationType.Proxy);
-            else if (devExt.contains(XCAiInitiatingGWCfg.class) 
-                    || devExt.contains(XCAInitiatingGWCfg.class)
-                    || devExt.contains(XCAiRespondingGWCfg.class) 
-                    || devExt.contains(XCARespondingGWCfg.class)
-                    || devExt.contains(XdsRegistry.class) 
-                    || devExt.contains(XdsRepository.class))
-                typeModel = Model.of(ConfigTreeProvider.ConfigurationType.XDS);
-            else
+            Iterator<DeviceExtension> iter = deviceModel.getDevice().listDeviceExtensions().iterator();
+            if (!iter.hasNext())
                 typeModel = Model.of(ConfigTreeProvider.ConfigurationType.Basic);
+            else {
+                DeviceExtension ext = iter.next();
+                if (ext instanceof ProxyDeviceExtension)
+                    typeModel = Model.of(ConfigTreeProvider.ConfigurationType.Proxy);
+                else if (ext instanceof XCAiInitiatingGWCfg 
+                        || ext instanceof XCAInitiatingGWCfg
+                        || ext instanceof XCAiRespondingGWCfg 
+                        || ext instanceof XCARespondingGWCfg
+                        || ext instanceof XdsRegistry 
+                        || ext instanceof XdsRepository)
+                    typeModel = Model.of(ConfigTreeProvider.ConfigurationType.XDS);
+                else
+                    typeModel = Model.of(ConfigTreeProvider.ConfigurationType.Basic);
+            }
 
             deviceNameModel = Model.of(deviceModel.getDevice().getDeviceName());
             installedModel = Model.of(deviceModel.getDevice().isInstalled());
@@ -455,10 +487,10 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
             deviceSerialNumberModel = Model.of(deviceModel.getDevice().getDeviceSerialNumber());
             institutionAddressModel = new StringArrayModel(deviceModel.getDevice().getInstitutionAddresses());
 
-            if (deviceModel.getDevice().getInstitutionCodes().length > 0) {
-                Code code = deviceModel.getDevice().getInstitutionCodes()[0];
-                institutionCodeModel = new InstitutionCodeModel(code);
-            }
+            Code code = null;
+            if (deviceModel.getDevice().getInstitutionCodes().length > 0)
+                code = deviceModel.getDevice().getInstitutionCodes()[0];
+            institutionCodeModel = new InstitutionCodeModel(code);
 
             institutionalDepartmentNameModel = new StringArrayModel(deviceModel.getDevice()
                     .getInstitutionalDepartmentNames());
@@ -513,6 +545,7 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
 
     private void setXdsDevExtConfiguration(DeviceModel deviceModel) {
         if (typeModel == Model.of(ConfigTreeProvider.ConfigurationType.XDS)) {
+            //TODO: load xds extensions and set values
         }
     }
 
@@ -556,7 +589,7 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         descriptionModel = Model.of();
         deviceSerialNumberModel = Model.of();
         institutionAddressModel = new StringArrayModel(null);
-        institutionCodeModel = new InstitutionCodeModel();
+        institutionCodeModel = new InstitutionCodeModel(null);
         institutionalDepartmentNameModel = new StringArrayModel(null);
         institutionNameModel = new StringArrayModel(null);
         issuerOfAccessionNumberModel = Model.of();
@@ -614,18 +647,15 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
             protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
                 try {
                     Device device = null;
-                    Collection<DeviceExtension> devExt = new ArrayList<>();
                     if (deviceModel != null) {
                         device = deviceModel.getDevice();
-                        devExt.addAll(device.listDeviceExtensions());
                     } else {
-                        device = initDeviceExtensions(devExt);
+                        device = initDeviceExtensions();
                     }
-
                     device.setInstalled(installedModel.getObject());
                     if (optionalContainer.isVisible()) {
                         setDeviceAttributes(device);
-                        setProxyDeviceAttributes(devExt, device);
+                        setProxyDeviceAttributes(device);
                     }
                     if (deviceModel == null)
                         ConfigTreeProvider.get().persistDevice(device);
@@ -639,55 +669,42 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
                 }
             }
 
-            private Device initDeviceExtensions(Collection<DeviceExtension> devExt) {
+            private Device initDeviceExtensions() {
                 Device device = new Device(deviceNameModel.getObject());
                 if (typeModel.getObject().equals(ConfigurationType.Proxy))
-                    initProxyDeviceExtension(devExt, device);
+                    initProxyDeviceExtension(device);
                 if (typeModel.getObject().equals(ConfigurationType.AuditRecordRepository))
-                    initARRExtension(devExt, device);
+                    initARRExtension(device);
                 if (typeModel.getObject().equals(ConfigurationType.XDS))
-                    initXdsExtensions(devExt, device);
+                    initXdsExtensions(device);
                 return device;
             }
 
-            private void initXdsExtensions(Collection<DeviceExtension> devExt, Device device) {
-                XCAiInitiatingGWCfg xcaiInit = new XCAiInitiatingGWCfg();
-                device.addDeviceExtension(xcaiInit);
-                devExt.add(xcaiInit);
-                XCAInitiatingGWCfg xcaInit = new XCAInitiatingGWCfg();
-                device.addDeviceExtension(xcaInit);
-                devExt.add(xcaInit);
-                XCAiRespondingGWCfg xcaiResp = new XCAiRespondingGWCfg();
-                device.addDeviceExtension(xcaiResp);
-                devExt.add(xcaiResp);
-                XCARespondingGWCfg xcaResp = new XCARespondingGWCfg();
-                device.addDeviceExtension(xcaResp);
-                devExt.add(xcaResp);
-                XdsRegistry xdsReg = new XdsRegistry();
-                device.addDeviceExtension(xdsReg);
-                devExt.add(xdsReg);
-                XdsRepository xdsRep = new XdsRepository();
-                device.addDeviceExtension(xdsRep);
-                devExt.add(xdsRep);
+            private void initXdsExtensions(Device device) {
+                device.addDeviceExtension(new XCAiInitiatingGWCfg());
+                device.addDeviceExtension(new XCAInitiatingGWCfg());
+                device.addDeviceExtension(new XCAiRespondingGWCfg());
+                device.addDeviceExtension(new XCARespondingGWCfg());
+                device.addDeviceExtension(new XdsRegistry());
+                device.addDeviceExtension(new XdsRepository());
+                device.addDeviceExtension(new HL7DeviceExtension());
             }
 
-            private void initARRExtension(Collection<DeviceExtension> devExt, Device device) {
+            private void initARRExtension(Device device) {
                 AuditRecordRepository auditRecordRepository = new AuditRecordRepository();
                 device.addDeviceExtension(auditRecordRepository);
-                devExt.add(auditRecordRepository);
             }
 
-            private void initProxyDeviceExtension(Collection<DeviceExtension> devExt, Device device) {
+            private void initProxyDeviceExtension(Device device) {
                 ProxyDeviceExtension proxyDeviceExtension = new ProxyDeviceExtension();
                 proxyDeviceExtension.setSchedulerInterval(schedulerIntervalModel.getObject());
                 device.addDeviceExtension(proxyDeviceExtension);
                 device.addDeviceExtension(new HL7DeviceExtension());
-                devExt.add(proxyDeviceExtension);
             }
 
-            private void setProxyDeviceAttributes(Collection<DeviceExtension> devExt, Device device) {
-                if (devExt.contains(ProxyDeviceExtension.class)) {
-                    ProxyDeviceExtension proxyDevExt = device.getDeviceExtension(ProxyDeviceExtension.class);
+            private void setProxyDeviceAttributes(Device device) {
+                ProxyDeviceExtension proxyDevExt = device.getDeviceExtension(ProxyDeviceExtension.class);
+                if (proxyDevExt != null) {
                     proxyDevExt.setSchedulerInterval(schedulerIntervalModel.getObject());
                     proxyDevExt.setConfigurationStaleTimeout(
                             staleTimeoutModel.getObject() != null 

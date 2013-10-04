@@ -67,7 +67,7 @@ public class ProxyDeviceModel extends HL7DeviceModel {
             ApplicationEntity applicationEntity = i.next();
             this.applicationEntities.put(
                     applicationEntity.getAETitle(), 
-                    new ProxyApplicationEntityModel((ApplicationEntity) applicationEntity));
+                    new ProxyApplicationEntityModel(applicationEntity));
         }
     }
 

@@ -46,14 +46,12 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
 import org.apache.wicket.Page;
-import org.apache.wicket.protocol.http.PageExpiredException;
 import org.apache.wicket.request.IRequestHandler;
 import org.apache.wicket.request.Request;
 import org.apache.wicket.request.Response;
 import org.apache.wicket.request.cycle.AbstractRequestCycleListener;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.settings.IExceptionSettings.AjaxErrorStrategy;
-import org.dcm4chee.wizard.common.component.InternalErrorPage;
 import org.dcm4chee.wizard.common.component.secure.SecureWebApplication;
 import org.dcm4chee.wizard.common.login.context.LoginContextSecurityHelper;
 import org.dcm4chee.wizard.common.login.context.SSOLoginContext;
@@ -80,10 +78,10 @@ public class WizardApplication extends SecureWebApplication {
         getExceptionSettings().setAjaxErrorHandlingStrategy(AjaxErrorStrategy.INVOKE_FAILURE_HANDLER);
         getRequestCycleListeners().add(new AbstractRequestCycleListener() {
             public IRequestHandler onException(RequestCycle cycle, Exception e) {
-                while (e.getCause() != null)
-                    e = (Exception) e.getCause();
-                if (!(e instanceof PageExpiredException))
-                    cycle.setResponsePage(new InternalErrorPage(e, null));
+//                while (e.getCause() != null)
+//                    e = (Exception) e.getCause();
+//                if (!(e instanceof PageExpiredException))
+//                    cycle.setResponsePage(new InternalErrorPage(e, null));
                 return cycle.getRequestHandlerScheduledAfterCurrent();
             }
         });

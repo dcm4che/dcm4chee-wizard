@@ -264,17 +264,13 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                 }).show(target);
             }
         };
-
         Component createDeviceImg = new Image("createDeviceImg", ImageManager.IMAGE_WIZARD_DEVICE_ADD);
         createDeviceImg.add(new ImageSizeBehaviour("vertical-align: middle;"));
         createDevice.add(createDeviceImg);
-
         createDevice.add(new TooltipBehavior("dicom."));
-
         Component createDeviceText = new Label("createDeviceText", new ResourceModel("dicom.createDevice.text"));
         createDeviceText.add(new AttributeAppender("style", Model.of("vertical-align: middle"), " "));
         createDevice.add(createDeviceText);
-
         form.add(createDevice);
     }
 

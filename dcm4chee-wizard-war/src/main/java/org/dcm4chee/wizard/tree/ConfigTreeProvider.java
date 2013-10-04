@@ -40,7 +40,6 @@ package org.dcm4chee.wizard.tree;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
@@ -160,7 +159,7 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode, Str
             addApplicationEntitySubnodes(aeNode);
             createTransferCapabilityNodes(applicationEntityModel, aeNode);
             if (configType.equals(ConfigurationType.Proxy))
-                createProxyNodes((ProxyApplicationEntityModel) applicationEntityModel, aeNode);
+                createProxyNodes(new ProxyApplicationEntityModel(applicationEntityModel.getApplicationEntity()), aeNode);
         }
     }
 
@@ -463,22 +462,25 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode, Str
     }
 
     public ConfigurationType getConfigurationType(Device device) {
-        Collection<DeviceExtension> devExt = device.listDeviceExtensions();
-        for (DeviceExtension de : devExt) {
-            if (de instanceof ProxyDeviceExtension)
-                return ConfigurationType.Proxy;
-        }
-        if (devExt.contains(ProxyDeviceExtension.class))
+        Iterator<DeviceExtension> iter = device.listDeviceExtensions().iterator();
+        if (!iter.hasNext())
+            return ConfigurationType.Basic;
+
+        DeviceExtension ext = device.listDeviceExtensions().iterator().next();
+        if (ext instanceof ProxyDeviceExtension)
             return ConfigurationType.Proxy;
-        if (devExt.contains(XCAiInitiatingGWCfg.class) 
-                || devExt.contains(XCAInitiatingGWCfg.class)
-                || devExt.contains(XCAiRespondingGWCfg.class) 
-                || devExt.contains(XCARespondingGWCfg.class)
-                || devExt.contains(XdsRegistry.class) 
-                || devExt.contains(XdsRepository.class))
+
+        else if (ext instanceof XCAiInitiatingGWCfg 
+                || ext instanceof XCAInitiatingGWCfg
+                || ext instanceof XCAiRespondingGWCfg 
+                || ext instanceof XCARespondingGWCfg
+                || ext instanceof XdsRegistry 
+                || ext instanceof XdsRepository)
             return ConfigurationType.XDS;
-        if (devExt.contains(AuditRecordRepository.class))
+
+        else if (ext instanceof AuditRecordRepository)
             return ConfigurationType.AuditRecordRepository;
+
         return ConfigurationType.Basic;
     }
 

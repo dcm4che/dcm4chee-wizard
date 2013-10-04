@@ -181,6 +181,11 @@
      <artifactId>dcm4chee-xds2-common</artifactId>
      <version>${dcm4chee.xds2.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.dcm4che</groupId>
+      <artifactId>dcm4chee-xds2-infoset</artifactId>
+      <version>${dcm4chee.xds2.version}</version>
+    </dependency>
   </dependencies>
   <build>
     <finalName>dcm4chee-wizard-war-${project.version}-${project-classifier}</finalName>

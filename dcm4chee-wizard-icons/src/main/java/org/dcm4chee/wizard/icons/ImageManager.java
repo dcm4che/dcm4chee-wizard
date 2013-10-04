@@ -106,13 +106,13 @@ public class ImageManager {
             "proxy/coercion.png");
 
     public static final ResourceReference IMAGE_WIZARD_ECHO = new PackageResourceReference(ImageManager.class,
-            "wizard/functions/echo.png");
+            "functions/echo.png");
     public static final ResourceReference IMAGE_WIZARD_RUNNING = new PackageResourceReference(ImageManager.class,
-            "wizard/functions/running.png");
+            "functions/running.png");
     public static final ResourceReference IMAGE_WIZARD_NOT_RUNNING = new PackageResourceReference(ImageManager.class,
-            "wizard/functions/not_running.png");
+            "functions/not_running.png");
     public static final ResourceReference IMAGE_WIZARD_RELOAD = new PackageResourceReference(ImageManager.class,
-            "wizard/functions/reload.png");
+            "functions/reload.png");
     public static final ResourceReference IMAGE_WIZARD_RELOAD_WARNING = new PackageResourceReference(
-            ImageManager.class, "wizard/functions/reload_warning.png");
+            ImageManager.class, "functions/reload_warning.png");
 }

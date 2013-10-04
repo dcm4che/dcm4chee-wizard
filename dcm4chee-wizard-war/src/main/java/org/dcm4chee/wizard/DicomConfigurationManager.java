@@ -69,6 +69,18 @@ import org.dcm4che.util.SafeClose;
 import org.dcm4che.util.StringUtils;
 import org.dcm4chee.proxy.conf.ldap.LdapProxyConfigurationExtension;
 import org.dcm4chee.proxy.conf.prefs.PreferencesProxyConfigurationExtension;
+import org.dcm4chee.xds2.conf.ldap.LdapXCAInitiatingGWConfiguration;
+import org.dcm4chee.xds2.conf.ldap.LdapXCARespondingGWConfiguration;
+import org.dcm4chee.xds2.conf.ldap.LdapXCAiInitiatingGWConfiguration;
+import org.dcm4chee.xds2.conf.ldap.LdapXCAiRespondingGWConfiguration;
+import org.dcm4chee.xds2.conf.ldap.LdapXDSRegistryConfiguration;
+import org.dcm4chee.xds2.conf.ldap.LdapXDSRepositoryConfiguration;
+import org.dcm4chee.xds2.conf.prefs.PreferencesXCAInitiatingGWConfiguration;
+import org.dcm4chee.xds2.conf.prefs.PreferencesXCARespondingGWConfiguration;
+import org.dcm4chee.xds2.conf.prefs.PreferencesXCAiInitiatingGWConfiguration;
+import org.dcm4chee.xds2.conf.prefs.PreferencesXCAiRespondingGWConfiguration;
+import org.dcm4chee.xds2.conf.prefs.PreferencesXDSRegistryConfiguration;
+import org.dcm4chee.xds2.conf.prefs.PreferencesXDSRepositoryConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,6 +116,12 @@ public class DicomConfigurationManager implements Serializable {
                 ldapConfig.addDicomConfigurationExtension(new LdapProxyConfigurationExtension());
                 ldapConfig.addDicomConfigurationExtension(new LdapAuditLoggerConfiguration());
                 ldapConfig.addDicomConfigurationExtension(new LdapAuditRecordRepositoryConfiguration());
+                ldapConfig.addDicomConfigurationExtension(new LdapXCAiInitiatingGWConfiguration());
+                ldapConfig.addDicomConfigurationExtension(new LdapXCAInitiatingGWConfiguration());
+                ldapConfig.addDicomConfigurationExtension(new LdapXCAiRespondingGWConfiguration());
+                ldapConfig.addDicomConfigurationExtension(new LdapXCARespondingGWConfiguration());
+                ldapConfig.addDicomConfigurationExtension(new LdapXDSRegistryConfiguration());
+                ldapConfig.addDicomConfigurationExtension(new LdapXDSRepositoryConfiguration());
                 dicomConfiguration = ldapConfig;
                 hl7Configuration = hl7Config;
             } catch (FileNotFoundException e) {
@@ -118,6 +136,12 @@ public class DicomConfigurationManager implements Serializable {
                 prefsConfig.addDicomConfigurationExtension(new PreferencesProxyConfigurationExtension());
                 prefsConfig.addDicomConfigurationExtension(new PreferencesAuditLoggerConfiguration());
                 prefsConfig.addDicomConfigurationExtension(new PreferencesAuditRecordRepositoryConfiguration());
+                prefsConfig.addDicomConfigurationExtension(new PreferencesXCAiInitiatingGWConfiguration());
+                prefsConfig.addDicomConfigurationExtension(new PreferencesXCAInitiatingGWConfiguration());
+                prefsConfig.addDicomConfigurationExtension(new PreferencesXCAiRespondingGWConfiguration());
+                prefsConfig.addDicomConfigurationExtension(new PreferencesXCARespondingGWConfiguration());
+                prefsConfig.addDicomConfigurationExtension(new PreferencesXDSRegistryConfiguration());
+                prefsConfig.addDicomConfigurationExtension(new PreferencesXDSRepositoryConfiguration());
                 dicomConfiguration = prefsConfig;
                 hl7Configuration = hl7Config;
             } finally {

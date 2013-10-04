@@ -53,9 +53,10 @@ public class InstitutionCodeModel implements Serializable {
 
     String[] fields = new String[4];
 
-    public InstitutionCodeModel() {}
-
     public InstitutionCodeModel(Code code) {
+        if (code == null)
+            return;
+
         fields[0] = code.getCodeValue();
         fields[1] = code.getCodingSchemeDesignator();
         fields[2] = code.getCodingSchemeVersion();
@@ -63,8 +64,9 @@ public class InstitutionCodeModel implements Serializable {
     }
 
     public Code getCode() {
-        return (fields[0] != null && fields[1] != null && fields[3] != null) ? new Code(fields[0], fields[1],
-                fields[2], fields[3]) : null;
+        return (fields[0] != null && fields[1] != null && fields[3] != null) 
+                ? new Code(fields[0], fields[1],fields[2], fields[3]) 
+                : null;
     }
 
     public CodeFieldModel getCodeFieldModel(int idx) {
