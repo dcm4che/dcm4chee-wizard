@@ -251,13 +251,6 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         };
 
         optionalXdsContainer.add(
-                new Label("xdsiSrcUrlMapping.label", 
-                new ResourceModel("dicom.edit.device.xds.optional.xdsiSrcUrlMapping.label"))
-                .setOutputMarkupPlaceholderTag(true));
-        optionalXdsContainer.add(
-                new TextArea<String>("xdsiSrcUrlMapping", xdsiSrcUrlMappingModel).setType(String.class));
-        
-        optionalXdsContainer.add(
                 new Label("xdsSoapMsgLogDir.label", 
                 new ResourceModel("dicom.edit.device.xds.optional.xdsSoapMsgLogDir.label"))
                 .setOutputMarkupPlaceholderTag(true));
@@ -569,6 +562,15 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         respondingGatewayUrlTextArea.setRequired(true);
         xdsWMC.add(respondingGatewayUrlTextArea);
 
+        Label xdsiSrcUrlMappingLabel = new Label("xdsiSrcUrlMapping.label", new ResourceModel(
+                "dicom.edit.device.xds.optional.xdsiSrcUrlMapping.label"));
+        xdsWMC.add(xdsiSrcUrlMappingLabel);
+        FormComponent<String> xdsiSrcUrlMappingTextArea = new TextArea<String>("xdsiSrcUrlMapping",
+                xdsiSrcUrlMappingModel);
+        xdsiSrcUrlMappingTextArea.setType(String.class);
+        xdsiSrcUrlMappingTextArea.setRequired(true);
+        xdsWMC.add(xdsiSrcUrlMappingTextArea);
+
         return xdsWMC;
     }
 
@@ -653,9 +655,23 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         XCAiInitiatingGWCfg xcaiInit = deviceModel.getDevice().getDeviceExtension(XCAiInitiatingGWCfg.class);
         if (xcaiInit != null)
             setXCAiInitGWAttributes(xcaiInit);
+        XCAiRespondingGWCfg xcaiResp = deviceModel.getDevice().getDeviceExtension(XCAiRespondingGWCfg.class);
+        if (xcaiResp != null)
+            setXCAiRespGWAttributes(xcaiResp);
         XCAInitiatingGWCfg xcaInit = deviceModel.getDevice().getDeviceExtension(XCAInitiatingGWCfg.class);
         if (xcaInit != null)
             setXCAInitGWAttributes(xcaInit);
+    }
+
+    private void setXCAiRespGWAttributes(XCAiRespondingGWCfg xcaiResp) {
+        if (xdsApplicationNameModel == null)
+            xdsApplicationNameModel = Model.of(xcaiResp.getApplicationName());
+        if (xdsHomeCommunityIdModel == null)
+            xdsHomeCommunityIdModel = Model.of(xcaiResp.getHomeCommunityID());
+        if (xdsiSrcUrlMappingModel == null && xcaiResp.getXDSiSourceURLs().length > 0)
+            xdsiSrcUrlMappingModel = new StringArrayModel(xcaiResp.getXDSiSourceURLs());
+        if (xdsSoapMsgLogDirModel == null)
+            xdsSoapMsgLogDirModel = Model.of(xcaiResp.getSoapLogDir());
     }
 
     private void setXCAInitGWAttributes(XCAInitiatingGWCfg xcaInit) {
@@ -692,7 +708,7 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
             xdsHomeCommunityIdModel = Model.of(xcaiInit.getHomeCommunityID());
         if (xdsRespondingGatewayUrlModel == null)
             xdsRespondingGatewayUrlModel = new StringArrayModel(xcaiInit.getRespondingGWURLs());
-        if (xdsiSrcUrlMappingModel == null)
+        if (xdsiSrcUrlMappingModel == null && xcaiInit.getXDSiSourceURLs().length > 0)
             xdsiSrcUrlMappingModel = new StringArrayModel(xcaiInit.getXDSiSourceURLs());
         if (xdsSoapMsgLogDirModel == null)
             xdsSoapMsgLogDirModel = Model.of(xcaiInit.getSoapLogDir());
@@ -908,7 +924,26 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
 
     private void setXdsDeviceAttributes(Device device, Form<?> optionalContainer) {
         setXCAiInitGWAttributes(device, optionalContainer);
+        setXCAiRespondingGWAttributes(device, optionalContainer);
         setXCAInitGWAttributes(device, optionalContainer);
+    }
+
+    private void setXCAiRespondingGWAttributes(Device device, Form<?> optionalContainer) {
+        XCAiRespondingGWCfg xcai = device.getDeviceExtension(XCAiRespondingGWCfg.class);
+        if (xcai == null)
+            return;
+
+        // mandatory
+        xcai.setApplicationName(xdsApplicationNameModel.getObject());
+        xcai.setHomeCommunityID(xdsHomeCommunityIdModel.getObject());
+        xcai.setXDSiSourceURLs(xdsiSrcUrlMappingModel.getArray());
+
+        // optional
+        if (!optionalContainer.isVisible())
+            return;
+
+        if (xdsSoapMsgLogDirModel.getObject() != null)
+            xcai.setSoapLogDir(xdsSoapMsgLogDirModel.getObject());
     }
 
     private void setXCAInitGWAttributes(Device device, Form<?> optionalContainer) {
@@ -982,7 +1017,17 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
 
     private void initXdsExtensions(Device device) {
         initXCAiInitGWAttributes(device);
+        initXCAiRespondingGWAttributes(device);
         initXCAInitGWAttributes(device);
+    }
+
+    private void initXCAiRespondingGWAttributes(Device device) {
+        XCAiRespondingGWCfg xcai = new XCAiRespondingGWCfg();
+        xcai.setApplicationName(xdsApplicationNameModel.getObject());
+        xcai.setHomeCommunityID(xdsHomeCommunityIdModel.getObject());
+        xcai.setXDSiSourceURLs(xdsiSrcUrlMappingModel.getArray());
+        xcai.setSoapLogDir(xdsSoapMsgLogDirModel.getObject());
+        device.addDeviceExtension(xcai);
     }
 
     private void initXCAInitGWAttributes(Device device) {
