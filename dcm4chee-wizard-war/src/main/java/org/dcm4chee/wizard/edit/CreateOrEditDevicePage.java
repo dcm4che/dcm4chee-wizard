@@ -279,20 +279,6 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
                 new TextArea<String>("xdsRespondingGatewayRetrieveUrl", xdsRespondingGatewayRetrieveUrlModel).setType(String.class));
 
         optionalXdsContainer.add(
-                new Label("xdsRegistryUrl.label", 
-                new ResourceModel("dicom.edit.device.xds.optional.xdsRegistryUrl.label"))
-                .setOutputMarkupPlaceholderTag(true));
-        optionalXdsContainer.add(
-                new TextField<String>("xdsRegistryUrl", xdsRegistryUrlModel).setType(String.class));
-
-        optionalXdsContainer.add(
-                new Label("xdsRepositoryUrl.label", 
-                new ResourceModel("dicom.edit.device.xds.optional.xdsRepositoryUrl.label"))
-                .setOutputMarkupPlaceholderTag(true));
-        optionalXdsContainer.add(
-                new TextArea<String>("xdsRepositoryUrl", xdsRepositoryUrlModel).setType(String.class));
-
-        optionalXdsContainer.add(
                 new Label("xdsPIXConsumerApplication.label", 
                 new ResourceModel("dicom.edit.device.xds.optional.xdsPIXConsumerApplication.label"))
                 .setOutputMarkupPlaceholderTag(true));
@@ -571,6 +557,24 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         xdsiSrcUrlMappingTextArea.setRequired(true);
         xdsWMC.add(xdsiSrcUrlMappingTextArea);
 
+        Label xdsRegistryUrlLabel = new Label("xdsRegistryUrl.label", new ResourceModel(
+                "dicom.edit.device.xds.optional.xdsRegistryUrl.label"));
+        xdsWMC.add(xdsRegistryUrlLabel);
+        FormComponent<String> xdsRegistryUrlTextField = new TextField<String>("xdsRegistryUrl",
+                xdsRegistryUrlModel);
+        xdsRegistryUrlTextField.setType(String.class);
+        xdsRegistryUrlTextField.setRequired(true);
+        xdsWMC.add(xdsRegistryUrlTextField);
+
+        Label xdsRepositoryUrlLabel = new Label("xdsRepositoryUrl.label", new ResourceModel(
+                "dicom.edit.device.xds.optional.xdsRepositoryUrl.label"));
+        xdsWMC.add(xdsRepositoryUrlLabel);
+        FormComponent<String> xdsRepositoryUrlTextArea = new TextArea<String>("xdsRepositoryUrl",
+                xdsRepositoryUrlModel);
+        xdsRepositoryUrlTextArea.setType(String.class);
+        xdsRepositoryUrlTextArea.setRequired(true);
+        xdsWMC.add(xdsRepositoryUrlTextArea);
+
         return xdsWMC;
     }
 
@@ -661,6 +665,20 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         XCAInitiatingGWCfg xcaInit = deviceModel.getDevice().getDeviceExtension(XCAInitiatingGWCfg.class);
         if (xcaInit != null)
             setXCAInitGWAttributes(xcaInit);
+        XCARespondingGWCfg xcaResp = deviceModel.getDevice().getDeviceExtension(XCARespondingGWCfg.class);
+        if (xcaResp != null)
+            setXCARespGWAttributes(xcaResp);
+    }
+
+    private void setXCARespGWAttributes(XCARespondingGWCfg xcaResp) {
+        if (xdsApplicationNameModel == null)
+            xdsApplicationNameModel = Model.of(xcaResp.getApplicationName());
+        if (xdsHomeCommunityIdModel == null)
+            xdsHomeCommunityIdModel = Model.of(xcaResp.getHomeCommunityID());
+        if (xdsRegistryUrlModel == null && xcaResp.getRegistryURL() != null)
+            xdsRegistryUrlModel = Model.of(xcaResp.getRegistryURL());
+        if (xdsRepositoryUrlModel == null && xcaResp.getRepositoryURLs().length > 0)
+            xdsRepositoryUrlModel = new StringArrayModel(xcaResp.getRepositoryURLs());
     }
 
     private void setXCAiRespGWAttributes(XCAiRespondingGWCfg xcaiResp) {
@@ -683,9 +701,9 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
             xdsRespondingGatewayUrlModel = new StringArrayModel(xcaInit.getRespondingGWURLs());
         if (xdsRespondingGatewayRetrieveUrlModel == null)
             xdsRespondingGatewayRetrieveUrlModel = new StringArrayModel(xcaInit.getRespondingGWRetrieveURLs());
-        if (xdsRegistryUrlModel == null)
+        if (xdsRegistryUrlModel == null && xcaInit.getRegistryURL() != null)
             xdsRegistryUrlModel = Model.of(xcaInit.getRegistryURL());
-        if (xdsRepositoryUrlModel == null)
+        if (xdsRepositoryUrlModel == null && xcaInit.getRepositoryURLs().length > 0)
             xdsRepositoryUrlModel = new StringArrayModel(xcaInit.getRepositoryURLs());
         if (xdsAsyncModel == null)
             xdsAsyncModel = Model.of(xcaInit.isAsync());
@@ -926,6 +944,26 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         setXCAiInitGWAttributes(device, optionalContainer);
         setXCAiRespondingGWAttributes(device, optionalContainer);
         setXCAInitGWAttributes(device, optionalContainer);
+        setXCARespondingGWAttributes(device, optionalContainer);
+    }
+
+    private void setXCARespondingGWAttributes(Device device, Form<?> optionalContainer) {
+        XCARespondingGWCfg xca = device.getDeviceExtension(XCARespondingGWCfg.class);
+        if (xca == null)
+            return;
+
+        // mandatory
+        xca.setApplicationName(xdsApplicationNameModel.getObject());
+        xca.setHomeCommunityID(xdsHomeCommunityIdModel.getObject());
+        xca.setRegistryURL(xdsRegistryUrlModel.getObject());
+        xca.setRepositoryURLs(xdsRepositoryUrlModel.getArray());
+
+        // optional
+        if (!optionalContainer.isVisible())
+            return;
+
+        if (xdsSoapMsgLogDirModel.getObject() != null)
+            xca.setSoapLogDir(xdsSoapMsgLogDirModel.getObject());
     }
 
     private void setXCAiRespondingGWAttributes(Device device, Form<?> optionalContainer) {
@@ -1019,6 +1057,17 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         initXCAiInitGWAttributes(device);
         initXCAiRespondingGWAttributes(device);
         initXCAInitGWAttributes(device);
+        initXCARespondingGWAttributes(device);
+    }
+
+    private void initXCARespondingGWAttributes(Device device) {
+        XCARespondingGWCfg xca = new XCARespondingGWCfg();
+        xca.setApplicationName(xdsApplicationNameModel.getObject());
+        xca.setHomeCommunityID(xdsHomeCommunityIdModel.getObject());
+        xca.setRegistryURL(xdsRegistryUrlModel.getObject());
+        xca.setRepositoryURLs(xdsRepositoryUrlModel.getArray());
+        xca.setSoapLogDir(xdsSoapMsgLogDirModel.getObject());
+        device.addDeviceExtension(xca);
     }
 
     private void initXCAiRespondingGWAttributes(Device device) {
