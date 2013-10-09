@@ -44,9 +44,9 @@
                       <span class="edit-desc" wicket:id="homeCommunityId.label" />
                       <input class="edit-value" wicket:id="homeCommunityId" type="text" />
                   </div>
-                  <div class="edit-table-row" >
+                  <div class="edit-table-row" style="height: 45px;">
                       <span class="edit-desc" wicket:id="respondingGatewayUrl.label" />
-                      <textarea class="edit-value" wicket:id="respondingGatewayUrl" rows="1" />
+                      <textarea class="edit-value" wicket:id="respondingGatewayUrl" rows="2" />
                   </div>
                 </div>
 				<div  class="edit-buttons">
@@ -54,6 +54,58 @@
 					<input class="edit-value" wicket:id="toggleOptional" type="checkbox" />
 				</div>
 				<form wicket:id="optional">
+                    <div wicket:id="optionalProxyContainer">
+                        <div class="edit-table-row">
+                            <span class="edit-desc" wicket:id="forwardThreads.label" />
+                            <input class="edit-value" wicket:id="forwardThreads" type="text" />
+                        </div>
+                        <div class="edit-table-row">
+                            <span class="edit-desc" wicket:id="staleTimeout.label" />
+                            <input class="edit-value" wicket:id="staleTimeout" type="text" />
+                        </div>
+                    </div>
+                    <div wicket:id="optionalXdsContainer">
+                        <div class="edit-table-row" style="height: 45px;">
+                            <span class="edit-desc" wicket:id="xdsiSrcUrlMapping.label" />
+                            <textarea class="edit-value" wicket:id="xdsiSrcUrlMapping" rows="2" />
+                        </div>
+                        <div class="edit-table-row">
+                            <span class="edit-desc" wicket:id="xdsSoapMsgLogDir.label" />
+                            <input class="edit-value" wicket:id="xdsSoapMsgLogDir" type="text" />
+                        </div>
+                        <div class="edit-table-row">
+                            <span class="edit-desc" wicket:id="xdsAsync.label" />
+                            <select class="edit-value" wicket:id="xdsAsync" />
+                        </div>
+                        <div class="edit-table-row">
+                            <span class="edit-desc" wicket:id="xdsAsyncHandler.label" />
+                            <select class="edit-value" wicket:id="xdsAsyncHandler" />
+                        </div>
+                        <div class="edit-table-row" style="height: 45px;">
+                            <span class="edit-desc" wicket:id="xdsRespondingGatewayRetrieveUrl.label" />
+                            <textarea class="edit-value" wicket:id="xdsRespondingGatewayRetrieveUrl" rows="2" />
+                        </div>
+                        <div class="edit-table-row">
+                            <span class="edit-desc" wicket:id="xdsRegistryUrl.label" />
+                            <input class="edit-value" wicket:id="xdsRegistryUrl" type="text" />
+                        </div>
+                        <div class="edit-table-row" style="height: 45px;">
+                            <span class="edit-desc" wicket:id="xdsRepositoryUrl.label" />
+                            <textarea class="edit-value" wicket:id="xdsRepositoryUrl" rows="2" />
+                        </div>
+                        <div class="edit-table-row">
+                            <span class="edit-desc" wicket:id="xdsPIXConsumerApplication.label" />
+                            <input class="edit-value" wicket:id="xdsPIXConsumerApplication" type="text" />
+                        </div>
+                        <div class="edit-table-row">
+                            <span class="edit-desc" wicket:id="xdsPIXManagerApplication.label" />
+                            <input class="edit-value" wicket:id="xdsPIXManagerApplication" type="text" />
+                        </div>
+                        <div class="edit-table-row" style="height: 45px;">
+                            <span class="edit-desc" wicket:id="xdsAssigningAuthority.label" />
+                            <textarea class="edit-value" wicket:id="xdsAssigningAuthority" rows="2" />
+                        </div>
+                    </div>
 					<div class="edit-table-row">
 						<span class="edit-desc" wicket:id="description.label" />
 						<input class="edit-value" wicket:id="description" type="text" />
@@ -64,7 +116,7 @@
 					</div>		
 					<div class="edit-table-row" style="height: 45px;">
 						<span class="edit-desc" wicket:id="institutionAddress.label" />
-						<textarea class="edit-value" wicket:id="institutionAddress" rows="1" />
+						<textarea class="edit-value" wicket:id="institutionAddress" rows="2" />
 					</div>
 					<div class="edit-table-row">
 						<span class="edit-desc" wicket:id="institutionCodeValue.label" />
@@ -84,11 +136,11 @@
 					</div>		
 					<div class="edit-table-row" style="height: 45px;">
 						<span class="edit-desc" wicket:id="institutionalDepartmentName.label" />
-						<textarea class="edit-value" wicket:id="institutionalDepartmentName" rows="1" />
+						<textarea class="edit-value" wicket:id="institutionalDepartmentName" rows="2" />
 					</div>
 					<div class="edit-table-row" style="height: 45px;">
 						<span class="edit-desc" wicket:id="institutionName.label" />
-						<textarea class="edit-value" wicket:id="institutionName" rows="1" />
+						<textarea class="edit-value" wicket:id="institutionName" rows="2" />
 					</div>
 					<div class="edit-table-row">
 						<span class="edit-desc" wicket:id="issuerOfAccessionNumber.label" />
@@ -132,11 +184,11 @@
 					</div>
 					<div class="edit-table-row" style="height: 45px;">
 						<span class="edit-desc" wicket:id="primaryDeviceTypes.label" />
-						<textarea class="edit-value" wicket:id="primaryDeviceTypes" rows="1" />
+						<textarea class="edit-value" wicket:id="primaryDeviceTypes" rows="2" />
 					</div>
 					<div class="edit-table-row" style="height: 45px;">
 						<span class="edit-desc" wicket:id="softwareVersions.label" />
-						<textarea class="edit-value" wicket:id="softwareVersions" rows="1" />
+						<textarea class="edit-value" wicket:id="softwareVersions" rows="2" />
 					</div>
 					<div class="edit-table-row">
 						<span class="edit-desc" wicket:id="stationName.label" />
@@ -173,19 +225,9 @@
 						<input class="edit-value" wicket:id="keyStoreKeyPin" type="text" />
 						<input class="edit-value" wicket:id="useKeyStoreKeyPinProperty" type="checkbox" />
 					</div>
-					<div wicket:id="optionalProxyContainer">
-						<div class="edit-table-row">
-							<span class="edit-desc" wicket:id="forwardThreads.label" />
-							<input class="edit-value" wicket:id="forwardThreads" type="text" />
-						</div>
-						<div class="edit-table-row">
-							<span class="edit-desc" wicket:id="staleTimeout.label" />
-							<input class="edit-value" wicket:id="staleTimeout" type="text" />
-						</div>
-					</div>
 					<div class="edit-table-row" style="height: 45px;" wicket:id="relatedDeviceRefsContainer">
 						<span class="edit-desc" wicket:id="relatedDeviceRefs.label" />
-						<textarea class="edit-value" wicket:id="relatedDeviceRefs" rows="1" />
+						<textarea class="edit-value" wicket:id="relatedDeviceRefs" rows="2" />
 					</div>
 					<div class="edit-table-row" wicket:id="vendorDataContainer">
 						<span class="edit-desc" wicket:id="vendorData.label" />

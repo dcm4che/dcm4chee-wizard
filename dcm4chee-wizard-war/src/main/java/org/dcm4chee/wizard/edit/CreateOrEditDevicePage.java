@@ -101,26 +101,16 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
     private static Logger log = LoggerFactory.getLogger(CreateOrEditDevicePage.class);
 
     private List<String> keyStoreTypes = Arrays.asList(new String[] { "JKS", "PKCS12" });
+    private List<Boolean> booleanChoice = Arrays.asList(new Boolean[] { true, false });
 
     // configuration type selection
     private Model<ConfigurationType> typeModel;
 
-    // mandatory
+    // Mandatory Device Attributes
     private Model<String> deviceNameModel;
     private IModel<Boolean> installedModel;
-
-    // ProxyDevice
-    private Model<Integer> schedulerIntervalModel;
-    private Model<Integer> forwardThreadsModel;
-    private Model<Integer> staleTimeoutModel;
-
-    // XDS Device
-    //XCAiInitiatingGW
-    private Model<String> xdsApplicationNameModel;
-    private Model<String> xdsHomeCommunityIdModel;
-    private StringArrayModel xdsRespondingGatewayUrlModel;
-
-    // optional
+    
+    // Optional Device Attributes
     private Model<String> descriptionModel;
     private Model<String> deviceSerialNumberModel;
     private StringArrayModel institutionAddressModel;
@@ -153,6 +143,26 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
     private Model<String> keyStoreKeyPinModel;
     private Model<Boolean> useKeyStoreKeyPinProperty;
 
+    // Proxy Device Attributes
+    private Model<Integer> schedulerIntervalModel;
+    private Model<Integer> forwardThreadsModel;
+    private Model<Integer> staleTimeoutModel;
+
+    // XDS Device Attributes
+    private Model<String> xdsApplicationNameModel;
+    private Model<String> xdsHomeCommunityIdModel;
+    private StringArrayModel xdsRespondingGatewayUrlModel;
+    private StringArrayModel xdsiSrcUrlMappingModel;
+    private Model<String> xdsSoapMsgLogDirModel;
+    private Model<Boolean> xdsAsyncModel;
+    private Model<Boolean> xdsAsyncHandlerModel;
+    private StringArrayModel xdsRespondingGatewayRetrieveUrlModel;
+    private Model<String> xdsRegistryUrlModel;
+    private StringArrayModel xdsRepositoryUrlModel;
+    private Model<String> xdsPIXConsumerApplicationModel;
+    private Model<String> xdsPIXManagerApplicationModel;
+    private StringArrayModel xdsAssigningAuthorityModel;
+
     public CreateOrEditDevicePage(final ModalWindow window, final DeviceModel deviceModel) {
         super();
         add(new WebMarkupContainer("create-device-title").setVisible(deviceModel == null));
@@ -162,12 +172,11 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         form.setResourceIdPrefix("dicom.edit.device.");
         add(form);
         if (deviceModel == null)
-            initBasicConfigurationTypeModel();
+            initNewConfigurationTypeModel();
         else
             initDeviceModel(deviceModel);
         addTypeLabel(form);
         DropDownChoice<ConfigTreeProvider.ConfigurationType> typeDropDown = setConfigurationTypeList();
-        addOnChangeUpdate(deviceModel, form, typeDropDown);
         addDeviceTitle(deviceModel, form);
         addInstalledLabel(form);
         form.add(proxyWebMarkupContainer(deviceModel));
@@ -175,6 +184,7 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         final Form<?> optionalContainer = addOptionalContainer(form);
         addSaveButton(window, deviceModel, form, optionalContainer);
         addCancelButton(window, form);
+        addOnChangeUpdate(deviceModel, form, typeDropDown);
     }
 
     private Form<?> addOptionalContainer(final ExtendedForm form) {
@@ -182,6 +192,7 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         optionalContainer.setOutputMarkupId(true);
         optionalContainer.setOutputMarkupPlaceholderTag(true);
         optionalContainer.setVisible(false);
+        form.add(optionalContainer);
         addTextField(optionalContainer, 
                 "dicom.edit.device.optional.description.label", 
                 "description.label", 
@@ -189,10 +200,10 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
                 descriptionModel);
         addToggleOptionalCheckBox(form, optionalContainer);
         addOptionalParameters(optionalContainer);
-        addOptionalProxyContainer(optionalContainer);
-        addRelatedDeviceRefsContainer(optionalContainer);
+        optionalContainer.add(getOptionalProxyContainer());
+        optionalContainer.add(getOptionalXdsContainer());
+        optionalContainer.add(getRelatedDeviceRefsContainer());
         addWebMarkupContainer(optionalContainer);
-        form.add(optionalContainer);
         return optionalContainer;
     }
 
@@ -218,27 +229,112 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         vendorDataContainer.setVisible(!vendorDataModel.getObject().equals("size 0"));
     }
 
-    private void addRelatedDeviceRefsContainer(final Form<?> optionalContainer) {
+    private WebMarkupContainer getRelatedDeviceRefsContainer() {
         WebMarkupContainer relatedDeviceRefsContainer = new WebMarkupContainer("relatedDeviceRefsContainer");
-        optionalContainer.add(relatedDeviceRefsContainer);
         relatedDeviceRefsContainer.add(new Label("relatedDeviceRefs.label", new ResourceModel(
                 "dicom.edit.device.relatedDeviceRefs.label")));
         relatedDeviceRefsContainer.add(new TextArea<String>("relatedDeviceRefs", relatedDeviceRefsModel)
                 .setEnabled(false));
         relatedDeviceRefsContainer.setVisible(relatedDeviceRefsModel.getArray().length > 0);
+        return relatedDeviceRefsContainer;
     }
 
-    private void addOptionalProxyContainer(final Form<?> optionalContainer) {
+    private WebMarkupContainer getOptionalXdsContainer() {
+        WebMarkupContainer optionalXdsContainer = new WebMarkupContainer("optionalXdsContainer") {
+
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public boolean isVisible() {
+                return typeModel.getObject().equals(ConfigurationType.XDS);
+            }
+        };
+
+        optionalXdsContainer.add(
+                new Label("xdsiSrcUrlMapping.label", 
+                new ResourceModel("dicom.edit.device.xds.optional.xdsiSrcUrlMapping.label"))
+                .setOutputMarkupPlaceholderTag(true));
+        optionalXdsContainer.add(
+                new TextArea<String>("xdsiSrcUrlMapping", xdsiSrcUrlMappingModel).setType(String.class));
+        
+        optionalXdsContainer.add(
+                new Label("xdsSoapMsgLogDir.label", 
+                new ResourceModel("dicom.edit.device.xds.optional.xdsSoapMsgLogDir.label"))
+                .setOutputMarkupPlaceholderTag(true));
+        optionalXdsContainer.add(
+                new TextField<String>("xdsSoapMsgLogDir", xdsSoapMsgLogDirModel).setType(String.class));
+        
+        optionalXdsContainer.add(
+                new Label("xdsAsync.label", 
+                new ResourceModel("dicom.edit.device.xds.optional.xdsAsync.label"))
+                .setOutputMarkupPlaceholderTag(true));
+        optionalXdsContainer.add(
+                new DropDownChoice<>("xdsAsync", xdsAsyncModel, booleanChoice).setNullValid(true));
+        
+        optionalXdsContainer.add(
+                new Label("xdsAsyncHandler.label", 
+                new ResourceModel("dicom.edit.device.xds.optional.xdsAsyncHandler.label"))
+                .setOutputMarkupPlaceholderTag(true));
+        optionalXdsContainer.add(
+                new DropDownChoice<>("xdsAsyncHandler", xdsAsyncHandlerModel, booleanChoice).setNullValid(true));
+
+        optionalXdsContainer.add(
+                new Label("xdsRespondingGatewayRetrieveUrl.label", 
+                new ResourceModel("dicom.edit.device.xds.optional.xdsRespondingGatewayRetrieveUrl.label"))
+                .setOutputMarkupPlaceholderTag(true));
+        optionalXdsContainer.add(
+                new TextArea<String>("xdsRespondingGatewayRetrieveUrl", xdsRespondingGatewayRetrieveUrlModel).setType(String.class));
+
+        optionalXdsContainer.add(
+                new Label("xdsRegistryUrl.label", 
+                new ResourceModel("dicom.edit.device.xds.optional.xdsRegistryUrl.label"))
+                .setOutputMarkupPlaceholderTag(true));
+        optionalXdsContainer.add(
+                new TextField<String>("xdsRegistryUrl", xdsRegistryUrlModel).setType(String.class));
+
+        optionalXdsContainer.add(
+                new Label("xdsRepositoryUrl.label", 
+                new ResourceModel("dicom.edit.device.xds.optional.xdsRepositoryUrl.label"))
+                .setOutputMarkupPlaceholderTag(true));
+        optionalXdsContainer.add(
+                new TextArea<String>("xdsRepositoryUrl", xdsRepositoryUrlModel).setType(String.class));
+
+        optionalXdsContainer.add(
+                new Label("xdsPIXConsumerApplication.label", 
+                new ResourceModel("dicom.edit.device.xds.optional.xdsPIXConsumerApplication.label"))
+                .setOutputMarkupPlaceholderTag(true));
+        optionalXdsContainer.add(
+                new TextField<String>("xdsPIXConsumerApplication", xdsPIXConsumerApplicationModel).setType(String.class));
+
+        optionalXdsContainer.add(
+                new Label("xdsPIXManagerApplication.label", 
+                new ResourceModel("dicom.edit.device.xds.optional.xdsPIXManagerApplication.label"))
+                .setOutputMarkupPlaceholderTag(true));
+        optionalXdsContainer.add(
+                new TextField<String>("xdsPIXManagerApplication", xdsPIXManagerApplicationModel).setType(String.class));
+
+        optionalXdsContainer.add(
+                new Label("xdsAssigningAuthority.label", 
+                new ResourceModel("dicom.edit.device.xds.optional.xdsAssigningAuthority.label"))
+                .setOutputMarkupPlaceholderTag(true));
+        optionalXdsContainer.add(
+                new TextArea<String>("xdsAssigningAuthority", xdsAssigningAuthorityModel).setType(String.class));
+
+        optionalXdsContainer.setOutputMarkupId(true);
+        optionalXdsContainer.setOutputMarkupPlaceholderTag(true);
+        return optionalXdsContainer;
+    }
+
+    private WebMarkupContainer getOptionalProxyContainer() {
         WebMarkupContainer optionalProxyContainer = new WebMarkupContainer("optionalProxyContainer") {
 
             private static final long serialVersionUID = 1L;
 
             @Override
             public boolean isVisible() {
-                return optionalContainer.isVisible() && typeModel.getObject().equals(ConfigurationType.Proxy);
+                return typeModel.getObject().equals(ConfigurationType.Proxy);
             }
         };
-        optionalContainer.add(optionalProxyContainer.setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true));
 
         optionalProxyContainer.add(new Label("forwardThreads.label", new ResourceModel(
                 "dicom.edit.device.optional.forwardThreads.label")).setOutputMarkupPlaceholderTag(true));
@@ -249,6 +345,10 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
                 "dicom.edit.device.optional.staleTimeout.label")).setOutputMarkupPlaceholderTag(true));
         optionalProxyContainer.add(new TextField<Integer>("staleTimeout", staleTimeoutModel).setType(Integer.class)
                 .add(new RangeValidator<Integer>(0, Integer.MAX_VALUE)));
+
+        optionalProxyContainer.setOutputMarkupId(true);
+        optionalProxyContainer.setOutputMarkupPlaceholderTag(true);
+        return optionalProxyContainer;
     }
 
     private void addOptionalParameters(final Form<?> optionalContainer) {
@@ -440,12 +540,8 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
                 return typeModel.getObject().equals(ConfigurationType.XDS);
             }
         };
-        xdsWMC.setOutputMarkupPlaceholderTag(true);
-        addXCAiInitiatingGWAttributes(xdsWMC);
-        return xdsWMC;
-    }
 
-    private void addXCAiInitiatingGWAttributes(WebMarkupContainer xdsWMC) {
+        xdsWMC.setOutputMarkupPlaceholderTag(true);
         Label applicationNameLabel = new Label("applicationName.label", new ResourceModel(
                 "dicom.edit.device.xds.applicationName.label"));
         xdsWMC.add(applicationNameLabel);
@@ -472,6 +568,8 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         respondingGatewayUrlTextArea.setType(String.class);
         respondingGatewayUrlTextArea.setRequired(true);
         xdsWMC.add(respondingGatewayUrlTextArea);
+
+        return xdsWMC;
     }
 
     private void addInstalledLabel(final ExtendedForm form) {
@@ -494,6 +592,7 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
                     protected void onUpdate(AjaxRequestTarget target) {
                         target.add(form.get("proxy"));
                         target.add(form.get("xds"));
+                        target.add(form.get("optional"));
                     }
                 }));
     }
@@ -514,77 +613,7 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
 
     private void initDeviceModel(final DeviceModel deviceModel) {
         try {
-            Iterator<DeviceExtension> iter = deviceModel.getDevice().listDeviceExtensions().iterator();
-            if (!iter.hasNext())
-                typeModel = Model.of(ConfigTreeProvider.ConfigurationType.Basic);
-            else {
-                DeviceExtension ext = iter.next();
-                if (ext instanceof ProxyDeviceExtension)
-                    typeModel = Model.of(ConfigTreeProvider.ConfigurationType.Proxy);
-                else if (ext instanceof XCAiInitiatingGWCfg 
-                        || ext instanceof XCAInitiatingGWCfg
-                        || ext instanceof XCAiRespondingGWCfg 
-                        || ext instanceof XCARespondingGWCfg
-                        || ext instanceof XdsRegistry 
-                        || ext instanceof XdsRepository)
-                    typeModel = Model.of(ConfigTreeProvider.ConfigurationType.XDS);
-                else
-                    typeModel = Model.of(ConfigTreeProvider.ConfigurationType.Basic);
-            }
-
-            deviceNameModel = Model.of(deviceModel.getDevice().getDeviceName());
-            installedModel = Model.of(deviceModel.getDevice().isInstalled());
-
-            descriptionModel = Model.of(deviceModel.getDevice().getDescription());
-            deviceSerialNumberModel = Model.of(deviceModel.getDevice().getDeviceSerialNumber());
-            institutionAddressModel = new StringArrayModel(deviceModel.getDevice().getInstitutionAddresses());
-
-            Code code = null;
-            if (deviceModel.getDevice().getInstitutionCodes().length > 0)
-                code = deviceModel.getDevice().getInstitutionCodes()[0];
-            institutionCodeModel = new InstitutionCodeModel(code);
-
-            institutionalDepartmentNameModel = new StringArrayModel(deviceModel.getDevice()
-                    .getInstitutionalDepartmentNames());
-            institutionNameModel = new StringArrayModel(deviceModel.getDevice().getInstitutionNames());
-            if (deviceModel.getDevice().getIssuerOfAccessionNumber() == null)
-                issuerOfAccessionNumberModel = Model.of();
-            else
-                issuerOfAccessionNumberModel = Model
-                        .of(deviceModel.getDevice().getIssuerOfAccessionNumber().toString());
-            if (deviceModel.getDevice().getIssuerOfAdmissionID() == null)
-                issuerOfAdmissionIDModel = Model.of();
-            else
-                issuerOfAdmissionIDModel = Model.of(deviceModel.getDevice().getIssuerOfAdmissionID().toString());
-            if (deviceModel.getDevice().getIssuerOfContainerIdentifier() == null)
-                issuerOfContainerIdentifierModel = Model.of();
-            else
-                issuerOfContainerIdentifierModel = Model.of(deviceModel.getDevice().getIssuerOfContainerIdentifier()
-                        .toString());
-            if (deviceModel.getDevice().getIssuerOfPatientID() == null)
-                issuerOfPatientIDModel = Model.of();
-            else
-                issuerOfPatientIDModel = Model.of(deviceModel.getDevice().getIssuerOfPatientID().toString());
-            if (deviceModel.getDevice().getIssuerOfServiceEpisodeID() == null)
-                issuerOfServiceEpisodeIDModel = Model.of();
-            else
-                issuerOfServiceEpisodeIDModel = Model.of(deviceModel.getDevice().getIssuerOfServiceEpisodeID()
-                        .toString());
-            if (deviceModel.getDevice().getIssuerOfSpecimenIdentifier() == null)
-                issuerOfSpecimenIdentifierModel = Model.of();
-            else
-                issuerOfSpecimenIdentifierModel = Model.of(deviceModel.getDevice().getIssuerOfSpecimenIdentifier()
-                        .toString());
-            manufacturerModel = Model.of(deviceModel.getDevice().getManufacturer());
-            manufacturerModelNameModel = Model.of(deviceModel.getDevice().getManufacturerModelName());
-            if (deviceModel.getDevice().getOrderFillerIdentifier() == null)
-                orderFillerIdentifierModel = Model.of();
-            else
-                orderFillerIdentifierModel = Model.of(deviceModel.getDevice().getOrderFillerIdentifier().toString());
-            if (deviceModel.getDevice().getOrderPlacerIdentifier() == null)
-                orderPlacerIdentifierModel = Model.of();
-            else
-                orderPlacerIdentifierModel = Model.of(deviceModel.getDevice().getOrderPlacerIdentifier().toString());
+            setTypeModel(deviceModel);
             setDeviceConfiguration(deviceModel);
             setProxyDevExtConfiguration(deviceModel);
             setXdsDevExtConfiguration(deviceModel);
@@ -595,22 +624,121 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         }
     }
 
-    private void setXdsDevExtConfiguration(DeviceModel deviceModel) throws ConfigurationException {
-        if (typeModel == Model.of(ConfigTreeProvider.ConfigurationType.XDS)) {
-            //TODO: load xds extensions and set values
-            setXCAiInitGWAttributes(deviceModel);
+    private void setTypeModel(final DeviceModel deviceModel) throws ConfigurationException {
+        Iterator<DeviceExtension> iter = deviceModel.getDevice().listDeviceExtensions().iterator();
+        while (iter.hasNext()) {
+            DeviceExtension ext = iter.next();
+            if (ext instanceof ProxyDeviceExtension) {
+                typeModel = Model.of(ConfigTreeProvider.ConfigurationType.Proxy);
+                break;
+            }
+            else if (ext instanceof XCAiInitiatingGWCfg 
+                    || ext instanceof XCAInitiatingGWCfg
+                    || ext instanceof XCAiRespondingGWCfg 
+                    || ext instanceof XCARespondingGWCfg
+                    || ext instanceof XdsRegistry 
+                    || ext instanceof XdsRepository) {
+                typeModel = Model.of(ConfigTreeProvider.ConfigurationType.XDS);
+                break;
+            }
         }
+        if (typeModel == null)
+            typeModel = Model.of(ConfigTreeProvider.ConfigurationType.Basic);
     }
 
-    private void setXCAiInitGWAttributes(DeviceModel deviceModel) throws ConfigurationException {
-        // TODO Auto-generated method stub
-        XCAiInitiatingGWCfg ext = deviceModel.getDevice().getDeviceExtension(XCAiInitiatingGWCfg.class);
-        xdsApplicationNameModel = Model.of(ext.getApplicationName());
-        xdsHomeCommunityIdModel = Model.of(ext.getHomeCommunityID());
-        xdsRespondingGatewayUrlModel = new StringArrayModel(ext.getRespondingGWURLs());
+    private void setXdsDevExtConfiguration(DeviceModel deviceModel) throws ConfigurationException {
+        if (!typeModel.getObject().equals(ConfigurationType.XDS))
+                return;
+
+        XCAiInitiatingGWCfg xcaiInit = deviceModel.getDevice().getDeviceExtension(XCAiInitiatingGWCfg.class);
+        if (xcaiInit != null)
+            setXCAiInitGWAttributes(xcaiInit);
+        XCAInitiatingGWCfg xcaInit = deviceModel.getDevice().getDeviceExtension(XCAInitiatingGWCfg.class);
+        if (xcaInit != null)
+            setXCAInitGWAttributes(xcaInit);
+    }
+
+    private void setXCAInitGWAttributes(XCAInitiatingGWCfg xcaInit) {
+        if (xdsApplicationNameModel == null)
+            xdsApplicationNameModel = Model.of(xcaInit.getApplicationName());
+        if (xdsHomeCommunityIdModel == null)
+            xdsHomeCommunityIdModel = Model.of(xcaInit.getHomeCommunityID());
+        if (xdsRespondingGatewayUrlModel == null)
+            xdsRespondingGatewayUrlModel = new StringArrayModel(xcaInit.getRespondingGWURLs());
+        if (xdsRespondingGatewayRetrieveUrlModel == null)
+            xdsRespondingGatewayRetrieveUrlModel = new StringArrayModel(xcaInit.getRespondingGWRetrieveURLs());
+        if (xdsRegistryUrlModel == null)
+            xdsRegistryUrlModel = Model.of(xcaInit.getRegistryURL());
+        if (xdsRepositoryUrlModel == null)
+            xdsRepositoryUrlModel = new StringArrayModel(xcaInit.getRepositoryURLs());
+        if (xdsAsyncModel == null)
+            xdsAsyncModel = Model.of(xcaInit.isAsync());
+        if (xdsAsyncHandlerModel == null)
+            xdsAsyncHandlerModel = Model.of(xcaInit.isAsyncHandler());
+        if (xdsPIXConsumerApplicationModel == null)
+            xdsPIXConsumerApplicationModel = Model.of(xcaInit.getLocalPIXConsumerApplication());
+        if (xdsPIXManagerApplicationModel == null)
+            xdsPIXManagerApplicationModel = Model.of(xcaInit.getRemotePIXManagerApplication());
+        if (xdsAssigningAuthorityModel == null)
+            xdsAssigningAuthorityModel = new StringArrayModel(xcaInit.getAssigningAuthorities());
+        if (xdsSoapMsgLogDirModel == null)
+            xdsSoapMsgLogDirModel = Model.of(xcaInit.getSoapLogDir());
+    }
+
+    private void setXCAiInitGWAttributes(XCAiInitiatingGWCfg xcaiInit) throws ConfigurationException {
+        if (xdsApplicationNameModel == null)
+            xdsApplicationNameModel = Model.of(xcaiInit.getApplicationName());
+        if (xdsHomeCommunityIdModel == null)
+            xdsHomeCommunityIdModel = Model.of(xcaiInit.getHomeCommunityID());
+        if (xdsRespondingGatewayUrlModel == null)
+            xdsRespondingGatewayUrlModel = new StringArrayModel(xcaiInit.getRespondingGWURLs());
+        if (xdsiSrcUrlMappingModel == null)
+            xdsiSrcUrlMappingModel = new StringArrayModel(xcaiInit.getXDSiSourceURLs());
+        if (xdsSoapMsgLogDirModel == null)
+            xdsSoapMsgLogDirModel = Model.of(xcaiInit.getSoapLogDir());
+        if (xdsAsyncModel == null)
+            xdsAsyncModel = Model.of(xcaiInit.isAsync());
+        if (xdsAsyncHandlerModel == null)
+            xdsAsyncHandlerModel = Model.of(xcaiInit.isAsyncHandler());
     }
 
     private void setDeviceConfiguration(final DeviceModel deviceModel) throws ConfigurationException {
+        deviceNameModel = Model.of(deviceModel.getDevice().getDeviceName());
+        installedModel = Model.of(deviceModel.getDevice().isInstalled());
+        descriptionModel = Model.of(deviceModel.getDevice().getDescription());
+        deviceSerialNumberModel = Model.of(deviceModel.getDevice().getDeviceSerialNumber());
+        institutionAddressModel = new StringArrayModel(deviceModel.getDevice().getInstitutionAddresses());
+        institutionCodeModel = deviceModel.getDevice().getInstitutionCodes().length > 0 
+                ? new InstitutionCodeModel(deviceModel.getDevice().getInstitutionCodes()[0])
+                        : new InstitutionCodeModel(null);
+        institutionalDepartmentNameModel = new StringArrayModel(deviceModel.getDevice().getInstitutionalDepartmentNames());
+        institutionNameModel = new StringArrayModel(deviceModel.getDevice().getInstitutionNames());
+        issuerOfAccessionNumberModel = deviceModel.getDevice().getIssuerOfAccessionNumber() == null
+                ? new Model<String>()
+                        : Model.of(deviceModel.getDevice().getIssuerOfAccessionNumber().toString());
+        issuerOfAdmissionIDModel = deviceModel.getDevice().getIssuerOfAdmissionID() == null
+                ? new Model<String>()
+                        : Model.of(deviceModel.getDevice().getIssuerOfAdmissionID().toString());
+        issuerOfContainerIdentifierModel = deviceModel.getDevice().getIssuerOfContainerIdentifier() == null
+                ? new Model<String>()
+                        : Model.of(deviceModel.getDevice().getIssuerOfContainerIdentifier().toString());
+        issuerOfPatientIDModel = deviceModel.getDevice().getIssuerOfPatientID() == null
+                ? new Model<String>()
+                        : Model.of(deviceModel.getDevice().getIssuerOfPatientID().toString());
+        issuerOfServiceEpisodeIDModel = deviceModel.getDevice().getIssuerOfServiceEpisodeID() == null
+                ? new Model<String>()
+                        : Model.of(deviceModel.getDevice().getIssuerOfServiceEpisodeID().toString());
+        issuerOfSpecimenIdentifierModel = deviceModel.getDevice().getIssuerOfSpecimenIdentifier() == null
+                ? new Model<String>()
+                        : Model.of(deviceModel.getDevice().getIssuerOfSpecimenIdentifier().toString());
+        manufacturerModel = Model.of(deviceModel.getDevice().getManufacturer());
+        manufacturerModelNameModel = Model.of(deviceModel.getDevice().getManufacturerModelName());
+        orderFillerIdentifierModel = deviceModel.getDevice().getOrderFillerIdentifier() == null
+                ? new Model<String>()
+                        : Model.of(deviceModel.getDevice().getOrderFillerIdentifier().toString());
+        orderPlacerIdentifierModel = deviceModel.getDevice().getOrderPlacerIdentifier() == null
+                ? new Model<String>()
+                        : Model.of(deviceModel.getDevice().getOrderPlacerIdentifier().toString());
         primaryDeviceTypesModel = new StringArrayModel(deviceModel.getDevice().getPrimaryDeviceTypes());
         relatedDeviceRefsModel = new StringArrayModel(deviceModel.getDevice().getRelatedDeviceRefs());
         softwareVersionsModel = new StringArrayModel(deviceModel.getDevice().getSoftwareVersions());
@@ -618,46 +746,52 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         vendorDataModel = Model.of("size " + deviceModel.getDevice().getVendorData().length);
         trustStoreURLModel = Model.of(deviceModel.getDevice().getTrustStoreURL());
         trustStoreTypeModel = Model.of(deviceModel.getDevice().getTrustStoreType());
-        trustStorePinModel = Model.of(deviceModel.getDevice().getTrustStorePinProperty() != null ? deviceModel
-                .getDevice().getTrustStorePinProperty() : deviceModel.getDevice().getTrustStorePin());
+        trustStorePinModel = Model.of(deviceModel.getDevice().getTrustStorePinProperty() != null 
+                ? deviceModel.getDevice().getTrustStorePinProperty() 
+                        : deviceModel.getDevice().getTrustStorePin());
         useTrustStorePinProperty = Model.of(deviceModel.getDevice().getTrustStorePinProperty() != null);
         keyStoreURLModel = Model.of(deviceModel.getDevice().getKeyStoreURL());
         keyStoreTypeModel = Model.of(deviceModel.getDevice().getKeyStoreType());
-        keyStorePinModel = Model.of(deviceModel.getDevice().getKeyStorePinProperty() != null ? deviceModel
-                .getDevice().getKeyStorePinProperty() : deviceModel.getDevice().getKeyStorePin());
+        keyStorePinModel = Model.of(deviceModel.getDevice().getKeyStorePinProperty() != null 
+                ? deviceModel.getDevice().getKeyStorePinProperty() 
+                        : deviceModel.getDevice().getKeyStorePin());
         useKeyStorePinProperty = Model.of(deviceModel.getDevice().getKeyStorePinProperty() != null);
-        keyStoreKeyPinModel = Model
-                .of(deviceModel.getDevice().getKeyStoreKeyPinProperty() != null ? deviceModel.getDevice()
-                        .getKeyStoreKeyPinProperty() : deviceModel.getDevice().getKeyStoreKeyPin());
+        keyStoreKeyPinModel = Model.of(deviceModel.getDevice().getKeyStoreKeyPinProperty() != null 
+                ? deviceModel.getDevice().getKeyStoreKeyPinProperty() 
+                        : deviceModel.getDevice().getKeyStoreKeyPin());
         useKeyStoreKeyPinProperty = Model.of(deviceModel.getDevice().getKeyStoreKeyPinProperty() != null);
     }
 
     private void setProxyDevExtConfiguration(final DeviceModel deviceModel) throws ConfigurationException {
-        if (typeModel == Model.of(ConfigTreeProvider.ConfigurationType.Proxy)) {
-            ProxyDeviceExtension proxyDevExt = deviceModel.getDevice().getDeviceExtension(
-                    ProxyDeviceExtension.class);
-            schedulerIntervalModel = Model.of(proxyDevExt.getSchedulerInterval());
-            forwardThreadsModel = Model.of(proxyDevExt.getForwardThreads());
-            staleTimeoutModel = Model.of(proxyDevExt.getConfigurationStaleTimeout());
-        }
+        if (!typeModel.getObject().equals(ConfigurationType.Proxy))
+            return;
+
+        ProxyDeviceExtension proxyDevExt = deviceModel.getDevice().getDeviceExtension(ProxyDeviceExtension.class);
+        schedulerIntervalModel = Model.of(proxyDevExt.getSchedulerInterval());
+        forwardThreadsModel = Model.of(proxyDevExt.getForwardThreads());
+        staleTimeoutModel = Model.of(proxyDevExt.getConfigurationStaleTimeout());
     }
 
-    private void initBasicConfigurationTypeModel() {
+    private void initNewConfigurationTypeModel() {
         initBasicDeviceConfigurationTypeModel();
         initProxyConfigurationTypeModel();
         initXdsConfigurationTypeModel();
     }
 
     private void initXdsConfigurationTypeModel() {
-        // TODO Auto-generated method stub
-        initXCAiInitGWConfigurationTypeModel();
-    }
-
-    private void initXCAiInitGWConfigurationTypeModel() {
-        // TODO Auto-generated method stub
         xdsApplicationNameModel = Model.of();
         xdsHomeCommunityIdModel = Model.of();
         xdsRespondingGatewayUrlModel = new StringArrayModel(null);
+        xdsiSrcUrlMappingModel = new StringArrayModel(null);
+        xdsSoapMsgLogDirModel = Model.of();
+        xdsAsyncModel = Model.of();
+        xdsAsyncHandlerModel = Model.of();
+        xdsRespondingGatewayRetrieveUrlModel = new StringArrayModel(null);
+        xdsRegistryUrlModel = Model.of();
+        xdsRepositoryUrlModel = new StringArrayModel(null);
+        xdsPIXConsumerApplicationModel = Model.of();
+        xdsPIXManagerApplicationModel = Model.of();
+        xdsAssigningAuthorityModel = new StringArrayModel(null);
     }
 
     private void initBasicDeviceConfigurationTypeModel() {
@@ -728,17 +862,14 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
             @Override
             protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
                 try {
-                    Device device = null;
-                    if (deviceModel != null) {
-                        device = deviceModel.getDevice();
-                    } else {
-                        device = initDeviceExtensions();
-                    }
+                    Device device = deviceModel != null
+                            ? deviceModel.getDevice()
+                                    : initDeviceExtensions();
                     device.setInstalled(installedModel.getObject());
                     if (optionalContainer.isVisible()) {
-                        setDeviceAttributes(device);
-                        setProxyDeviceAttributes(device);
-                        setXdsDeviceAttributes(device);
+                        setOptionalDeviceAttributes(device);
+                        setOptionalProxyDeviceAttributes(device);
+                        setOptionalXdsDeviceAttributes(device);
                     }
                     if (deviceModel == null)
                         ConfigTreeProvider.get().persistDevice(device);
@@ -764,23 +895,24 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
             }
 
             private void initXdsExtensions(Device device) {
-                //TODO: init attributes per extension
                 initXCAiInitGWAttributes(device);
-                device.addDeviceExtension(new XCAInitiatingGWCfg());
-                device.addDeviceExtension(new XCAiRespondingGWCfg());
-                device.addDeviceExtension(new XCARespondingGWCfg());
-                device.addDeviceExtension(new XdsRegistry());
-                device.addDeviceExtension(new XdsRepository());
-                device.addDeviceExtension(new HL7DeviceExtension());
+                initXCAInitGWAttributes(device);
+            }
+
+            private void initXCAInitGWAttributes(Device device) {
+                XCAInitiatingGWCfg xca = new XCAInitiatingGWCfg();
+                xca.setApplicationName(xdsApplicationNameModel.getObject());
+                xca.setHomeCommunityID(xdsHomeCommunityIdModel.getObject());
+                xca.setRespondingGWURLs(xdsRespondingGatewayUrlModel.getArray());
+                device.addDeviceExtension(xca);
             }
 
             private void initXCAiInitGWAttributes(Device device) {
-                // TODO Auto-generated method stub
-                XCAiInitiatingGWCfg ext = new XCAiInitiatingGWCfg();
-                ext.setApplicationName(xdsApplicationNameModel.getObject());
-                ext.setHomeCommunityID(xdsHomeCommunityIdModel.getObject());
-                ext.setRespondingGWURLs(xdsRespondingGatewayUrlModel.getArray());
-                device.addDeviceExtension(ext);
+                XCAiInitiatingGWCfg xcai = new XCAiInitiatingGWCfg();
+                xcai.setApplicationName(xdsApplicationNameModel.getObject());
+                xcai.setHomeCommunityID(xdsHomeCommunityIdModel.getObject());
+                xcai.setRespondingGWURLs(xdsRespondingGatewayUrlModel.getArray());
+                device.addDeviceExtension(xcai);
             }
 
             private void initARRExtension(Device device) {
@@ -795,10 +927,9 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
                 device.addDeviceExtension(new HL7DeviceExtension());
             }
 
-            private void setProxyDeviceAttributes(Device device) {
+            private void setOptionalProxyDeviceAttributes(Device device) {
                 ProxyDeviceExtension proxyDevExt = device.getDeviceExtension(ProxyDeviceExtension.class);
                 if (proxyDevExt != null) {
-                    proxyDevExt.setSchedulerInterval(schedulerIntervalModel.getObject());
                     proxyDevExt.setConfigurationStaleTimeout(
                             staleTimeoutModel.getObject() != null 
                                 ? staleTimeoutModel.getObject() 
@@ -808,22 +939,39 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
                 }
             }
 
-            private void setXdsDeviceAttributes(Device device) {
-                //TODO: set attributes per extension
-                setXCAiInitGWAttributes(device);
+            private void setOptionalXdsDeviceAttributes(Device device) {
+                setOptionalXCAiInitGWAttributes(device);
+                setOptionalXCAInitGWAttributes(device);
             }
 
-            private void setXCAiInitGWAttributes(Device device) {
-                XCAiInitiatingGWCfg ext = device.getDeviceExtension(XCAiInitiatingGWCfg.class);
-                if (ext != null) {
-                    //TODO: set attributes
-                    ext.setApplicationName(xdsApplicationNameModel.getObject());
-                    ext.setHomeCommunityID(xdsHomeCommunityIdModel.getObject());
-                    ext.setRespondingGWURLs(xdsRespondingGatewayUrlModel.getArray());
-                }
+            private void setOptionalXCAInitGWAttributes(Device device) {
+                XCAInitiatingGWCfg xca = device.getDeviceExtension(XCAInitiatingGWCfg.class);
+                if (xca == null)
+                    return;
+
+                xca.setRespondingGWRetrieveURLs(xdsRespondingGatewayRetrieveUrlModel.getArray());
+                xca.setRegistryURL(xdsRegistryUrlModel.getObject());
+                xca.setRepositoryURLs(xdsRepositoryUrlModel.getArray());
+                xca.setAsync(xdsAsyncModel.getObject());
+                xca.setAsyncHandler(xdsAsyncHandlerModel.getObject());
+                xca.setLocalPIXConsumerApplication(xdsPIXConsumerApplicationModel.getObject());
+                xca.setRemotePIXManagerApplication(xdsPIXManagerApplicationModel.getObject());
+                xca.setAssigningAuthoritiesMap(xdsAssigningAuthorityModel.getArray());
+                xca.setSoapLogDir(xdsSoapMsgLogDirModel.getObject());
             }
 
-            private void setDeviceAttributes(Device device) {
+            private void setOptionalXCAiInitGWAttributes(Device device) {
+                XCAiInitiatingGWCfg xcai = device.getDeviceExtension(XCAiInitiatingGWCfg.class);
+                if (xcai == null)
+                    return;
+
+                xcai.setXDSiSourceURLs(xdsiSrcUrlMappingModel.getArray());
+                xcai.setSoapLogDir(xdsSoapMsgLogDirModel.getObject());
+                xcai.setAsync(xdsAsyncModel.getObject());
+                xcai.setAsyncHandler(xdsAsyncHandlerModel.getObject());
+            }
+
+            private void setOptionalDeviceAttributes(Device device) {
                 device.setDescription(descriptionModel.getObject());
                 device.setDeviceSerialNumber(deviceSerialNumberModel.getObject());
                 device.setInstitutionAddresses(institutionAddressModel.getArray());
