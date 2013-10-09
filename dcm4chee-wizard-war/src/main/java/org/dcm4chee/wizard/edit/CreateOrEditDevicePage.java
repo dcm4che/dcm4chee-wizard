@@ -865,12 +865,9 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
                     Device device = deviceModel != null
                             ? deviceModel.getDevice()
                                     : initDeviceExtensions();
-                    device.setInstalled(installedModel.getObject());
-                    if (optionalContainer.isVisible()) {
-                        setOptionalDeviceAttributes(device);
-                        setOptionalProxyDeviceAttributes(device);
-                        setOptionalXdsDeviceAttributes(device);
-                    }
+                    setDeviceAttributes(device, optionalContainer);
+                    setProxyDeviceAttributes(device, optionalContainer);
+                    setXdsDeviceAttributes(device, optionalContainer);
                     if (deviceModel == null)
                         ConfigTreeProvider.get().persistDevice(device);
                     else
@@ -883,147 +880,191 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
                 }
             }
 
-            private Device initDeviceExtensions() {
-                Device device = new Device(deviceNameModel.getObject());
-                if (typeModel.getObject().equals(ConfigurationType.Proxy))
-                    initProxyDeviceExtension(device);
-                if (typeModel.getObject().equals(ConfigurationType.AuditRecordRepository))
-                    initARRExtension(device);
-                if (typeModel.getObject().equals(ConfigurationType.XDS))
-                    initXdsExtensions(device);
-                return device;
-            }
-
-            private void initXdsExtensions(Device device) {
-                initXCAiInitGWAttributes(device);
-                initXCAInitGWAttributes(device);
-            }
-
-            private void initXCAInitGWAttributes(Device device) {
-                XCAInitiatingGWCfg xca = new XCAInitiatingGWCfg();
-                xca.setApplicationName(xdsApplicationNameModel.getObject());
-                xca.setHomeCommunityID(xdsHomeCommunityIdModel.getObject());
-                xca.setRespondingGWURLs(xdsRespondingGatewayUrlModel.getArray());
-                device.addDeviceExtension(xca);
-            }
-
-            private void initXCAiInitGWAttributes(Device device) {
-                XCAiInitiatingGWCfg xcai = new XCAiInitiatingGWCfg();
-                xcai.setApplicationName(xdsApplicationNameModel.getObject());
-                xcai.setHomeCommunityID(xdsHomeCommunityIdModel.getObject());
-                xcai.setRespondingGWURLs(xdsRespondingGatewayUrlModel.getArray());
-                device.addDeviceExtension(xcai);
-            }
-
-            private void initARRExtension(Device device) {
-                AuditRecordRepository auditRecordRepository = new AuditRecordRepository();
-                device.addDeviceExtension(auditRecordRepository);
-            }
-
-            private void initProxyDeviceExtension(Device device) {
-                ProxyDeviceExtension proxyDeviceExtension = new ProxyDeviceExtension();
-                proxyDeviceExtension.setSchedulerInterval(schedulerIntervalModel.getObject());
-                device.addDeviceExtension(proxyDeviceExtension);
-                device.addDeviceExtension(new HL7DeviceExtension());
-            }
-
-            private void setOptionalProxyDeviceAttributes(Device device) {
-                ProxyDeviceExtension proxyDevExt = device.getDeviceExtension(ProxyDeviceExtension.class);
-                if (proxyDevExt != null) {
-                    proxyDevExt.setConfigurationStaleTimeout(
-                            staleTimeoutModel.getObject() != null 
-                                ? staleTimeoutModel.getObject() 
-                                : 60);
-                    if (forwardThreadsModel.getObject() != null)
-                        proxyDevExt.setForwardThreads(forwardThreadsModel.getObject());
-                }
-            }
-
-            private void setOptionalXdsDeviceAttributes(Device device) {
-                setOptionalXCAiInitGWAttributes(device);
-                setOptionalXCAInitGWAttributes(device);
-            }
-
-            private void setOptionalXCAInitGWAttributes(Device device) {
-                XCAInitiatingGWCfg xca = device.getDeviceExtension(XCAInitiatingGWCfg.class);
-                if (xca == null)
-                    return;
-
-                xca.setRespondingGWRetrieveURLs(xdsRespondingGatewayRetrieveUrlModel.getArray());
-                xca.setRegistryURL(xdsRegistryUrlModel.getObject());
-                xca.setRepositoryURLs(xdsRepositoryUrlModel.getArray());
-                xca.setAsync(xdsAsyncModel.getObject());
-                xca.setAsyncHandler(xdsAsyncHandlerModel.getObject());
-                xca.setLocalPIXConsumerApplication(xdsPIXConsumerApplicationModel.getObject());
-                xca.setRemotePIXManagerApplication(xdsPIXManagerApplicationModel.getObject());
-                xca.setAssigningAuthoritiesMap(xdsAssigningAuthorityModel.getArray());
-                xca.setSoapLogDir(xdsSoapMsgLogDirModel.getObject());
-            }
-
-            private void setOptionalXCAiInitGWAttributes(Device device) {
-                XCAiInitiatingGWCfg xcai = device.getDeviceExtension(XCAiInitiatingGWCfg.class);
-                if (xcai == null)
-                    return;
-
-                xcai.setXDSiSourceURLs(xdsiSrcUrlMappingModel.getArray());
-                xcai.setSoapLogDir(xdsSoapMsgLogDirModel.getObject());
-                xcai.setAsync(xdsAsyncModel.getObject());
-                xcai.setAsyncHandler(xdsAsyncHandlerModel.getObject());
-            }
-
-            private void setOptionalDeviceAttributes(Device device) {
-                device.setDescription(descriptionModel.getObject());
-                device.setDeviceSerialNumber(deviceSerialNumberModel.getObject());
-                device.setInstitutionAddresses(institutionAddressModel.getArray());
-                device.setInstitutionCodes(institutionCodeModel.getCode() == null ? new Code[] {}
-                        : new Code[] { institutionCodeModel.getCode() });
-                device.setInstitutionalDepartmentNames(institutionalDepartmentNameModel.getArray());
-                device.setInstitutionNames(institutionNameModel.getArray());
-                device.setIssuerOfAccessionNumber(issuerOfAccessionNumberModel.getObject() == null ? null
-                        : new Issuer(issuerOfAccessionNumberModel.getObject()));
-                device.setIssuerOfAdmissionID(issuerOfAdmissionIDModel.getObject() == null ? null : new Issuer(
-                        issuerOfAdmissionIDModel.getObject()));
-                device.setIssuerOfContainerIdentifier(issuerOfContainerIdentifierModel.getObject() == null ? null
-                        : new Issuer(issuerOfContainerIdentifierModel.getObject()));
-                device.setIssuerOfPatientID(issuerOfPatientIDModel.getObject() == null ? null : new Issuer(
-                        issuerOfPatientIDModel.getObject()));
-                device.setIssuerOfServiceEpisodeID(issuerOfServiceEpisodeIDModel.getObject() == null ? null
-                        : new Issuer(issuerOfServiceEpisodeIDModel.getObject()));
-                device.setIssuerOfSpecimenIdentifier(issuerOfSpecimenIdentifierModel.getObject() == null ? null
-                        : new Issuer(issuerOfSpecimenIdentifierModel.getObject()));
-                device.setManufacturer(manufacturerModel.getObject());
-                device.setManufacturerModelName(manufacturerModelNameModel.getObject());
-                device.setOrderFillerIdentifier(orderFillerIdentifierModel.getObject() == null ? null
-                        : new Issuer(orderFillerIdentifierModel.getObject()));
-                device.setOrderPlacerIdentifier(orderPlacerIdentifierModel.getObject() == null ? null
-                        : new Issuer(orderPlacerIdentifierModel.getObject()));
-                device.setPrimaryDeviceTypes(primaryDeviceTypesModel.getArray());
-                device.setRelatedDeviceRefs(relatedDeviceRefsModel.getArray());
-                device.setSoftwareVersions(softwareVersionsModel.getArray());
-                device.setStationName(stationNameModel.getObject());
-                device.setTrustStoreURL(trustStoreURLModel.getObject());
-                device.setTrustStoreType(trustStoreTypeModel.getObject());
-                device.setTrustStorePinProperty(useTrustStorePinProperty.getObject() ? trustStorePinModel
-                        .getObject() : null);
-                device.setTrustStorePin(!useTrustStorePinProperty.getObject() ? trustStorePinModel.getObject()
-                        : null);
-                device.setKeyStoreURL(keyStoreURLModel.getObject());
-                device.setKeyStoreType(keyStoreTypeModel.getObject());
-                device.setKeyStorePinProperty(useKeyStorePinProperty.getObject() ? keyStorePinModel.getObject()
-                        : null);
-                device.setKeyStorePin(!useKeyStorePinProperty.getObject() ? keyStorePinModel.getObject() : null);
-                device.setKeyStoreKeyPinProperty(useKeyStoreKeyPinProperty.getObject() ? keyStoreKeyPinModel
-                        .getObject() : null);
-                device.setKeyStoreKeyPin(!useKeyStoreKeyPinProperty.getObject() ? keyStoreKeyPinModel
-                        .getObject() : null);
-            }
-
             @Override
             protected void onError(AjaxRequestTarget target, Form<?> form) {
                 if (target != null)
                     target.add(form);
             }
         });
+    }
+
+    private void setProxyDeviceAttributes(Device device, Form<?> optionalContainer) {
+        ProxyDeviceExtension proxyDevExt = device.getDeviceExtension(ProxyDeviceExtension.class);
+        if (proxyDevExt == null)
+            return;
+
+        // mandatory
+        proxyDevExt.setSchedulerInterval(schedulerIntervalModel.getObject());
+
+        // optional
+        if (!optionalContainer.isVisible())
+            return;
+
+        if (staleTimeoutModel.getObject() != null)
+            proxyDevExt.setConfigurationStaleTimeout(staleTimeoutModel.getObject());
+        if (forwardThreadsModel.getObject() != null)
+            proxyDevExt.setForwardThreads(forwardThreadsModel.getObject());
+    }
+
+    private void setXdsDeviceAttributes(Device device, Form<?> optionalContainer) {
+        setXCAiInitGWAttributes(device, optionalContainer);
+        setXCAInitGWAttributes(device, optionalContainer);
+    }
+
+    private void setXCAInitGWAttributes(Device device, Form<?> optionalContainer) {
+        XCAInitiatingGWCfg xca = device.getDeviceExtension(XCAInitiatingGWCfg.class);
+        if (xca == null)
+            return;
+
+        // mandatory
+        xca.setApplicationName(xdsApplicationNameModel.getObject());
+        xca.setHomeCommunityID(xdsHomeCommunityIdModel.getObject());
+        xca.setRespondingGWURLs(xdsRespondingGatewayUrlModel.getArray());
+
+        // optional
+        if (!optionalContainer.isVisible())
+            return;
+
+        if (xdsRespondingGatewayRetrieveUrlModel.getArray() != null)
+            xca.setRespondingGWRetrieveURLs(xdsRespondingGatewayRetrieveUrlModel.getArray());
+        if (xdsRegistryUrlModel.getObject() != null)
+            xca.setRegistryURL(xdsRegistryUrlModel.getObject());
+        if (xdsRepositoryUrlModel.getArray() != null)
+            xca.setRepositoryURLs(xdsRepositoryUrlModel.getArray());
+        if (xdsAsyncModel.getObject() != null)
+            xca.setAsync(xdsAsyncModel.getObject());
+        if (xdsAsyncHandlerModel.getObject() != null)
+            xca.setAsyncHandler(xdsAsyncHandlerModel.getObject());
+        if (xdsPIXConsumerApplicationModel.getObject() != null)
+            xca.setLocalPIXConsumerApplication(xdsPIXConsumerApplicationModel.getObject());
+        if (xdsPIXManagerApplicationModel.getObject() != null)
+            xca.setRemotePIXManagerApplication(xdsPIXManagerApplicationModel.getObject());
+        if (xdsAssigningAuthorityModel.getArray() != null)
+            xca.setAssigningAuthoritiesMap(xdsAssigningAuthorityModel.getArray());
+        if (xdsSoapMsgLogDirModel.getObject() != null)
+            xca.setSoapLogDir(xdsSoapMsgLogDirModel.getObject());
+    }
+
+    private void setXCAiInitGWAttributes(Device device, Form<?> optionalContainer) {
+        XCAiInitiatingGWCfg xcai = device.getDeviceExtension(XCAiInitiatingGWCfg.class);
+        if (xcai == null)
+            return;
+
+        // mandatory
+        xcai.setApplicationName(xdsApplicationNameModel.getObject());
+        xcai.setHomeCommunityID(xdsHomeCommunityIdModel.getObject());
+        xcai.setRespondingGWURLs(xdsRespondingGatewayUrlModel.getArray());
+
+        // optional
+        if (!optionalContainer.isVisible())
+            return;
+
+        if (xdsiSrcUrlMappingModel.getArray() != null)
+            xcai.setXDSiSourceURLs(xdsiSrcUrlMappingModel.getArray());
+        if (xdsSoapMsgLogDirModel.getObject() != null)
+            xcai.setSoapLogDir(xdsSoapMsgLogDirModel.getObject());
+        if (xdsAsyncModel.getObject() != null)
+            xcai.setAsync(xdsAsyncModel.getObject());
+        if (xdsAsyncHandlerModel.getObject() != null)
+            xcai.setAsyncHandler(xdsAsyncHandlerModel.getObject());
+    }
+
+    private Device initDeviceExtensions() {
+        Device device = new Device(deviceNameModel.getObject());
+        if (typeModel.getObject().equals(ConfigurationType.Proxy))
+            initProxyDeviceExtension(device);
+        if (typeModel.getObject().equals(ConfigurationType.AuditRecordRepository))
+            initARRExtension(device);
+        if (typeModel.getObject().equals(ConfigurationType.XDS))
+            initXdsExtensions(device);
+        return device;
+    }
+
+    private void initXdsExtensions(Device device) {
+        initXCAiInitGWAttributes(device);
+        initXCAInitGWAttributes(device);
+    }
+
+    private void initXCAInitGWAttributes(Device device) {
+        XCAInitiatingGWCfg xca = new XCAInitiatingGWCfg();
+        xca.setApplicationName(xdsApplicationNameModel.getObject());
+        xca.setHomeCommunityID(xdsHomeCommunityIdModel.getObject());
+        xca.setRespondingGWURLs(xdsRespondingGatewayUrlModel.getArray());
+        device.addDeviceExtension(xca);
+    }
+
+    private void initXCAiInitGWAttributes(Device device) {
+        XCAiInitiatingGWCfg xcai = new XCAiInitiatingGWCfg();
+        xcai.setApplicationName(xdsApplicationNameModel.getObject());
+        xcai.setHomeCommunityID(xdsHomeCommunityIdModel.getObject());
+        xcai.setRespondingGWURLs(xdsRespondingGatewayUrlModel.getArray());
+        device.addDeviceExtension(xcai);
+    }
+
+    private void initARRExtension(Device device) {
+        AuditRecordRepository auditRecordRepository = new AuditRecordRepository();
+        device.addDeviceExtension(auditRecordRepository);
+    }
+
+    private void initProxyDeviceExtension(Device device) {
+        ProxyDeviceExtension proxyDeviceExtension = new ProxyDeviceExtension();
+        proxyDeviceExtension.setSchedulerInterval(schedulerIntervalModel.getObject());
+        device.addDeviceExtension(proxyDeviceExtension);
+        device.addDeviceExtension(new HL7DeviceExtension());
+    }
+
+    private void setDeviceAttributes(Device device, Form<?> optionalContainer) {
+        // mandatory
+        device.setInstalled(installedModel.getObject());
+
+        // optional
+        if (!optionalContainer.isVisible())
+            return;
+
+        device.setDescription(descriptionModel.getObject());
+        device.setDeviceSerialNumber(deviceSerialNumberModel.getObject());
+        device.setInstitutionAddresses(institutionAddressModel.getArray());
+        device.setInstitutionCodes(institutionCodeModel.getCode() == null ? new Code[] {}
+                : new Code[] { institutionCodeModel.getCode() });
+        device.setInstitutionalDepartmentNames(institutionalDepartmentNameModel.getArray());
+        device.setInstitutionNames(institutionNameModel.getArray());
+        device.setIssuerOfAccessionNumber(issuerOfAccessionNumberModel.getObject() == null ? null
+                : new Issuer(issuerOfAccessionNumberModel.getObject()));
+        device.setIssuerOfAdmissionID(issuerOfAdmissionIDModel.getObject() == null ? null : new Issuer(
+                issuerOfAdmissionIDModel.getObject()));
+        device.setIssuerOfContainerIdentifier(issuerOfContainerIdentifierModel.getObject() == null ? null
+                : new Issuer(issuerOfContainerIdentifierModel.getObject()));
+        device.setIssuerOfPatientID(issuerOfPatientIDModel.getObject() == null ? null : new Issuer(
+                issuerOfPatientIDModel.getObject()));
+        device.setIssuerOfServiceEpisodeID(issuerOfServiceEpisodeIDModel.getObject() == null ? null
+                : new Issuer(issuerOfServiceEpisodeIDModel.getObject()));
+        device.setIssuerOfSpecimenIdentifier(issuerOfSpecimenIdentifierModel.getObject() == null ? null
+                : new Issuer(issuerOfSpecimenIdentifierModel.getObject()));
+        device.setManufacturer(manufacturerModel.getObject());
+        device.setManufacturerModelName(manufacturerModelNameModel.getObject());
+        device.setOrderFillerIdentifier(orderFillerIdentifierModel.getObject() == null ? null
+                : new Issuer(orderFillerIdentifierModel.getObject()));
+        device.setOrderPlacerIdentifier(orderPlacerIdentifierModel.getObject() == null ? null
+                : new Issuer(orderPlacerIdentifierModel.getObject()));
+        device.setPrimaryDeviceTypes(primaryDeviceTypesModel.getArray());
+        device.setRelatedDeviceRefs(relatedDeviceRefsModel.getArray());
+        device.setSoftwareVersions(softwareVersionsModel.getArray());
+        device.setStationName(stationNameModel.getObject());
+        device.setTrustStoreURL(trustStoreURLModel.getObject());
+        device.setTrustStoreType(trustStoreTypeModel.getObject());
+        device.setTrustStorePinProperty(useTrustStorePinProperty.getObject() ? trustStorePinModel
+                .getObject() : null);
+        device.setTrustStorePin(!useTrustStorePinProperty.getObject() ? trustStorePinModel.getObject()
+                : null);
+        device.setKeyStoreURL(keyStoreURLModel.getObject());
+        device.setKeyStoreType(keyStoreTypeModel.getObject());
+        device.setKeyStorePinProperty(useKeyStorePinProperty.getObject() ? keyStorePinModel.getObject()
+                : null);
+        device.setKeyStorePin(!useKeyStorePinProperty.getObject() ? keyStorePinModel.getObject() : null);
+        device.setKeyStoreKeyPinProperty(useKeyStoreKeyPinProperty.getObject() ? keyStoreKeyPinModel
+                .getObject() : null);
+        device.setKeyStoreKeyPin(!useKeyStoreKeyPinProperty.getObject() ? keyStoreKeyPinModel
+                .getObject() : null);
     }
 
     private DropDownChoice<ConfigTreeProvider.ConfigurationType> setConfigurationTypeList() {
