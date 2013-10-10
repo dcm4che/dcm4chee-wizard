@@ -45,6 +45,7 @@ import java.util.List;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
+import org.apache.wicket.ajax.form.AjaxFormSubmitBehavior;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxButton;
@@ -209,7 +210,8 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
 
     private void addToggleOptionalCheckBox(final ExtendedForm form, final Form<?> optionalContainer) {
         form.add(new Label("toggleOptional.label", new ResourceModel("dicom.edit.toggleOptional.label")));
-        form.add(new AjaxCheckBox("toggleOptional", new Model<Boolean>()) {
+
+        AjaxCheckBox ajaxCheckBox = new AjaxCheckBox("toggleOptional", new Model<Boolean>()) {
 
             private static final long serialVersionUID = 1L;
 
@@ -217,7 +219,19 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
             protected void onUpdate(AjaxRequestTarget target) {
                 target.add(optionalContainer.setVisible(this.getModelObject()));
             }
-        });
+        };
+
+        AjaxFormSubmitBehavior onClick = new AjaxFormSubmitBehavior(optionalContainer, "change") {
+
+            private static final long serialVersionUID = 1L;
+
+            protected void onEvent(final AjaxRequestTarget target) {
+                super.onEvent(target);
+            }
+        };
+
+        ajaxCheckBox.add(onClick);
+        form.add(ajaxCheckBox);
     }
 
     private void addWebMarkupContainer(final Form<?> optionalContainer) {
@@ -899,9 +913,9 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
                     Device device = deviceModel != null
                             ? deviceModel.getDevice()
                                     : initDeviceExtensions();
-                    setDeviceAttributes(device, optionalContainer);
-                    setProxyDeviceAttributes(device, optionalContainer);
-                    setXdsDeviceAttributes(device, optionalContainer);
+                    setDeviceAttributes(device);
+                    setProxyDeviceAttributes(device);
+                    setXdsDeviceAttributes(device);
                     if (deviceModel == null)
                         ConfigTreeProvider.get().persistDevice(device);
                     else
@@ -922,7 +936,7 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         });
     }
 
-    private void setProxyDeviceAttributes(Device device, Form<?> optionalContainer) {
+    private void setProxyDeviceAttributes(Device device) {
         ProxyDeviceExtension proxyDevExt = device.getDeviceExtension(ProxyDeviceExtension.class);
         if (proxyDevExt == null)
             return;
@@ -931,23 +945,20 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         proxyDevExt.setSchedulerInterval(schedulerIntervalModel.getObject());
 
         // optional
-        if (!optionalContainer.isVisible())
-            return;
-
         if (staleTimeoutModel.getObject() != null)
             proxyDevExt.setConfigurationStaleTimeout(staleTimeoutModel.getObject());
         if (forwardThreadsModel.getObject() != null)
             proxyDevExt.setForwardThreads(forwardThreadsModel.getObject());
     }
 
-    private void setXdsDeviceAttributes(Device device, Form<?> optionalContainer) {
-        setXCAiInitGWAttributes(device, optionalContainer);
-        setXCAiRespondingGWAttributes(device, optionalContainer);
-        setXCAInitGWAttributes(device, optionalContainer);
-        setXCARespondingGWAttributes(device, optionalContainer);
+    private void setXdsDeviceAttributes(Device device) {
+        setXCAiInitGWAttributes(device);
+        setXCAiRespondingGWAttributes(device);
+        setXCAInitGWAttributes(device);
+        setXCARespondingGWAttributes(device);
     }
 
-    private void setXCARespondingGWAttributes(Device device, Form<?> optionalContainer) {
+    private void setXCARespondingGWAttributes(Device device) {
         XCARespondingGWCfg xca = device.getDeviceExtension(XCARespondingGWCfg.class);
         if (xca == null)
             return;
@@ -959,14 +970,11 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         xca.setRepositoryURLs(xdsRepositoryUrlModel.getArray());
 
         // optional
-        if (!optionalContainer.isVisible())
-            return;
-
         if (xdsSoapMsgLogDirModel.getObject() != null)
             xca.setSoapLogDir(xdsSoapMsgLogDirModel.getObject());
     }
 
-    private void setXCAiRespondingGWAttributes(Device device, Form<?> optionalContainer) {
+    private void setXCAiRespondingGWAttributes(Device device) {
         XCAiRespondingGWCfg xcai = device.getDeviceExtension(XCAiRespondingGWCfg.class);
         if (xcai == null)
             return;
@@ -977,14 +985,11 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         xcai.setXDSiSourceURLs(xdsiSrcUrlMappingModel.getArray());
 
         // optional
-        if (!optionalContainer.isVisible())
-            return;
-
         if (xdsSoapMsgLogDirModel.getObject() != null)
             xcai.setSoapLogDir(xdsSoapMsgLogDirModel.getObject());
     }
 
-    private void setXCAInitGWAttributes(Device device, Form<?> optionalContainer) {
+    private void setXCAInitGWAttributes(Device device) {
         XCAInitiatingGWCfg xca = device.getDeviceExtension(XCAInitiatingGWCfg.class);
         if (xca == null)
             return;
@@ -995,9 +1000,6 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         xca.setRespondingGWURLs(xdsRespondingGatewayUrlModel.getArray());
 
         // optional
-        if (!optionalContainer.isVisible())
-            return;
-
         if (xdsRespondingGatewayRetrieveUrlModel.getArray() != null)
             xca.setRespondingGWRetrieveURLs(xdsRespondingGatewayRetrieveUrlModel.getArray());
         if (xdsRegistryUrlModel.getObject() != null)
@@ -1018,7 +1020,7 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
             xca.setSoapLogDir(xdsSoapMsgLogDirModel.getObject());
     }
 
-    private void setXCAiInitGWAttributes(Device device, Form<?> optionalContainer) {
+    private void setXCAiInitGWAttributes(Device device) {
         XCAiInitiatingGWCfg xcai = device.getDeviceExtension(XCAiInitiatingGWCfg.class);
         if (xcai == null)
             return;
@@ -1029,9 +1031,6 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         xcai.setRespondingGWURLs(xdsRespondingGatewayUrlModel.getArray());
 
         // optional
-        if (!optionalContainer.isVisible())
-            return;
-
         if (xdsiSrcUrlMappingModel.getArray() != null)
             xcai.setXDSiSourceURLs(xdsiSrcUrlMappingModel.getArray());
         if (xdsSoapMsgLogDirModel.getObject() != null)
@@ -1107,14 +1106,11 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         device.addDeviceExtension(new HL7DeviceExtension());
     }
 
-    private void setDeviceAttributes(Device device, Form<?> optionalContainer) {
+    private void setDeviceAttributes(Device device) {
         // mandatory
         device.setInstalled(installedModel.getObject());
 
         // optional
-        if (!optionalContainer.isVisible())
-            return;
-
         device.setDescription(descriptionModel.getObject());
         device.setDeviceSerialNumber(deviceSerialNumberModel.getObject());
         device.setInstitutionAddresses(institutionAddressModel.getArray());
