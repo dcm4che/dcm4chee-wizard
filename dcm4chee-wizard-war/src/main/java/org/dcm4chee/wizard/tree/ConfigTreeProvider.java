@@ -300,7 +300,7 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode, Str
         deviceNode.setConfigurationType(getConfigurationType(device));
         deviceNode.setModel(deviceModel);
         deviceNode.removeChildren();
-        addDeviceSubnodes(deviceNode);
+        addDeviceSubnodes(deviceNode, device);
         return deviceModel;
     }
 
@@ -350,7 +350,7 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode, Str
         return getDicomConfigurationManager().getApplicationEntity(aet);
     }
 
-    private void addDeviceSubnodes(ConfigTreeNode deviceNode) throws ConfigurationException {
+    private void addDeviceSubnodes(ConfigTreeNode deviceNode, Device device) throws ConfigurationException {
 
         // CREATE CONNECTIONS FOLDER
         new ConfigTreeNode(deviceNode, new StringResourceModel("dicom.list.connections.label", forComponent, null),
@@ -370,6 +370,45 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode, Str
             new ConfigTreeNode(deviceNode,
                     new StringResourceModel("dicom.list.auditLoggers.label", forComponent, null),
                     ConfigTreeNode.TreeNodeType.CONTAINER_AUDIT_LOGGERS, null);
+        }
+
+        if (configurationType.equals(ConfigurationType.XDS)) {
+            Iterator<DeviceExtension> iter = device.listDeviceExtensions().iterator();
+            while (iter.hasNext())
+                addXdsDeviceExtensionSubNode(iter.next(), deviceNode);
+        }
+    }
+
+    private void addXdsDeviceExtensionSubNode(DeviceExtension ext, ConfigTreeNode deviceNode) {
+        if (ext instanceof XCAiInitiatingGWCfg) {
+            new ConfigTreeNode(deviceNode,
+                    new StringResourceModel("dicom.list.xcaiInitiatingGateway.label", forComponent, null),
+                    ConfigTreeNode.TreeNodeType.XCAiInitiatingGateway, null);
+        }
+        else if (ext instanceof XCAInitiatingGWCfg) {
+            new ConfigTreeNode(deviceNode,
+                    new StringResourceModel("dicom.list.xcaInitiatingGateway.label", forComponent, null),
+                    ConfigTreeNode.TreeNodeType.XCAInitiatingGateway, null);
+        }
+        else if (ext instanceof XCAiRespondingGWCfg) {
+            new ConfigTreeNode(deviceNode,
+                    new StringResourceModel("dicom.list.xcaiRespondingGateway.label", forComponent, null),
+                    ConfigTreeNode.TreeNodeType.XCAiRespondingGateway, null);
+        }
+        else if (ext instanceof XCARespondingGWCfg) {
+            new ConfigTreeNode(deviceNode,
+                    new StringResourceModel("dicom.list.xcaRespondingGateway.label", forComponent, null),
+                    ConfigTreeNode.TreeNodeType.XCARespondingGateway, null);
+        }
+        else if (ext instanceof XdsRegistry) {
+            new ConfigTreeNode(deviceNode,
+                    new StringResourceModel("dicom.list.xdsRegistry.label", forComponent, null),
+                    ConfigTreeNode.TreeNodeType.XDSRegistry, null);
+        }
+        else if (ext instanceof XdsRepository) {
+            new ConfigTreeNode(deviceNode,
+                    new StringResourceModel("dicom.list.xdsRepository.label", forComponent, null),
+                    ConfigTreeNode.TreeNodeType.XDSRepository, null);
         }
     }
 
@@ -427,7 +466,7 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode, Str
                 ConfigTreeNode.TreeNodeType.DEVICE, getConfigurationType(device), null);
         deviceNodeList.add(deviceNode);
         Collections.sort(deviceNodeList);
-        addDeviceSubnodes(deviceNode);
+        addDeviceSubnodes(deviceNode, device);
         Session.get().setAttribute("configTreeProvider", this);
         ((WizardApplication) Session.get().getApplication()).getDicomConfigurationManager().setReload(
                 device.getDeviceName());
@@ -463,24 +502,22 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode, Str
 
     public ConfigurationType getConfigurationType(Device device) {
         Iterator<DeviceExtension> iter = device.listDeviceExtensions().iterator();
-        if (!iter.hasNext())
-            return ConfigurationType.Basic;
-
-        DeviceExtension ext = device.listDeviceExtensions().iterator().next();
-        if (ext instanceof ProxyDeviceExtension)
-            return ConfigurationType.Proxy;
-
-        else if (ext instanceof XCAiInitiatingGWCfg 
-                || ext instanceof XCAInitiatingGWCfg
-                || ext instanceof XCAiRespondingGWCfg 
-                || ext instanceof XCARespondingGWCfg
-                || ext instanceof XdsRegistry 
-                || ext instanceof XdsRepository)
-            return ConfigurationType.XDS;
-
-        else if (ext instanceof AuditRecordRepository)
-            return ConfigurationType.AuditRecordRepository;
-
+        while (iter.hasNext()) {
+            DeviceExtension ext = iter.next();
+            if (ext instanceof ProxyDeviceExtension)
+                return ConfigurationType.Proxy;
+    
+            else if (ext instanceof XCAiInitiatingGWCfg 
+                    || ext instanceof XCAInitiatingGWCfg
+                    || ext instanceof XCAiRespondingGWCfg 
+                    || ext instanceof XCARespondingGWCfg
+                    || ext instanceof XdsRegistry 
+                    || ext instanceof XdsRepository)
+                return ConfigurationType.XDS;
+    
+            else if (ext instanceof AuditRecordRepository)
+                return ConfigurationType.AuditRecordRepository;
+        }
         return ConfigurationType.Basic;
     }
 

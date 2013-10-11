@@ -48,6 +48,7 @@ import org.dcm4chee.wizard.tree.ConfigTreeProvider.ConfigurationType;
 
 /**
  * @author Robert David <robert.david@agfa.com>
+ * @author Michael Backhaus <michael.backhaus@agfa.com>
  */
 public class ConfigTreeNode implements Serializable, Comparable<ConfigTreeNode> {
 
@@ -74,7 +75,14 @@ public class ConfigTreeNode implements Serializable, Comparable<ConfigTreeNode> 
         // proxy                                                                                                                                           // values
         FORWARD_RULE, 
         FORWARD_OPTION, 
-        RETRY, 
+        RETRY,
+        // xds
+        XCAiInitiatingGateway,
+        XCAInitiatingGateway,
+        XCAiRespondingGateway,
+        XCARespondingGateway,
+        XDSRegistry,
+        XDSRepository
     };
 
     // device containers

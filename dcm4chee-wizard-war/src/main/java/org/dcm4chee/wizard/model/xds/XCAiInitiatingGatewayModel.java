@@ -38,23 +38,18 @@
 
 package org.dcm4chee.wizard.model.xds;
 
-import org.dcm4che.conf.api.ConfigurationException;
-import org.dcm4che.net.Device;
-import org.dcm4che.net.audit.AuditLogger;
-import org.dcm4chee.wizard.model.hl7.HL7DeviceModel;
+import java.io.Serializable;
+
+import org.dcm4chee.wizard.model.ConfigNodeModel;
 
 /**
  * @author Michael Backhaus <michael.backhaus@agfa.com>
  */
-public class XdsDeviceModel extends HL7DeviceModel {
+public class XCAiInitiatingGatewayModel extends ConfigNodeModel implements Serializable{
 
     private static final long serialVersionUID = 1L;
+    
+    public static String cssClass = "xds";
+    public static String toolTip = "XCAi Initiating Gateway";
 
-    public static String cssClass = "device";
-    public static String toolTip = "XDS Device";
-
-    public XdsDeviceModel(Device device) throws ConfigurationException {
-        super(device);
-        setAuditLogger(device.getDeviceExtension(AuditLogger.class));
-    }
 }

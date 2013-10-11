@@ -158,3 +158,8 @@ span.tree-content a:hover {}
 	background-position: 0px center !important;
 	background-image: url("../org.dcm4chee.wizard.icons.ImageManager/proxy/folder_proxy_rules.png") !important;
 }
+
+.xds .tree-folder-open, .xds .tree-folder-closed, .xds .tree-folder-other {
+    background-position: 0px center !important;
+    background-image: url("../org.dcm4chee.wizard.icons.ImageManager/common/profile.png") !important;
+}

@@ -534,6 +534,8 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
             }
         };
 
+        addXdsConfigurationTypeCheckBoxes(xdsWMC);
+
         xdsWMC.setOutputMarkupPlaceholderTag(true);
         Label applicationNameLabel = new Label("applicationName.label", new ResourceModel(
                 "dicom.edit.device.xds.applicationName.label"));
@@ -590,6 +592,22 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         xdsWMC.add(xdsRepositoryUrlTextArea);
 
         return xdsWMC;
+    }
+
+    private void addXdsConfigurationTypeCheckBoxes(WebMarkupContainer xdsWMC) {
+//        xdsWMC.add(new Label("toggleOptional.label", new ResourceModel("dicom.edit.toggleOptional.label")));
+//
+//        AjaxCheckBox ajaxCheckBox = new AjaxCheckBox("toggleOptional", new Model<Boolean>()) {
+//
+//            private static final long serialVersionUID = 1L;
+//
+//            @Override
+//            protected void onUpdate(AjaxRequestTarget target) {
+//                target.add(optionalContainer.setVisible(this.getModelObject()));
+//            }
+//        };
+//
+//        xdsWMC.add(ajaxCheckBox);
     }
 
     private void addInstalledLabel(final ExtendedForm form) {

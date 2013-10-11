@@ -36,25 +36,36 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.dcm4chee.wizard.model.xds;
+package org.dcm4chee.wizard.edit.xds;
 
-import org.dcm4che.conf.api.ConfigurationException;
-import org.dcm4che.net.Device;
-import org.dcm4che.net.audit.AuditLogger;
-import org.dcm4chee.wizard.model.hl7.HL7DeviceModel;
+import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
+import org.apache.wicket.model.Model;
+import org.dcm4chee.wizard.common.component.secure.SecureSessionCheckPage;
+import org.dcm4chee.wizard.model.StringArrayModel;
+import org.dcm4chee.wizard.model.xds.XCAiInitiatingGatewayModel;
+import org.dcm4chee.wizard.tree.ConfigTreeNode;
 
 /**
  * @author Michael Backhaus <michael.backhaus@agfa.com>
  */
-public class XdsDeviceModel extends HL7DeviceModel {
+public class EditXCAiInitiatingGatewayPage extends SecureSessionCheckPage{
 
     private static final long serialVersionUID = 1L;
 
-    public static String cssClass = "device";
-    public static String toolTip = "XDS Device";
+    // mandatory
+    private Model<String> xdsApplicationNameModel;
+    private Model<String> xdsHomeCommunityIdModel;
+    private StringArrayModel xdsRespondingGatewayUrlModel;
 
-    public XdsDeviceModel(Device device) throws ConfigurationException {
-        super(device);
-        setAuditLogger(device.getDeviceExtension(AuditLogger.class));
+    // optional
+    private StringArrayModel xdsiSrcUrlMappingModel;
+    private Model<String> xdsSoapMsgLogDirModel;
+    private Model<Boolean> xdsAsyncModel;
+    private Model<Boolean> xdsAsyncHandlerModel;
+
+    public EditXCAiInitiatingGatewayPage(ModalWindow editWindow, XCAiInitiatingGatewayModel model,
+            ConfigTreeNode ancestor) {
+        super();
     }
+
 }

@@ -62,6 +62,7 @@ import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxLink;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
+import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow.PageCreator;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow.WindowClosedCallback;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
@@ -111,6 +112,7 @@ import org.dcm4chee.wizard.edit.CreateOrEditTransferCapabilityPage;
 import org.dcm4chee.wizard.edit.proxy.CreateOrEditForwardOptionPage;
 import org.dcm4chee.wizard.edit.proxy.CreateOrEditForwardRulePage;
 import org.dcm4chee.wizard.edit.proxy.CreateOrEditRetryPage;
+import org.dcm4chee.wizard.edit.xds.EditXCAiInitiatingGatewayPage;
 import org.dcm4chee.wizard.icons.ImageManager;
 import org.dcm4chee.wizard.icons.behaviour.ImageSizeBehaviour;
 import org.dcm4chee.wizard.model.ApplicationEntityModel;
@@ -123,14 +125,21 @@ import org.dcm4chee.wizard.model.hl7.HL7ApplicationModel;
 import org.dcm4chee.wizard.model.proxy.ForwardOptionModel;
 import org.dcm4chee.wizard.model.proxy.ForwardRuleModel;
 import org.dcm4chee.wizard.model.proxy.RetryModel;
+import org.dcm4chee.wizard.model.xds.XCAiInitiatingGatewayModel;
 import org.dcm4chee.wizard.page.ApplyTransferCapabilityProfilePage;
 import org.dcm4chee.wizard.page.DicomEchoPage;
 import org.dcm4chee.wizard.tree.ConfigTableTree;
 import org.dcm4chee.wizard.tree.ConfigTreeNode;
-import org.dcm4chee.wizard.tree.ConfigTreeProvider;
-import org.dcm4chee.wizard.tree.CustomTreeColumn;
 import org.dcm4chee.wizard.tree.ConfigTreeNode.TreeNodeType;
+import org.dcm4chee.wizard.tree.ConfigTreeProvider;
 import org.dcm4chee.wizard.tree.ConfigTreeProvider.ConfigurationType;
+import org.dcm4chee.wizard.tree.CustomTreeColumn;
+import org.dcm4chee.xds2.conf.XCAInitiatingGWCfg;
+import org.dcm4chee.xds2.conf.XCARespondingGWCfg;
+import org.dcm4chee.xds2.conf.XCAiInitiatingGWCfg;
+import org.dcm4chee.xds2.conf.XCAiRespondingGWCfg;
+import org.dcm4chee.xds2.conf.XdsRegistry;
+import org.dcm4chee.xds2.conf.XdsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -155,14 +164,14 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
     private MessageWindow reloadMessage;
     public WindowClosedCallback windowClosedCallback;
 
-    List<IColumn<ConfigTreeNode, String>> deviceColumns;
+    List<IColumn<ConfigTreeNode, String>> deviceColumns = new ArrayList<IColumn<ConfigTreeNode, String>>();
     TableTree<ConfigTreeNode, String> configTree;
 
     public BasicConfigurationPanel(final String id) {
         super(id);
         add(new Label("reload-message"));
         createChangeTimer();
-        addWindowClosedCallback();
+        setWindowClosedCallback();
         addEchoWindow();
         addEditWindow();
         addRemoveConfirmation();
@@ -174,22 +183,45 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
     }
 
     private void addDeviceColumns() {
-        List<IColumn<ConfigTreeNode, String>> deviceColumns = new ArrayList<IColumn<ConfigTreeNode, String>>();
-        deviceColumns.add(new CustomTreeColumn(Model.of("Devices")));
         try {
-            createColumns();
-            configTree = new ConfigTableTree("configTree", deviceColumns,
-                    ConfigTreeProvider.init(BasicConfigurationPanel.this), Integer.MAX_VALUE);
+            deviceColumns.add(new CustomTreeColumn(Model.of("Devices")));
+            deviceColumns.add(getConfigurationTypeColumn());
+            deviceColumns.add(getProtocolColumn());
+            deviceColumns.add(getConnectionsColumn());
+            deviceColumns.add(getStatusColumn());
+            deviceColumns.add(getSendColumn());
+            deviceColumns.add(getEmptyModelColumn());
+            if (System.getProperty("org.dcm4chee.wizard.config.aeTitle") != null)
+                deviceColumns.add(getEchoColum());
+            deviceColumns.add(getEditColumn());
+            deviceColumns.add(getProfileColumn());
+            deviceColumns.add(getDeleteColumn());
+            ConfigTreeProvider initCTP = ConfigTreeProvider.init(BasicConfigurationPanel.this);
+            configTree = new ConfigTableTree("configTree", deviceColumns, initCTP, Integer.MAX_VALUE);
             renderTree();
         } catch (ConfigurationException ce) {
             log.error(this.getClass().toString() + ": " + "Error creating tree: " + ce.getMessage());
-            log.debug("Exception", ce);
+            if (log.isDebugEnabled())
+                ce.printStackTrace();
             throw new RuntimeException(ce);
         }
     }
 
     private void addExport() {
-        final Link<Object> export = new Link<Object>("export") {
+        final Link<Object> export = getExportLink();
+        export.add(new Image("exportImg", ImageManager.IMAGE_WIZARD_EXPORT).add(new ImageSizeBehaviour(
+                "vertical-align: middle;")));
+        export.add(new TooltipBehavior("dicom."));
+        export.add(new Label("exportText", new ResourceModel("dicom.export.text")).add(new AttributeAppender("style",
+                Model.of("vertical-align: middle"), " ")));
+        form.add(export);
+
+        if (!(((WizardApplication) getApplication()).getDicomConfigurationManager().getDicomConfiguration() instanceof PreferencesDicomConfiguration))
+            export.setVisible(false);
+    }
+
+    private Link<Object> getExportLink() {
+        return new Link<Object>("export") {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -236,19 +268,22 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                 });
             }
         };
-        export.add(new Image("exportImg", ImageManager.IMAGE_WIZARD_EXPORT).add(new ImageSizeBehaviour(
-                "vertical-align: middle;")));
-        export.add(new TooltipBehavior("dicom."));
-        export.add(new Label("exportText", new ResourceModel("dicom.export.text")).add(new AttributeAppender("style",
-                Model.of("vertical-align: middle"), " ")));
-        form.add(export);
-
-        if (!(((WizardApplication) getApplication()).getDicomConfigurationManager().getDicomConfiguration() instanceof PreferencesDicomConfiguration))
-            export.setVisible(false);
     }
 
     private void addCreateDevice() {
-        AjaxLink<Object> createDevice = new AjaxLink<Object>("createDevice") {
+        AjaxLink<Object> createDevice = getCreateDeviceLink();
+        Component createDeviceImg = new Image("createDeviceImg", ImageManager.IMAGE_WIZARD_DEVICE_ADD);
+        createDeviceImg.add(new ImageSizeBehaviour("vertical-align: middle;"));
+        createDevice.add(createDeviceImg);
+        createDevice.add(new TooltipBehavior("dicom."));
+        Component createDeviceText = new Label("createDeviceText", new ResourceModel("dicom.createDevice.text"));
+        createDeviceText.add(new AttributeAppender("style", Model.of("vertical-align: middle"), " "));
+        createDevice.add(createDeviceText);
+        form.add(createDevice);
+    }
+
+    private AjaxLink<Object> getCreateDeviceLink() {
+        return new AjaxLink<Object>("createDevice") {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -264,14 +299,6 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                 }).show(target);
             }
         };
-        Component createDeviceImg = new Image("createDeviceImg", ImageManager.IMAGE_WIZARD_DEVICE_ADD);
-        createDeviceImg.add(new ImageSizeBehaviour("vertical-align: middle;"));
-        createDevice.add(createDeviceImg);
-        createDevice.add(new TooltipBehavior("dicom."));
-        Component createDeviceText = new Label("createDeviceText", new ResourceModel("dicom.createDevice.text"));
-        createDeviceText.add(new AttributeAppender("style", Model.of("vertical-align: middle"), " "));
-        createDevice.add(createDeviceText);
-        form.add(createDevice);
     }
 
     private void addForm() {
@@ -280,8 +307,16 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
     }
 
     private void addRefreshMessage() {
-        refreshMessage = new MessageWindow("refresh-message", new StringResourceModel("dicom.confirmRefresh", this,
-                null).wrapOnAssignment(BasicConfigurationPanel.this)) {
+        refreshMessage = getRefreshMessageWindow();
+        refreshMessage.setInitialHeight(150);
+        refreshMessage.setWindowClosedCallback(windowClosedCallback);
+        add(refreshMessage);
+    }
+
+    private MessageWindow getRefreshMessageWindow() {
+        return new MessageWindow("refresh-message",
+                new StringResourceModel("dicom.confirmRefresh", this, null)
+                        .wrapOnAssignment(BasicConfigurationPanel.this)) {
 
             private static final long serialVersionUID = 1L;
 
@@ -302,11 +337,17 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                 }
             }
         };
-        add(refreshMessage.setInitialHeight(150).setWindowClosedCallback(windowClosedCallback));
     }
 
     private void addRemoveConfirmation() {
-        removeConfirmation = new ConfirmationWindow<ConfigTreeNode>("remove-confirmation") {
+        removeConfirmation = getNewRemoveConfirmation();
+        removeConfirmation.setInitialHeight(200);
+        removeConfirmation.setWindowClosedCallback(windowClosedCallback);
+        add(removeConfirmation);
+    }
+
+    private ConfirmationWindow<ConfigTreeNode> getNewRemoveConfirmation() {
+        return new ConfirmationWindow<ConfigTreeNode>("remove-confirmation") {
 
             private static final long serialVersionUID = 1L;
 
@@ -366,7 +407,30 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                             ((ApplicationEntityModel) node.getAncestor(2).getModel()).getApplicationEntity()
                                     .getAEExtension(ProxyAEExtension.class).getAttributeCoercions()
                                     .remove(((CoercionModel) node.getModel()).getCoercion());
-
+                        } else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.XCAiInitiatingGateway)) {
+                            ((DeviceModel) deviceNode.getModel()).getDevice().removeDeviceExtension(
+                                    ((DeviceModel) deviceNode.getModel()).getDevice().getDeviceExtension(
+                                            XCAiInitiatingGWCfg.class));
+                        } else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.XCAInitiatingGateway)) {
+                            ((DeviceModel) deviceNode.getModel()).getDevice().removeDeviceExtension(
+                                    ((DeviceModel) deviceNode.getModel()).getDevice().getDeviceExtension(
+                                            XCAInitiatingGWCfg.class));
+                        } else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.XCAiRespondingGateway)) {
+                            ((DeviceModel) deviceNode.getModel()).getDevice().removeDeviceExtension(
+                                    ((DeviceModel) deviceNode.getModel()).getDevice().getDeviceExtension(
+                                            XCAiRespondingGWCfg.class));
+                        } else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.XCARespondingGateway)) {
+                            ((DeviceModel) deviceNode.getModel()).getDevice().removeDeviceExtension(
+                                    ((DeviceModel) deviceNode.getModel()).getDevice().getDeviceExtension(
+                                            XCARespondingGWCfg.class));
+                        } else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.XDSRegistry)) {
+                            ((DeviceModel) deviceNode.getModel()).getDevice().removeDeviceExtension(
+                                    ((DeviceModel) deviceNode.getModel()).getDevice().getDeviceExtension(
+                                            XdsRegistry.class));
+                        } else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.XDSRepository)) {
+                            ((DeviceModel) deviceNode.getModel()).getDevice().removeDeviceExtension(
+                                    ((DeviceModel) deviceNode.getModel()).getDevice().getDeviceExtension(
+                                            XdsRepository.class));
                         } else {
                             log.error("Missing type of ConfigurationTreeNode");
                             return;
@@ -381,7 +445,6 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                 }
             }
         };
-        add(removeConfirmation.setInitialHeight(200).setWindowClosedCallback(windowClosedCallback));
     }
 
     private void addEditWindow() {
@@ -398,8 +461,12 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
         add(echoWindow);
     }
 
-    private void addWindowClosedCallback() {
-        windowClosedCallback = new ModalWindow.WindowClosedCallback() {
+    private void setWindowClosedCallback() {
+        windowClosedCallback = getWindowClosedCallback();
+    }
+
+    private WindowClosedCallback getWindowClosedCallback() {
+        return new ModalWindow.WindowClosedCallback() {
 
             private static final long serialVersionUID = 1L;
 
@@ -428,21 +495,25 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
             String checkForChangesInterval = ((WebApplication) this.getApplication())
                     .getInitParameter("CheckForChangesInterval");
             if (checkForChangesInterval != null && !checkForChangesInterval.equals(""))
-                add(new AbstractAjaxTimerBehavior(Duration.seconds(Integer.parseInt(checkForChangesInterval))) {
-                    private static final long serialVersionUID = 1L;
-
-                    @Override
-                    protected void onTimer(AjaxRequestTarget target) {
-                        if (ConfigTreeProvider.get().getLastModificationTime()
-                                .before(getDicomConfigurationManager().getLastModificationTime())) {
-                            log.warn("Configuration needs to be reloaded because of concurrent modification");
-                            refreshMessage.show(target);
-                        }
-                    }
-                });
+                add(getChangeIntervalTimerBehaviour(checkForChangesInterval));
         } catch (Exception e) {
             log.error("Error creating timer for checking changes", e);
         }
+    }
+
+    private AbstractAjaxTimerBehavior getChangeIntervalTimerBehaviour(String checkForChangesInterval) {
+        return new AbstractAjaxTimerBehavior(Duration.seconds(Integer.parseInt(checkForChangesInterval))) {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            protected void onTimer(AjaxRequestTarget target) {
+                if (ConfigTreeProvider.get().getLastModificationTime()
+                        .before(getDicomConfigurationManager().getLastModificationTime())) {
+                    log.warn("Configuration needs to be reloaded because of concurrent modification");
+                    refreshMessage.show(target);
+                }
+            }
+        };
     }
 
     @Override
@@ -450,24 +521,8 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
         response.render(OnDomReadyHeaderItem.forScript("Wicket.Window.unloadConfirmation = false"));
     }
 
-    public void createColumns() {
-        deviceColumns = new ArrayList<IColumn<ConfigTreeNode, String>>();
-        addDeviceTreeColumn();
-        addConfigurationTypeColumn();
-        addProtocolColumn();
-        addConnectionsColumn();
-        addStatusColumn();
-        addSendColumn();
-        addEmptyModelColumn();
-        if (System.getProperty("org.dcm4chee.wizard.config.aeTitle") != null)
-            addEchoColumn();
-        addEditColumn();
-        addProfileColumn();
-        addDeleteColumn();
-    }
-
-    private void addDeleteColumn() {
-        deviceColumns.add(new AbstractColumn<ConfigTreeNode, String>(Model.of("Delete")) {
+    private AbstractColumn<ConfigTreeNode, String> getDeleteColumn() {
+        return new AbstractColumn<ConfigTreeNode, String>(Model.of("Delete")) {
 
             private static final long serialVersionUID = 1L;
 
@@ -477,6 +532,7 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                 final TreeNodeType type = rowModel.getObject().getNodeType();
                 if (type == null)
                     throw new RuntimeException("Error: Unknown node type, cannot create delete modal window");
+
                 else if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_CONNECTIONS)
                         || type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_APPLICATION_ENTITIES)
                         || type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_HL7_APPLICATIONS)
@@ -491,17 +547,7 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                     return;
                 }
 
-                AjaxLink<Object> ajaxLink = new AjaxLink<Object>("wickettree.link") {
-
-                    private static final long serialVersionUID = 1L;
-
-                    @Override
-                    public void onClick(AjaxRequestTarget target) {
-                        removeConfirmation.confirm(target, new StringResourceModel("dicom.confirmDelete", this, null,
-                                new Object[] { rowModel.getObject().getNodeType(), rowModel.getObject().getName() }),
-                                rowModel.getObject());
-                    }
-                };
+                AjaxLink<Object> ajaxLink = getConfirmDeleteLink(rowModel);
                 cellItem.add(
                         new LinkPanel(componentId, ajaxLink, ImageManager.IMAGE_WIZARD_COMMON_REMOVE,
                                 removeConfirmation)).add(
@@ -540,11 +586,11 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                     }
                 }
             }
-        });
+        };
     }
 
-    private void addProfileColumn() {
-        deviceColumns.add(new AbstractColumn<ConfigTreeNode, String>(Model.of("Profile")) {
+    private AbstractColumn<ConfigTreeNode, String> getProfileColumn() {
+        return new AbstractColumn<ConfigTreeNode, String>(Model.of("Profile")) {
 
             private static final long serialVersionUID = 1L;
 
@@ -585,11 +631,11 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                                 removeConfirmation)).add(
                         new AttributeAppender("style", Model.of("width: 50px; text-align: center;")));
             }
-        });
+        };
     }
 
-    private void addEditColumn() {
-        deviceColumns.add(new AbstractColumn<ConfigTreeNode, String>(Model.of("Edit")) {
+    private AbstractColumn<ConfigTreeNode, String> getEditColumn() {
+        return new AbstractColumn<ConfigTreeNode, String>(Model.of("Edit")) {
 
             private static final long serialVersionUID = 1L;
 
@@ -606,172 +652,25 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
 
                     @Override
                     public void onClick(AjaxRequestTarget target) {
-
                         editWindow.setTitle("Device "
                                 + ((DeviceModel) rowModel.getObject().getRoot().getModel()).getDeviceName());
-
-                        if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_CONNECTIONS)) {
-                            editWindow.setPageCreator(new ModalWindow.PageCreator() {
-
-                                private static final long serialVersionUID = 1L;
-
-                                @Override
-                                public Page createPage() {
-                                    return new CreateOrEditConnectionPage(editWindow, null, rowModel.getObject()
-                                            .getParent());
-                                }
-                            });
-                        } else if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_APPLICATION_ENTITIES)) {
-                            editWindow.setPageCreator(new ModalWindow.PageCreator() {
-
-                                private static final long serialVersionUID = 1L;
-
-                                @Override
-                                public Page createPage() {
-                                    return new CreateOrEditApplicationEntityPage(editWindow, null, rowModel.getObject()
-                                            .getParent());
-                                }
-                            });
-                        } else if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_HL7_APPLICATIONS)) {
-                            editWindow.setPageCreator(new ModalWindow.PageCreator() {
-
-                                private static final long serialVersionUID = 1L;
-
-                                @Override
-                                public Page createPage() {
-                                    return new CreateOrEditHL7ApplicationPage(editWindow, null, rowModel.getObject()
-                                            .getParent());
-                                }
-                            });
-                        } else if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_AUDIT_LOGGERS)) {
-                            editWindow.setPageCreator(new ModalWindow.PageCreator() {
-
-                                private static final long serialVersionUID = 1L;
-
-                                @Override
-                                public Page createPage() {
-                                    return new CreateOrEditAuditLoggerPage(editWindow, null, rowModel.getObject()
-                                            .getParent());
-                                }
-                            });
-                        } else if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_TRANSFER_CAPABILITIES)) {
-                            editWindow.setPageCreator(new ModalWindow.PageCreator() {
-
-                                private static final long serialVersionUID = 1L;
-
-                                @Override
-                                public Page createPage() {
-                                    return new CreateOrEditTransferCapabilityPage(editWindow, null, rowModel
-                                            .getObject().getParent());
-                                }
-                            });
-                        } else if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_FORWARD_RULES)) {
-                            editWindow.setPageCreator(new ModalWindow.PageCreator() {
-
-                                private static final long serialVersionUID = 1L;
-
-                                @Override
-                                public Page createPage() {
-                                    return new CreateOrEditForwardRulePage(editWindow, null, rowModel.getObject()
-                                            .getParent());
-                                }
-                            });
-                        } else if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_FORWARD_OPTIONS)) {
-                            editWindow.setPageCreator(new ModalWindow.PageCreator() {
-
-                                private static final long serialVersionUID = 1L;
-
-                                @Override
-                                public Page createPage() {
-                                    return new CreateOrEditForwardOptionPage(editWindow, null, rowModel.getObject()
-                                            .getParent());
-                                }
-                            });
-                        } else if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_RETRIES)) {
-                            editWindow.setPageCreator(new ModalWindow.PageCreator() {
-
-                                private static final long serialVersionUID = 1L;
-
-                                @Override
-                                public Page createPage() {
-                                    return new CreateOrEditRetryPage(editWindow, null, rowModel.getObject().getParent());
-                                }
-                            });
-                        } else if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_COERCIONS)) {
-                            editWindow.setPageCreator(new ModalWindow.PageCreator() {
-
-                                private static final long serialVersionUID = 1L;
-
-                                @Override
-                                public Page createPage() {
-                                    return new CreateOrEditCoercionPage(editWindow, null, rowModel.getObject()
-                                            .getParent());
-                                }
-                            });
-                        } else {
-                            editWindow.setPageCreator(new ModalWindow.PageCreator() {
-
-                                private static final long serialVersionUID = 1L;
-
-                                @Override
-                                public Page createPage() {
-                                    if (type.equals(ConfigTreeNode.TreeNodeType.DEVICE)) {
-                                        try {
-                                            ConfigTreeProvider.get().loadDevice(rowModel.getObject());
-                                            return new CreateOrEditDevicePage(editWindow, (DeviceModel) rowModel
-                                                    .getObject().getModel());
-                                        } catch (Exception e) {
-                                            log.error("Error loading device on edit", e);
-                                            return null;
-                                        }
-                                    } else if (type.equals(ConfigTreeNode.TreeNodeType.CONNECTION)) {
-                                        return new CreateOrEditConnectionPage(editWindow, (ConnectionModel) rowModel
-                                                .getObject().getModel(), rowModel.getObject().getAncestor(2));
-                                    } else if (type.equals(ConfigTreeNode.TreeNodeType.APPLICATION_ENTITY)) {
-                                        return new CreateOrEditApplicationEntityPage(editWindow,
-                                                (ApplicationEntityModel) rowModel.getObject().getModel(), rowModel
-                                                        .getObject().getAncestor(2));
-                                    } else if (type.equals(ConfigTreeNode.TreeNodeType.HL7_APPLICATION)) {
-                                        return new CreateOrEditHL7ApplicationPage(editWindow,
-                                                (HL7ApplicationModel) rowModel.getObject().getModel(), rowModel
-                                                        .getObject().getAncestor(2));
-                                    } else if (type.equals(ConfigTreeNode.TreeNodeType.AUDIT_LOGGER)) {
-                                        return new CreateOrEditAuditLoggerPage(editWindow, (AuditLoggerModel) rowModel
-                                                .getObject().getModel(), rowModel.getObject().getAncestor(2));
-                                    } else if (type.equals(ConfigTreeNode.TreeNodeType.TRANSFER_CAPABILITY)) {
-                                        return new CreateOrEditTransferCapabilityPage(editWindow,
-                                                (TransferCapabilityModel) rowModel.getObject().getModel(), rowModel
-                                                        .getObject().getAncestor(3));
-                                    } else if (type.equals(ConfigTreeNode.TreeNodeType.FORWARD_RULE)) {
-                                        return new CreateOrEditForwardRulePage(editWindow, (ForwardRuleModel) rowModel
-                                                .getObject().getModel(), rowModel.getObject().getAncestor(2));
-                                    } else if (type.equals(ConfigTreeNode.TreeNodeType.FORWARD_OPTION)) {
-                                        return new CreateOrEditForwardOptionPage(editWindow,
-                                                (ForwardOptionModel) rowModel.getObject().getModel(), rowModel
-                                                        .getObject().getAncestor(2));
-                                    } else if (type.equals(ConfigTreeNode.TreeNodeType.RETRY)) {
-                                        return new CreateOrEditRetryPage(editWindow, (RetryModel) rowModel.getObject()
-                                                .getModel(), rowModel.getObject().getAncestor(2));
-                                    } else if (type.equals(ConfigTreeNode.TreeNodeType.COERCION)) {
-                                        return new CreateOrEditCoercionPage(editWindow, (CoercionModel) rowModel
-                                                .getObject().getModel(), rowModel.getObject().getAncestor(2));
-                                    } else
-                                        return null;
-                                }
-                            });
-                        }
+                        setEditWindowPageCreator(rowModel, type);
                         editWindow.setWindowClosedCallback(windowClosedCallback).show(target);
                     }
                 };
+
                 ajaxLink.setVisible((!type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_APPLICATION_ENTITIES)
                         && !type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_HL7_APPLICATIONS) && !type
                             .equals(ConfigTreeNode.TreeNodeType.CONTAINER_AUDIT_LOGGERS))
                         || rowModel.getObject().getParent().getChildren().get(0).hasChildren());
+
                 try {
                     if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_FORWARD_OPTIONS))
                         ajaxLink.setVisible(ConfigTreeProvider.get().getUniqueAETitles().length > 0);
                 } catch (ConfigurationException ce) {
                     log.error("Error listing Registered AE Titles", ce);
+                    if (log.isDebugEnabled())
+                        ce.printStackTrace();
                 }
 
                 try {
@@ -803,11 +702,11 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                     cellItem.add(new LinkPanel(componentId, ajaxLink, image, removeConfirmation)).add(
                             new AttributeAppender("style", Model.of("width: 50px; text-align: center;")));
             }
-        });
+        };
     }
 
-    private void addEchoColumn() {
-        deviceColumns.add(new AbstractColumn<ConfigTreeNode, String>(Model.of("Echo")) {
+    private AbstractColumn<ConfigTreeNode, String> getEchoColum() {
+        return new AbstractColumn<ConfigTreeNode, String>(Model.of("Echo")) {
 
             private static final long serialVersionUID = 1L;
 
@@ -836,8 +735,8 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                                         return new DicomEchoPage(echoWindow, ((ApplicationEntityModel) rowModel
                                                 .getObject().getModel()).getApplicationEntity());
                                     } catch (Exception e) {
-                                        log.error(this.getClass().toString() + ": "
-                                                + "Error creating DicomEchoPage: " + e.getMessage());
+                                        log.error(this.getClass().toString() + ": " + "Error creating DicomEchoPage: "
+                                                + e.getMessage());
                                         log.debug("Exception", e);
                                         throw new RuntimeException(e);
                                     }
@@ -854,11 +753,11 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                 else
                     cellItem.add(new Label(componentId));
             }
-        });
+        };
     }
 
-    private void addEmptyModelColumn() {
-        deviceColumns.add(new AbstractColumn<ConfigTreeNode, String>(Model.of("")) {
+    private AbstractColumn<ConfigTreeNode, String> getEmptyModelColumn() {
+        return new AbstractColumn<ConfigTreeNode, String>(Model.of("")) {
 
             private static final long serialVersionUID = 1L;
 
@@ -897,11 +796,11 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                         new LinkPanel(componentId, reloadWarningLink, ImageManager.IMAGE_WIZARD_RELOAD_WARNING, null))
                         .add(new AttributeAppender("style", Model.of("width: 50px; text-align: center;")));
             }
-        });
+        };
     }
 
-    private void addSendColumn() {
-        deviceColumns.add(new AbstractColumn<ConfigTreeNode, String>(Model.of("Send")) {
+    private AbstractColumn<ConfigTreeNode, String> getSendColumn() {
+        return new AbstractColumn<ConfigTreeNode, String>(Model.of("Send")) {
 
             private static final long serialVersionUID = 1L;
 
@@ -974,11 +873,11 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                 cellItem.add(new LinkPanel(componentId, ajaxLink, ImageManager.IMAGE_WIZARD_RELOAD, reloadMessage))
                         .add(new AttributeAppender("style", Model.of("width: 50px; text-align: center;")));
             }
-        });
+        };
     }
 
-    private void addStatusColumn() {
-        deviceColumns.add(new AbstractColumn<ConfigTreeNode, String>(Model.of("Status")) {
+    private AbstractColumn<ConfigTreeNode, String> getStatusColumn() {
+        return new AbstractColumn<ConfigTreeNode, String>(Model.of("Status")) {
 
             private static final long serialVersionUID = 1L;
 
@@ -1049,11 +948,11 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                                 .setOutputMarkupId(true)).add(
                         new AttributeAppender("style", Model.of("width: 50px; text-align: center;")));
             }
-        });
+        };
     }
 
-    private void addConnectionsColumn() {
-        deviceColumns.add(new AbstractColumn<ConfigTreeNode, String>(Model.of("Connections")) {
+    private AbstractColumn<ConfigTreeNode, String> getConnectionsColumn() {
+        return new AbstractColumn<ConfigTreeNode, String>(Model.of("Connections")) {
 
             private static final long serialVersionUID = 1L;
 
@@ -1081,11 +980,11 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                     throw new RuntimeException(ce);
                 }
             }
-        });
+        };
     }
 
-    private void addProtocolColumn() {
-        deviceColumns.add(new AbstractColumn<ConfigTreeNode, String>(Model.of("Protocol")) {
+    private AbstractColumn<ConfigTreeNode, String> getProtocolColumn() {
+        return new AbstractColumn<ConfigTreeNode, String>(Model.of("Protocol")) {
 
             private static final long serialVersionUID = 1L;
 
@@ -1105,11 +1004,11 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                     }
                 cellItem.add(new Label(componentId, Model.of(protocol)));
             }
-        });
+        };
     }
 
-    private void addConfigurationTypeColumn() {
-        deviceColumns.add(new AbstractColumn<ConfigTreeNode, String>(Model.of("ConfigurationType")) {
+    private AbstractColumn<ConfigTreeNode, String> getConfigurationTypeColumn() {
+        return new AbstractColumn<ConfigTreeNode, String>(Model.of("ConfigurationType")) {
 
             private static final long serialVersionUID = 1L;
 
@@ -1117,16 +1016,10 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                     final IModel<ConfigTreeNode> rowModel) {
 
                 final ConfigurationType configurationType = rowModel.getObject().getConfigurationType();
-                cellItem.add(new Label(componentId, Model.of(
-                        configurationType == null 
-                            ? "" 
-                            : configurationType.toString())));
+                cellItem.add(new Label(componentId, Model.of(configurationType == null ? "" : configurationType
+                        .toString())));
             }
-        });
-    }
-
-    private void addDeviceTreeColumn() {
-        deviceColumns.add(new CustomTreeColumn(Model.of("Devices")));
+        };
     }
 
     public void renderTree() throws ConfigurationException {
@@ -1155,5 +1048,181 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
 
     public static String getModuleName() {
         return MODULE_NAME;
+    }
+
+    private PageCreator getModalWindowPageCreator(final IModel<ConfigTreeNode> rowModel, final TreeNodeType type) {
+        return new ModalWindow.PageCreator() {
+
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public Page createPage() {
+                if (type.equals(ConfigTreeNode.TreeNodeType.DEVICE)) {
+                    try {
+                        ConfigTreeProvider.get().loadDevice(rowModel.getObject());
+                        return new CreateOrEditDevicePage(editWindow, (DeviceModel) rowModel.getObject().getModel());
+                    } catch (Exception e) {
+                        log.error("Error loading device on edit", e);
+                        return null;
+                    }
+                } else if (type.equals(ConfigTreeNode.TreeNodeType.CONNECTION)) {
+                    return new CreateOrEditConnectionPage(editWindow,
+                            (ConnectionModel) rowModel.getObject().getModel(), rowModel.getObject().getAncestor(2));
+                } else if (type.equals(ConfigTreeNode.TreeNodeType.APPLICATION_ENTITY)) {
+                    return new CreateOrEditApplicationEntityPage(editWindow, (ApplicationEntityModel) rowModel
+                            .getObject().getModel(), rowModel.getObject().getAncestor(2));
+                } else if (type.equals(ConfigTreeNode.TreeNodeType.HL7_APPLICATION)) {
+                    return new CreateOrEditHL7ApplicationPage(editWindow, (HL7ApplicationModel) rowModel.getObject()
+                            .getModel(), rowModel.getObject().getAncestor(2));
+                } else if (type.equals(ConfigTreeNode.TreeNodeType.AUDIT_LOGGER)) {
+                    return new CreateOrEditAuditLoggerPage(editWindow, (AuditLoggerModel) rowModel.getObject()
+                            .getModel(), rowModel.getObject().getAncestor(2));
+                } else if (type.equals(ConfigTreeNode.TreeNodeType.TRANSFER_CAPABILITY)) {
+                    return new CreateOrEditTransferCapabilityPage(editWindow, (TransferCapabilityModel) rowModel
+                            .getObject().getModel(), rowModel.getObject().getAncestor(3));
+                } else if (type.equals(ConfigTreeNode.TreeNodeType.FORWARD_RULE)) {
+                    return new CreateOrEditForwardRulePage(editWindow, (ForwardRuleModel) rowModel.getObject()
+                            .getModel(), rowModel.getObject().getAncestor(2));
+                } else if (type.equals(ConfigTreeNode.TreeNodeType.FORWARD_OPTION)) {
+                    return new CreateOrEditForwardOptionPage(editWindow, (ForwardOptionModel) rowModel.getObject()
+                            .getModel(), rowModel.getObject().getAncestor(2));
+                } else if (type.equals(ConfigTreeNode.TreeNodeType.RETRY)) {
+                    return new CreateOrEditRetryPage(editWindow, (RetryModel) rowModel.getObject().getModel(), rowModel
+                            .getObject().getAncestor(2));
+                } else if (type.equals(ConfigTreeNode.TreeNodeType.COERCION)) {
+                    return new CreateOrEditCoercionPage(editWindow, (CoercionModel) rowModel.getObject().getModel(),
+                            rowModel.getObject().getAncestor(2));
+                } else if (type.equals(ConfigTreeNode.TreeNodeType.XCAiInitiatingGateway)) {
+                    return new EditXCAiInitiatingGatewayPage(editWindow, (XCAiInitiatingGatewayModel) rowModel
+                            .getObject().getModel(), rowModel.getObject().getAncestor(2));
+//                } else if (type.equals(ConfigTreeNode.TreeNodeType.AUDIT_LOGGER)) {
+//                    return new CreateOrEditAuditLoggerPage(editWindow, (AuditLoggerModel) rowModel.getObject()
+//                            .getModel(), rowModel.getObject().getAncestor(2));
+//                } else if (type.equals(ConfigTreeNode.TreeNodeType.AUDIT_LOGGER)) {
+//                    return new CreateOrEditAuditLoggerPage(editWindow, (AuditLoggerModel) rowModel.getObject()
+//                            .getModel(), rowModel.getObject().getAncestor(2));
+//                } else if (type.equals(ConfigTreeNode.TreeNodeType.AUDIT_LOGGER)) {
+//                    return new CreateOrEditAuditLoggerPage(editWindow, (AuditLoggerModel) rowModel.getObject()
+//                            .getModel(), rowModel.getObject().getAncestor(2));
+//                } else if (type.equals(ConfigTreeNode.TreeNodeType.AUDIT_LOGGER)) {
+//                    return new CreateOrEditAuditLoggerPage(editWindow, (AuditLoggerModel) rowModel.getObject()
+//                            .getModel(), rowModel.getObject().getAncestor(2));
+//                } else if (type.equals(ConfigTreeNode.TreeNodeType.AUDIT_LOGGER)) {
+//                    return new CreateOrEditAuditLoggerPage(editWindow, (AuditLoggerModel) rowModel.getObject()
+//                            .getModel(), rowModel.getObject().getAncestor(2));
+                } else
+                    return null;
+            }
+        };
+    }
+
+    private void setEditWindowPageCreator(final IModel<ConfigTreeNode> rowModel, final TreeNodeType type) {
+        if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_CONNECTIONS)) {
+            editWindow.setPageCreator(new ModalWindow.PageCreator() {
+
+                private static final long serialVersionUID = 1L;
+
+                @Override
+                public Page createPage() {
+                    return new CreateOrEditConnectionPage(editWindow, null, rowModel.getObject().getParent());
+                }
+            });
+        } else if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_APPLICATION_ENTITIES)) {
+            editWindow.setPageCreator(new ModalWindow.PageCreator() {
+
+                private static final long serialVersionUID = 1L;
+
+                @Override
+                public Page createPage() {
+                    return new CreateOrEditApplicationEntityPage(editWindow, null, rowModel.getObject().getParent());
+                }
+            });
+        } else if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_HL7_APPLICATIONS)) {
+            editWindow.setPageCreator(new ModalWindow.PageCreator() {
+
+                private static final long serialVersionUID = 1L;
+
+                @Override
+                public Page createPage() {
+                    return new CreateOrEditHL7ApplicationPage(editWindow, null, rowModel.getObject().getParent());
+                }
+            });
+        } else if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_AUDIT_LOGGERS)) {
+            editWindow.setPageCreator(new ModalWindow.PageCreator() {
+
+                private static final long serialVersionUID = 1L;
+
+                @Override
+                public Page createPage() {
+                    return new CreateOrEditAuditLoggerPage(editWindow, null, rowModel.getObject().getParent());
+                }
+            });
+        } else if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_TRANSFER_CAPABILITIES)) {
+            editWindow.setPageCreator(new ModalWindow.PageCreator() {
+
+                private static final long serialVersionUID = 1L;
+
+                @Override
+                public Page createPage() {
+                    return new CreateOrEditTransferCapabilityPage(editWindow, null, rowModel.getObject().getParent());
+                }
+            });
+        } else if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_FORWARD_RULES)) {
+            editWindow.setPageCreator(new ModalWindow.PageCreator() {
+
+                private static final long serialVersionUID = 1L;
+
+                @Override
+                public Page createPage() {
+                    return new CreateOrEditForwardRulePage(editWindow, null, rowModel.getObject().getParent());
+                }
+            });
+        } else if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_FORWARD_OPTIONS)) {
+            editWindow.setPageCreator(new ModalWindow.PageCreator() {
+
+                private static final long serialVersionUID = 1L;
+
+                @Override
+                public Page createPage() {
+                    return new CreateOrEditForwardOptionPage(editWindow, null, rowModel.getObject().getParent());
+                }
+            });
+        } else if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_RETRIES)) {
+            editWindow.setPageCreator(new ModalWindow.PageCreator() {
+
+                private static final long serialVersionUID = 1L;
+
+                @Override
+                public Page createPage() {
+                    return new CreateOrEditRetryPage(editWindow, null, rowModel.getObject().getParent());
+                }
+            });
+        } else if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_COERCIONS)) {
+            editWindow.setPageCreator(new ModalWindow.PageCreator() {
+
+                private static final long serialVersionUID = 1L;
+
+                @Override
+                public Page createPage() {
+                    return new CreateOrEditCoercionPage(editWindow, null, rowModel.getObject().getParent());
+                }
+            });
+        } else {
+            editWindow.setPageCreator(getModalWindowPageCreator(rowModel, type));
+        }
+    }
+
+    private AjaxLink<Object> getConfirmDeleteLink(final IModel<ConfigTreeNode> rowModel) {
+        return new AjaxLink<Object>("wickettree.link") {
+
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void onClick(AjaxRequestTarget target) {
+                removeConfirmation.confirm(target, new StringResourceModel("dicom.confirmDelete", this, null,
+                        new Object[] { rowModel.getObject().getNodeType(), rowModel.getObject().getName() }), rowModel
+                        .getObject());
+            }
+        };
     }
 }
