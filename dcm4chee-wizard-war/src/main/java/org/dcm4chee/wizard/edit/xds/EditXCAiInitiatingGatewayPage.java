@@ -38,12 +38,37 @@
 
 package org.dcm4chee.wizard.edit.xds;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.form.AjaxFormSubmitBehavior;
+import org.apache.wicket.ajax.markup.html.form.AjaxButton;
+import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
+import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxButton;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
+import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.DropDownChoice;
+import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.FormComponent;
+import org.apache.wicket.markup.html.form.TextArea;
+import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.model.ResourceModel;
+import org.dcm4che.conf.api.ConfigurationException;
+import org.dcm4che.net.Device;
+import org.dcm4chee.wizard.common.component.ExtendedForm;
+import org.dcm4chee.wizard.common.component.ModalWindowRuntimeException;
 import org.dcm4chee.wizard.common.component.secure.SecureSessionCheckPage;
+import org.dcm4chee.wizard.model.DeviceModel;
 import org.dcm4chee.wizard.model.StringArrayModel;
 import org.dcm4chee.wizard.model.xds.XCAiInitiatingGatewayModel;
 import org.dcm4chee.wizard.tree.ConfigTreeNode;
+import org.dcm4chee.wizard.tree.ConfigTreeProvider;
+import org.dcm4chee.xds2.conf.XCAiInitiatingGWCfg;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Michael Backhaus <michael.backhaus@agfa.com>
@@ -51,6 +76,10 @@ import org.dcm4chee.wizard.tree.ConfigTreeNode;
 public class EditXCAiInitiatingGatewayPage extends SecureSessionCheckPage{
 
     private static final long serialVersionUID = 1L;
+
+    private static Logger log = LoggerFactory.getLogger(EditXCAiInitiatingGatewayPage.class);
+
+    private List<Boolean> booleanChoice = Arrays.asList(new Boolean[] { true, false });
 
     // mandatory
     private Model<String> xdsApplicationNameModel;
@@ -63,9 +92,194 @@ public class EditXCAiInitiatingGatewayPage extends SecureSessionCheckPage{
     private Model<Boolean> xdsAsyncModel;
     private Model<Boolean> xdsAsyncHandlerModel;
 
-    public EditXCAiInitiatingGatewayPage(ModalWindow editWindow, XCAiInitiatingGatewayModel model,
-            ConfigTreeNode ancestor) {
+    public EditXCAiInitiatingGatewayPage(final ModalWindow window, XCAiInitiatingGatewayModel model, 
+            final ConfigTreeNode deviceNode) {
         super();
+        try {
+            add(new WebMarkupContainer("edit-xcaiinitiatinggateway-title").setVisible(model != null));
+            setOutputMarkupId(true);
+            final ExtendedForm form = new ExtendedForm("form");
+            form.setResourceIdPrefix("dicom.edit.xds.");
+            Device device = ((DeviceModel) deviceNode.getModel()).getDevice();
+            setXCAiInitAttributes(device.getDeviceExtension(XCAiInitiatingGWCfg.class));
+            addMandatoryAttributes(form);
+            addOptionalAttributes(form);
+            addSaveButton(window, deviceNode, form);
+            addCancelButton(window, form);
+            add(form);
+        } catch (ConfigurationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
+    private void addOptionalAttributes(ExtendedForm form) {
+        final Form<?> optionalContainer = new Form<Object>("optional");
+        optionalContainer.setOutputMarkupId(true);
+        optionalContainer.setOutputMarkupPlaceholderTag(true);
+        optionalContainer.setVisible(false);
+        form.add(optionalContainer);
+        addToggleOptionalCheckBox(form, optionalContainer);
+        
+        optionalContainer.add(
+                new Label("xdsSoapMsgLogDir.label", 
+                new ResourceModel("dicom.edit.xds.optional.xdsSoapMsgLogDir.label"))
+                .setOutputMarkupPlaceholderTag(true));
+        optionalContainer.add(
+                new TextField<String>("xdsSoapMsgLogDir", xdsSoapMsgLogDirModel).setType(String.class));
+        
+        optionalContainer.add(
+                new Label("xdsAsync.label", 
+                new ResourceModel("dicom.edit.xds.optional.xdsAsync.label"))
+                .setOutputMarkupPlaceholderTag(true));
+        optionalContainer.add(
+                new DropDownChoice<>("xdsAsync", xdsAsyncModel, booleanChoice).setNullValid(true));
+        
+        optionalContainer.add(
+                new Label("xdsAsyncHandler.label", 
+                new ResourceModel("dicom.edit.xds.optional.xdsAsyncHandler.label"))
+                .setOutputMarkupPlaceholderTag(true));
+        optionalContainer.add(
+                new DropDownChoice<>("xdsAsyncHandler", xdsAsyncHandlerModel, booleanChoice).setNullValid(true));
+        
+        optionalContainer.add(
+                new Label("xdsiSrcUrlMapping.label", 
+                        new ResourceModel("dicom.edit.xds.optional.xdsiSrcUrlMapping.label"))
+                .setOutputMarkupPlaceholderTag(true));
+        optionalContainer.add(
+                new TextArea<String>("xdsiSrcUrlMapping", xdsiSrcUrlMappingModel)
+                .setType(String.class));
+    }
+
+    private void addToggleOptionalCheckBox(final ExtendedForm form, final Form<?> optionalContainer) {
+        form.add(new Label("toggleOptional.label", new ResourceModel("dicom.edit.toggleOptional.label")));
+
+        AjaxCheckBox ajaxCheckBox = new AjaxCheckBox("toggleOptional", new Model<Boolean>()) {
+
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            protected void onUpdate(AjaxRequestTarget target) {
+                target.add(optionalContainer.setVisible(this.getModelObject()));
+            }
+        };
+
+        AjaxFormSubmitBehavior onClick = new AjaxFormSubmitBehavior(optionalContainer, "change") {
+
+            private static final long serialVersionUID = 1L;
+
+            protected void onEvent(final AjaxRequestTarget target) {
+                super.onEvent(target);
+            }
+        };
+
+        ajaxCheckBox.add(onClick);
+        form.add(ajaxCheckBox);
+    }
+
+    private void addMandatoryAttributes(ExtendedForm form) {
+        Label applicationNameLabel = new Label("applicationName.label", new ResourceModel(
+                "dicom.edit.xds.applicationName.label"));
+        form.add(applicationNameLabel);
+        FormComponent<String> applicationNameTextField = new TextField<String>("applicationName",
+                xdsApplicationNameModel);
+        applicationNameTextField.setType(String.class);
+        applicationNameTextField.setRequired(true);
+        form.add(applicationNameTextField);
+
+        Label homeCommunityIdLabel = new Label("homeCommunityId.label", new ResourceModel(
+                "dicom.edit.xds.homeCommunityId.label"));
+        form.add(homeCommunityIdLabel);
+        FormComponent<String> homeCommunityIdTextField = new TextField<String>("homeCommunityId",
+                xdsHomeCommunityIdModel);
+        homeCommunityIdTextField.setType(String.class);
+        homeCommunityIdTextField.setRequired(true);
+        form.add(homeCommunityIdTextField);
+
+        Label respondingGatewayUrlLabel = new Label("respondingGatewayUrl.label", new ResourceModel(
+                "dicom.edit.xds.respondingGatewayUrl.label"));
+        form.add(respondingGatewayUrlLabel);
+        FormComponent<String> respondingGatewayUrlTextArea = new TextArea<String>("respondingGatewayUrl",
+                xdsRespondingGatewayUrlModel);
+        respondingGatewayUrlTextArea.setType(String.class);
+        respondingGatewayUrlTextArea.setRequired(true);
+        form.add(respondingGatewayUrlTextArea);
+    }
+
+    private void setXCAiInitAttributes(XCAiInitiatingGWCfg xcaiInit) {
+        if (xcaiInit == null) {
+            xdsApplicationNameModel = Model.of();
+            xdsHomeCommunityIdModel = Model.of();
+            xdsRespondingGatewayUrlModel = new StringArrayModel(null);
+            xdsiSrcUrlMappingModel = new StringArrayModel(null);
+            xdsSoapMsgLogDirModel = Model.of();
+            xdsAsyncModel = Model.of();
+            xdsAsyncHandlerModel = Model.of();
+        } else {
+            xdsApplicationNameModel = Model.of(xcaiInit.getApplicationName());
+            xdsHomeCommunityIdModel = Model.of(xcaiInit.getHomeCommunityID());
+            xdsRespondingGatewayUrlModel = new StringArrayModel(xcaiInit.getRespondingGWURLs());
+            xdsiSrcUrlMappingModel = new StringArrayModel(xcaiInit.getXDSiSourceURLs());
+            xdsSoapMsgLogDirModel = Model.of(xcaiInit.getSoapLogDir());
+            xdsAsyncModel = Model.of(xcaiInit.isAsync());
+            xdsAsyncHandlerModel = Model.of(xcaiInit.isAsyncHandler());
+        }
+    }
+
+    private void addCancelButton(final ModalWindow window, final ExtendedForm form) {
+        form.add(new AjaxButton("cancel", new ResourceModel("cancelBtn"), form) {
+
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
+                window.close(target);
+            }
+
+            @Override
+            protected void onError(AjaxRequestTarget arg0, Form<?> arg1) {
+            }
+        }.setDefaultFormProcessing(false));
+    }
+
+    private void addSaveButton(final ModalWindow window, final ConfigTreeNode deviceNode, final ExtendedForm form) {
+        form.add(new IndicatingAjaxButton("submit", new ResourceModel("saveBtn"), form) {
+
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
+                try {
+                    Device device = ((DeviceModel) deviceNode.getModel()).getDevice();
+                    XCAiInitiatingGWCfg xcai = device.getDeviceExtension(XCAiInitiatingGWCfg.class);
+                    // mandatory
+                    xcai.setApplicationName(xdsApplicationNameModel.getObject());
+                    xcai.setHomeCommunityID(xdsHomeCommunityIdModel.getObject());
+                    xcai.setRespondingGWURLs(xdsRespondingGatewayUrlModel.getArray());
+                    // optional
+                    if (xdsiSrcUrlMappingModel.getArray() != null)
+                        xcai.setXDSiSourceURLs(xdsiSrcUrlMappingModel.getArray());
+                    if (xdsSoapMsgLogDirModel.getObject() != null)
+                        xcai.setSoapLogDir(xdsSoapMsgLogDirModel.getObject());
+                    if (xdsAsyncModel.getObject() != null)
+                        xcai.setAsync(xdsAsyncModel.getObject());
+                    if (xdsAsyncHandlerModel.getObject() != null)
+                        xcai.setAsyncHandler(xdsAsyncHandlerModel.getObject());
+                    ConfigTreeProvider.get().mergeDevice(device);
+                    window.close(target);
+                } catch (Exception e) {
+                    log.error("{}: Error modifying HL7 application: {}", this, e);
+                    if (log.isDebugEnabled())
+                        e.printStackTrace();
+                    throw new ModalWindowRuntimeException(e.getLocalizedMessage());
+                }
+            }
+
+            @Override
+            protected void onError(AjaxRequestTarget target, Form<?> form) {
+                if (target != null)
+                    target.add(form);
+            }
+        });
+    }
 }

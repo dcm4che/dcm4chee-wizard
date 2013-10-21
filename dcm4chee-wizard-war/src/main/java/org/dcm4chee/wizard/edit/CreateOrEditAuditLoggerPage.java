@@ -384,7 +384,8 @@ public class CreateOrEditAuditLoggerPage extends SecureSessionCheckPage {
                     window.close(target);
                 } catch (Exception e) {
                     log.error(this.getClass().toString() + ": " + "Error modifying HL7 application: " + e.getMessage());
-                    log.debug("Exception", e);
+                    if (log.isDebugEnabled())
+                        e.printStackTrace();
                     throw new ModalWindowRuntimeException(e.getLocalizedMessage());
                 }
             }

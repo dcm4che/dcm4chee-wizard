@@ -1094,7 +1094,7 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                             rowModel.getObject().getAncestor(2));
                 } else if (type.equals(ConfigTreeNode.TreeNodeType.XCAiInitiatingGateway)) {
                     return new EditXCAiInitiatingGatewayPage(editWindow, (XCAiInitiatingGatewayModel) rowModel
-                            .getObject().getModel(), rowModel.getObject().getAncestor(2));
+                            .getObject().getModel(), rowModel.getObject().getAncestor(1));
 //                } else if (type.equals(ConfigTreeNode.TreeNodeType.AUDIT_LOGGER)) {
 //                    return new CreateOrEditAuditLoggerPage(editWindow, (AuditLoggerModel) rowModel.getObject()
 //                            .getModel(), rowModel.getObject().getAncestor(2));

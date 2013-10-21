@@ -89,10 +89,10 @@ public class ConfigTreeNode implements Serializable, Comparable<ConfigTreeNode> 
     public static final int CONTAINER_CONNECTIONS = 0;
     public static final int CONTAINER_APPLICATION_ENTITIES = 1;
 
-    // proxy device containers
+    // hl7 device containers
     public static final int CONTAINER_HL7_APPLICATIONS = 2;
 
-    // proxy audit loggers
+    // audit loggers
     public static final int CONTAINER_AUDIT_LOGGERS = 3;
 
     // ae containers

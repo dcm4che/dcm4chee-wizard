@@ -41,6 +41,7 @@ package org.dcm4chee.wizard.model.xds;
 import java.io.Serializable;
 
 import org.dcm4chee.wizard.model.ConfigNodeModel;
+import org.dcm4chee.xds2.conf.XCAiInitiatingGWCfg;
 
 /**
  * @author Michael Backhaus <michael.backhaus@agfa.com>
@@ -51,5 +52,23 @@ public class XCAiInitiatingGatewayModel extends ConfigNodeModel implements Seria
     
     public static String cssClass = "xds";
     public static String toolTip = "XCAi Initiating Gateway";
+    
+    private XCAiInitiatingGWCfg xcaiInitiatingGateway;
 
+    public XCAiInitiatingGatewayModel(XCAiInitiatingGWCfg xcaiInit) {
+        this.setXcaiInitiatingGateway(xcaiInit);
+    }
+
+    public XCAiInitiatingGWCfg getXcaiInitiatingGateway() {
+        return xcaiInitiatingGateway;
+    }
+
+    public void setXcaiInitiatingGateway(XCAiInitiatingGWCfg xcaiInit) {
+        this.xcaiInitiatingGateway = xcaiInit;
+    }
+
+    @Override
+    public String getDescription() {
+        return toolTip;
+    }
 }
