@@ -61,6 +61,7 @@ import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
+import org.apache.wicket.validation.ValidationError;
 import org.apache.wicket.validation.validator.RangeValidator;
 import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.data.Code;
@@ -173,7 +174,7 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         addDeviceTitle(deviceModel, form);
         addInstalledLabel(form);
         form.add(proxyWebMarkupContainer());
-        form.add(xdsWebMarkupContainer());
+        form.add(xdsWebMarkupContainer(form));
         addOptionalContainer(form);
         addSaveButton(window, deviceModel, form);
         addCancelButton(window, form);
@@ -448,7 +449,7 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         return proxyWMC;
     }
 
-    private WebMarkupContainer xdsWebMarkupContainer() {
+    private WebMarkupContainer xdsWebMarkupContainer(ExtendedForm form) {
         WebMarkupContainer xdsWMC = new WebMarkupContainer("xds") {
 
             private static final long serialVersionUID = 1L;
@@ -458,29 +459,214 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
                 return typeModel.getObject().equals(ConfigurationType.XDS);
             }
         };
-        addXdsConfigurationTypeCheckBoxes(xdsWMC);
+        addXdsConfigurationTypeCheckBoxes(xdsWMC, form);
         xdsWMC.setOutputMarkupPlaceholderTag(true);
         return xdsWMC;
     }
 
-    private void addXdsConfigurationTypeCheckBoxes(WebMarkupContainer xdsWMC) {
-        xdsWMC.add(new Label("xcaiInitiatingGateway.label", new ResourceModel("dicom.edit.xds.xcaiInitiatingGateway.label")));
-        xdsWMC.add(new CheckBox("xcaiInitiatingGateway", xcaiInitiatingGatewayModel));
+    private void addXdsConfigurationTypeCheckBoxes(final WebMarkupContainer xdsWMC, ExtendedForm form) {
+        addXcaiInitiatingGatewayCheckBox(xdsWMC, form);
+        addXcaInitiatingGatewayCheckBox(xdsWMC, form);
+        addXcaiRespondingGatewayCheckBox(xdsWMC, form);
+        addXcaRespondingGatewayCheckBox(xdsWMC, form);
+        addXdsRegistryCheckBox(xdsWMC, form);
+        addXdsRepositoryCheckBox(xdsWMC, form);
+    }
 
-        xdsWMC.add(new Label("xcaInitiatingGateway.label", new ResourceModel("dicom.edit.xds.xcaInitiatingGateway.label")));
-        xdsWMC.add(new CheckBox("xcaInitiatingGateway", xcaInitiatingGatewayModel));
-
-        xdsWMC.add(new Label("xcaiRespondingGateway.label", new ResourceModel("dicom.edit.xds.xcaiRespondingGateway.label")));
-        xdsWMC.add(new CheckBox("xcaiRespondingGateway", xcaiRespondingGatewayModel));
-
-        xdsWMC.add(new Label("xcaRespondingGateway.label", new ResourceModel("dicom.edit.xds.xcaRespondingGateway.label")));
-        xdsWMC.add(new CheckBox("xcaRespondingGateway", xcaRespondingGatewayModel));
-
+    private void addXdsRegistryCheckBox(final WebMarkupContainer xdsWMC, ExtendedForm form) {
         xdsWMC.add(new Label("xdsRegistry.label", new ResourceModel("dicom.edit.xds.xdsRegistry.label")));
-        xdsWMC.add(new CheckBox("xdsRegistry", xdsRegistryModel));
+        AjaxCheckBox xdsRegistryCheckBox = new AjaxCheckBox("xdsRegistry", xdsRegistryModel) {
 
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            protected void onUpdate(AjaxRequestTarget target) {
+                if (xdsRegistryModel.getObject().booleanValue())
+                    return;
+
+                if (!isXdsExtensionSelected()) {
+                    log.error("{}: Need to select at least one XDS Extension", this);
+                    xdsRegistryModel.setObject(true);
+                    this.error(new ValidationError("Need to select at least one XDS Extension"));
+                    target.add(this);
+                }
+            }
+        };
+        AjaxFormSubmitBehavior onClick = new AjaxFormSubmitBehavior(form, "change") {
+            
+            private static final long serialVersionUID = 1L;
+            
+            protected void onEvent(final AjaxRequestTarget target) {
+                super.onEvent(target);
+            }
+        };
+        xdsRegistryCheckBox.add(onClick);
+        xdsWMC.add(xdsRegistryCheckBox.setOutputMarkupId(true));
+    }
+
+    private void addXcaRespondingGatewayCheckBox(final WebMarkupContainer xdsWMC, ExtendedForm form) {
+        xdsWMC.add(new Label("xcaRespondingGateway.label", new ResourceModel("dicom.edit.xds.xcaRespondingGateway.label")));
+        AjaxCheckBox xcaRespondingGatewayCheckBox = new AjaxCheckBox("xcaRespondingGateway", xcaRespondingGatewayModel) {
+
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            protected void onUpdate(AjaxRequestTarget target) {
+                if (xcaRespondingGatewayModel.getObject().booleanValue())
+                    return;
+
+                if (!isXdsExtensionSelected()) {
+                    log.error("{}: Need to select at least one XDS Extension", this);
+                    xcaRespondingGatewayModel.setObject(true);
+                    this.error(new ValidationError("Need to select at least one XDS Extension"));
+                    target.add(this);
+                }
+            }
+        };
+        AjaxFormSubmitBehavior onClick = new AjaxFormSubmitBehavior(form, "change") {
+            
+            private static final long serialVersionUID = 1L;
+            
+            protected void onEvent(final AjaxRequestTarget target) {
+                super.onEvent(target);
+            }
+        };
+        xcaRespondingGatewayCheckBox.add(onClick);
+        xdsWMC.add(xcaRespondingGatewayCheckBox.setOutputMarkupId(true));
+    }
+
+    private void addXcaiRespondingGatewayCheckBox(final WebMarkupContainer xdsWMC, ExtendedForm form) {
+        xdsWMC.add(new Label("xcaiRespondingGateway.label", new ResourceModel("dicom.edit.xds.xcaiRespondingGateway.label")));
+        AjaxCheckBox xcaiRespondingGatewayCheckBox = new AjaxCheckBox("xcaiRespondingGateway", xcaiRespondingGatewayModel) {
+
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            protected void onUpdate(AjaxRequestTarget target) {
+                if (xcaiRespondingGatewayModel.getObject().booleanValue())
+                    return;
+
+                if (!isXdsExtensionSelected()) {
+                    log.error("{}: Need to select at least one XDS Extension", this);
+                    xcaiRespondingGatewayModel.setObject(true);
+                    this.error(new ValidationError("Need to select at least one XDS Extension"));
+                    target.add(this);
+                }
+            }
+        };
+        AjaxFormSubmitBehavior onClick = new AjaxFormSubmitBehavior(form, "change") {
+            
+            private static final long serialVersionUID = 1L;
+            
+            protected void onEvent(final AjaxRequestTarget target) {
+                super.onEvent(target);
+            }
+        };
+        xcaiRespondingGatewayCheckBox.add(onClick);
+        xdsWMC.add(xcaiRespondingGatewayCheckBox.setOutputMarkupId(true));
+    }
+
+    private void addXcaInitiatingGatewayCheckBox(final WebMarkupContainer xdsWMC, ExtendedForm form) {
+        xdsWMC.add(new Label("xcaInitiatingGateway.label", new ResourceModel("dicom.edit.xds.xcaInitiatingGateway.label")));
+        AjaxCheckBox xcaInitiatingGatewayCheckBox = new AjaxCheckBox("xcaInitiatingGateway", xcaInitiatingGatewayModel) {
+
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            protected void onUpdate(AjaxRequestTarget target) {
+                if (xcaInitiatingGatewayModel.getObject().booleanValue())
+                    return;
+
+                if (!isXdsExtensionSelected()) {
+                    log.error("{}: Need to select at least one XDS Extension", this);
+                    xcaInitiatingGatewayModel.setObject(true);
+                    this.error(new ValidationError("Need to select at least one XDS Extension"));
+                    target.add(this);
+                }
+            }
+        };
+        AjaxFormSubmitBehavior onClick = new AjaxFormSubmitBehavior(form, "change") {
+            
+            private static final long serialVersionUID = 1L;
+            
+            protected void onEvent(final AjaxRequestTarget target) {
+                super.onEvent(target);
+            }
+        };
+        xcaInitiatingGatewayCheckBox.add(onClick);
+        xdsWMC.add(xcaInitiatingGatewayCheckBox.setOutputMarkupId(true));
+    }
+
+    private void addXdsRepositoryCheckBox(final WebMarkupContainer xdsWMC, ExtendedForm form) {
         xdsWMC.add(new Label("xdsRepository.label", new ResourceModel("dicom.edit.xds.xdsRepository.label")));
-        xdsWMC.add(new CheckBox("xdsRepository", xdsRepositoryModel));
+        AjaxCheckBox xdsRepositoryCheckBox = new AjaxCheckBox("xdsRepository", xdsRepositoryModel) {
+
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            protected void onUpdate(AjaxRequestTarget target) {
+                if (xdsRepositoryModel.getObject().booleanValue())
+                    return;
+
+                if (!isXdsExtensionSelected()) {
+                    log.error("{}: Need to select at least one XDS Extension", this);
+                    xdsRepositoryModel.setObject(true);
+                    this.error(new ValidationError("Need to select at least one XDS Extension"));
+                    target.add(this);
+                }
+            }
+        };
+        AjaxFormSubmitBehavior onClick = new AjaxFormSubmitBehavior(form, "change") {
+            
+            private static final long serialVersionUID = 1L;
+            
+            protected void onEvent(final AjaxRequestTarget target) {
+                super.onEvent(target);
+            }
+        };
+        xdsRepositoryCheckBox.add(onClick);
+        xdsWMC.add(xdsRepositoryCheckBox.setOutputMarkupId(true));
+    }
+
+    private void addXcaiInitiatingGatewayCheckBox(final WebMarkupContainer xdsWMC, ExtendedForm form) {
+        AjaxFormSubmitBehavior onClick1 = new AjaxFormSubmitBehavior(form, "change") {
+            
+            private static final long serialVersionUID = 1L;
+            
+            protected void onEvent(final AjaxRequestTarget target) {
+                super.onEvent(target);
+            }
+        };
+
+        xdsWMC.add(new Label("xcaiInitiatingGateway.label", new ResourceModel("dicom.edit.xds.xcaiInitiatingGateway.label")));
+        AjaxCheckBox xcaiInitiatingGatewayCheckBox = new AjaxCheckBox("xcaiInitiatingGateway", xcaiInitiatingGatewayModel) {
+
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            protected void onUpdate(AjaxRequestTarget target) {
+                if (xcaiInitiatingGatewayModel.getObject().booleanValue())
+                    return;
+
+                if (!isXdsExtensionSelected()) {
+                    log.error("{}: Need to select at least one XDS Extension", this);
+                    xcaiInitiatingGatewayModel.setObject(true);
+                    this.error(new ValidationError("Need to select at least one XDS Extension"));
+                    target.add(this);
+                }
+            }
+        };
+        xcaiInitiatingGatewayCheckBox.add(onClick1);
+        xdsWMC.add(xcaiInitiatingGatewayCheckBox);
+    }
+
+    private boolean isXdsExtensionSelected() {
+        return xcaiInitiatingGatewayModel.getObject().booleanValue()
+                || xcaiRespondingGatewayModel.getObject().booleanValue()
+                || xcaInitiatingGatewayModel.getObject().booleanValue()
+                || xcaRespondingGatewayModel.getObject().booleanValue()
+                || xdsRegistryModel.getObject().booleanValue()
+                || xdsRepositoryModel.getObject().booleanValue();
     }
 
     private void addInstalledLabel(final ExtendedForm form) {

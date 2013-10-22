@@ -548,7 +548,13 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                         || type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_FORWARD_RULES)
                         || type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_FORWARD_OPTIONS)
                         || type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_RETRIES)
-                        || type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_COERCIONS)) {
+                        || type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_COERCIONS)
+                        || type.equals(ConfigTreeNode.TreeNodeType.XCAiInitiatingGateway)
+                        || type.equals(ConfigTreeNode.TreeNodeType.XCAInitiatingGateway)
+                        || type.equals(ConfigTreeNode.TreeNodeType.XCAiRespondingGateway)
+                        || type.equals(ConfigTreeNode.TreeNodeType.XCARespondingGateway)
+                        || type.equals(ConfigTreeNode.TreeNodeType.XDSRegistry)
+                        || type.equals(ConfigTreeNode.TreeNodeType.XDSRepository)) {
                     cellItem.add(new Label(componentId));
                     return;
                 }
