@@ -950,6 +950,9 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
     }
 
     private void setXdsDeviceAttributes(Device device) {
+        if (!typeModel.getObject().equals(ConfigTreeProvider.ConfigurationType.XDS))
+            return;
+
         XCAiInitiatingGWCfg xcaiInit = device.getDeviceExtension(XCAiInitiatingGWCfg.class);
         Boolean xcaiInitCheck = xcaiInitiatingGatewayModel.getObject();
         if (xcaiInitCheck && xcaiInit == null)

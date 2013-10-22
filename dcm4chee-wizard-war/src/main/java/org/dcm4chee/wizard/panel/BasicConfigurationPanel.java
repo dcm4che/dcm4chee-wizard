@@ -116,6 +116,7 @@ import org.dcm4chee.wizard.edit.xds.EditXCAInitiatingGatewayPage;
 import org.dcm4chee.wizard.edit.xds.EditXCARespondingGatewayPage;
 import org.dcm4chee.wizard.edit.xds.EditXCAiInitiatingGatewayPage;
 import org.dcm4chee.wizard.edit.xds.EditXCAiRespondingGatewayPage;
+import org.dcm4chee.wizard.edit.xds.EditXDSRegistryPage;
 import org.dcm4chee.wizard.icons.ImageManager;
 import org.dcm4chee.wizard.icons.behaviour.ImageSizeBehaviour;
 import org.dcm4chee.wizard.model.ApplicationEntityModel;
@@ -132,6 +133,7 @@ import org.dcm4chee.wizard.model.xds.XCAInitiatingGatewayModel;
 import org.dcm4chee.wizard.model.xds.XCARespondingGatewayModel;
 import org.dcm4chee.wizard.model.xds.XCAiInitiatingGatewayModel;
 import org.dcm4chee.wizard.model.xds.XCAiRespondingGatewayModel;
+import org.dcm4chee.wizard.model.xds.XDSRegistryModel;
 import org.dcm4chee.wizard.page.ApplyTransferCapabilityProfilePage;
 import org.dcm4chee.wizard.page.DicomEchoPage;
 import org.dcm4chee.wizard.tree.ConfigTableTree;
@@ -1116,9 +1118,9 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                 } else if (type.equals(ConfigTreeNode.TreeNodeType.XCARespondingGateway)) {
                     return new EditXCARespondingGatewayPage(editWindow, (XCARespondingGatewayModel) rowModel.getObject()
                             .getModel(), rowModel.getObject().getAncestor(1));
-//                } else if (type.equals(ConfigTreeNode.TreeNodeType.AUDIT_LOGGER)) {
-//                    return new CreateOrEditAuditLoggerPage(editWindow, (AuditLoggerModel) rowModel.getObject()
-//                            .getModel(), rowModel.getObject().getAncestor(2));
+                } else if (type.equals(ConfigTreeNode.TreeNodeType.XDSRegistry)) {
+                    return new EditXDSRegistryPage(editWindow, (XDSRegistryModel) rowModel.getObject()
+                            .getModel(), rowModel.getObject().getAncestor(1));
 //                } else if (type.equals(ConfigTreeNode.TreeNodeType.AUDIT_LOGGER)) {
 //                    return new CreateOrEditAuditLoggerPage(editWindow, (AuditLoggerModel) rowModel.getObject()
 //                            .getModel(), rowModel.getObject().getAncestor(2));

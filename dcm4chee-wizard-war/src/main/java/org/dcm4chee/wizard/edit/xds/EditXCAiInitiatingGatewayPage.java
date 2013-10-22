@@ -135,14 +135,14 @@ public class EditXCAiInitiatingGatewayPage extends SecureSessionCheckPage{
                 new ResourceModel("dicom.edit.xds.optional.xdsAsync.label"))
                 .setOutputMarkupPlaceholderTag(true));
         optionalContainer.add(
-                new DropDownChoice<>("xdsAsync", xdsAsyncModel, booleanChoice).setNullValid(true));
+                new DropDownChoice<>("xdsAsync", xdsAsyncModel, booleanChoice).setNullValid(false));
         
         optionalContainer.add(
                 new Label("xdsAsyncHandler.label", 
                 new ResourceModel("dicom.edit.xds.optional.xdsAsyncHandler.label"))
                 .setOutputMarkupPlaceholderTag(true));
         optionalContainer.add(
-                new DropDownChoice<>("xdsAsyncHandler", xdsAsyncHandlerModel, booleanChoice).setNullValid(true));
+                new DropDownChoice<>("xdsAsyncHandler", xdsAsyncHandlerModel, booleanChoice).setNullValid(false));
         
         optionalContainer.add(
                 new Label("xdsiSrcUrlMapping.label", 
