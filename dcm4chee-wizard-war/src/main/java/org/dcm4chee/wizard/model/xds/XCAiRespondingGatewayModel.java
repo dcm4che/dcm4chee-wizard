@@ -41,30 +41,30 @@ package org.dcm4chee.wizard.model.xds;
 import java.io.Serializable;
 
 import org.dcm4chee.wizard.model.ConfigNodeModel;
-import org.dcm4chee.xds2.conf.XCAInitiatingGWCfg;
+import org.dcm4chee.xds2.conf.XCAiRespondingGWCfg;
 
 /**
  * @author Michael Backhaus <michael.backhaus@agfa.com>
  */
-public class XCAInitiatingGatewayModel extends ConfigNodeModel implements Serializable{
+public class XCAiRespondingGatewayModel extends ConfigNodeModel implements Serializable{
 
     private static final long serialVersionUID = 1L;
     
     public static String cssClass = "xds";
-    public static String toolTip = "XCA Initiating Gateway";
+    public static String toolTip = "XCAi Responding Gateway";
     
-    private XCAInitiatingGWCfg xcaInitiatingGateway;
+    private XCAiRespondingGWCfg xcaiRespondingGateway;
 
-    public XCAInitiatingGatewayModel(XCAInitiatingGWCfg xca) {
-        this.xcaInitiatingGateway = xca;
+    public XCAiRespondingGatewayModel(XCAiRespondingGWCfg xcai) {
+        this.xcaiRespondingGateway = xcai;
     }
 
-    public XCAInitiatingGWCfg getXcaInitiatingGateway() {
-        return xcaInitiatingGateway;
+    public XCAiRespondingGWCfg getXcaiRespondingGatewayy() {
+        return xcaiRespondingGateway;
     }
 
-    public void setXcaInitiatingGateway(XCAInitiatingGWCfg xcaInit) {
-        this.xcaInitiatingGateway = xcaInit;
+    public void setXcaiRespondingGateway(XCAiRespondingGWCfg xcai) {
+        this.xcaiRespondingGateway = xcai;
     }
 
     @Override

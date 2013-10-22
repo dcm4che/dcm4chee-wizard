@@ -38,9 +38,6 @@
 
 package org.dcm4chee.wizard.edit.xds;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormSubmitBehavior;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
@@ -49,7 +46,6 @@ import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxButton;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextArea;
@@ -63,52 +59,47 @@ import org.dcm4chee.wizard.common.component.ModalWindowRuntimeException;
 import org.dcm4chee.wizard.common.component.secure.SecureSessionCheckPage;
 import org.dcm4chee.wizard.model.DeviceModel;
 import org.dcm4chee.wizard.model.StringArrayModel;
-import org.dcm4chee.wizard.model.xds.XCAiInitiatingGatewayModel;
+import org.dcm4chee.wizard.model.xds.XCAiRespondingGatewayModel;
 import org.dcm4chee.wizard.tree.ConfigTreeNode;
 import org.dcm4chee.wizard.tree.ConfigTreeProvider;
-import org.dcm4chee.xds2.conf.XCAiInitiatingGWCfg;
+import org.dcm4chee.xds2.conf.XCAiRespondingGWCfg;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author Michael Backhaus <michael.backhaus@agfa.com>
  */
-public class EditXCAiInitiatingGatewayPage extends SecureSessionCheckPage{
+public class EditXCAiRespondingGatewayPage extends SecureSessionCheckPage{
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger log = LoggerFactory.getLogger(EditXCAiInitiatingGatewayPage.class);
-
-    private List<Boolean> booleanChoice = Arrays.asList(new Boolean[] { true, false });
+    private static Logger log = LoggerFactory.getLogger(EditXCAiRespondingGatewayPage.class);
 
     // mandatory
     private Model<String> xdsApplicationNameModel;
     private Model<String> xdsHomeCommunityIdModel;
-    private StringArrayModel xdsRespondingGatewayUrlModel;
+    private StringArrayModel xdsiSrcUrlMappingModel;
 
     // optional
-    private StringArrayModel xdsiSrcUrlMappingModel;
     private Model<String> xdsSoapMsgLogDirModel;
-    private Model<Boolean> xdsAsyncModel;
-    private Model<Boolean> xdsAsyncHandlerModel;
 
-    public EditXCAiInitiatingGatewayPage(final ModalWindow window, XCAiInitiatingGatewayModel model, 
+    public EditXCAiRespondingGatewayPage(final ModalWindow window, XCAiRespondingGatewayModel model, 
             final ConfigTreeNode deviceNode) {
         super();
         try {
-            add(new WebMarkupContainer("edit-xcaiinitiatinggateway-title").setVisible(model != null));
+            add(new WebMarkupContainer("edit-xcairespondinggateway-title").setVisible(model != null));
             setOutputMarkupId(true);
             final ExtendedForm form = new ExtendedForm("form");
             form.setResourceIdPrefix("dicom.edit.xds.");
             Device device = ((DeviceModel) deviceNode.getModel()).getDevice();
-            initAttributes(device.getDeviceExtension(XCAiInitiatingGWCfg.class));
+            initAttributes(device.getDeviceExtension(XCAiRespondingGWCfg.class));
             addMandatoryFormAttributes(form);
             addOptionalFormAttributes(form);
             addSaveButton(window, deviceNode, form);
             addCancelButton(window, form);
             add(form);
         } catch (ConfigurationException e) {
-            log.error("{}: Error modifying XCAi Initating Gateway: {}", this, e);
+            log.error("{}: Error modifying XCAi Responding Gateway: {}", this, e);
             if (log.isDebugEnabled())
                 e.printStackTrace();
             throw new ModalWindowRuntimeException(e.getLocalizedMessage());
@@ -129,28 +120,6 @@ public class EditXCAiInitiatingGatewayPage extends SecureSessionCheckPage{
                 .setOutputMarkupPlaceholderTag(true));
         optionalContainer.add(
                 new TextField<String>("xdsSoapMsgLogDir", xdsSoapMsgLogDirModel).setType(String.class));
-        
-        optionalContainer.add(
-                new Label("xdsAsync.label", 
-                new ResourceModel("dicom.edit.xds.optional.xdsAsync.label"))
-                .setOutputMarkupPlaceholderTag(true));
-        optionalContainer.add(
-                new DropDownChoice<>("xdsAsync", xdsAsyncModel, booleanChoice).setNullValid(true));
-        
-        optionalContainer.add(
-                new Label("xdsAsyncHandler.label", 
-                new ResourceModel("dicom.edit.xds.optional.xdsAsyncHandler.label"))
-                .setOutputMarkupPlaceholderTag(true));
-        optionalContainer.add(
-                new DropDownChoice<>("xdsAsyncHandler", xdsAsyncHandlerModel, booleanChoice).setNullValid(true));
-        
-        optionalContainer.add(
-                new Label("xdsiSrcUrlMapping.label", 
-                        new ResourceModel("dicom.edit.xds.optional.xdsiSrcUrlMapping.label"))
-                .setOutputMarkupPlaceholderTag(true));
-        optionalContainer.add(
-                new TextArea<String>("xdsiSrcUrlMapping", xdsiSrcUrlMappingModel)
-                .setType(String.class));
     }
 
     private void addToggleOptionalCheckBox(final ExtendedForm form, final Form<?> optionalContainer) {
@@ -198,33 +167,24 @@ public class EditXCAiInitiatingGatewayPage extends SecureSessionCheckPage{
         homeCommunityIdTextField.setRequired(true);
         form.add(homeCommunityIdTextField);
 
-        Label respondingGatewayUrlLabel = new Label("respondingGatewayUrl.label", new ResourceModel(
-                "dicom.edit.xds.respondingGatewayUrl.label"));
-        form.add(respondingGatewayUrlLabel);
-        FormComponent<String> respondingGatewayUrlTextArea = new TextArea<String>("respondingGatewayUrl",
-                xdsRespondingGatewayUrlModel);
-        respondingGatewayUrlTextArea.setType(String.class);
-        respondingGatewayUrlTextArea.setRequired(true);
-        form.add(respondingGatewayUrlTextArea);
+        form.add(new Label("xdsiSrcUrlMapping.label", new ResourceModel(
+                "dicom.edit.xds.xdsiSrcUrlMapping.label")));
+        form.add(new TextArea<String>("xdsiSrcUrlMapping", xdsiSrcUrlMappingModel)
+                .setType(String.class)
+                .setRequired(true));
     }
 
-    private void initAttributes(XCAiInitiatingGWCfg xcaiInit) {
-        if (xcaiInit == null) {
+    private void initAttributes(XCAiRespondingGWCfg xcai) {
+        if (xcai == null) {
             xdsApplicationNameModel = Model.of();
             xdsHomeCommunityIdModel = Model.of();
-            xdsRespondingGatewayUrlModel = new StringArrayModel(null);
             xdsiSrcUrlMappingModel = new StringArrayModel(null);
             xdsSoapMsgLogDirModel = Model.of();
-            xdsAsyncModel = Model.of();
-            xdsAsyncHandlerModel = Model.of();
         } else {
-            xdsApplicationNameModel = Model.of(xcaiInit.getApplicationName());
-            xdsHomeCommunityIdModel = Model.of(xcaiInit.getHomeCommunityID());
-            xdsRespondingGatewayUrlModel = new StringArrayModel(xcaiInit.getRespondingGWURLs());
-            xdsiSrcUrlMappingModel = new StringArrayModel(xcaiInit.getXDSiSourceURLs());
-            xdsSoapMsgLogDirModel = Model.of(xcaiInit.getSoapLogDir());
-            xdsAsyncModel = Model.of(xcaiInit.isAsync());
-            xdsAsyncHandlerModel = Model.of(xcaiInit.isAsyncHandler());
+            xdsApplicationNameModel = Model.of(xcai.getApplicationName());
+            xdsHomeCommunityIdModel = Model.of(xcai.getHomeCommunityID());
+            xdsiSrcUrlMappingModel = new StringArrayModel(xcai.getXDSiSourceURLs());
+            xdsSoapMsgLogDirModel = Model.of(xcai.getSoapLogDir());
         }
     }
 
@@ -253,20 +213,14 @@ public class EditXCAiInitiatingGatewayPage extends SecureSessionCheckPage{
             protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
                 try {
                     Device device = ((DeviceModel) deviceNode.getModel()).getDevice();
-                    XCAiInitiatingGWCfg xcai = device.getDeviceExtension(XCAiInitiatingGWCfg.class);
+                    XCAiRespondingGWCfg xcai = device.getDeviceExtension(XCAiRespondingGWCfg.class);
                     // mandatory
                     xcai.setApplicationName(xdsApplicationNameModel.getObject());
                     xcai.setHomeCommunityID(xdsHomeCommunityIdModel.getObject());
-                    xcai.setRespondingGWURLs(xdsRespondingGatewayUrlModel.getArray());
+                    xcai.setXDSiSourceURLs(xdsiSrcUrlMappingModel.getArray());
                     // optional
-                    if (xdsiSrcUrlMappingModel.getArray() != null)
-                        xcai.setXDSiSourceURLs(xdsiSrcUrlMappingModel.getArray());
                     if (xdsSoapMsgLogDirModel.getObject() != null)
                         xcai.setSoapLogDir(xdsSoapMsgLogDirModel.getObject());
-                    if (xdsAsyncModel.getObject() != null)
-                        xcai.setAsync(xdsAsyncModel.getObject());
-                    if (xdsAsyncHandlerModel.getObject() != null)
-                        xcai.setAsyncHandler(xdsAsyncHandlerModel.getObject());
                     ConfigTreeProvider.get().mergeDevice(device);
                     window.close(target);
                 } catch (Exception e) {

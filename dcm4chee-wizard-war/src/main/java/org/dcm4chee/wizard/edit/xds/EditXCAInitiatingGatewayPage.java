@@ -87,7 +87,6 @@ public class EditXCAInitiatingGatewayPage extends SecureSessionCheckPage{
     private StringArrayModel xdsRespondingGatewayUrlModel;
 
     // optional
-    private StringArrayModel xdsiSrcUrlMappingModel;
     private Model<String> xdsSoapMsgLogDirModel;
     private Model<Boolean> xdsAsyncModel;
     private Model<Boolean> xdsAsyncHandlerModel;
@@ -141,10 +140,6 @@ public class EditXCAInitiatingGatewayPage extends SecureSessionCheckPage{
                 "dicom.edit.xds.optional.xdsAsyncHandler.label")).setOutputMarkupPlaceholderTag(true));
         optionalContainer.add(new DropDownChoice<>("xdsAsyncHandler", xdsAsyncHandlerModel, booleanChoice)
                 .setNullValid(true));
-
-        optionalContainer.add(new Label("xdsiSrcUrlMapping.label", new ResourceModel(
-                "dicom.edit.xds.optional.xdsiSrcUrlMapping.label")).setOutputMarkupPlaceholderTag(true));
-        optionalContainer.add(new TextArea<String>("xdsiSrcUrlMapping", xdsiSrcUrlMappingModel).setType(String.class));
 
         optionalContainer.add(new Label("xdsRespondingGatewayRetrieveUrl.label", new ResourceModel(
                 "dicom.edit.xds.optional.xdsRespondingGatewayRetrieveUrl.label")).setOutputMarkupPlaceholderTag(true));
