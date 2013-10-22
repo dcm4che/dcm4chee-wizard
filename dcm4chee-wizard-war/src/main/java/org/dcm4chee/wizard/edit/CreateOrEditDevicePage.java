@@ -730,50 +730,6 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
             xdsSoapMsgLogDirModel = Model.of(xcaiResp.getSoapLogDir());
     }
 
-    private void setXCAInitGWAttributes(XCAInitiatingGWCfg xcaInit) {
-        if (xdsApplicationNameModel == null)
-            xdsApplicationNameModel = Model.of(xcaInit.getApplicationName());
-        if (xdsHomeCommunityIdModel == null)
-            xdsHomeCommunityIdModel = Model.of(xcaInit.getHomeCommunityID());
-        if (xdsRespondingGatewayUrlModel == null)
-            xdsRespondingGatewayUrlModel = new StringArrayModel(xcaInit.getRespondingGWURLs());
-        if (xdsRespondingGatewayRetrieveUrlModel == null)
-            xdsRespondingGatewayRetrieveUrlModel = new StringArrayModel(xcaInit.getRespondingGWRetrieveURLs());
-        if (xdsRegistryUrlModel == null && xcaInit.getRegistryURL() != null)
-            xdsRegistryUrlModel = Model.of(xcaInit.getRegistryURL());
-        if (xdsRepositoryUrlModel == null && xcaInit.getRepositoryURLs().length > 0)
-            xdsRepositoryUrlModel = new StringArrayModel(xcaInit.getRepositoryURLs());
-        if (xdsAsyncModel == null)
-            xdsAsyncModel = Model.of(xcaInit.isAsync());
-        if (xdsAsyncHandlerModel == null)
-            xdsAsyncHandlerModel = Model.of(xcaInit.isAsyncHandler());
-        if (xdsPIXConsumerApplicationModel == null)
-            xdsPIXConsumerApplicationModel = Model.of(xcaInit.getLocalPIXConsumerApplication());
-        if (xdsPIXManagerApplicationModel == null)
-            xdsPIXManagerApplicationModel = Model.of(xcaInit.getRemotePIXManagerApplication());
-        if (xdsAssigningAuthorityModel == null)
-            xdsAssigningAuthorityModel = new StringArrayModel(xcaInit.getAssigningAuthorities());
-        if (xdsSoapMsgLogDirModel == null)
-            xdsSoapMsgLogDirModel = Model.of(xcaInit.getSoapLogDir());
-    }
-
-    private void setXCAiInitGWAttributes(XCAiInitiatingGWCfg xcaiInit) throws ConfigurationException {
-        if (xdsApplicationNameModel == null)
-            xdsApplicationNameModel = Model.of(xcaiInit.getApplicationName());
-        if (xdsHomeCommunityIdModel == null)
-            xdsHomeCommunityIdModel = Model.of(xcaiInit.getHomeCommunityID());
-        if (xdsRespondingGatewayUrlModel == null)
-            xdsRespondingGatewayUrlModel = new StringArrayModel(xcaiInit.getRespondingGWURLs());
-        if (xdsiSrcUrlMappingModel == null && xcaiInit.getXDSiSourceURLs().length > 0)
-            xdsiSrcUrlMappingModel = new StringArrayModel(xcaiInit.getXDSiSourceURLs());
-        if (xdsSoapMsgLogDirModel == null)
-            xdsSoapMsgLogDirModel = Model.of(xcaiInit.getSoapLogDir());
-        if (xdsAsyncModel == null)
-            xdsAsyncModel = Model.of(xcaiInit.isAsync());
-        if (xdsAsyncHandlerModel == null)
-            xdsAsyncHandlerModel = Model.of(xcaiInit.isAsyncHandler());
-    }
-
     private void setDeviceConfiguration(final DeviceModel deviceModel) throws ConfigurationException {
         deviceNameModel = Model.of(deviceModel.getDevice().getDeviceName());
         installedModel = Model.of(deviceModel.getDevice().isInstalled());
@@ -1074,42 +1030,17 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
             xca.setSoapLogDir(xdsSoapMsgLogDirModel.getObject());
     }
 
-    private void setXCAiInitGWAttributes(Device device) {
-        XCAiInitiatingGWCfg xcai = device.getDeviceExtension(XCAiInitiatingGWCfg.class);
-        if (xcai == null)
-            return;
-
-        // mandatory
-        xcai.setApplicationName(xdsApplicationNameModel.getObject());
-        xcai.setHomeCommunityID(xdsHomeCommunityIdModel.getObject());
-        xcai.setRespondingGWURLs(xdsRespondingGatewayUrlModel.getArray());
-
-        // optional
-        if (xdsiSrcUrlMappingModel.getArray() != null)
-            xcai.setXDSiSourceURLs(xdsiSrcUrlMappingModel.getArray());
-        if (xdsSoapMsgLogDirModel.getObject() != null)
-            xcai.setSoapLogDir(xdsSoapMsgLogDirModel.getObject());
-        if (xdsAsyncModel.getObject() != null)
-            xcai.setAsync(xdsAsyncModel.getObject());
-        if (xdsAsyncHandlerModel.getObject() != null)
-            xcai.setAsyncHandler(xdsAsyncHandlerModel.getObject());
-    }
-
     private Device initDeviceExtensions() {
         Device device = new Device(deviceNameModel.getObject());
         if (typeModel.getObject().equals(ConfigurationType.Proxy))
             initProxyDeviceExtension(device);
         if (typeModel.getObject().equals(ConfigurationType.AuditRecordRepository))
             initARRExtension(device);
-//        if (typeModel.getObject().equals(ConfigurationType.XDS))
-//            initXdsExtensions(device);
         return device;
     }
 
     private void initXdsExtensions(Device device) {
-        initXCAiInitGWAttributes(device);
         initXCAiRespondingGWAttributes(device);
-        initXCAInitGWAttributes(device);
         initXCARespondingGWAttributes(device);
     }
 
@@ -1129,22 +1060,6 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         xcai.setHomeCommunityID(xdsHomeCommunityIdModel.getObject());
         xcai.setXDSiSourceURLs(xdsiSrcUrlMappingModel.getArray());
         xcai.setSoapLogDir(xdsSoapMsgLogDirModel.getObject());
-        device.addDeviceExtension(xcai);
-    }
-
-    private void initXCAInitGWAttributes(Device device) {
-        XCAInitiatingGWCfg xca = new XCAInitiatingGWCfg();
-        xca.setApplicationName(xdsApplicationNameModel.getObject());
-        xca.setHomeCommunityID(xdsHomeCommunityIdModel.getObject());
-        xca.setRespondingGWURLs(xdsRespondingGatewayUrlModel.getArray());
-        device.addDeviceExtension(xca);
-    }
-
-    private void initXCAiInitGWAttributes(Device device) {
-        XCAiInitiatingGWCfg xcai = new XCAiInitiatingGWCfg();
-//        xcai.setApplicationName(xdsApplicationNameModel.getObject());
-//        xcai.setHomeCommunityID(xdsHomeCommunityIdModel.getObject());
-//        xcai.setRespondingGWURLs(xdsRespondingGatewayUrlModel.getArray());
         device.addDeviceExtension(xcai);
     }
 

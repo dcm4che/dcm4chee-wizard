@@ -31,34 +31,35 @@
           <textarea class="edit-value" wicket:id="respondingGatewayUrl"
             rows="2" />
         </div>
-      </div>
-      <div class="edit-buttons">
-        <span class="edit-desc" wicket:id="toggleOptional.label" /> <input
-          class="edit-value" wicket:id="toggleOptional" type="checkbox" />
-      </div>
-      <form wicket:id="optional">
-        <div class="edit-table-row">
-          <span class="edit-desc" wicket:id="xdsSoapMsgLogDir.label" />
-          <input class="edit-value" wicket:id="xdsSoapMsgLogDir"
-            type="text" />
+        <div class="edit-buttons">
+          <span class="edit-desc" wicket:id="toggleOptional.label" /> <input
+            class="edit-value" wicket:id="toggleOptional"
+            type="checkbox" />
         </div>
-        <div class="edit-table-row" style="height: 45px;">
-          <span class="edit-desc" wicket:id="xdsiSrcUrlMapping.label" />
-          <textarea class="edit-value" wicket:id="xdsiSrcUrlMapping"
-            rows="2" />
+        <form wicket:id="optional">
+          <div class="edit-table-row">
+            <span class="edit-desc" wicket:id="xdsSoapMsgLogDir.label" />
+            <input class="edit-value" wicket:id="xdsSoapMsgLogDir"
+              type="text" />
+          </div>
+          <div class="edit-table-row" style="height: 45px;">
+            <span class="edit-desc" wicket:id="xdsiSrcUrlMapping.label" />
+            <textarea class="edit-value" wicket:id="xdsiSrcUrlMapping"
+              rows="2" />
+          </div>
+          <div class="edit-table-row">
+            <span class="edit-desc" wicket:id="xdsAsync.label" /> <select
+              class="edit-value" wicket:id="xdsAsync" />
+          </div>
+          <div class="edit-table-row">
+            <span class="edit-desc" wicket:id="xdsAsyncHandler.label" />
+            <select class="edit-value" wicket:id="xdsAsyncHandler" />
+          </div>
+        </form>
+        <div class="edit-buttons">
+          <input type="submit" wicket:id="submit" /> <input
+            type="submit" wicket:id="cancel" />
         </div>
-        <div class="edit-table-row">
-          <span class="edit-desc" wicket:id="xdsAsync.label" /> <select
-            class="edit-value" wicket:id="xdsAsync" />
-        </div>
-        <div class="edit-table-row">
-          <span class="edit-desc" wicket:id="xdsAsyncHandler.label" />
-          <select class="edit-value" wicket:id="xdsAsyncHandler" />
-        </div>
-      </form>
-      <div class="edit-buttons">
-        <input type="submit" wicket:id="submit" /> <input type="submit"
-          wicket:id="cancel" />
       </div>
     </form>
   </div>
