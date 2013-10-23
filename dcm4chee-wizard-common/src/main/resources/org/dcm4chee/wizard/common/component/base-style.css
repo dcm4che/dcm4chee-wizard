@@ -168,3 +168,5 @@ div.edit-buttons { background: none #AAAAAA; width: 100%; height: 20px; text-ali
 input.IE_DEFAULT_SUBMIT {color: #FFFFFF; background-color: #FFFFFF; border: none; width: 1px; height: 1px; }
 
 .longText { width:20%; overflow: hidden; }
+
+textarea{resize: none}

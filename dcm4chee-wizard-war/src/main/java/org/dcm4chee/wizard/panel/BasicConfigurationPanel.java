@@ -112,11 +112,12 @@ import org.dcm4chee.wizard.edit.CreateOrEditTransferCapabilityPage;
 import org.dcm4chee.wizard.edit.proxy.CreateOrEditForwardOptionPage;
 import org.dcm4chee.wizard.edit.proxy.CreateOrEditForwardRulePage;
 import org.dcm4chee.wizard.edit.proxy.CreateOrEditRetryPage;
-import org.dcm4chee.wizard.edit.xds.EditXCAInitiatingGatewayPage;
-import org.dcm4chee.wizard.edit.xds.EditXCARespondingGatewayPage;
-import org.dcm4chee.wizard.edit.xds.EditXCAiInitiatingGatewayPage;
-import org.dcm4chee.wizard.edit.xds.EditXCAiRespondingGatewayPage;
-import org.dcm4chee.wizard.edit.xds.EditXDSRegistryPage;
+import org.dcm4chee.wizard.edit.xds.XCAInitiatingGatewayEditPage;
+import org.dcm4chee.wizard.edit.xds.XCARespondingGatewayEditPage;
+import org.dcm4chee.wizard.edit.xds.XCAiInitiatingGatewayEditPage;
+import org.dcm4chee.wizard.edit.xds.XCAiRespondingGatewayEditPage;
+import org.dcm4chee.wizard.edit.xds.XDSRegistryEditPage;
+import org.dcm4chee.wizard.edit.xds.XDSRepositoryEditPage;
 import org.dcm4chee.wizard.icons.ImageManager;
 import org.dcm4chee.wizard.icons.behaviour.ImageSizeBehaviour;
 import org.dcm4chee.wizard.model.ApplicationEntityModel;
@@ -134,6 +135,7 @@ import org.dcm4chee.wizard.model.xds.XCARespondingGatewayModel;
 import org.dcm4chee.wizard.model.xds.XCAiInitiatingGatewayModel;
 import org.dcm4chee.wizard.model.xds.XCAiRespondingGatewayModel;
 import org.dcm4chee.wizard.model.xds.XDSRegistryModel;
+import org.dcm4chee.wizard.model.xds.XDSRepositoryModel;
 import org.dcm4chee.wizard.page.ApplyTransferCapabilityProfilePage;
 import org.dcm4chee.wizard.page.DicomEchoPage;
 import org.dcm4chee.wizard.tree.ConfigTableTree;
@@ -1107,23 +1109,23 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                     return new CreateOrEditCoercionPage(editWindow, (CoercionModel) rowModel.getObject().getModel(),
                             rowModel.getObject().getAncestor(2));
                 } else if (type.equals(ConfigTreeNode.TreeNodeType.XCAiInitiatingGateway)) {
-                    return new EditXCAiInitiatingGatewayPage(editWindow, (XCAiInitiatingGatewayModel) rowModel
+                    return new XCAiInitiatingGatewayEditPage(editWindow, (XCAiInitiatingGatewayModel) rowModel
                             .getObject().getModel(), rowModel.getObject().getAncestor(1));
                 } else if (type.equals(ConfigTreeNode.TreeNodeType.XCAInitiatingGateway)) {
-                    return new EditXCAInitiatingGatewayPage(editWindow, (XCAInitiatingGatewayModel) rowModel.getObject()
+                    return new XCAInitiatingGatewayEditPage(editWindow, (XCAInitiatingGatewayModel) rowModel.getObject()
                             .getModel(), rowModel.getObject().getAncestor(1));
                 } else if (type.equals(ConfigTreeNode.TreeNodeType.XCAiRespondingGateway)) {
-                    return new EditXCAiRespondingGatewayPage(editWindow, (XCAiRespondingGatewayModel) rowModel.getObject()
+                    return new XCAiRespondingGatewayEditPage(editWindow, (XCAiRespondingGatewayModel) rowModel.getObject()
                             .getModel(), rowModel.getObject().getAncestor(1));
                 } else if (type.equals(ConfigTreeNode.TreeNodeType.XCARespondingGateway)) {
-                    return new EditXCARespondingGatewayPage(editWindow, (XCARespondingGatewayModel) rowModel.getObject()
+                    return new XCARespondingGatewayEditPage(editWindow, (XCARespondingGatewayModel) rowModel.getObject()
                             .getModel(), rowModel.getObject().getAncestor(1));
                 } else if (type.equals(ConfigTreeNode.TreeNodeType.XDSRegistry)) {
-                    return new EditXDSRegistryPage(editWindow, (XDSRegistryModel) rowModel.getObject()
+                    return new XDSRegistryEditPage(editWindow, (XDSRegistryModel) rowModel.getObject()
                             .getModel(), rowModel.getObject().getAncestor(1));
-//                } else if (type.equals(ConfigTreeNode.TreeNodeType.AUDIT_LOGGER)) {
-//                    return new CreateOrEditAuditLoggerPage(editWindow, (AuditLoggerModel) rowModel.getObject()
-//                            .getModel(), rowModel.getObject().getAncestor(2));
+                } else if (type.equals(ConfigTreeNode.TreeNodeType.XDSRepository)) {
+                    return new XDSRepositoryEditPage(editWindow, (XDSRepositoryModel) rowModel.getObject()
+                            .getModel(), rowModel.getObject().getAncestor(1));
                 } else
                     return null;
             }

@@ -69,11 +69,11 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Michael Backhaus <michael.backhaus@agfa.com>
  */
-public class EditXCARespondingGatewayPage extends SecureSessionCheckPage{
+public class XCARespondingGatewayEditPage extends SecureSessionCheckPage{
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger log = LoggerFactory.getLogger(EditXCARespondingGatewayPage.class);
+    private static Logger log = LoggerFactory.getLogger(XCARespondingGatewayEditPage.class);
 
     // mandatory
     private Model<String> xdsApplicationNameModel;
@@ -84,7 +84,7 @@ public class EditXCARespondingGatewayPage extends SecureSessionCheckPage{
     // optional
     private Model<String> xdsSoapMsgLogDirModel;
 
-    public EditXCARespondingGatewayPage(final ModalWindow window, XCARespondingGatewayModel model, 
+    public XCARespondingGatewayEditPage(final ModalWindow window, XCARespondingGatewayModel model, 
             final ConfigTreeNode deviceNode) {
         super();
         try {
@@ -238,7 +238,7 @@ public class EditXCARespondingGatewayPage extends SecureSessionCheckPage{
                     ConfigTreeProvider.get().mergeDevice(device);
                     window.close(target);
                 } catch (Exception e) {
-                    log.error("{}: Error modifying XCAi Initating Gateway: {}", this, e);
+                    log.error("{}: Error modifying XCA Responding Gateway: {}", this, e);
                     if (log.isDebugEnabled())
                         e.printStackTrace();
                     throw new ModalWindowRuntimeException(e.getLocalizedMessage());

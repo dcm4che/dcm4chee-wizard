@@ -73,11 +73,11 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Michael Backhaus <michael.backhaus@agfa.com>
  */
-public class EditXDSRegistryPage extends SecureSessionCheckPage{
+public class XDSRegistryEditPage extends SecureSessionCheckPage{
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger log = LoggerFactory.getLogger(EditXDSRegistryPage.class);
+    private static Logger log = LoggerFactory.getLogger(XDSRegistryEditPage.class);
 
     private List<Boolean> booleanChoice = Arrays.asList(new Boolean[] { true, false });
 
@@ -96,7 +96,7 @@ public class EditXDSRegistryPage extends SecureSessionCheckPage{
     private Model<Boolean> xdsCheckMimetypeModel;
     private Model<Boolean> xdsPreMetadataCheckModel;
 
-    public EditXDSRegistryPage(final ModalWindow window, XDSRegistryModel model,
+    public XDSRegistryEditPage(final ModalWindow window, XDSRegistryModel model,
             final ConfigTreeNode deviceNode) {
         super();
         try {
@@ -301,7 +301,7 @@ public class EditXDSRegistryPage extends SecureSessionCheckPage{
                     ConfigTreeProvider.get().mergeDevice(device);
                     window.close(target);
                 } catch (Exception e) {
-                    log.error("{}: Error modifying XCA Initating Gateway: {}", this, e);
+                    log.error("{}: Error modifying XDS Registry: {}", this, e);
                     if (log.isDebugEnabled())
                         e.printStackTrace();
                     throw new ModalWindowRuntimeException(e.getLocalizedMessage());

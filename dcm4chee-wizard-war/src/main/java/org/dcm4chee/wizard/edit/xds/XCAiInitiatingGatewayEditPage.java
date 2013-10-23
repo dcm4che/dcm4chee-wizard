@@ -73,11 +73,11 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Michael Backhaus <michael.backhaus@agfa.com>
  */
-public class EditXCAiInitiatingGatewayPage extends SecureSessionCheckPage{
+public class XCAiInitiatingGatewayEditPage extends SecureSessionCheckPage{
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger log = LoggerFactory.getLogger(EditXCAiInitiatingGatewayPage.class);
+    private static Logger log = LoggerFactory.getLogger(XCAiInitiatingGatewayEditPage.class);
 
     private List<Boolean> booleanChoice = Arrays.asList(new Boolean[] { true, false });
 
@@ -92,7 +92,7 @@ public class EditXCAiInitiatingGatewayPage extends SecureSessionCheckPage{
     private Model<Boolean> xdsAsyncModel;
     private Model<Boolean> xdsAsyncHandlerModel;
 
-    public EditXCAiInitiatingGatewayPage(final ModalWindow window, XCAiInitiatingGatewayModel model, 
+    public XCAiInitiatingGatewayEditPage(final ModalWindow window, XCAiInitiatingGatewayModel model, 
             final ConfigTreeNode deviceNode) {
         super();
         try {
