@@ -955,43 +955,74 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
 
         XCAiInitiatingGWCfg xcaiInit = device.getDeviceExtension(XCAiInitiatingGWCfg.class);
         Boolean xcaiInitCheck = xcaiInitiatingGatewayModel.getObject();
-        if (xcaiInitCheck && xcaiInit == null)
-            device.addDeviceExtension(new XCAiInitiatingGWCfg());
+        if (xcaiInitCheck && xcaiInit == null) {
+            XCAiInitiatingGWCfg xcai = new XCAiInitiatingGWCfg();
+            xcai.setApplicationName("SAMPLE^APPLICATION");
+            xcai.setHomeCommunityID("SAMPLE-ID");
+            xcai.setRespondingGWURLs(new String[] {"SAMPLE|URL"});
+            device.addDeviceExtension(xcai);
+        }
         else if (xcaiInit != null && !xcaiInitCheck)
                 device.removeDeviceExtension(xcaiInit);
 
         XCAInitiatingGWCfg xcaInit = device.getDeviceExtension(XCAInitiatingGWCfg.class);
         Boolean xcaInitCheck = xcaInitiatingGatewayModel.getObject();
-        if (xcaInitCheck && xcaInit == null)
-            device.addDeviceExtension(new XCAInitiatingGWCfg());
+        if (xcaInitCheck && xcaInit == null) {
+            XCAInitiatingGWCfg xca = new XCAInitiatingGWCfg();
+            xca.setApplicationName("SAMPLE^APPLICATION");
+            xca.setHomeCommunityID("SAMPLE-ID");
+            xca.setRespondingGWURLs(new String[] {"SAMPLE|URL"});
+            device.addDeviceExtension(xca);
+        }
         else if (xcaInit != null && !xcaInitCheck)
                 device.removeDeviceExtension(xcaInit);
 
         XCAiRespondingGWCfg xcaiResp = device.getDeviceExtension(XCAiRespondingGWCfg.class);
         Boolean xcaiRespCheck = xcaiRespondingGatewayModel.getObject();
-        if (xcaiRespCheck && xcaiResp == null)
-            device.addDeviceExtension(new XCAiRespondingGWCfg());
+        if (xcaiRespCheck && xcaiResp == null) {
+            XCAiRespondingGWCfg xcai = new XCAiRespondingGWCfg();
+            xcai.setApplicationName("SAMPLE^APPLICATION");
+            xcai.setHomeCommunityID("SAMPLE-ID");
+            xcai.setXDSiSourceURLs(new String[] {"SAMPLE|URL"});
+            device.addDeviceExtension(xcai);
+        }
         else if (xcaiResp != null && !xcaiRespCheck)
                 device.removeDeviceExtension(xcaiResp);
 
         XCARespondingGWCfg xcaResp = device.getDeviceExtension(XCARespondingGWCfg.class);
         Boolean xcaRespCheck = xcaRespondingGatewayModel.getObject();
-        if (xcaRespCheck && xcaResp == null)
-            device.addDeviceExtension(new XCARespondingGWCfg());
+        if (xcaRespCheck && xcaResp == null) {
+            XCARespondingGWCfg xca = new XCARespondingGWCfg();
+            xca.setApplicationName("SAMPLE^APPLICATION");
+            xca.setHomeCommunityID("SAMPLE-ID");
+            xca.setRegistryURL("SAMPLE-URL");
+            xca.setRepositoryURLs(new String[] {"SAMPLE|URL"});
+            device.addDeviceExtension(xca);
+        }
         else if (xcaResp != null && !xcaRespCheck)
                 device.removeDeviceExtension(xcaResp);
 
         XdsRegistry xdsReg = device.getDeviceExtension(XdsRegistry.class);
         Boolean xdsRegCheck = xdsRegistryModel.getObject();
-        if (xdsRegCheck && xdsReg == null)
-            device.addDeviceExtension(new XdsRegistry());
+        if (xdsRegCheck && xdsReg == null) {
+            XdsRegistry xds = new XdsRegistry();
+            xds.setApplicationName("SAMPLE^APPLICATION");
+            xds.setAffinityDomain(new String[] {"SAMPLE-DOMAIN"});
+            xds.setAffinityDomainConfigDir("SAMPLE-DIR");
+            device.addDeviceExtension(xds);
+        }
         else if (xdsReg != null && !xdsRegCheck)
                 device.removeDeviceExtension(xdsReg);
 
         XdsRepository xdsRep = device.getDeviceExtension(XdsRepository.class);
         Boolean xdsRepCheck = xdsRepositoryModel.getObject();
-        if (xdsRepCheck && xdsRep == null)
-            device.addDeviceExtension(new XdsRepository());
+        if (xdsRepCheck && xdsRep == null) {
+            XdsRepository xds = new XdsRepository();
+            xds.setApplicationName("SAMPLE^APPLICATION");
+            xds.setRegistryURLs(new String[] {"SAMPLE-URL"});
+            xds.setRepositoryUID("SAMPLE-UID");
+            device.addDeviceExtension(xds);
+        }
         else if (xdsRep != null && !xdsRepCheck)
                 device.removeDeviceExtension(xdsRep);
     }

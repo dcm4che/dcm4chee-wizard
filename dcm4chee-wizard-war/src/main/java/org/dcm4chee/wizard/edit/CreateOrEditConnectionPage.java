@@ -446,10 +446,11 @@ public class CreateOrEditConnectionPage extends SecureSessionCheckPage {
 
             @Override
             protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
+                Connection connection = null;
                 try {
-                    Connection connection = connectionModel == null ? new Connection(commonNameModel.getObject(),
-                            hostnameModel.getObject()) : connectionModel.getConnection();
-
+                    connection = (connectionModel == null) 
+                            ? new Connection(commonNameModel.getObject(), hostnameModel.getObject()) 
+                            : connectionModel.getConnection();
                     connection.setHostname(hostnameModel.getObject());
                     connection.setCommonName(commonNameModel.getObject());
                     connection.setInstalled(installedModel.getObject());
@@ -477,14 +478,14 @@ public class CreateOrEditConnectionPage extends SecureSessionCheckPage {
                     connection.setResponseTimeout(responseTimeoutModel.getObject());
                     connection.setRetrieveTimeout(retrieveTimeoutModel.getObject());
                     connection.setIdleTimeout(idleTimeoutModel.getObject());
-
                     if (connectionModel == null)
                         ((DeviceModel) deviceNode.getModel()).getDevice().addConnection(connection);
                     ConfigTreeProvider.get().mergeDevice(connection.getDevice());
                     window.close(target);
                 } catch (Exception e) {
-                    log.error(this.getClass().toString() + ": " + "Error modifying connection: " + e.getMessage());
-                    log.debug("Exception", e);
+                    log.error("{}: Error saving connection: {}", this, e);
+                    if (log.isDebugEnabled())
+                        e.printStackTrace();
                     throw new ModalWindowRuntimeException(e.getLocalizedMessage());
                 }
             }
