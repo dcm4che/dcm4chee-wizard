@@ -39,8 +39,8 @@
 package org.dcm4chee.wizard.util;
 
 import java.util.EnumSet;
-import org.dcm4che.data.UID;
 
+import org.dcm4che.data.UID;
 import org.dcm4che.net.ApplicationEntity;
 import org.dcm4che.net.QueryOption;
 import org.dcm4che.net.TransferCapability;
@@ -129,7 +129,7 @@ public class TransferCapabilitiesUtils {
     }
 
     public static void addTCsToAE(ApplicationEntity ae) {
-
+        addVerificationStorageTransferCapabilities(ae);
         addTCs(ae, null, Role.SCP, IMAGE_CUIDS, IMAGE_TSUIDS);
         addTCs(ae, null, Role.SCP, VIDEO_CUIDS, VIDEO_TSUIDS);
         addTCs(ae, null, Role.SCP, OTHER_CUIDS, OTHER_TSUIDS);
@@ -137,5 +137,14 @@ public class TransferCapabilitiesUtils {
         addTCs(ae, null, Role.SCU, VIDEO_CUIDS, VIDEO_TSUIDS);
         addTCs(ae, null, Role.SCU, OTHER_CUIDS, OTHER_TSUIDS);
         addTCs(ae, EnumSet.allOf(QueryOption.class), Role.SCP, QUERY_CUIDS, UID.ImplicitVRLittleEndian);
+    }
+
+    private static void addVerificationStorageTransferCapabilities(ApplicationEntity ae) {
+        String cuid = UID.VerificationSOPClass;
+        String name = UID.nameOf(cuid).replace('/', ' ');
+        ae.addTransferCapability(new TransferCapability(name + " SCP", cuid, TransferCapability.Role.SCP,
+                UID.ImplicitVRLittleEndian));
+        ae.addTransferCapability(new TransferCapability(name + " SCU", cuid, TransferCapability.Role.SCU,
+                UID.ImplicitVRLittleEndian));
     }
 }
