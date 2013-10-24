@@ -1,5 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dicom>
+  <group name="Other">
+    <dicomTransferCapability>
+      <Name>Verification SOP Class</Name>
+      <SOPClass>1.2.840.10008.1.1</SOPClass>
+      <dicomTransferSyntax>1.2.840.10008.1.2</dicomTransferSyntax>
+    </dicomTransferCapability>
+    <dicomTransferCapability>
+      <Name>Storage Commitment Push Model SOP Class</Name>
+      <SOPClass>1.2.840.10008.1.20.1</SOPClass>
+      <dicomTransferSyntax>1.2.840.10008.1.2</dicomTransferSyntax>
+      <dicomTransferSyntax>1.2.840.10008.1.2.1</dicomTransferSyntax>
+      <dicomTransferSyntax>1.2.840.10008.1.2.1.99</dicomTransferSyntax>
+      <dicomTransferSyntax>1.2.840.10008.1.2.2</dicomTransferSyntax>
+    </dicomTransferCapability>
+    <dicomTransferCapability>
+      <Name>Modality Performed Procedure Step SOP Class</Name>
+      <SOPClass>1.2.840.10008.3.1.2.3.3</SOPClass>
+      <dicomTransferSyntax>1.2.840.10008.1.2</dicomTransferSyntax>
+      <dicomTransferSyntax>1.2.840.10008.1.2.1</dicomTransferSyntax>
+      <dicomTransferSyntax>1.2.840.10008.1.2.1.99</dicomTransferSyntax>
+      <dicomTransferSyntax>1.2.840.10008.1.2.2</dicomTransferSyntax>
+    </dicomTransferCapability>
+  </group>
   <group name="Image Storage">
     <dicomTransferCapability>
       <Name>Nuclear Medicine Image Storage</Name>
@@ -1098,14 +1121,6 @@
       <dicomTransferSyntax>1.2.840.10008.1.2.2</dicomTransferSyntax>
     </dicomTransferCapability>
     <dicomTransferCapability>
-      <Name>Storage Commitment Push Model SOP Class</Name>
-      <SOPClass>1.2.840.10008.1.20.1</SOPClass>
-      <dicomTransferSyntax>1.2.840.10008.1.2</dicomTransferSyntax>
-      <dicomTransferSyntax>1.2.840.10008.1.2.1</dicomTransferSyntax>
-      <dicomTransferSyntax>1.2.840.10008.1.2.1.99</dicomTransferSyntax>
-      <dicomTransferSyntax>1.2.840.10008.1.2.2</dicomTransferSyntax>
-    </dicomTransferCapability>
-    <dicomTransferCapability>
       <Name>MR Spectroscopy Storage</Name>
       <SOPClass>1.2.840.10008.5.1.4.1.1.4.2</SOPClass>
       <dicomTransferSyntax>1.2.840.10008.1.2</dicomTransferSyntax>
@@ -1131,11 +1146,6 @@
       <dicomTransferSyntax>1.2.840.10008.1.2.4.80</dicomTransferSyntax>
     </dicomTransferCapability>
     <dicomTransferCapability>
-      <Name>Verification SOP Class</Name>
-      <SOPClass>1.2.840.10008.1.1</SOPClass>
-      <dicomTransferSyntax>1.2.840.10008.1.2</dicomTransferSyntax>
-    </dicomTransferCapability>
-    <dicomTransferCapability>
       <Name>Key Object Selection Document Storage</Name>
       <SOPClass>1.2.840.10008.5.1.4.1.1.88.59</SOPClass>
       <dicomTransferSyntax>1.2.840.10008.1.2</dicomTransferSyntax>
@@ -1154,14 +1164,6 @@
     <dicomTransferCapability>
       <Name>Raw Data Storage</Name>
       <SOPClass>1.2.840.10008.5.1.4.1.1.66</SOPClass>
-      <dicomTransferSyntax>1.2.840.10008.1.2</dicomTransferSyntax>
-      <dicomTransferSyntax>1.2.840.10008.1.2.1</dicomTransferSyntax>
-      <dicomTransferSyntax>1.2.840.10008.1.2.1.99</dicomTransferSyntax>
-      <dicomTransferSyntax>1.2.840.10008.1.2.2</dicomTransferSyntax>
-    </dicomTransferCapability>
-    <dicomTransferCapability>
-      <Name>Modality Performed Procedure Step SOP Class</Name>
-      <SOPClass>1.2.840.10008.3.1.2.3.3</SOPClass>
       <dicomTransferSyntax>1.2.840.10008.1.2</dicomTransferSyntax>
       <dicomTransferSyntax>1.2.840.10008.1.2.1</dicomTransferSyntax>
       <dicomTransferSyntax>1.2.840.10008.1.2.1.99</dicomTransferSyntax>
