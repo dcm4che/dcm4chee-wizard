@@ -629,7 +629,7 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
     }
 
     private void addXcaiInitiatingGatewayCheckBox(final WebMarkupContainer xdsWMC, ExtendedForm form) {
-        AjaxFormSubmitBehavior onClick1 = new AjaxFormSubmitBehavior(form, "change") {
+        AjaxFormSubmitBehavior onClick = new AjaxFormSubmitBehavior(form, "change") {
             
             private static final long serialVersionUID = 1L;
             
@@ -656,7 +656,7 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
                 }
             }
         };
-        xcaiInitiatingGatewayCheckBox.add(onClick1);
+        xcaiInitiatingGatewayCheckBox.add(onClick);
         xdsWMC.add(xcaiInitiatingGatewayCheckBox);
     }
 

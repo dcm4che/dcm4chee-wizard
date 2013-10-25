@@ -24,10 +24,6 @@
 						<span class="edit-desc" wicket:id="hostname.label" />
 						<input class="edit-value" wicket:id="hostname" type="text" />
 					</div>
-					<div class="edit-table-row">
-						<span class="edit-desc" wicket:id="port.label" />
-						<input class="edit-value" wicket:id="port" type="text" />
-					</div>
 					<div  class="edit-buttons">
 						<span class="edit-desc" wicket:id="toggleOptional.label" />
 						<input class="edit-value" wicket:id="toggleOptional" type="checkbox" />
@@ -38,12 +34,18 @@
 							<input class="edit-value" wicket:id="commonName" type="text" />
 						</div>
 						<div class="edit-table-row">
-							<span class="edit-desc" wicket:id="installed.label" />
-							<select class="edit-value" wicket:id="installed" />
-						</div>
-						<div class="edit-table-row">
 							<span class="edit-desc" wicket:id="protocol.label" />
 							<select class="edit-value" wicket:id="protocol" />
+						</div>
+                        <div wicket:id="port">
+                          <div class="edit-table-row">
+                            <span class="edit-desc" wicket:id="port.label" /> <input class="edit-value" wicket:id="port"
+                              type="text" />
+                          </div>
+                        </div>
+                        <div class="edit-table-row">
+							<span class="edit-desc" wicket:id="installed.label" />
+							<select class="edit-value" wicket:id="installed" />
 						</div>
 						<div class="edit-table-row" style="height: 115px;">
 							<span class="edit-desc" wicket:id="tlsProtocol.label" />

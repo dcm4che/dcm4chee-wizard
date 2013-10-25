@@ -49,6 +49,8 @@ import java.util.List;
 
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
+import org.apache.wicket.ajax.form.AjaxFormSubmitBehavior;
 import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.ajax.markup.html.form.AjaxFallbackButton;
 import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxButton;
@@ -82,6 +84,7 @@ import org.dcm4chee.wizard.model.StringArrayModel;
 import org.dcm4chee.wizard.model.TlsCipherSuiteCollectionModel;
 import org.dcm4chee.wizard.tree.ConfigTreeNode;
 import org.dcm4chee.wizard.tree.ConfigTreeProvider;
+import org.dcm4chee.wizard.tree.ConfigTreeProvider.ConfigurationType;
 import org.dcm4chee.wizard.validator.ConnectionValidator;
 import org.dcm4chee.wizard.validator.HostnameValidator;
 import org.slf4j.Logger;
@@ -180,7 +183,7 @@ public class CreateOrEditConnectionPage extends SecureSessionCheckPage {
                 hostnameModel = Model.of();
                 commonNameModel = Model.of();
                 installedModel = Model.of();
-                portModel = Model.of(11112);
+                portModel = Model.of();
                 tlsCipherSuitesModel = new TlsCipherSuiteCollectionModel(null, 3);
                 httpProxyModel = Model.of();
                 tlsNeedClientAuthModel = Model.of(true);
@@ -228,13 +231,6 @@ public class CreateOrEditConnectionPage extends SecureSessionCheckPage {
                 hostnameTextField = new TextField<String>("hostname", hostnameModel).add(new HostnameValidator())
                         .setRequired(true));
 
-        FormComponent<Integer> portTextField;
-        form.add(new Label("port.label", new ResourceModel("dicom.edit.connection.port.label"))).add(
-                portTextField = new TextField<Integer>("port", portModel).setType(Integer.class).add(
-                        new RangeValidator<Integer>(1, 65535)));
-        if (portModel.getObject().equals(-1))
-            portTextField.setModelObject(null);
-
         final WebMarkupContainer optionalContainer = new WebMarkupContainer("optional");
         form.add(optionalContainer.setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true).setVisible(false));
 
@@ -242,6 +238,28 @@ public class CreateOrEditConnectionPage extends SecureSessionCheckPage {
         optionalContainer.add(
                 new Label("commonName.label", new ResourceModel("dicom.edit.connection.optional.commonName.label")))
                 .add(commonNameTextField = new TextField<String>("commonName", commonNameModel));
+
+        WebMarkupContainer portWMC = new WebMarkupContainer("port") {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public boolean isVisible() {
+                return !((protocolModel.getObject().equals(Connection.Protocol.SYSLOG_TLS)
+                        || protocolModel.getObject().equals(Connection.Protocol.SYSLOG_UDP))
+                        && (deviceNode.getConfigurationType().equals(ConfigurationType.Proxy)
+                                || deviceNode.getConfigurationType().equals(ConfigurationType.XDS)));
+            }  
+        };
+        portWMC.setOutputMarkupId(true);
+        portWMC.setOutputMarkupPlaceholderTag(true);
+        FormComponent<Integer> portTextField;
+        portWMC.add(new Label("port.label", new ResourceModel("dicom.edit.connection.optional.port.label")))
+                .add(portTextField = new TextField<Integer>("port", portModel).setType(Integer.class).add(
+                        new RangeValidator<Integer>(1, 65535)));
+        optionalContainer.add(portWMC);
+
+//        if (portModel.getObject().equals(-1))
+//            portTextField.setModelObject(null);
 
         optionalContainer.add(
                 new Label("installed.label", new ResourceModel("dicom.edit.connection.optional.installed.label"))).add(
@@ -298,7 +316,25 @@ public class CreateOrEditConnectionPage extends SecureSessionCheckPage {
                             public String getIdValue(Connection.Protocol object, int index) {
                                 return String.valueOf(index);
                             }
-                        })).setNullValid(false));
+                        })).setNullValid(false).add(new AjaxFormComponentUpdatingBehavior("onchange") {
+
+                    private static final long serialVersionUID = 1L;
+
+                    @Override
+                    protected void onUpdate(AjaxRequestTarget target) {
+                        target.add(optionalContainer.get("port"));
+                    }
+                }));
+        ;
+        AjaxFormSubmitBehavior onProtocolChange = new AjaxFormSubmitBehavior(form, "change") {
+            
+            private static final long serialVersionUID = 1L;
+            
+            protected void onEvent(final AjaxRequestTarget target) {
+                super.onEvent(target);
+            }
+        };
+        protocolDropDown.add(onProtocolChange);
 
         optionalContainer.add(
                 new Label("tlsProtocol.label", new ResourceModel("dicom.edit.connection.optional.tlsProtocol.label")))
