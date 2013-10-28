@@ -101,6 +101,7 @@ public class CreateOrEditForwardRulePage extends SecureSessionCheckPage {
     private StringArrayModel sopClassModel;
     private Model<Boolean> runPIXQueryModel;
     private Model<String> mpps2DoseSrTemplateURIModel;
+    private Model<String> doseSrIODTemplateURIModel;
     private Model<String> descriptionModel;
 
     public CreateOrEditForwardRulePage(final ModalWindow window, final ForwardRuleModel forwardRuleModel,
@@ -136,6 +137,7 @@ public class CreateOrEditForwardRulePage extends SecureSessionCheckPage {
             sopClassModel = new StringArrayModel(null);
             runPIXQueryModel = Model.of(false);
             mpps2DoseSrTemplateURIModel = Model.of();
+            doseSrIODTemplateURIModel = Model.of();
             descriptionModel = Model.of();
         } else {
             ForwardRule forwardRule = forwardRuleModel.getForwardRule();
@@ -151,6 +153,7 @@ public class CreateOrEditForwardRulePage extends SecureSessionCheckPage {
             sopClassModel = new StringArrayModel(forwardRule.getSopClasses().toArray(new String[0]));
             runPIXQueryModel = Model.of(forwardRule.isRunPIXQuery());
             mpps2DoseSrTemplateURIModel = Model.of(forwardRule.getMpps2DoseSrTemplateURI());
+            doseSrIODTemplateURIModel = Model.of(forwardRule.getDoseSrIODTemplateURI());
             descriptionModel = Model.of(forwardRule.getDescription());
         }
 
@@ -274,6 +277,11 @@ public class CreateOrEditForwardRulePage extends SecureSessionCheckPage {
                 new TextField<String>("mpps2DoseSrTemplateURI", mpps2DoseSrTemplateURIModel));
 
         optionalContainer.add(
+                new Label("doseSrIODTemplateURI.label", new ResourceModel(
+                        "dicom.edit.forwardRule.optional.doseSrIODTemplateURI.label"))).add(
+                new TextField<String>("doseSrIODTemplateURI", doseSrIODTemplateURIModel));
+
+        optionalContainer.add(
                 new Label("description.label", new ResourceModel("dicom.edit.forwardRule.optional.description.label")))
                 .add(new TextField<String>("description", descriptionModel));
 
@@ -311,6 +319,7 @@ public class CreateOrEditForwardRulePage extends SecureSessionCheckPage {
                     forwardRule.setSopClasses(Arrays.asList(sopClassModel.getArray()));
                     forwardRule.setRunPIXQuery(runPIXQueryModel.getObject());
                     forwardRule.setMpps2DoseSrTemplateURI(mpps2DoseSrTemplateURIModel.getObject());
+                    forwardRule.setDoseSrIODTemplateURI(doseSrIODTemplateURIModel.getObject());
                     forwardRule.setDescription(descriptionModel.getObject());
 
                     ProxyAEExtension proxyAEExtension = ((ApplicationEntityModel) aeNode.getModel())
