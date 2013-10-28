@@ -860,14 +860,24 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                             int responseCode = connection.getResponseCode();
                             connection.disconnect();
 
-                            if (responseCode != 204)
-                                throw new Exception("Expected response 204, but was " + connection.getResponseCode()
-                                        + ". <br />" + connection.getResponseMessage());
+                            if (responseCode != 204) {
+                                if (responseCode == 404) {
+                                    String msg = "The server has not found anything matching the Request-URI "
+                                            + connection.getURL().toString() + ", HTTP Status "
+                                            + connection.getResponseCode() + ": " + connection.getResponseMessage();
+                                    throw new Exception(msg);
+                                }
+                                else
+                                    throw new Exception("</br>Expected response 204, but was "
+                                            + connection.getResponseCode() + ": " + connection.getResponseMessage());
+                            }
 
                             ((WizardApplication) getApplication()).getDicomConfigurationManager().clearReload(
                                     rowModel.getObject().getName());
                         } catch (Exception e) {
-                            log.error("Error reloading configuration of connected device", e);
+                            log.error("Error reloading configuration of connected device: " + e.getMessage());
+                            if (log.isDebugEnabled())
+                                e.printStackTrace();
                             resultMessage = new StringResourceModel("dicom.reload.message.failed", this, null,
                                     new Object[] { e.getMessage() });
 
@@ -935,7 +945,9 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                                     : "dicom.status.message.warning", this, null);
                             image = result ? ImageManager.IMAGE_WIZARD_RUNNING : ImageManager.IMAGE_WIZARD_NOT_RUNNING;
                         } catch (Exception e) {
-                            log.warn("Error retrieving status of connected device", e);
+                            log.error("Error retrieving status of connected device: " + e.getMessage());
+                            if (log.isDebugEnabled())
+                                e.printStackTrace();
                             resultMessage = new StringResourceModel("dicom.status.message.failed", this, null,
                                     new Object[] { e.getMessage() });
                             image = ImageManager.IMAGE_WIZARD_NOT_RUNNING;
@@ -953,7 +965,9 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                             : "dicom.status.message.warning", BasicConfigurationPanel.this, null);
                     image = result ? ImageManager.IMAGE_WIZARD_RUNNING : ImageManager.IMAGE_WIZARD_NOT_RUNNING;
                 } catch (Exception e) {
-                    log.warn("Error retrieving status of connected device", e);
+                    log.error("Error retrieving status of connected device: " + e.getMessage());
+                    if (log.isDebugEnabled())
+                        e.printStackTrace();
                     resultMessage = new StringResourceModel("dicom.status.message.failed",
                             BasicConfigurationPanel.this, null, new Object[] { e.getMessage() });
                     image = ImageManager.IMAGE_WIZARD_NOT_RUNNING;
