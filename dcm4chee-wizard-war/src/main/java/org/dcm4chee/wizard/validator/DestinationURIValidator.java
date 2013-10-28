@@ -62,6 +62,10 @@ public class DestinationURIValidator extends StringValidator {
     public void validate(IValidatable<String> validatable) {
         Set<String> labeledURISet = new HashSet<String>();
         for (String uri : validatable.getValue().split("\r\n")) {
+            if (uri.startsWith("AET:")) {
+                validatable.error(new ValidationError().addKey("DestinationURIValidator.wrongSyntax"));
+                return;
+            }
             if (labeledURISet.contains(uri)) {
                 validatable.error(new ValidationError().addKey("DestinationURIValidator.duplicateEntries"));
                 return;
