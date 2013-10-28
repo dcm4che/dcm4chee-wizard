@@ -81,7 +81,6 @@ import org.dcm4chee.wizard.model.ConnectionModel;
 import org.dcm4chee.wizard.model.DefaultableModel;
 import org.dcm4chee.wizard.model.DeviceModel;
 import org.dcm4chee.wizard.model.StringArrayModel;
-import org.dcm4chee.wizard.model.TlsCipherSuiteCollectionModel;
 import org.dcm4chee.wizard.tree.ConfigTreeNode;
 import org.dcm4chee.wizard.tree.ConfigTreeProvider;
 import org.dcm4chee.wizard.tree.ConfigTreeProvider.ConfigurationType;
@@ -106,7 +105,7 @@ public class CreateOrEditConnectionPage extends SecureSessionCheckPage {
     private Model<String> commonNameModel;
     private Model<Boolean> installedModel;
     private Model<Integer> portModel;
-    private TlsCipherSuiteCollectionModel tlsCipherSuitesModel;
+    private Model<ArrayList<String>> tlsCipherSuitesModel;
     private Model<String> httpProxyModel;
     private Model<Boolean> tlsNeedClientAuthModel;
     private Model<Connection.Protocol> protocolModel;
@@ -149,12 +148,11 @@ public class CreateOrEditConnectionPage extends SecureSessionCheckPage {
         installedRendererChoices
                 .add(new ResourceModel("dicom.installed.false.text").wrapOnAssignment(this).getObject());
 
-        ArrayList<String> tlsProtocols;
-        ArrayList<String> tlsCipherSuites;
+        ArrayList<String> tlsProtocols = new ArrayList<>(Arrays.asList("SSLv2Hello", "SSLv3", "TLSv1", "TLSv1.1",
+                "TLSv1.2"));
+        ArrayList<String> tlsCipherSuites = new ArrayList<>(Arrays.asList("SSL_RSA_WITH_NULL_SHA",
+                "TLS_RSA_WITH_AES_128_CBC_SHA", "SSL_RSA_WITH_3DES_EDE_CBC_SHA"));
         try {
-            tlsProtocols = (ArrayList<String>) loadConfiguration("tls-protocols.txt");
-            tlsCipherSuites = (ArrayList<String>) loadConfiguration("tls-ciphersuites.txt");
-
             tcpBacklogModel = new DefaultableModel<Integer>(Connection.DEF_BACKLOG);
             tcpConnectTimeoutModel = new DefaultableModel<Integer>(Connection.NO_TIMEOUT);
             tcpCloseDelayModel = new DefaultableModel<Integer>(Connection.DEF_SOCKETDELAY);
@@ -178,13 +176,19 @@ public class CreateOrEditConnectionPage extends SecureSessionCheckPage {
                     if (assignedTlsProtocols.contains(tlsProtocol))
                         tlsProtocolModel.getObject().add(tlsProtocol);
             }
-
+            tlsCipherSuitesModel = new Model<ArrayList<String>>();
+            tlsCipherSuitesModel.setObject(new ArrayList<String>());
+            if (connectionModel != null) {
+                List<String> assignedCipherSuites = Arrays.asList(connectionModel.getConnection().getTlsCipherSuites());
+                for (String tlsCipherSuite : tlsCipherSuites)
+                    if (assignedCipherSuites.contains(tlsCipherSuite))
+                        tlsCipherSuitesModel.getObject().add(tlsCipherSuite);
+            }
             if (connectionModel == null) {
                 hostnameModel = Model.of();
                 commonNameModel = Model.of();
                 installedModel = Model.of();
                 portModel = Model.of();
-                tlsCipherSuitesModel = new TlsCipherSuiteCollectionModel(null, 3);
                 httpProxyModel = Model.of();
                 tlsNeedClientAuthModel = Model.of(true);
                 protocolModel = Model.of(Connection.Protocol.DICOM);
@@ -197,7 +201,6 @@ public class CreateOrEditConnectionPage extends SecureSessionCheckPage {
                 commonNameModel = Model.of(connection.getCommonName());
                 installedModel = Model.of(connection.getInstalled());
                 portModel = Model.of(connection.getPort());
-                tlsCipherSuitesModel = new TlsCipherSuiteCollectionModel(connectionModel.getConnection(), 3);
                 httpProxyModel = Model.of(connection.getHttpProxy());
                 tlsNeedClientAuthModel = Model.of(connection.isTlsNeedClientAuth());
                 protocolModel = Model.of(connection.getProtocol());
@@ -244,22 +247,21 @@ public class CreateOrEditConnectionPage extends SecureSessionCheckPage {
 
             @Override
             public boolean isVisible() {
-                return !((protocolModel.getObject().equals(Connection.Protocol.SYSLOG_TLS)
-                        || protocolModel.getObject().equals(Connection.Protocol.SYSLOG_UDP))
-                        && (deviceNode.getConfigurationType().equals(ConfigurationType.Proxy)
-                                || deviceNode.getConfigurationType().equals(ConfigurationType.XDS)));
-            }  
+                return !((protocolModel.getObject().equals(Connection.Protocol.SYSLOG_TLS) || protocolModel.getObject()
+                        .equals(Connection.Protocol.SYSLOG_UDP)) && (deviceNode.getConfigurationType().equals(
+                        ConfigurationType.Proxy) || deviceNode.getConfigurationType().equals(ConfigurationType.XDS)));
+            }
         };
         portWMC.setOutputMarkupId(true);
         portWMC.setOutputMarkupPlaceholderTag(true);
         FormComponent<Integer> portTextField;
-        portWMC.add(new Label("port.label", new ResourceModel("dicom.edit.connection.optional.port.label")))
-                .add(portTextField = new TextField<Integer>("port", portModel).setType(Integer.class).add(
+        portWMC.add(new Label("port.label", new ResourceModel("dicom.edit.connection.optional.port.label"))).add(
+                portTextField = new TextField<Integer>("port", portModel).setType(Integer.class).add(
                         new RangeValidator<Integer>(1, 65535)));
         optionalContainer.add(portWMC);
 
-//        if (portModel.getObject().equals(-1))
-//            portTextField.setModelObject(null);
+        // if (portModel.getObject().equals(-1))
+        // portTextField.setModelObject(null);
 
         optionalContainer.add(
                 new Label("installed.label", new ResourceModel("dicom.edit.connection.optional.installed.label"))).add(
@@ -278,17 +280,10 @@ public class CreateOrEditConnectionPage extends SecureSessionCheckPage {
                     }
                 }).setNullValid(true));
 
-        optionalContainer.add(new Label("tlsCipherSuites.label", new ResourceModel(
-                "dicom.edit.connection.optional.tlsCipherSuites.label")));
-        DropDownChoice<String> tlsCipherSuiteDropDown1 = new DropDownChoice<String>("tlsCipherSuite1",
-                tlsCipherSuitesModel.getTlsCipherSuiteModel(0), tlsCipherSuites);
-        optionalContainer.add(tlsCipherSuiteDropDown1.setNullValid(true));
-        DropDownChoice<String> tlsCipherSuiteDropDown2 = new DropDownChoice<String>("tlsCipherSuite2",
-                tlsCipherSuitesModel.getTlsCipherSuiteModel(1), tlsCipherSuites);
-        optionalContainer.add(tlsCipherSuiteDropDown2.setNullValid(true));
-        DropDownChoice<String> tlsCipherSuiteDropDown3 = new DropDownChoice<String>("tlsCipherSuite3",
-                tlsCipherSuitesModel.getTlsCipherSuiteModel(2), tlsCipherSuites);
-        optionalContainer.add(tlsCipherSuiteDropDown3.setNullValid(true));
+        optionalContainer.add(
+                new Label("tlsCipherSuites.label", new ResourceModel("dicom.edit.connection.optional.tlsCipherSuites.label")))
+                .add(new CheckBoxMultipleChoice<String>("tlsCipherSuites", tlsCipherSuitesModel, new Model<ArrayList<String>>(
+                        tlsCipherSuites)));
 
         optionalContainer.add(
                 new Label("httpProxy.label", new ResourceModel("dicom.edit.connection.optional.httpProxy.label"))).add(
@@ -327,9 +322,9 @@ public class CreateOrEditConnectionPage extends SecureSessionCheckPage {
                 }));
         ;
         AjaxFormSubmitBehavior onProtocolChange = new AjaxFormSubmitBehavior(form, "change") {
-            
+
             private static final long serialVersionUID = 1L;
-            
+
             protected void onEvent(final AjaxRequestTarget target) {
                 super.onEvent(target);
             }
@@ -484,14 +479,13 @@ public class CreateOrEditConnectionPage extends SecureSessionCheckPage {
             protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
                 Connection connection = null;
                 try {
-                    connection = (connectionModel == null) 
-                            ? new Connection(commonNameModel.getObject(), hostnameModel.getObject()) 
-                            : connectionModel.getConnection();
+                    connection = (connectionModel == null) ? new Connection(commonNameModel.getObject(), hostnameModel
+                            .getObject()) : connectionModel.getConnection();
                     connection.setHostname(hostnameModel.getObject());
                     connection.setCommonName(commonNameModel.getObject());
                     connection.setInstalled(installedModel.getObject());
                     connection.setPort(portModel.getObject() == null ? -1 : portModel.getObject().intValue());
-                    connection.setTlsCipherSuites(tlsCipherSuitesModel.getTlsCipherSuites().toArray(new String[0]));
+                    connection.setTlsCipherSuites(tlsCipherSuitesModel.getObject().toArray(new String[0]));
                     connection.setHttpProxy(httpProxyModel.getObject());
                     connection.setTlsNeedClientAuth(tlsNeedClientAuthModel.getObject());
                     connection.setProtocol(protocolModel.getObject());
