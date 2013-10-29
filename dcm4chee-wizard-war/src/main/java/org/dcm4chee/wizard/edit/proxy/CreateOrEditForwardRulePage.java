@@ -40,8 +40,8 @@ package org.dcm4chee.wizard.edit.proxy;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
+import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.ajax.markup.html.form.AjaxFallbackButton;
@@ -80,6 +80,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert David <robert.david@agfa.com>
+ * @author Michael Backhaus <michael.backhaus@agfa.com>
  */
 public class CreateOrEditForwardRulePage extends SecureSessionCheckPage {
 
@@ -92,7 +93,7 @@ public class CreateOrEditForwardRulePage extends SecureSessionCheckPage {
     private StringArrayModel destinationURIModel;
 
     // optional
-    private Model<String> callingAETitleModel;
+    private StringArrayModel callingAETitleModel;
     private DimseCollectionModel dimsesModel;
     private Model<Boolean> exclusiveUseDefinedTCModel;
     private Model<String> scheduleDaysModel;
@@ -125,10 +126,10 @@ public class CreateOrEditForwardRulePage extends SecureSessionCheckPage {
         form.setResourceIdPrefix("dicom.edit.forwardRule.");
         add(form);
 
-        callingAETitleModel = Model.of();
         if (forwardRuleModel == null) {
             commonNameModel = Model.of();
             destinationURIModel = new StringArrayModel(null);
+            callingAETitleModel = new StringArrayModel(null);
             dimsesModel = new DimseCollectionModel(null, 5);
             exclusiveUseDefinedTCModel = Model.of(false);
             scheduleDaysModel = Model.of();
@@ -142,15 +143,14 @@ public class CreateOrEditForwardRulePage extends SecureSessionCheckPage {
         } else {
             ForwardRule forwardRule = forwardRuleModel.getForwardRule();
             commonNameModel = Model.of(forwardRule.getCommonName());
-            destinationURIModel = new StringArrayModel(forwardRule.getDestinationURI().toArray(new String[0]));
-            if (forwardRule.getCallingAETs() != null && forwardRule.getCallingAETs().size() > 0)
-                callingAETitleModel = Model.of(forwardRule.getCallingAETs().get(0));
+            destinationURIModel = new StringArrayModel(forwardRule.getDestinationURI().toArray(new String[forwardRule.getDestinationURI().size()]));
+            callingAETitleModel = new StringArrayModel(forwardRule.getCallingAETs().toArray(new String[forwardRule.getCallingAETs().size()]));
             dimsesModel = new DimseCollectionModel(forwardRuleModel.getForwardRule(), 5);
             exclusiveUseDefinedTCModel = Model.of(forwardRule.isExclusiveUseDefinedTC());
             scheduleDaysModel = Model.of(forwardRule.getReceiveSchedule().getDays());
             scheduleHoursModel = Model.of(forwardRule.getReceiveSchedule().getHours());
             useCallingAETitleModel = Model.of(forwardRule.getUseCallingAET());
-            sopClassModel = new StringArrayModel(forwardRule.getSopClasses().toArray(new String[0]));
+            sopClassModel = new StringArrayModel(forwardRule.getSopClasses().toArray(new String[forwardRule.getSopClasses().size()]));
             runPIXQueryModel = Model.of(forwardRule.isRunPIXQuery());
             mpps2DoseSrTemplateURIModel = Model.of(forwardRule.getMpps2DoseSrTemplateURI());
             doseSrIODTemplateURIModel = Model.of(forwardRule.getDoseSrIODTemplateURI());
@@ -168,48 +168,10 @@ public class CreateOrEditForwardRulePage extends SecureSessionCheckPage {
         final WebMarkupContainer optionalContainer = new WebMarkupContainer("optional");
         form.add(optionalContainer.setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true).setVisible(false));
 
-        List<String> aeTitles = null;
-        try {
-            aeTitles = Arrays.asList(ConfigTreeProvider.get().getUniqueAETitles());
-        } catch (ConfigurationException ce) {
-            log.error(this.getClass().toString() + ": " + "Error retrieving unique ae titles: " + ce.getMessage());
-            log.debug("Exception", ce);
-            throw new ModalWindowRuntimeException(ce.getLocalizedMessage());
-        }
-
-        final DropDownChoice<String> callingAETitleDropDownChoice = new DropDownChoice<String>("callingAETitle",
-                callingAETitleModel, aeTitles);
         optionalContainer.add(
                 new Label("callingAETitle.label", new ResourceModel(
                         "dicom.edit.forwardRule.optional.callingAETitle.label"))).add(
-                callingAETitleDropDownChoice.setNullValid(true).setOutputMarkupId(true)
-                        .setOutputMarkupPlaceholderTag(true));
-
-        final TextField<String> callingAETitleTextField = new TextField<String>("callingAETitle.freetext",
-                callingAETitleModel);
-        optionalContainer.add(callingAETitleTextField.setVisible(false).setOutputMarkupId(true)
-                .setOutputMarkupPlaceholderTag(true));
-
-        final Model<Boolean> toggleCallingAETitleModel = Model.of(false);
-        if (forwardRuleModel != null && callingAETitleModel.getObject() != null
-                && !aeTitles.contains(callingAETitleModel.getObject())) {
-            toggleCallingAETitleModel.setObject(true);
-            callingAETitleTextField.setVisible(true);
-            callingAETitleDropDownChoice.setVisible(false);
-        }
-
-        optionalContainer.add(new AjaxCheckBox("toggleCallingAETitle", toggleCallingAETitleModel) {
-
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            protected void onUpdate(AjaxRequestTarget target) {
-                callingAETitleDropDownChoice.setVisible(!toggleCallingAETitleModel.getObject());
-                callingAETitleTextField.setVisible(toggleCallingAETitleModel.getObject());
-                target.add(callingAETitleDropDownChoice);
-                target.add(callingAETitleTextField);
-            }
-        });
+                new TextArea<String>("callingAETitle", callingAETitleModel));
 
         optionalContainer
                 .add(new Label("dimse.label", new ResourceModel("dicom.edit.forwardRule.optional.dimse.label")));
@@ -295,6 +257,28 @@ public class CreateOrEditForwardRulePage extends SecureSessionCheckPage {
                     }
                 });
 
+        addSubmitButton(window, forwardRuleModel, aeNode, form);
+        addCancelButton(window, form);
+    }
+
+    private MarkupContainer addCancelButton(final ModalWindow window, final ExtendedForm form) {
+        return form.add(new AjaxFallbackButton("cancel", new ResourceModel("cancelBtn"), form) {
+
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
+                window.close(target);
+            }
+
+            @Override
+            protected void onError(AjaxRequestTarget arg0, Form<?> arg1) {
+            }
+        }.setDefaultFormProcessing(false));
+    }
+
+    private void addSubmitButton(final ModalWindow window, final ForwardRuleModel forwardRuleModel,
+            final ConfigTreeNode aeNode, final ExtendedForm form) {
         form.add(new IndicatingAjaxButton("submit", new ResourceModel("saveBtn"), form) {
 
             private static final long serialVersionUID = 1L;
@@ -307,8 +291,7 @@ public class CreateOrEditForwardRulePage extends SecureSessionCheckPage {
 
                     forwardRule.setCommonName(commonNameModel.getObject());
                     forwardRule.setDestinationURIs(Arrays.asList(destinationURIModel.getArray()));
-                    forwardRule.setCallingAETs(callingAETitleModel.getObject() == null ? new ArrayList<String>()
-                            : Arrays.asList(new String[] { callingAETitleModel.getObject() }));
+                    forwardRule.setCallingAETs(Arrays.asList(callingAETitleModel.getArray()));
                     forwardRule.setDimse(new ArrayList<Dimse>(dimsesModel.getDimses()));
                     forwardRule.setExclusiveUseDefinedTC(exclusiveUseDefinedTCModel.getObject());
                     Schedule schedule = new Schedule();
@@ -344,18 +327,5 @@ public class CreateOrEditForwardRulePage extends SecureSessionCheckPage {
                     target.add(form);
             }
         });
-        form.add(new AjaxFallbackButton("cancel", new ResourceModel("cancelBtn"), form) {
-
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
-                window.close(target);
-            }
-
-            @Override
-            protected void onError(AjaxRequestTarget arg0, Form<?> arg1) {
-            }
-        }.setDefaultFormProcessing(false));
     }
 }

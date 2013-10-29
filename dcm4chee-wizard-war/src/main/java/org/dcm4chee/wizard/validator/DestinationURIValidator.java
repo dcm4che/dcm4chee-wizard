@@ -69,8 +69,7 @@ public class DestinationURIValidator extends StringValidator {
             if (labeledURISet.contains(uri)) {
                 validatable.error(new ValidationError().addKey("DestinationURIValidator.duplicateEntries"));
                 return;
-            } else
-                labeledURISet.add(uri);
+            }
             if (uri.startsWith("aet:")) {
                 String aet = uri.substring(4);
                 try {
@@ -80,13 +79,13 @@ public class DestinationURIValidator extends StringValidator {
                             exists = true;
                     if (!exists)
                         validatable.error(new ValidationError().addKey("DestinationURIValidator.aetDoesNotExist"));
+                    else
+                        labeledURISet.add(uri);
                 } catch (ConfigurationException e) {
                     validatable.error(new ValidationError().addKey("AETitleValidator"));
                     log.error("Error validating AETs for DestinationURIs", e);
                 }
-            } else
-                // TODO: validate template
-                System.out.println("Not implemented yet");
+            }
         }
     }
 }
