@@ -60,32 +60,32 @@ public class DestinationURIValidator extends StringValidator {
 
     @Override
     public void validate(IValidatable<String> validatable) {
-    	Set<String> labeledURISet = new HashSet<String>();
-    	for (String uri : validatable.getValue().split("\r\n")) {
-    		if (labeledURISet.contains(uri)) {
-				validatable.error(new ValidationError()
-					.addKey("DestinationURIValidator.duplicateEntries"));
-				return;
-    		} else
-    			labeledURISet.add(uri);
-    		if (uri.startsWith("aet:")) {
-    			String aet = uri.substring(4);
-    			try {
-    				boolean exists = false;
-					for (String aeTitle : ConfigTreeProvider.get().getUniqueAETitles())
-						if (aet.equals(aeTitle))
-							exists = true;
-					if (!exists)
-						validatable.error(new ValidationError()
-	    					.addKey("DestinationURIValidator.aetDoesNotExist"));
-				} catch (ConfigurationException e) {
-					validatable.error(new ValidationError()
-    					.addKey("AETitleValidator"));
-					log.error("Error validating AETs for DestinationURIs", e);
-				}
-    		} else
-	  		// TODO: validate template
-	  		System.out.println("Not implemented yet");
-    	}
+        Set<String> labeledURISet = new HashSet<String>();
+        for (String uri : validatable.getValue().split("\r\n")) {
+            if (uri.startsWith("AET:")) {
+                validatable.error(new ValidationError().addKey("DestinationURIValidator.wrongSyntax"));
+                return;
+            }
+            if (labeledURISet.contains(uri)) {
+                validatable.error(new ValidationError().addKey("DestinationURIValidator.duplicateEntries"));
+                return;
+            }
+            if (uri.startsWith("aet:")) {
+                String aet = uri.substring(4);
+                try {
+                    boolean exists = false;
+                    for (String aeTitle : ConfigTreeProvider.get().getUniqueAETitles())
+                        if (aet.equals(aeTitle))
+                            exists = true;
+                    if (!exists)
+                        validatable.error(new ValidationError().addKey("DestinationURIValidator.aetDoesNotExist"));
+                    else
+                        labeledURISet.add(uri);
+                } catch (ConfigurationException e) {
+                    validatable.error(new ValidationError().addKey("AETitleValidator"));
+                    log.error("Error validating AETs for DestinationURIs", e);
+                }
+            }
+        }
     }
 }
