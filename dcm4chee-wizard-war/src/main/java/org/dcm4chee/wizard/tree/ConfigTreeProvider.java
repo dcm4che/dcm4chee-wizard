@@ -40,13 +40,14 @@ package org.dcm4chee.wizard.tree;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.wicket.Application;
 import org.apache.wicket.Component;
@@ -148,11 +149,12 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode, Str
     }
 
     private void createAENodes(ConfigTreeNode deviceNode, DeviceModel deviceModel) throws ConfigurationException {
-        deviceNode.getContainer(ConfigTreeNode.CONTAINER_APPLICATION_ENTITIES).removeChildren();
+        ConfigTreeNode aeContainer = deviceNode.getContainer(ConfigTreeNode.CONTAINER_APPLICATION_ENTITIES);
+        aeContainer.removeChildren();
         for (ApplicationEntityModel applicationEntityModel : deviceModel.getApplicationEntities().values()) {
             ConfigurationType configType = this.getConfigurationType(applicationEntityModel.getApplicationEntity());
             ConfigTreeNode aeNode = new ConfigTreeNode(
-                    deviceNode.getContainer(ConfigTreeNode.CONTAINER_APPLICATION_ENTITIES), 
+                    aeContainer, 
                     applicationEntityModel.getApplicationEntity().getAETitle(), 
                     ConfigTreeNode.TreeNodeType.APPLICATION_ENTITY,
                     configType, 
@@ -215,53 +217,60 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode, Str
     private void createTransferCapabilityNodes(ApplicationEntityModel applicationEntityModel, ConfigTreeNode aeNode) {
         Map<String, Group> groupMap = ((WizardApplication) forComponent.getApplication())
                 .getTransferCapabilityProfiles().asMap();
-
-        for (String groupName : groupMap.keySet()) {
-            ConfigTreeNode groupNode = new ConfigTreeNode(
-                    aeNode.getContainer(ConfigTreeNode.CONTAINER_TRANSFER_CAPABILITIES), groupName,
-                    ConfigTreeNode.TreeNodeType.CONTAINER_TRANSFER_CAPABILITY_TYPE, null);
-
-            for (TransferCapabilityModel transferCapabilityModel : applicationEntityModel.getTransferCapabilities())
+        ConfigTreeNode customGroupNode = null;
+        Set<String> groupNames = groupMap.keySet();
+        HashMap<String, ConfigTreeNode> tcGroups = new HashMap<>();
+        ConfigTreeNode tcContainer = aeNode.getContainer(ConfigTreeNode.CONTAINER_TRANSFER_CAPABILITIES);
+        List<TransferCapabilityModel> transferCapabilities = applicationEntityModel.getTransferCapabilities();
+        for (TransferCapabilityModel transferCapabilityModel : transferCapabilities) {
+            for (String groupName : groupNames) {
                 if (groupMap.get(groupName).asMap()
                         .containsKey(transferCapabilityModel.getTransferCapability().getSopClass())) {
                     transferCapabilityModel.setGroup(true);
-                    new ConfigTreeNode(
-                            groupNode,
-                            transferCapabilityModel.getTransferCapability().getCommonName() != null ? transferCapabilityModel
-                                    .getTransferCapability().getCommonName().length() > 64 ? transferCapabilityModel
-                                    .getTransferCapability().getCommonName().substring(0, 64) : transferCapabilityModel
-                                    .getTransferCapability().getCommonName() : transferCapabilityModel
-                                    .getTransferCapability().getRole()
-                                    + " "
-                                    + transferCapabilityModel.getTransferCapability().getSopClass(),
-                            ConfigTreeNode.TreeNodeType.TRANSFER_CAPABILITY, transferCapabilityModel);
+                    ConfigTreeNode group = tcGroups.get(groupName);
+                    if (group == null) {
+                        group = new ConfigTreeNode(tcContainer, groupName,
+                                ConfigTreeNode.TreeNodeType.CONTAINER_TRANSFER_CAPABILITY_TYPE, null);
+                        tcGroups.put(groupName, group);
+                    }
+                    addGroupNodeChild(group, transferCapabilityModel);
+                    break;
                 }
-            if (!groupNode.hasChildren())
-                groupNode.remove();
+            }
+            if (!transferCapabilityModel.hasGroup()) {
+                if (customGroupNode == null)
+                    customGroupNode = new ConfigTreeNode(
+                            tcContainer,
+                            new StringResourceModel("dicom.list.transferCapabilities.custom.label", forComponent, null),
+                            ConfigTreeNode.TreeNodeType.CONTAINER_TRANSFER_CAPABILITY_TYPE, null);
+                addCustomGroupNodeChild(customGroupNode, transferCapabilityModel);
+            }
         }
+    }
 
-        ConfigTreeNode groupNode = new ConfigTreeNode(
-                aeNode.getContainer(
-                        ConfigTreeNode.CONTAINER_TRANSFER_CAPABILITIES), 
-                        new StringResourceModel("dicom.list.transferCapabilities.custom.label", forComponent, null),
-                ConfigTreeNode.TreeNodeType.CONTAINER_TRANSFER_CAPABILITY_TYPE, null);
+    private void addGroupNodeChild(ConfigTreeNode group,
+            TransferCapabilityModel transferCapabilityModel) {
+        new ConfigTreeNode(group,
+                transferCapabilityModel.getTransferCapability().getCommonName() != null ? transferCapabilityModel
+                        .getTransferCapability().getCommonName().length() > 64 ? transferCapabilityModel
+                        .getTransferCapability().getCommonName().substring(0, 64) : transferCapabilityModel
+                        .getTransferCapability().getCommonName() : transferCapabilityModel.getTransferCapability()
+                        .getRole() + " " + transferCapabilityModel.getTransferCapability().getSopClass(),
+                ConfigTreeNode.TreeNodeType.TRANSFER_CAPABILITY, transferCapabilityModel);
+    }
 
-        for (TransferCapabilityModel transferCapabilityModel : applicationEntityModel.getTransferCapabilities())
-            if (!transferCapabilityModel.hasGroup())
-                new ConfigTreeNode(
-                        groupNode,
-                        transferCapabilityModel.getTransferCapability().getCommonName() != null ? transferCapabilityModel
-                                .getTransferCapability().getCommonName().length() > 64 ? transferCapabilityModel
+    private void addCustomGroupNodeChild(ConfigTreeNode customGroupNode,
+            TransferCapabilityModel transferCapabilityModel) {
+        new ConfigTreeNode(
+                customGroupNode,
+                transferCapabilityModel.getTransferCapability().getCommonName() != null ? transferCapabilityModel
+                        .getTransferCapability().getCommonName().length() > 64 ? transferCapabilityModel
                                 .getTransferCapability().getCommonName().substring(0, 64) : transferCapabilityModel
                                 .getTransferCapability().getCommonName() : transferCapabilityModel
                                 .getTransferCapability().getRole()
                                 + " "
                                 + transferCapabilityModel.getTransferCapability().getSopClass(),
-                        ConfigTreeNode.TreeNodeType.TRANSFER_CAPABILITY, transferCapabilityModel);
-        if (!groupNode.hasChildren())
-            groupNode.remove();
-
-        Collections.sort(aeNode.getContainer(ConfigTreeNode.CONTAINER_TRANSFER_CAPABILITIES).getChildren());
+                                ConfigTreeNode.TreeNodeType.TRANSFER_CAPABILITY, transferCapabilityModel);
     }
 
     private void createAuditLoggerNodes(ConfigTreeNode deviceNode, HL7DeviceModel deviceModel) {
