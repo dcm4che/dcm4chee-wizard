@@ -27,7 +27,7 @@
 		</init-param>
 		<init-param>
 			<param-name>proxyJarName</param-name>
-			<param-value>dcm4chee-proxy-service-1.0.0.jar</param-value>
+			<param-value>dcm4chee-proxy-service-1.0.1.jar</param-value>
 		</init-param>
 		<init-param>
 			<param-name>internalErrorPageClass</param-name>
