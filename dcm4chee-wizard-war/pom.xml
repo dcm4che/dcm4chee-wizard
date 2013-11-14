@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.dcm4chee</groupId>
     <artifactId>dcm4chee-wizard</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.0-SNAPSHOT</version>
   </parent>
   <artifactId>dcm4chee-wizard-war</artifactId>
   <packaging>war</packaging>
@@ -37,6 +37,9 @@
     </profile>
     <profile>
       <id>jdbc</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
       <properties>
         <project-classifier>jdbc</project-classifier>
         <profile.dependencies>org.jboss.logmanager,org.slf4j.impl,org.dcm4che.core,org.dcm4che.net,org.dcm4che.net-hl7,org.dcm4che.conf.api,org.dcm4che.conf.ldap,org.dcm4che.conf.ldap-hl7,org.dcm4che.conf.ldap-audit,org.dcm4che.conf.prefs,org.dcm4che.conf.prefs-hl7,org.dcm4che.conf.prefs-audit,org.dcm4che.emf,deployment.dcm4che-jdbc-prefs-ejb-1.0.0.jar</profile.dependencies>
@@ -45,9 +48,6 @@
     </profile>
     <profile>
       <id>jdbc-proxy</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
       <properties>
         <project-classifier>jdbc-proxy</project-classifier>
         <profile.dependencies>org.dcm4che.mime,org.jboss.logmanager,org.slf4j.impl,org.dcm4che.core,org.dcm4che.net,org.dcm4che.net-hl7,org.dcm4che.conf.api,org.dcm4che.conf.ldap,org.dcm4che.conf.ldap-hl7,org.dcm4che.conf.ldap-audit,org.dcm4che.conf.prefs,org.dcm4che.conf.prefs-hl7,org.dcm4che.conf.prefs-audit,org.dcm4che.emf,deployment.dcm4che-jdbc-prefs-ejb-1.0.0.jar</profile.dependencies>
