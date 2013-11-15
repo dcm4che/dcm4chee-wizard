@@ -102,7 +102,6 @@ public class CreateOrEditForwardRulePage extends SecureSessionCheckPage {
     private StringArrayModel sopClassModel;
     private Model<Boolean> runPIXQueryModel;
     private Model<String> mpps2DoseSrTemplateURIModel;
-    private Model<String> doseSrIODTemplateURIModel;
     private Model<String> descriptionModel;
 
     public CreateOrEditForwardRulePage(final ModalWindow window, final ForwardRuleModel forwardRuleModel,
@@ -138,7 +137,6 @@ public class CreateOrEditForwardRulePage extends SecureSessionCheckPage {
             sopClassModel = new StringArrayModel(null);
             runPIXQueryModel = Model.of(false);
             mpps2DoseSrTemplateURIModel = Model.of();
-            doseSrIODTemplateURIModel = Model.of();
             descriptionModel = Model.of();
         } else {
             ForwardRule forwardRule = forwardRuleModel.getForwardRule();
@@ -236,11 +234,6 @@ public class CreateOrEditForwardRulePage extends SecureSessionCheckPage {
                 new Label("mpps2DoseSrTemplateURI.label", new ResourceModel(
                         "dicom.edit.forwardRule.optional.mpps2DoseSrTemplateURI.label"))).add(
                 new TextField<String>("mpps2DoseSrTemplateURI", mpps2DoseSrTemplateURIModel));
-
-        optionalContainer.add(
-                new Label("doseSrIODTemplateURI.label", new ResourceModel(
-                        "dicom.edit.forwardRule.optional.doseSrIODTemplateURI.label"))).add(
-                new TextField<String>("doseSrIODTemplateURI", doseSrIODTemplateURIModel));
 
         optionalContainer.add(
                 new Label("description.label", new ResourceModel("dicom.edit.forwardRule.optional.description.label")))
