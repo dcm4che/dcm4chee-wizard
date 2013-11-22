@@ -87,7 +87,7 @@
     <web-resource-collection>
       <web-resource-name>Protected resources for web application
       </web-resource-name>
-      <url-pattern>/?*</url-pattern>
+      <url-pattern>/*</url-pattern>
       <http-method>GET</http-method>
       <http-method>POST</http-method>
     </web-resource-collection>
