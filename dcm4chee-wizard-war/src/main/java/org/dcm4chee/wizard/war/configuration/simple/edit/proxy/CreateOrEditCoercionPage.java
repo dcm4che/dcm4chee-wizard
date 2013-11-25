@@ -145,8 +145,6 @@ public class CreateOrEditCoercionPage extends SecureSessionCheckPage {
         dimseList.add(Dimse.C_MOVE_RQ);
         dimseList.add(Dimse.C_FIND_RQ);
         dimseList.add(Dimse.C_FIND_RSP);
-        dimseList.add(Dimse.C_MOVE_RSP);
-        dimseList.add(Dimse.C_GET_RSP);
         DropDownChoice<Dimse> dimseDropDown = new DropDownChoice<Dimse>("dimse", dimseModel, dimseList);
         form.add(dimseDropDown.setNullValid(false));
 
