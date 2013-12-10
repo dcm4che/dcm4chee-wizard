@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.dcm4chee</groupId>
   <artifactId>dcm4chee-wizard</artifactId>
-  <version>1.0.1</version>
+  <version>1.0.2</version>
   <packaging>pom</packaging>
   <name>Dcm4chee Wizard Components</name>
   <description>Wizard Application for DCM4CHEE Archive</description>
@@ -16,7 +16,7 @@
   <properties>
     <wicket.version>6.9.0</wicket.version>
     <wicket.security.version>6.9.0</wicket.security.version>
-    <dcm4chee.proxy.version>1.0.1</dcm4chee.proxy.version>
+    <dcm4chee.proxy.version>1.0.2</dcm4chee.proxy.version>
     <dcm4che.version>3.2.1</dcm4che.version>
     <device-name>dcm4chee-proxy</device-name>
   </properties>

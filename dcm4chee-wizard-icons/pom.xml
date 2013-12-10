@@ -5,7 +5,7 @@
     <parent>
     <groupId>org.dcm4chee</groupId>
     <artifactId>dcm4chee-wizard</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
   </parent>
   <artifactId>dcm4chee-wizard-icons</artifactId>
   <packaging>jar</packaging>
