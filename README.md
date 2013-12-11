@@ -8,7 +8,7 @@ specified in [DICOM 2011, Part 15][1], Annex H.
 
 In addition to the configuration of basic DICOM devices, the application has been
 extended to allow for the configuration of dcm4che specific DICOM implementations, such
-as the DICOM proxy (dcm4chee-proxy) and XDS.b applications (dcm4chee-xds).
+as the DICOM proxy (dcm4chee-proxy).
 
 Supported configuration backends include *LDAP* and *Java Preferences*.
 
