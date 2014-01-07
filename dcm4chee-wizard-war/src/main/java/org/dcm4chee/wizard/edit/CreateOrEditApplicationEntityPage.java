@@ -103,6 +103,7 @@ public class CreateOrEditApplicationEntityPage extends SecureSessionCheckPage {
     private Model<Boolean> enableAuditLogModel;
     private Model<String> spoolDirectoryModel;
     private Model<Boolean> deleteFailedDataWithoutRetryConfigurationModel;
+    private Model<Boolean> mergeStgCmtMessagesUsingANDLogicModel;
 
     // optional
     private StringArrayModel applicationClustersModel;
@@ -168,6 +169,7 @@ public class CreateOrEditApplicationEntityPage extends SecureSessionCheckPage {
                 enableAuditLogModel = Model.of(false);
                 spoolDirectoryModel = Model.of();
                 deleteFailedDataWithoutRetryConfigurationModel = Model.of(false);
+                mergeStgCmtMessagesUsingANDLogicModel = Model.of(false);
 
                 applicationClustersModel = new StringArrayModel(null);
                 descriptionModel = Model.of();
@@ -190,6 +192,8 @@ public class CreateOrEditApplicationEntityPage extends SecureSessionCheckPage {
                 spoolDirectoryModel = Model.of(isProxy ? proxyAEExtension.getSpoolDirectory() : null);
                 deleteFailedDataWithoutRetryConfigurationModel = Model.of(isProxy ? proxyAEExtension
                         .isDeleteFailedDataWithoutRetryConfiguration() : false);
+                mergeStgCmtMessagesUsingANDLogicModel = Model.of(isProxy ? proxyAEExtension
+                        .isMergeStgCmtMessagesUsingANDLogic() : false);
 
                 applicationClustersModel = new StringArrayModel(aeModel.getApplicationEntity().getApplicationClusters());
                 descriptionModel = Model.of(aeModel.getApplicationEntity().getDescription());
@@ -286,6 +290,12 @@ public class CreateOrEditApplicationEntityPage extends SecureSessionCheckPage {
                         "dicom.edit.applicationEntity.proxy.deleteFailedDataWithoutRetryConfiguration.label"))).add(
                 new CheckBox("deleteFailedDataWithoutRetryConfiguration",
                         deleteFailedDataWithoutRetryConfigurationModel));
+
+        proxyContainer.add(
+                new Label("mergeStgCmtMessagesUsingANDLogic.label", new ResourceModel(
+                        "dicom.edit.applicationEntity.proxy.mergeStgCmtMessagesUsingANDLogic.label"))).add(
+                new CheckBox("mergeStgCmtMessagesUsingANDLogic",
+                        mergeStgCmtMessagesUsingANDLogicModel));
 
         final WebMarkupContainer optionalContainer = new WebMarkupContainer("optional");
         form.add(optionalContainer.setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true).setVisible(false));
@@ -512,6 +522,7 @@ public class CreateOrEditApplicationEntityPage extends SecureSessionCheckPage {
                         proxyAEExtension.setProxyPIXConsumerApplication(proxyPIXConsumerApplicationModel.getObject());
                         proxyAEExtension.setRemotePIXManagerApplication(remotePIXManagerApplicationModel.getObject());
                         proxyAEExtension.setFallbackDestinationAET(fallbackDestinationAETModel.getObject());
+                        proxyAEExtension.setMergeStgCmtMessagesUsingANDLogic(mergeStgCmtMessagesUsingANDLogicModel.getObject());
 
                         TransferCapabilitiesUtils.addTCsToAE(applicationEntity);
                     }
