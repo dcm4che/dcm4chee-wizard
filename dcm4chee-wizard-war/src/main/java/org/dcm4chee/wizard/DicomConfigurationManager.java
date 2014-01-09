@@ -52,6 +52,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.wicket.request.Url;
+import org.apache.wicket.request.cycle.RequestCycle;
+import org.apache.wicket.request.http.WebRequest;
 import org.dcm4che.conf.api.ConfigurationException;
 import org.dcm4che.conf.api.DicomConfiguration;
 import org.dcm4che.conf.api.hl7.HL7Configuration;
@@ -227,6 +230,13 @@ public class DicomConfigurationManager implements Serializable {
                     String connectedDeviceUrl = System.getProperty("org.dcm4chee.device." + deviceName);
                     if (connectedDeviceUrl != null) {
                         try {
+                            if (!connectedDeviceUrl.startsWith("http")) {
+                                Url url = ((WebRequest) RequestCycle.get().getRequest()).getUrl();
+                                connectedDeviceUrl = url.getProtocol().concat("://")
+                                        .concat(url.getHost()).concat(":")
+                                        .concat(url.getPort().toString())
+                                        .concat(connectedDeviceUrl);
+                            }
                             connectedDeviceUrls
                                     .put(deviceName, StringUtils.replaceSystemProperties(connectedDeviceUrl));
                         } catch (Exception e) {
