@@ -63,13 +63,13 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.validation.ValidationError;
 import org.apache.wicket.validation.validator.RangeValidator;
-import org.dcm4che.conf.api.ConfigurationException;
-import org.dcm4che.data.Code;
-import org.dcm4che.data.Issuer;
-import org.dcm4che.net.Device;
-import org.dcm4che.net.DeviceExtension;
-import org.dcm4che.net.audit.AuditRecordRepository;
-import org.dcm4che.net.hl7.HL7DeviceExtension;
+import org.dcm4che3.conf.api.ConfigurationException;
+import org.dcm4che3.data.Code;
+import org.dcm4che3.data.Issuer;
+import org.dcm4che3.net.Device;
+import org.dcm4che3.net.DeviceExtension;
+import org.dcm4che3.net.audit.AuditRecordRepository;
+import org.dcm4che3.net.hl7.HL7DeviceExtension;
 import org.dcm4chee.proxy.conf.ProxyDeviceExtension;
 import org.dcm4chee.wizard.common.behavior.FocusOnLoadBehavior;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
@@ -959,7 +959,6 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
             XCAiInitiatingGWCfg xcai = new XCAiInitiatingGWCfg();
             xcai.setApplicationName("SAMPLE^APPLICATION");
             xcai.setHomeCommunityID("SAMPLE-ID");
-            xcai.setRespondingGWURLs(new String[] {"SAMPLE|URL"});
             device.addDeviceExtension(xcai);
         }
         else if (xcaiInit != null && !xcaiInitCheck)
@@ -971,7 +970,6 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
             XCAInitiatingGWCfg xca = new XCAInitiatingGWCfg();
             xca.setApplicationName("SAMPLE^APPLICATION");
             xca.setHomeCommunityID("SAMPLE-ID");
-            xca.setRespondingGWURLs(new String[] {"SAMPLE|URL"});
             device.addDeviceExtension(xca);
         }
         else if (xcaInit != null && !xcaInitCheck)
@@ -983,7 +981,6 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
             XCAiRespondingGWCfg xcai = new XCAiRespondingGWCfg();
             xcai.setApplicationName("SAMPLE^APPLICATION");
             xcai.setHomeCommunityID("SAMPLE-ID");
-            xcai.setXDSiSourceURLs(new String[] {"SAMPLE|URL"});
             device.addDeviceExtension(xcai);
         }
         else if (xcaiResp != null && !xcaiRespCheck)
@@ -995,8 +992,6 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
             XCARespondingGWCfg xca = new XCARespondingGWCfg();
             xca.setApplicationName("SAMPLE^APPLICATION");
             xca.setHomeCommunityID("SAMPLE-ID");
-            xca.setRegistryURL("SAMPLE-URL");
-            xca.setRepositoryURLs(new String[] {"SAMPLE|URL"});
             device.addDeviceExtension(xca);
         }
         else if (xcaResp != null && !xcaRespCheck)
@@ -1019,7 +1014,6 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         if (xdsRepCheck && xdsRep == null) {
             XdsRepository xds = new XdsRepository();
             xds.setApplicationName("SAMPLE^APPLICATION");
-            xds.setRegistryURLs(new String[] {"SAMPLE-URL"});
             xds.setRepositoryUID("SAMPLE-UID");
             device.addDeviceExtension(xds);
         }

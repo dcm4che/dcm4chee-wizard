@@ -40,8 +40,8 @@ package org.dcm4chee.wizard.model.hl7;
 
 import java.io.Serializable;
 
-import org.dcm4che.conf.api.ConfigurationException;
-import org.dcm4che.net.hl7.HL7Application;
+import org.dcm4che3.conf.api.ConfigurationException;
+import org.dcm4che3.net.hl7.HL7Application;
 import org.dcm4chee.wizard.model.ConfigNodeModel;
 
 /**

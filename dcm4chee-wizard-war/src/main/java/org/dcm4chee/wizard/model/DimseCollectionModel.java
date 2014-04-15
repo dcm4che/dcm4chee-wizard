@@ -43,7 +43,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.wicket.model.IModel;
-import org.dcm4che.net.Dimse;
+import org.dcm4che3.net.Dimse;
 import org.dcm4chee.proxy.conf.ForwardRule;
 
 /**

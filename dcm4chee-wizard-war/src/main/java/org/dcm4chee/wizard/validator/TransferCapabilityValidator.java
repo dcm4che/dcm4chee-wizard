@@ -44,9 +44,9 @@ import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.form.validation.AbstractFormValidator;
 import org.apache.wicket.model.StringResourceModel;
-import org.dcm4che.net.ApplicationEntity;
-import org.dcm4che.net.TransferCapability;
-import org.dcm4che.net.TransferCapability.Role;
+import org.dcm4che3.net.ApplicationEntity;
+import org.dcm4che3.net.TransferCapability;
+import org.dcm4che3.net.TransferCapability.Role;
 
 /**
  * @author Robert David <robert.david@agfa.com>
@@ -61,7 +61,7 @@ public class TransferCapabilityValidator extends AbstractFormValidator {
     private TextField<String> commonNameTextField;
 
     public TransferCapabilityValidator(ApplicationEntity applicationEntity, TextField<String> sopClassTextField,
-            DropDownChoice<org.dcm4che.net.TransferCapability.Role> roleDropDown, TextField<String> commonNameTextField) {
+            DropDownChoice<org.dcm4che3.net.TransferCapability.Role> roleDropDown, TextField<String> commonNameTextField) {
         this.applicationEntity = applicationEntity;
         this.sopClassTextField = sopClassTextField;
         this.roleDropDown = roleDropDown;

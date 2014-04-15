@@ -41,7 +41,7 @@ package org.dcm4chee.wizard.model;
 import java.io.Serializable;
 
 import org.apache.wicket.model.IModel;
-import org.dcm4che.data.Code;
+import org.dcm4che3.data.Code;
 
 /**
  * @author Robert David <robert.david@agfa.com>

@@ -45,7 +45,7 @@ import java.util.List;
 import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.IValidator;
 import org.apache.wicket.validation.ValidationError;
-import org.dcm4che.net.Connection;
+import org.dcm4che3.net.Connection;
 import org.dcm4chee.wizard.common.component.ModalWindowRuntimeException;
 import org.dcm4chee.wizard.model.ConnectionModel;
 import org.slf4j.Logger;

@@ -56,8 +56,8 @@ import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
-import org.dcm4che.conf.api.ConfigurationException;
-import org.dcm4che.net.Device;
+import org.dcm4che3.conf.api.ConfigurationException;
+import org.dcm4che3.net.Device;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
 import org.dcm4chee.wizard.common.component.ModalWindowRuntimeException;
 import org.dcm4chee.wizard.common.component.secure.SecureSessionCheckPage;
@@ -87,7 +87,7 @@ public class XCAiInitiatingGatewayEditPage extends SecureSessionCheckPage{
     private StringArrayModel xdsRespondingGatewayUrlModel;
 
     // optional
-    private StringArrayModel xdsiSrcUrlMappingModel;
+    //private StringArrayModel xdsiSrcUrlMappingModel;
     private Model<String> xdsSoapMsgLogDirModel;
     private Model<Boolean> xdsAsyncModel;
     private Model<Boolean> xdsAsyncHandlerModel;
@@ -148,9 +148,6 @@ public class XCAiInitiatingGatewayEditPage extends SecureSessionCheckPage{
                 new Label("xdsiSrcUrlMapping.label", 
                         new ResourceModel("dicom.edit.xds.optional.xdsiSrcUrlMapping.label"))
                 .setOutputMarkupPlaceholderTag(true));
-        optionalContainer.add(
-                new TextArea<String>("xdsiSrcUrlMapping", xdsiSrcUrlMappingModel)
-                .setType(String.class));
     }
 
     private void addToggleOptionalCheckBox(final ExtendedForm form, final Form<?> optionalContainer) {
@@ -220,8 +217,6 @@ public class XCAiInitiatingGatewayEditPage extends SecureSessionCheckPage{
         } else {
             xdsApplicationNameModel = Model.of(xcaiInit.getApplicationName());
             xdsHomeCommunityIdModel = Model.of(xcaiInit.getHomeCommunityID());
-            xdsRespondingGatewayUrlModel = new StringArrayModel(xcaiInit.getRespondingGWURLs());
-            xdsiSrcUrlMappingModel = new StringArrayModel(xcaiInit.getXDSiSourceURLs());
             xdsSoapMsgLogDirModel = Model.of(xcaiInit.getSoapLogDir());
             xdsAsyncModel = Model.of(xcaiInit.isAsync());
             xdsAsyncHandlerModel = Model.of(xcaiInit.isAsyncHandler());

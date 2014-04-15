@@ -56,11 +56,11 @@ import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
-import org.dcm4che.conf.api.AttributeCoercion;
-import org.dcm4che.conf.api.ConfigurationException;
-import org.dcm4che.net.ApplicationEntity;
-import org.dcm4che.net.Dimse;
-import org.dcm4che.net.TransferCapability.Role;
+import org.dcm4che3.conf.api.AttributeCoercion;
+import org.dcm4che3.conf.api.ConfigurationException;
+import org.dcm4che3.net.ApplicationEntity;
+import org.dcm4che3.net.Dimse;
+import org.dcm4che3.net.TransferCapability.Role;
 import org.dcm4chee.proxy.conf.ProxyAEExtension;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
 import org.dcm4chee.wizard.common.component.ModalWindowRuntimeException;
@@ -119,8 +119,8 @@ public class CreateOrEditCoercionPage extends SecureSessionCheckPage {
         aeTitleModel = Model.of();
         if (coercionModel == null) {
             commonNameModel = Model.of();
-            dimseModel = Model.of(org.dcm4che.net.Dimse.C_STORE_RQ);
-            transferRoleModel = Model.of(org.dcm4che.net.TransferCapability.Role.SCP);
+            dimseModel = Model.of(org.dcm4che3.net.Dimse.C_STORE_RQ);
+            transferRoleModel = Model.of(org.dcm4che3.net.TransferCapability.Role.SCP);
             labeledURIModel = Model.of();
             sopClassesModel = new StringArrayModel(null);
         } else {
@@ -151,10 +151,10 @@ public class CreateOrEditCoercionPage extends SecureSessionCheckPage {
         form.add(dimseDropDown.setNullValid(false));
 
         form.add(new Label("transferRole.label", new ResourceModel("dicom.edit.coercion.transferRole.label")));
-        ArrayList<org.dcm4che.net.TransferCapability.Role> transferSyntaxList = new ArrayList<org.dcm4che.net.TransferCapability.Role>();
-        transferSyntaxList.add(org.dcm4che.net.TransferCapability.Role.SCP);
-        transferSyntaxList.add(org.dcm4che.net.TransferCapability.Role.SCU);
-        DropDownChoice<org.dcm4che.net.TransferCapability.Role> roleDropDown = new DropDownChoice<org.dcm4che.net.TransferCapability.Role>(
+        ArrayList<org.dcm4che3.net.TransferCapability.Role> transferSyntaxList = new ArrayList<org.dcm4che3.net.TransferCapability.Role>();
+        transferSyntaxList.add(org.dcm4che3.net.TransferCapability.Role.SCP);
+        transferSyntaxList.add(org.dcm4che3.net.TransferCapability.Role.SCU);
+        DropDownChoice<org.dcm4che3.net.TransferCapability.Role> roleDropDown = new DropDownChoice<org.dcm4che3.net.TransferCapability.Role>(
                 "transferRole", transferRoleModel, transferSyntaxList);
         form.add(roleDropDown.setNullValid(false));
 

@@ -41,7 +41,7 @@ package org.dcm4chee.wizard.validator;
 import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.ValidationError;
 import org.apache.wicket.validation.validator.StringValidator;
-import org.dcm4che.net.ApplicationEntity;
+import org.dcm4che3.net.ApplicationEntity;
 import org.dcm4chee.proxy.conf.ForwardRule;
 import org.dcm4chee.proxy.conf.ProxyAEExtension;
 

@@ -46,11 +46,11 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
-import org.dcm4che.conf.api.AttributeCoercion;
-import org.dcm4che.conf.api.AttributeCoercions;
-import org.dcm4che.conf.api.ConfigurationException;
-import org.dcm4che.net.ApplicationEntity;
-import org.dcm4che.net.TransferCapability;
+import org.dcm4che3.conf.api.AttributeCoercion;
+import org.dcm4che3.conf.api.AttributeCoercions;
+import org.dcm4che3.conf.api.ConfigurationException;
+import org.dcm4che3.net.ApplicationEntity;
+import org.dcm4che3.net.TransferCapability;
 
 /**
  * @author Robert David <robert.david@agfa.com>

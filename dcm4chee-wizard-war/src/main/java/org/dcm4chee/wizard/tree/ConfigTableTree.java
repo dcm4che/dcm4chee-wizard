@@ -43,7 +43,7 @@ import java.util.List;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.tree.DefaultTableTree;
 import org.apache.wicket.extensions.markup.html.repeater.tree.ISortableTreeProvider;
-import org.dcm4che.conf.api.ConfigurationException;
+import org.dcm4che3.conf.api.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

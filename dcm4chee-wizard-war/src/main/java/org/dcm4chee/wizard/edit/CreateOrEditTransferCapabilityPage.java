@@ -53,10 +53,10 @@ import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
-import org.dcm4che.conf.api.ConfigurationException;
-import org.dcm4che.net.ApplicationEntity;
-import org.dcm4che.net.TransferCapability;
-import org.dcm4che.net.TransferCapability.Role;
+import org.dcm4che3.conf.api.ConfigurationException;
+import org.dcm4che3.net.ApplicationEntity;
+import org.dcm4che3.net.TransferCapability;
+import org.dcm4che3.net.TransferCapability.Role;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
 import org.dcm4chee.wizard.common.component.ModalWindowRuntimeException;
 import org.dcm4chee.wizard.model.ApplicationEntityModel;
@@ -106,7 +106,7 @@ public class CreateOrEditTransferCapabilityPage extends DicomConfigurationWebPag
 
             if (transferCapabilityModel == null) {
                 sopClassModel = Model.of();
-                roleModel = Model.of(org.dcm4che.net.TransferCapability.Role.SCP);
+                roleModel = Model.of(org.dcm4che3.net.TransferCapability.Role.SCP);
                 transferSyntaxModel = new StringArrayModel(null);
                 commonNameModel = Model.of();
             } else {
@@ -124,10 +124,10 @@ public class CreateOrEditTransferCapabilityPage extends DicomConfigurationWebPag
             form.add(sopClassTextField);
 
             form.add(new Label("role.label", new ResourceModel("dicom.edit.transferCapability.role.label")));
-            ArrayList<org.dcm4che.net.TransferCapability.Role> transferSyntaxList = new ArrayList<org.dcm4che.net.TransferCapability.Role>();
-            transferSyntaxList.add(org.dcm4che.net.TransferCapability.Role.SCP);
-            transferSyntaxList.add(org.dcm4che.net.TransferCapability.Role.SCU);
-            DropDownChoice<org.dcm4che.net.TransferCapability.Role> roleDropDown = new DropDownChoice<org.dcm4che.net.TransferCapability.Role>(
+            ArrayList<org.dcm4che3.net.TransferCapability.Role> transferSyntaxList = new ArrayList<org.dcm4che3.net.TransferCapability.Role>();
+            transferSyntaxList.add(org.dcm4che3.net.TransferCapability.Role.SCP);
+            transferSyntaxList.add(org.dcm4che3.net.TransferCapability.Role.SCU);
+            DropDownChoice<org.dcm4che3.net.TransferCapability.Role> roleDropDown = new DropDownChoice<org.dcm4che3.net.TransferCapability.Role>(
                     "role", roleModel, transferSyntaxList);
             form.add(roleDropDown.setNullValid(false));
 
