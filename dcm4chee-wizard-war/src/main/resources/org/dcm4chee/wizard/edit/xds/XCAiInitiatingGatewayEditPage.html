@@ -26,26 +26,27 @@
           <input class="edit-value" wicket:id="homeCommunityId"
             type="text" />
         </div>
-        <div class="edit-table-row" style="height: 45px;">
-          <span class="edit-desc" wicket:id="respondingGatewayUrl.label" />
-          <textarea class="edit-value" wicket:id="respondingGatewayUrl"
-            rows="2" />
+        <div class="edit-table-row">
+          <span class="edit-desc" wicket:id="respondingGWs.label" />
+          <textarea class="edit-value" wicket:id="respondingGWs"
+            rows="6" />
+        </div>
+        <div class="edit-table-row">
+          <span class="edit-desc" wicket:id="imagingSources.label" />
+          <textarea class="edit-value" wicket:id="imagingSources"
+            rows="6" />
         </div>
         <div class="edit-buttons">
           <span class="edit-desc" wicket:id="toggleOptional.label" /> <input
             class="edit-value" wicket:id="toggleOptional"
             type="checkbox" />
         </div>
+        
         <form wicket:id="optional">
           <div class="edit-table-row">
             <span class="edit-desc" wicket:id="xdsSoapMsgLogDir.label" />
             <input class="edit-value" wicket:id="xdsSoapMsgLogDir"
               type="text" />
-          </div>
-          <div class="edit-table-row" style="height: 45px;">
-            <span class="edit-desc" wicket:id="xdsiSrcUrlMapping.label" />
-            <textarea class="edit-value" wicket:id="xdsiSrcUrlMapping"
-              rows="2" />
           </div>
           <div class="edit-table-row">
             <span class="edit-desc" wicket:id="xdsAsync.label" /> <select

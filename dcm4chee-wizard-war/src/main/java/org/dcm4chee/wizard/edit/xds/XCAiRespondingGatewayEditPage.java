@@ -183,7 +183,7 @@ public class XCAiRespondingGatewayEditPage extends SecureSessionCheckPage{
         } else {
             xdsApplicationNameModel = Model.of(xcai.getApplicationName());
             xdsHomeCommunityIdModel = Model.of(xcai.getHomeCommunityID());
-            xdsiSrcUrlMappingModel = new StringArrayModel(xcai.getXDSiSourceURLs());
+            //xdsiSrcUrlMappingModel = new StringArrayModel(xcai.getXDSiSourceURLs());
             xdsSoapMsgLogDirModel = Model.of(xcai.getSoapLogDir());
         }
     }
@@ -217,7 +217,7 @@ public class XCAiRespondingGatewayEditPage extends SecureSessionCheckPage{
                     // mandatory
                     xcai.setApplicationName(xdsApplicationNameModel.getObject());
                     xcai.setHomeCommunityID(xdsHomeCommunityIdModel.getObject());
-                    xcai.setXDSiSourceURLs(xdsiSrcUrlMappingModel.getArray());
+                    //xcai.setXDSiSourceURLs(xdsiSrcUrlMappingModel.getArray());
                     // optional
                     if (xdsSoapMsgLogDirModel.getObject() != null)
                         xcai.setSoapLogDir(xdsSoapMsgLogDirModel.getObject());

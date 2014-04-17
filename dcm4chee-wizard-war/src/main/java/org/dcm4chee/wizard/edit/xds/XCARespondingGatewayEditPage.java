@@ -196,7 +196,7 @@ public class XCARespondingGatewayEditPage extends SecureSessionCheckPage{
             xdsApplicationNameModel = Model.of(xca.getApplicationName());
             xdsHomeCommunityIdModel = Model.of(xca.getHomeCommunityID());
             xdsRegistryUrlModel = Model.of(xca.getRegistryURL());
-            xdsRepositoryUrlModel = new StringArrayModel(xca.getRepositoryURLs());
+            //xdsRepositoryUrlModel = new StringArrayModel(xca.getRepositoryURLs());
             xdsSoapMsgLogDirModel = Model.of(xca.getSoapLogDir());
         }
     }
@@ -230,8 +230,8 @@ public class XCARespondingGatewayEditPage extends SecureSessionCheckPage{
                     // mandatory
                     xca.setApplicationName(xdsApplicationNameModel.getObject());
                     xca.setHomeCommunityID(xdsHomeCommunityIdModel.getObject());
-                    xca.setRegistryURL(xdsRegistryUrlModel.getObject());
-                    xca.setRepositoryURLs(xdsRepositoryUrlModel.getArray());
+                    //xca.setRegistryURL(xdsRegistryUrlModel.getObject());
+                   // xca.setRepositoryURLs(xdsRepositoryUrlModel.getArray());
                     // optional
                     if (xdsSoapMsgLogDirModel.getObject() != null)
                         xca.setSoapLogDir(xdsSoapMsgLogDirModel.getObject());

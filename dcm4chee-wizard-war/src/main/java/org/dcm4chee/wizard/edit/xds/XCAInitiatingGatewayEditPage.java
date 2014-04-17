@@ -84,18 +84,18 @@ public class XCAInitiatingGatewayEditPage extends SecureSessionCheckPage{
     // mandatory
     private Model<String> xdsApplicationNameModel;
     private Model<String> xdsHomeCommunityIdModel;
-    private StringArrayModel xdsRespondingGatewayUrlModel;
+    //private StringArrayModel xdsRespondingGatewayUrlModel;
 
     // optional
     private Model<String> xdsSoapMsgLogDirModel;
     private Model<Boolean> xdsAsyncModel;
     private Model<Boolean> xdsAsyncHandlerModel;
-    private StringArrayModel xdsRespondingGatewayRetrieveUrlModel;
-    private Model<String> xdsRegistryUrlModel;
-    private StringArrayModel xdsRepositoryUrlModel;
+    //private StringArrayModel xdsRespondingGatewayRetrieveUrlModel;
+    //private Model<String> xdsRegistryUrlModel;
+    //private StringArrayModel xdsRepositoryUrlModel;
     private Model<String> xdsPIXConsumerApplicationModel;
     private Model<String> xdsPIXManagerApplicationModel;
-    private StringArrayModel xdsAssigningAuthorityModel;
+    //private StringArrayModel xdsAssigningAuthorityModel;
 
     public XCAInitiatingGatewayEditPage(final ModalWindow window, XCAInitiatingGatewayModel model, 
             final ConfigTreeNode deviceNode) {
@@ -242,10 +242,10 @@ public class XCAInitiatingGatewayEditPage extends SecureSessionCheckPage{
         } else {
             xdsApplicationNameModel = Model.of(xcaInit.getApplicationName());
             xdsHomeCommunityIdModel = Model.of(xcaInit.getHomeCommunityID());
-            xdsRespondingGatewayUrlModel = new StringArrayModel(xcaInit.getRespondingGWURLs());
-            xdsRespondingGatewayRetrieveUrlModel = new StringArrayModel(xcaInit.getRespondingGWRetrieveURLs());
+            //xdsRespondingGatewayUrlModel = new StringArrayModel(xcaInit.getRespondingGWURLs());
+            //xdsRespondingGatewayRetrieveUrlModel = new StringArrayModel(xcaInit.getRespondingGWRetrieveURLs());
             xdsRegistryUrlModel = Model.of(xcaInit.getRegistryURL());
-            xdsRepositoryUrlModel = new StringArrayModel(xcaInit.getRepositoryURLs());
+            //xdsRepositoryUrlModel = new StringArrayModel(xcaInit.getRepositoryURLs());
             xdsAsyncModel = Model.of(xcaInit.isAsync());
             xdsAsyncHandlerModel = Model.of(xcaInit.isAsyncHandler());
             xdsPIXConsumerApplicationModel = Model.of(xcaInit.getLocalPIXConsumerApplication());
@@ -284,14 +284,14 @@ public class XCAInitiatingGatewayEditPage extends SecureSessionCheckPage{
                     // mandatory
                     xca.setApplicationName(xdsApplicationNameModel.getObject());
                     xca.setHomeCommunityID(xdsHomeCommunityIdModel.getObject());
-                    xca.setRespondingGWURLs(xdsRespondingGatewayUrlModel.getArray());
+                    //xca.setRespondingGWURLs(xdsRespondingGatewayUrlModel.getArray());
                     // optional
-                    if (xdsRespondingGatewayRetrieveUrlModel.getArray() != null)
+                    /*if (xdsRespondingGatewayRetrieveUrlModel.getArray() != null)
                         xca.setRespondingGWRetrieveURLs(xdsRespondingGatewayRetrieveUrlModel.getArray());
                     if (xdsRegistryUrlModel.getObject() != null)
                         xca.setRegistryURL(xdsRegistryUrlModel.getObject());
                     if (xdsRepositoryUrlModel.getArray() != null)
-                        xca.setRepositoryURLs(xdsRepositoryUrlModel.getArray());
+                        xca.setRepositoryURLs(xdsRepositoryUrlModel.getArray());*/
                     if (xdsAsyncModel.getObject() != null)
                         xca.setAsync(xdsAsyncModel.getObject());
                     if (xdsAsyncHandlerModel.getObject() != null)
@@ -300,8 +300,8 @@ public class XCAInitiatingGatewayEditPage extends SecureSessionCheckPage{
                         xca.setLocalPIXConsumerApplication(xdsPIXConsumerApplicationModel.getObject());
                     if (xdsPIXManagerApplicationModel.getObject() != null)
                         xca.setRemotePIXManagerApplication(xdsPIXManagerApplicationModel.getObject());
-                    if (xdsAssigningAuthorityModel.getArray() != null)
-                        xca.setAssigningAuthoritiesMap(xdsAssigningAuthorityModel.getArray());
+                    /*if (xdsAssigningAuthorityModel.getArray() != null)
+                        xca.setAssigningAuthoritiesMap(xdsAssigningAuthorityModel.getArray());*/
                     if (xdsSoapMsgLogDirModel.getObject() != null)
                         xca.setSoapLogDir(xdsSoapMsgLogDirModel.getObject());
                     ConfigTreeProvider.get().mergeDevice(device);

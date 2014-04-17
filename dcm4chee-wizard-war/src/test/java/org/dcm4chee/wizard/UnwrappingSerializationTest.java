@@ -16,7 +16,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 
-@RunWith(BlockJUnit4ClassRunner.class)
+/*@RunWith(BlockJUnit4ClassRunner.class)*/
 public class UnwrappingSerializationTest {
 
     private static final String[] MIME_TYPES2 = new String[] { "application/xml", "application/dicom", "application/pdf", "text/plain",
@@ -134,14 +134,14 @@ public class UnwrappingSerializationTest {
     public void testSerializeUnwrap() throws Exception {
 
         XCAInitiatingGWCfg initgw = createInitGw();
-        GenericConfigNodeModel<XCAInitiatingGWCfg> nm = new GenericConfigNodeModel<XCAInitiatingGWCfg>(initgw, "xdsRespondingGateways");
+        GenericConfigNodeModel<XCAInitiatingGWCfg> nm = new GenericConfigNodeModel<XCAInitiatingGWCfg>(initgw, "xdsRespondingGateways", Map.class);
         System.out.println(nm.getObject());
         nm.setObject("{\"1301\":{\"xdsAffinityDomain\":\"1.2.5\",\"xdsRespondingGateway\":\"repo_dDDD\"},\"2002\":{\"xdsAffinityDomain\":\"10.20.30.40.50\",\"xdsRespondingGateway\":\"rgw_device_2\"}}");
         System.out.println(nm.getModifiedConfigObj().getRespondingGWByHomeCommunityIdMap());
 
         
         XdsRegistry reg = createRegistry();
-        GenericConfigNodeModel<XdsRegistry> nm1 = new GenericConfigNodeModel<XdsRegistry>(reg, "xdsBrowser");
+        GenericConfigNodeModel<XdsRegistry> nm1 = new GenericConfigNodeModel<XdsRegistry>(reg, "xdsBrowser", Map.class);
         System.out.println(nm1.getObject());
         nm1.setObject("{\"xdsControlledDevices\" : [ \"BOODev\", \"TheThirdanotherDev\", \"AlsoControlledDev\" ]}");
         System.out.println(nm1.getModifiedConfigObj().getXdsBrowser().getControlledDevices());
