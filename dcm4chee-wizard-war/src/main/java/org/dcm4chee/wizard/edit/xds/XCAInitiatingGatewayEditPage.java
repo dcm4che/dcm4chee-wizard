@@ -156,7 +156,7 @@ public class XCAInitiatingGatewayEditPage extends SecureSessionCheckPage{
 
     
         FormUtils.addGenericField(optionalContainer, "xdsRegistry", xdsRegistry, false);
-        FormUtils.addGenericField(optionalContainer, "xdsRepositories", xdsRepositories, false);
+        FormUtils.addGenericField(optionalContainer, "xdsRepositories", xdsRepositories, true);
 
         
     }
