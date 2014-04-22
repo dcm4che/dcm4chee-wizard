@@ -21,8 +21,8 @@ public class FormUtils {
         FormComponent<String> formField;
         
         if (textArea)
-            formField = new TextArea<String>("fieldName", model); else
-            formField = new TextField<String>("fieldName", model);
+            formField = new TextArea<String>(fieldName, model); else
+            formField = new TextField<String>(fieldName, model);
             
         formField.setType(String.class);
         formField.setRequired(true);
