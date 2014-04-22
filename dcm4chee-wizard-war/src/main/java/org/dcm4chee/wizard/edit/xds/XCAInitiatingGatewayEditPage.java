@@ -40,6 +40,7 @@ package org.dcm4chee.wizard.edit.xds;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormSubmitBehavior;
@@ -52,8 +53,8 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
-import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.dcm4che3.conf.api.ConfigurationException;
@@ -62,11 +63,14 @@ import org.dcm4chee.wizard.common.component.ExtendedForm;
 import org.dcm4chee.wizard.common.component.ModalWindowRuntimeException;
 import org.dcm4chee.wizard.common.component.secure.SecureSessionCheckPage;
 import org.dcm4chee.wizard.model.DeviceModel;
+import org.dcm4chee.wizard.model.GenericConfigNodeModel;
 import org.dcm4chee.wizard.model.StringArrayModel;
 import org.dcm4chee.wizard.model.xds.XCAInitiatingGatewayModel;
 import org.dcm4chee.wizard.tree.ConfigTreeNode;
 import org.dcm4chee.wizard.tree.ConfigTreeProvider;
+import org.dcm4chee.wizard.util.FormUtils;
 import org.dcm4chee.xds2.conf.XCAInitiatingGWCfg;
+import org.dcm4chee.xds2.conf.XCAiInitiatingGWCfg;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,18 +88,16 @@ public class XCAInitiatingGatewayEditPage extends SecureSessionCheckPage{
     // mandatory
     private Model<String> xdsApplicationNameModel;
     private Model<String> xdsHomeCommunityIdModel;
-    //private StringArrayModel xdsRespondingGatewayUrlModel;
-
+    private GenericConfigNodeModel<XCAInitiatingGWCfg> xdsRegistry;
+    private GenericConfigNodeModel<XCAInitiatingGWCfg> xdsRespondingGWs;
+    private GenericConfigNodeModel<XCAInitiatingGWCfg> xdsRepositories;
+    
     // optional
     private Model<String> xdsSoapMsgLogDirModel;
     private Model<Boolean> xdsAsyncModel;
     private Model<Boolean> xdsAsyncHandlerModel;
-    //private StringArrayModel xdsRespondingGatewayRetrieveUrlModel;
-    //private Model<String> xdsRegistryUrlModel;
-    //private StringArrayModel xdsRepositoryUrlModel;
     private Model<String> xdsPIXConsumerApplicationModel;
     private Model<String> xdsPIXManagerApplicationModel;
-    //private StringArrayModel xdsAssigningAuthorityModel;
 
     public XCAInitiatingGatewayEditPage(final ModalWindow window, XCAInitiatingGatewayModel model, 
             final ConfigTreeNode deviceNode) {
@@ -141,10 +143,6 @@ public class XCAInitiatingGatewayEditPage extends SecureSessionCheckPage{
         optionalContainer.add(new DropDownChoice<>("xdsAsyncHandler", xdsAsyncHandlerModel, booleanChoice)
                 .setNullValid(false));
 
-        optionalContainer.add(new Label("xdsRespondingGatewayRetrieveUrl.label", new ResourceModel(
-                "dicom.edit.xds.optional.xdsRespondingGatewayRetrieveUrl.label")).setOutputMarkupPlaceholderTag(true));
-        optionalContainer.add(new TextArea<String>("xdsRespondingGatewayRetrieveUrl",
-                xdsRespondingGatewayRetrieveUrlModel).setType(String.class));
 
         optionalContainer.add(new Label("xdsPIXConsumerApplication.label", new ResourceModel(
                 "dicom.edit.xds.optional.xdsPIXConsumerApplication.label")).setOutputMarkupPlaceholderTag(true));
@@ -156,18 +154,11 @@ public class XCAInitiatingGatewayEditPage extends SecureSessionCheckPage{
         optionalContainer.add(new TextField<String>("xdsPIXManagerApplication", xdsPIXManagerApplicationModel)
                 .setType(String.class));
 
-        optionalContainer.add(new Label("xdsAssigningAuthority.label", new ResourceModel(
-                "dicom.edit.xds.optional.xdsAssigningAuthority.label")).setOutputMarkupPlaceholderTag(true));
-        optionalContainer.add(new TextArea<String>("xdsAssigningAuthority", xdsAssigningAuthorityModel)
-                .setType(String.class));
+    
+        FormUtils.addGenericField(optionalContainer, "xdsRegistry", xdsRegistry, false);
+        FormUtils.addGenericField(optionalContainer, "xdsRepositories", xdsRepositories, false);
 
-        optionalContainer.add(new Label("xdsRegistryUrl.label", new ResourceModel(
-                "dicom.edit.xds.optional.xdsRegistryUrl.label")).setOutputMarkupPlaceholderTag(true));
-        optionalContainer.add(new TextField<String>("xdsRegistryUrl", xdsRegistryUrlModel).setType(String.class));
-
-        optionalContainer.add(new Label("xdsRepositoryUrl.label", new ResourceModel(
-                "dicom.edit.xds.optional.xdsRepositoryUrl.label")).setOutputMarkupPlaceholderTag(true));
-        optionalContainer.add(new TextArea<String>("xdsRepositoryUrl", xdsRepositoryUrlModel).setType(String.class));
+        
     }
 
     private void addToggleOptionalCheckBox(final ExtendedForm form, final Form<?> optionalContainer) {
@@ -215,42 +206,44 @@ public class XCAInitiatingGatewayEditPage extends SecureSessionCheckPage{
         homeCommunityIdTextField.setRequired(true);
         form.add(homeCommunityIdTextField);
 
-        Label respondingGatewayUrlLabel = new Label("respondingGatewayUrl.label", new ResourceModel(
-                "dicom.edit.xds.respondingGatewayUrl.label"));
-        form.add(respondingGatewayUrlLabel);
-        FormComponent<String> respondingGatewayUrlTextArea = new TextArea<String>("respondingGatewayUrl",
-                xdsRespondingGatewayUrlModel);
-        respondingGatewayUrlTextArea.setType(String.class);
-        respondingGatewayUrlTextArea.setRequired(true);
-        form.add(respondingGatewayUrlTextArea);
+        FormUtils.addGenericField(form, "xdsRespondingGWs", xdsRespondingGWs, true);
+
     }
 
     private void initAttributes(XCAInitiatingGWCfg xcaInit) {
         if (xcaInit == null) {
             xdsApplicationNameModel = Model.of();
             xdsHomeCommunityIdModel = Model.of();
-            xdsRespondingGatewayUrlModel = new StringArrayModel(null);
-            xdsRespondingGatewayRetrieveUrlModel = new StringArrayModel(null);
-            xdsRegistryUrlModel = Model.of();
-            xdsRepositoryUrlModel = new StringArrayModel(null);
+            
+            xdsRespondingGWs = new GenericConfigNodeModel<XCAInitiatingGWCfg>(new XCAInitiatingGWCfg(), "xdsRespondingGateways", Map.class);
+            xdsRepositories = new GenericConfigNodeModel<XCAInitiatingGWCfg>(new XCAInitiatingGWCfg(), "xdsRepository", Map.class);
+            xdsRegistry = new GenericConfigNodeModel<XCAInitiatingGWCfg>(new XCAInitiatingGWCfg(), "xdsRegistry", String.class);
+            
+            //xdsRegistryUrlModel = Model.of();
+            //xdsRepositoryUrlModel = new StringArrayModel(null);
             xdsAsyncModel = Model.of();
             xdsAsyncHandlerModel = Model.of();
             xdsPIXConsumerApplicationModel = Model.of();
             xdsPIXManagerApplicationModel = Model.of();
-            xdsAssigningAuthorityModel = new StringArrayModel(null);
             xdsSoapMsgLogDirModel = Model.of();
         } else {
             xdsApplicationNameModel = Model.of(xcaInit.getApplicationName());
             xdsHomeCommunityIdModel = Model.of(xcaInit.getHomeCommunityID());
+
+            xdsRespondingGWs = new GenericConfigNodeModel<XCAInitiatingGWCfg>(xcaInit, "xdsRespondingGateways", Map.class);
+            xdsRepositories = new GenericConfigNodeModel<XCAInitiatingGWCfg>(xcaInit, "xdsRepository", Map.class);
+            xdsRegistry = new GenericConfigNodeModel<XCAInitiatingGWCfg>(xcaInit, "xdsRegistry", String.class);
+
+            
             //xdsRespondingGatewayUrlModel = new StringArrayModel(xcaInit.getRespondingGWURLs());
             //xdsRespondingGatewayRetrieveUrlModel = new StringArrayModel(xcaInit.getRespondingGWRetrieveURLs());
-            xdsRegistryUrlModel = Model.of(xcaInit.getRegistryURL());
+            //xdsRegistryUrlModel = Model.of(xcaInit.getRegistryURL());
             //xdsRepositoryUrlModel = new StringArrayModel(xcaInit.getRepositoryURLs());
             xdsAsyncModel = Model.of(xcaInit.isAsync());
             xdsAsyncHandlerModel = Model.of(xcaInit.isAsyncHandler());
             xdsPIXConsumerApplicationModel = Model.of(xcaInit.getLocalPIXConsumerApplication());
             xdsPIXManagerApplicationModel = Model.of(xcaInit.getRemotePIXManagerApplication());
-            xdsAssigningAuthorityModel = new StringArrayModel(xcaInit.getAssigningAuthorities());
+            //xdsAssigningAuthorityModel = new StringArrayModel(xcaInit.getAssigningAuthorities());
             xdsSoapMsgLogDirModel = Model.of(xcaInit.getSoapLogDir());
         }
     }
@@ -284,14 +277,22 @@ public class XCAInitiatingGatewayEditPage extends SecureSessionCheckPage{
                     // mandatory
                     xca.setApplicationName(xdsApplicationNameModel.getObject());
                     xca.setHomeCommunityID(xdsHomeCommunityIdModel.getObject());
-                    //xca.setRespondingGWURLs(xdsRespondingGatewayUrlModel.getArray());
+
+                    
+                    try {
+                        xca.setRespondingGWByHomeCommunityIdMap(xdsRespondingGWs.getModifiedConfigObj().getRespondingGWByHomeCommunityIdMap());
+                    } catch (NullPointerException e) { /* thats fine, this means nothing has changed */ }
+
                     // optional
-                    /*if (xdsRespondingGatewayRetrieveUrlModel.getArray() != null)
-                        xca.setRespondingGWRetrieveURLs(xdsRespondingGatewayRetrieveUrlModel.getArray());
-                    if (xdsRegistryUrlModel.getObject() != null)
-                        xca.setRegistryURL(xdsRegistryUrlModel.getObject());
-                    if (xdsRepositoryUrlModel.getArray() != null)
-                        xca.setRepositoryURLs(xdsRepositoryUrlModel.getArray());*/
+
+                    try {
+                        xca.setRepositoryDeviceByUidMap(xdsRepositories.getModifiedConfigObj().getRepositoryDeviceByUidMap());
+                    } catch (NullPointerException e) { /* thats fine, this means nothing has changed */ }
+
+                    try {
+                        xca.setRegistry(xdsRegistry.getModifiedConfigObj().getRegistry());
+                    } catch (NullPointerException e) { /* thats fine, this means nothing has changed */ }
+                    
                     if (xdsAsyncModel.getObject() != null)
                         xca.setAsync(xdsAsyncModel.getObject());
                     if (xdsAsyncHandlerModel.getObject() != null)
@@ -300,8 +301,6 @@ public class XCAInitiatingGatewayEditPage extends SecureSessionCheckPage{
                         xca.setLocalPIXConsumerApplication(xdsPIXConsumerApplicationModel.getObject());
                     if (xdsPIXManagerApplicationModel.getObject() != null)
                         xca.setRemotePIXManagerApplication(xdsPIXManagerApplicationModel.getObject());
-                    /*if (xdsAssigningAuthorityModel.getArray() != null)
-                        xca.setAssigningAuthoritiesMap(xdsAssigningAuthorityModel.getArray());*/
                     if (xdsSoapMsgLogDirModel.getObject() != null)
                         xca.setSoapLogDir(xdsSoapMsgLogDirModel.getObject());
                     ConfigTreeProvider.get().mergeDevice(device);

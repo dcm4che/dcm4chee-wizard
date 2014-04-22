@@ -23,15 +23,28 @@
           <span class="edit-desc" wicket:id="homeCommunityId.label" /> 
           <input class="edit-value" wicket:id="homeCommunityId" type="text" />
         </div>
-        <div class="edit-table-row" style="height: 45px;">
-          <span class="edit-desc" wicket:id="respondingGatewayUrl.label" />
-          <textarea class="edit-value" wicket:id="respondingGatewayUrl" rows="2" />
+        <div class="edit-table-row">
+          <span class="edit-desc" wicket:id="xdsRespondingGWs.label" />
+          <textarea class="edit-value" wicket:id="xdsRespondingGWs" rows="5" />
         </div>
+
         <div class="edit-buttons">
           <span class="edit-desc" wicket:id="toggleOptional.label" /> 
           <input class="edit-value" wicket:id="toggleOptional" type="checkbox" />
         </div>
+        
         <form wicket:id="optional">
+
+          <div class="edit-table-row">
+            <span class="edit-desc" wicket:id="xdsRepositories.label" />
+            <textarea class="edit-value" wicket:id="xdsRepositories" rows="5" />
+          </div>
+          
+          <div class="edit-table-row">
+            <span class="edit-desc" wicket:id="xdsRegistry.label" />
+	        <input class="edit-value" wicket:id="xdsRegistry" type="text" />
+          </div>
+
           <div class="edit-table-row">
             <span class="edit-desc" wicket:id="xdsSoapMsgLogDir.label" /> 
             <input class="edit-value" wicket:id="xdsSoapMsgLogDir" type="text" />
@@ -43,10 +56,6 @@
           <div class="edit-table-row">
             <span class="edit-desc" wicket:id="xdsAsyncHandler.label" /> 
             <select class="edit-value" wicket:id="xdsAsyncHandler" />
-          </div>
-          <div class="edit-table-row" style="height: 45px;">
-            <span class="edit-desc" wicket:id="xdsRespondingGatewayRetrieveUrl.label" />
-            <textarea class="edit-value" wicket:id="xdsRespondingGatewayRetrieveUrl" rows="2" />
           </div>
           <div class="edit-table-row">
             <span class="edit-desc" wicket:id="xdsPIXConsumerApplication.label" /> 

@@ -271,9 +271,7 @@ public class XCAiInitiatingGatewayEditPage extends SecureSessionCheckPage{
                     
                     try {
                         xcai.setSrcDevicebySrcIdMap(xdsImagingSources.getModifiedConfigObj().getSrcDevicebySrcIdMap());
-                    } catch (NullPointerException e) {
-                        // thats fine, this means nothing has changed
-                    }
+                    } catch (NullPointerException e) { /* thats fine, this means nothing has changed */ }
 
                     try {
                         xcai.setRespondingGWDevicebyHomeCommunityId(xdsRepondingGWs.getModifiedConfigObj().getRespondingGWDevicebyHomeCommunityId());
