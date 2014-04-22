@@ -155,8 +155,8 @@ public class XCAInitiatingGatewayEditPage extends SecureSessionCheckPage{
                 .setType(String.class));
 
     
-        FormUtils.addGenericField(optionalContainer, "xdsRegistry", xdsRegistry, false);
-        FormUtils.addGenericField(optionalContainer, "xdsRepositories", xdsRepositories, true);
+        FormUtils.addGenericField(optionalContainer, "xdsRegistry", xdsRegistry, false, false);
+        FormUtils.addGenericField(optionalContainer, "xdsRepositories", xdsRepositories, true, false);
 
         
     }
@@ -206,7 +206,7 @@ public class XCAInitiatingGatewayEditPage extends SecureSessionCheckPage{
         homeCommunityIdTextField.setRequired(true);
         form.add(homeCommunityIdTextField);
 
-        FormUtils.addGenericField(form, "xdsRespondingGWs", xdsRespondingGWs, true);
+        FormUtils.addGenericField(form, "xdsRespondingGWs", xdsRespondingGWs, true, true);
 
     }
 
@@ -306,9 +306,7 @@ public class XCAInitiatingGatewayEditPage extends SecureSessionCheckPage{
                     ConfigTreeProvider.get().mergeDevice(device);
                     window.close(target);
                 } catch (Exception e) {
-                    log.error("{}: Error modifying XCA Initating Gateway: {}", this, e);
-                    if (log.isDebugEnabled())
-                        e.printStackTrace();
+                    log.error("Error modifying XCA Initating Gateway: "+this.toString(), e);
                     throw new ModalWindowRuntimeException(e.getLocalizedMessage());
                 }
             }

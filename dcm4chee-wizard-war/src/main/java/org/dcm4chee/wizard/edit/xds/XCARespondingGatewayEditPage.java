@@ -38,6 +38,8 @@
 
 package org.dcm4chee.wizard.edit.xds;
 
+import java.util.Map;
+
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormSubmitBehavior;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
@@ -58,10 +60,13 @@ import org.dcm4chee.wizard.common.component.ExtendedForm;
 import org.dcm4chee.wizard.common.component.ModalWindowRuntimeException;
 import org.dcm4chee.wizard.common.component.secure.SecureSessionCheckPage;
 import org.dcm4chee.wizard.model.DeviceModel;
+import org.dcm4chee.wizard.model.GenericConfigNodeModel;
 import org.dcm4chee.wizard.model.StringArrayModel;
 import org.dcm4chee.wizard.model.xds.XCARespondingGatewayModel;
 import org.dcm4chee.wizard.tree.ConfigTreeNode;
 import org.dcm4chee.wizard.tree.ConfigTreeProvider;
+import org.dcm4chee.wizard.util.FormUtils;
+import org.dcm4chee.xds2.conf.XCAInitiatingGWCfg;
 import org.dcm4chee.xds2.conf.XCARespondingGWCfg;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,9 +83,12 @@ public class XCARespondingGatewayEditPage extends SecureSessionCheckPage{
     // mandatory
     private Model<String> xdsApplicationNameModel;
     private Model<String> xdsHomeCommunityIdModel;
-    private Model<String> xdsRegistryUrlModel;
-    private StringArrayModel xdsRepositoryUrlModel;
-
+    private Model<String> xdsRetrieveURLModel;
+    private Model<String> xdsQueryURLModel;
+    
+    private GenericConfigNodeModel<XCARespondingGWCfg> xdsRepositories;
+    private GenericConfigNodeModel<XCARespondingGWCfg> xdsRegistry;
+    
     // optional
     private Model<String> xdsSoapMsgLogDirModel;
 
@@ -168,36 +176,43 @@ public class XCARespondingGatewayEditPage extends SecureSessionCheckPage{
         homeCommunityIdTextField.setRequired(true);
         form.add(homeCommunityIdTextField);
 
-        Label xdsRegistryUrlLabel = new Label("xdsRegistryUrl.label", new ResourceModel(
-                "dicom.edit.xds.xdsRegistryUrl.label"));
-        form.add(xdsRegistryUrlLabel);
-        FormComponent<String> xdsRegistryUrlTextField = new TextField<String>("xdsRegistryUrl", xdsRegistryUrlModel);
-        xdsRegistryUrlTextField.setType(String.class);
-        xdsRegistryUrlTextField.setRequired(true);
-        form.add(xdsRegistryUrlTextField);
+        form.add(new Label("xdsQueryURL.label", new ResourceModel("dicom.edit.xds.xdsQueryURL.label")));
+        FormComponent<String> xdsQueryURLField = new TextField<String>("xdsQueryURL",
+                xdsQueryURLModel);
+        xdsQueryURLField.setType(String.class);
+        xdsQueryURLField.setRequired(true);
+        form.add(xdsQueryURLField);
 
-        Label xdsRepositoryUrlLabel = new Label("xdsRepositoryUrl.label", new ResourceModel(
-                "dicom.edit.xds.xdsRepositoryUrl.label"));
-        form.add(xdsRepositoryUrlLabel);
-        FormComponent<String> xdsRepositoryUrlTextArea = new TextArea<String>("xdsRepositoryUrl", xdsRepositoryUrlModel);
-        xdsRepositoryUrlTextArea.setType(String.class);
-        xdsRepositoryUrlTextArea.setRequired(true);
-        form.add(xdsRepositoryUrlTextArea);
+        form.add(new Label("xdsRetrieveURL.label", new ResourceModel("dicom.edit.xds.xdsRetrieveURL.label")));
+        FormComponent<String> xdsRetrieveURLField = new TextField<String>("xdsRetrieveURL",
+                xdsRetrieveURLModel);
+        xdsRetrieveURLField.setType(String.class);
+        xdsRetrieveURLField.setRequired(true);
+        form.add(xdsRetrieveURLField);
+        
+        FormUtils.addGenericField(form, "xdsRepositories", xdsRepositories, true, true);
+        FormUtils.addGenericField(form, "xdsRegistry", xdsRegistry, false, true);        
+
     }
 
     private void initAttributes(XCARespondingGWCfg xca) {
         if (xca == null) {
             xdsApplicationNameModel = Model.of();
             xdsHomeCommunityIdModel = Model.of();
-            xdsRegistryUrlModel = Model.of();
-            xdsRepositoryUrlModel = new StringArrayModel(null);
+            xdsRetrieveURLModel = Model.of();
+            xdsQueryURLModel = Model.of();
             xdsSoapMsgLogDirModel = Model.of();
+            xdsRepositories = new GenericConfigNodeModel<XCARespondingGWCfg>(new XCARespondingGWCfg(), "xdsRepository", Map.class);
+            xdsRegistry = new GenericConfigNodeModel<XCARespondingGWCfg>(new XCARespondingGWCfg(), "xdsRegistry", String.class);
+                    
         } else {
             xdsApplicationNameModel = Model.of(xca.getApplicationName());
             xdsHomeCommunityIdModel = Model.of(xca.getHomeCommunityID());
-            xdsRegistryUrlModel = Model.of(xca.getRegistryURL());
-            //xdsRepositoryUrlModel = new StringArrayModel(xca.getRepositoryURLs());
+            xdsRetrieveURLModel = Model.of(xca.getRetrieveUrl());
+            xdsQueryURLModel = Model.of(xca.getQueryUrl());
             xdsSoapMsgLogDirModel = Model.of(xca.getSoapLogDir());
+            xdsRepositories = new GenericConfigNodeModel<XCARespondingGWCfg>(xca, "xdsRepository", Map.class);
+            xdsRegistry = new GenericConfigNodeModel<XCARespondingGWCfg>(xca, "xdsRegistry", String.class);
         }
     }
 
@@ -230,8 +245,19 @@ public class XCARespondingGatewayEditPage extends SecureSessionCheckPage{
                     // mandatory
                     xca.setApplicationName(xdsApplicationNameModel.getObject());
                     xca.setHomeCommunityID(xdsHomeCommunityIdModel.getObject());
-                    //xca.setRegistryURL(xdsRegistryUrlModel.getObject());
-                   // xca.setRepositoryURLs(xdsRepositoryUrlModel.getArray());
+                    
+                    xca.setQueryUrl(xdsQueryURLModel.getObject());
+                    xca.setRetrieveUrl(xdsRetrieveURLModel.getObject());
+                    
+                    try {
+                        xca.setRepositoryDeviceByUidMap(xdsRepositories.getModifiedConfigObj().getRepositoryDeviceByUidMap());
+                    } catch (NullPointerException e) { /* thats fine, this means nothing has changed */ }
+                    
+                    try {
+                        xca.setRegistry(xdsRegistry.getModifiedConfigObj().getRegistry());
+                    } catch (NullPointerException e) { /* thats fine, this means nothing has changed */ }
+                    
+
                     // optional
                     if (xdsSoapMsgLogDirModel.getObject() != null)
                         xca.setSoapLogDir(xdsSoapMsgLogDirModel.getObject());

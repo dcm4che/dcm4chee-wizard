@@ -82,9 +82,7 @@ public class WizardApplication extends SecureWebApplication {
 //                    e = (Exception) e.getCause();
 //                if (!(e instanceof PageExpiredException))
 //                    cycle.setResponsePage(new InternalErrorPage(e, null));
-                log.error("{}: Unexpected exception: {}", this, e);
-                if (log.isDebugEnabled())
-                    e.printStackTrace();
+                log.error("Unexpected exception in the wizard application: ", e);
                 return cycle.getRequestHandlerScheduledAfterCurrent();
             }
         });

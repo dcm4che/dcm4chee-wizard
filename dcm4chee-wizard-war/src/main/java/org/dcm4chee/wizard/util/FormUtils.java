@@ -13,7 +13,7 @@ public class FormUtils {
 
     // ugly helper
     @SuppressWarnings("unchecked")
-    public static void addGenericField(Form form, String fieldName, GenericConfigNodeModel model, boolean textArea) {
+    public static void addGenericField(Form form, String fieldName, GenericConfigNodeModel model, boolean textArea, boolean required) {
         
         form.add(new Label(fieldName+".label", new ResourceModel(
                 "dicom.edit.xds."+fieldName+".label")));
@@ -25,7 +25,7 @@ public class FormUtils {
             formField = new TextField<String>(fieldName, model);
             
         formField.setType(String.class);
-        formField.setRequired(true);
+        formField.setRequired(required);
         formField.add((IValidator<String>) model);
         form.add(formField);
     }

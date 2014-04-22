@@ -23,14 +23,27 @@
           <span class="edit-desc" wicket:id="homeCommunityId.label" /> 
           <input class="edit-value" wicket:id="homeCommunityId" type="text" />
         </div>
+
         <div class="edit-table-row">
-            <span class="edit-desc" wicket:id="xdsRegistryUrl.label" />
-            <input class="edit-value" wicket:id="xdsRegistryUrl" type="text" />
+          <span class="edit-desc" wicket:id="xdsRetrieveURL.label" /> 
+          <input class="edit-value" wicket:id="xdsRetrieveURL" type="text" />
         </div>
-        <div class="edit-table-row" style="height: 45px;">
-            <span class="edit-desc" wicket:id="xdsRepositoryUrl.label" />
-            <textarea class="edit-value" wicket:id="xdsRepositoryUrl" rows="2" />
+
+        <div class="edit-table-row">
+          <span class="edit-desc" wicket:id="xdsQueryURL.label" /> 
+          <input class="edit-value" wicket:id="xdsQueryURL" type="text" />
         </div>
+
+        <div class="edit-table-row">
+          <span class="edit-desc" wicket:id="xdsRepositories.label" />
+          <textarea class="edit-value" wicket:id="xdsRepositories" rows="5" />
+        </div>
+        
+        <div class="edit-table-row">
+          <span class="edit-desc" wicket:id="xdsRegistry.label" />
+	      <input class="edit-value" wicket:id="xdsRegistry" type="text" />
+        </div>
+
         <div class="edit-buttons">
           <span class="edit-desc" wicket:id="toggleOptional.label" /> 
           <input class="edit-value" wicket:id="toggleOptional" type="checkbox" />
