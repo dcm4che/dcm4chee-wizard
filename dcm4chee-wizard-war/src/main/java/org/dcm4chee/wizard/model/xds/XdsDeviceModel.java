@@ -38,9 +38,9 @@
 
 package org.dcm4chee.wizard.model.xds;
 
-import org.dcm4che.conf.api.ConfigurationException;
-import org.dcm4che.net.Device;
-import org.dcm4che.net.audit.AuditLogger;
+import org.dcm4che3.conf.api.ConfigurationException;
+import org.dcm4che3.net.Device;
+import org.dcm4che3.net.audit.AuditLogger;
 import org.dcm4chee.wizard.model.hl7.HL7DeviceModel;
 
 /**

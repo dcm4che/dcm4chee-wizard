@@ -56,8 +56,8 @@ import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
-import org.dcm4che.conf.api.ConfigurationException;
-import org.dcm4che.net.Device;
+import org.dcm4che3.conf.api.ConfigurationException;
+import org.dcm4che3.net.Device;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
 import org.dcm4chee.wizard.common.component.ModalWindowRuntimeException;
 import org.dcm4chee.wizard.common.component.secure.SecureSessionCheckPage;
@@ -85,6 +85,8 @@ public class XDSRegistryEditPage extends SecureSessionCheckPage{
     private Model<String> xdsApplicationNameModel;
     private StringArrayModel xdsAffinityDomainModel;
     private Model<String> xdsAffinityDomainConfigDirModel;
+    private Model<String> xdsQueryURLModel;
+    private Model<String> xdsRegisterURLModel;    
 
     // optional
     private StringArrayModel xdsAcceptedMimeTypesModel;
@@ -216,11 +218,27 @@ public class XDSRegistryEditPage extends SecureSessionCheckPage{
         Label affinityDomainConfigDirLabel = new Label("xdsAffinityDomainConfigDir.label", new ResourceModel(
                 "dicom.edit.xds.xdsAffinityDomainConfigDir.label"));
         form.add(affinityDomainConfigDirLabel);
+        
         FormComponent<String> affinityDomainConfigDirTextField = new TextField<String>("xdsAffinityDomainConfigDir",
                 xdsAffinityDomainConfigDirModel);
         affinityDomainConfigDirTextField.setType(String.class);
         affinityDomainConfigDirTextField.setRequired(true);
         form.add(affinityDomainConfigDirTextField);
+
+        form.add(new Label("xdsQueryURL.label", new ResourceModel("dicom.edit.xds.xdsQueryURL.label")));
+        FormComponent<String> xdsQueryURLField = new TextField<String>("xdsQueryURL",
+                xdsQueryURLModel);
+        xdsQueryURLField.setType(String.class);
+        xdsQueryURLField.setRequired(true);
+        form.add(xdsQueryURLField);
+
+        form.add(new Label("xdsRegisterURL.label", new ResourceModel("dicom.edit.xds.xdsRegisterURL.label")));
+        FormComponent<String> xdsRegisterURLField = new TextField<String>("xdsRegisterURL",
+                xdsRegisterURLModel);
+        xdsRegisterURLField.setType(String.class);
+        xdsRegisterURLField.setRequired(true);
+        form.add(xdsRegisterURLField);
+        
     }
 
     private void initAttributes(XdsRegistry xds) {
@@ -236,6 +254,8 @@ public class XDSRegistryEditPage extends SecureSessionCheckPage{
             xdsCheckAffinityDomainModel = Model.of();
             xdsCheckMimetypeModel = Model.of();
             xdsPreMetadataCheckModel = Model.of();
+            xdsQueryURLModel = Model.of();
+            xdsRegisterURLModel = Model.of();
         } else {
             xdsApplicationNameModel = Model.of(xds.getApplicationName());
             xdsAffinityDomainModel = new StringArrayModel(xds.getAffinityDomain());
@@ -248,6 +268,8 @@ public class XDSRegistryEditPage extends SecureSessionCheckPage{
             xdsCheckAffinityDomainModel = Model.of(xds.isCheckAffinityDomain());
             xdsCheckMimetypeModel = Model.of(xds.isCheckMimetype());
             xdsPreMetadataCheckModel = Model.of(xds.isPreMetadataCheck());
+            xdsQueryURLModel = Model.of(xds.getQueryUrl());
+            xdsRegisterURLModel = Model.of(xds.getRegisterUrl());            
         }
     }
 
@@ -281,6 +303,10 @@ public class XDSRegistryEditPage extends SecureSessionCheckPage{
                     xds.setApplicationName(xdsApplicationNameModel.getObject());
                     xds.setAffinityDomain(xdsAffinityDomainModel.getArray());
                     xds.setAffinityDomainConfigDir(xdsAffinityDomainConfigDirModel.getObject());
+                    
+                    xds.setQueryUrl(xdsQueryURLModel.getObject());
+                    xds.setRegisterUrl(xdsRegisterURLModel.getObject());
+                    
                     // optional
                     if (xdsAcceptedMimeTypesModel.getArray().length > 0)
                         xds.setAcceptedMimeTypes(xdsAcceptedMimeTypesModel.getArray());

@@ -44,7 +44,7 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.validation.AbstractFormValidator;
 import org.apache.wicket.model.StringResourceModel;
-import org.dcm4che.conf.api.ConfigurationException;
+import org.dcm4che3.conf.api.ConfigurationException;
 import org.dcm4chee.wizard.common.component.ModalWindowRuntimeException;
 import org.dcm4chee.wizard.model.ConnectionModel;
 

@@ -40,7 +40,7 @@ package org.dcm4chee.wizard.model;
 
 import java.io.Serializable;
 
-import org.dcm4che.conf.api.AttributeCoercion;
+import org.dcm4che3.conf.api.AttributeCoercion;
 
 /**
  * @author Robert David <robert.david@agfa.com>

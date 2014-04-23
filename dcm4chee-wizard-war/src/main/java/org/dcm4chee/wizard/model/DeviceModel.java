@@ -45,10 +45,10 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import org.dcm4che.conf.api.ConfigurationException;
-import org.dcm4che.net.ApplicationEntity;
-import org.dcm4che.net.Connection;
-import org.dcm4che.net.Device;
+import org.dcm4che3.conf.api.ConfigurationException;
+import org.dcm4che3.net.ApplicationEntity;
+import org.dcm4che3.net.Connection;
+import org.dcm4che3.net.Device;
 
 /**
  * @author Robert David <robert.david@agfa.com>

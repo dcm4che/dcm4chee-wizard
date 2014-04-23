@@ -40,6 +40,7 @@ package org.dcm4chee.wizard.edit.xds;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormSubmitBehavior;
@@ -56,16 +57,19 @@ import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
-import org.dcm4che.conf.api.ConfigurationException;
-import org.dcm4che.net.Device;
+import org.apache.wicket.validation.IValidator;
+import org.dcm4che3.conf.api.ConfigurationException;
+import org.dcm4che3.net.Device;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
 import org.dcm4chee.wizard.common.component.ModalWindowRuntimeException;
 import org.dcm4chee.wizard.common.component.secure.SecureSessionCheckPage;
 import org.dcm4chee.wizard.model.DeviceModel;
+import org.dcm4chee.wizard.model.GenericConfigNodeModel;
 import org.dcm4chee.wizard.model.StringArrayModel;
 import org.dcm4chee.wizard.model.xds.XDSRepositoryModel;
 import org.dcm4chee.wizard.tree.ConfigTreeNode;
 import org.dcm4chee.wizard.tree.ConfigTreeProvider;
+import org.dcm4chee.xds2.conf.XCAiInitiatingGWCfg;
 import org.dcm4chee.xds2.conf.XdsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,9 +87,9 @@ public class XDSRepositoryEditPage extends SecureSessionCheckPage{
 
     // mandatory
     private Model<String> xdsApplicationNameModel;
-    private StringArrayModel xdsRegistryURLModel;
     private Model<String> xdsRepositoryUIDModel;
-
+    private Model<String> xdsRetrieveURLModel;
+    private Model<String> xdsProvideURLModel;
     // optional
     private StringArrayModel xdsAcceptedMimeTypesModel;
     private Model<Boolean> xdsCheckMimetypeModel;
@@ -93,6 +97,8 @@ public class XDSRepositoryEditPage extends SecureSessionCheckPage{
     private Model<String> xdsAllowedCipherHostnameModel;
     private Model<Boolean> xdsForceMTOMModel;
     private StringArrayModel xdsLogFullMessageHostsModel;
+    private GenericConfigNodeModel<XdsRepository> xdsSources;
+    
 
     public XDSRepositoryEditPage(final ModalWindow window, XDSRepositoryModel model,
             final ConfigTreeNode deviceNode) {
@@ -191,15 +197,6 @@ public class XDSRepositoryEditPage extends SecureSessionCheckPage{
         applicationNameTextField.setRequired(true);
         form.add(applicationNameTextField);
 
-        Label registryUrlLabel = new Label("xdsRegistryURL.label", new ResourceModel(
-                "dicom.edit.xds.xdsRegistryURL.label"));
-        form.add(registryUrlLabel);
-        FormComponent<String> registryUrlTextArea = new TextArea<String>("xdsRegistryURL",
-                xdsRegistryURLModel);
-        registryUrlTextArea.setType(String.class);
-        registryUrlTextArea.setRequired(true);
-        form.add(registryUrlTextArea);
-
         Label xdsRepositoryUIDLabel = new Label("xdsRepositoryUID.label", new ResourceModel(
                 "dicom.edit.xds.xdsRepositoryUID.label"));
         form.add(xdsRepositoryUIDLabel);
@@ -208,12 +205,33 @@ public class XDSRepositoryEditPage extends SecureSessionCheckPage{
         xdsRepositoryUIDTextField.setType(String.class);
         xdsRepositoryUIDTextField.setRequired(true);
         form.add(xdsRepositoryUIDTextField);
+        
+        form.add(new Label("xdsRetrieveURL.label", new ResourceModel("dicom.edit.xds.xdsRetrieveURL.label")));
+        FormComponent<String> xdsRetrieveURLField = new TextField<String>("xdsRetrieveURL",
+                xdsRetrieveURLModel);
+        xdsRetrieveURLField.setType(String.class);
+        xdsRetrieveURLField.setRequired(true);
+        form.add(xdsRetrieveURLField);
+
+        form.add(new Label("xdsProvideURL.label", new ResourceModel("dicom.edit.xds.xdsProvideURL.label")));
+        FormComponent<String> xdsProvideURLField = new TextField<String>("xdsProvideURL",
+                xdsProvideURLModel);
+        xdsProvideURLField.setType(String.class);
+        xdsProvideURLField.setRequired(true);
+        form.add(xdsProvideURLField);        
+        
+        form.add(new Label("xdsSources.label", new ResourceModel("dicom.edit.xds.xdsSources.label")));
+        FormComponent<String> sources = new TextArea<String>("xdsSources",
+                xdsSources);
+        sources.setType(String.class);
+        sources.setRequired(true);
+        sources.add((IValidator<String>) xdsSources);
+        form.add(sources);        
     }
 
     private void initAttributes(XdsRepository xds) {
         if (xds == null) {
             xdsApplicationNameModel = Model.of();
-            xdsRegistryURLModel = new StringArrayModel(null);
             xdsRepositoryUIDModel = Model.of();
             xdsAcceptedMimeTypesModel = new StringArrayModel(null);
             xdsCheckMimetypeModel = Model.of();
@@ -221,9 +239,11 @@ public class XDSRepositoryEditPage extends SecureSessionCheckPage{
             xdsAllowedCipherHostnameModel = Model.of();
             xdsForceMTOMModel = Model.of();
             xdsLogFullMessageHostsModel = new StringArrayModel(null);
+            xdsRetrieveURLModel = Model.of();
+            xdsProvideURLModel = Model.of();
+            xdsSources = new GenericConfigNodeModel<XdsRepository>(new XdsRepository(), "xdsSource", Map.class);
         } else {
             xdsApplicationNameModel = Model.of(xds.getApplicationName());
-            xdsRegistryURLModel = new StringArrayModel(xds.getRegistryURLs());
             xdsRepositoryUIDModel = Model.of(xds.getRepositoryUID());
             xdsAcceptedMimeTypesModel = new StringArrayModel(xds.getAcceptedMimeTypes());
             xdsCheckMimetypeModel = Model.of(xds.isCheckMimetype());
@@ -231,6 +251,9 @@ public class XDSRepositoryEditPage extends SecureSessionCheckPage{
             xdsAllowedCipherHostnameModel = Model.of(xds.getAllowedCipherHostname());
             xdsForceMTOMModel = Model.of(xds.isForceMTOM());
             xdsLogFullMessageHostsModel = new StringArrayModel(xds.getLogFullMessageHosts());
+            xdsRetrieveURLModel = Model.of(xds.getRetrieveUrl());
+            xdsProvideURLModel = Model.of(xds.getProvideUrl());
+            xdsSources = new GenericConfigNodeModel<XdsRepository>(xds, "xdsSource", Map.class);
         }
     }
 
@@ -262,8 +285,16 @@ public class XDSRepositoryEditPage extends SecureSessionCheckPage{
                     XdsRepository xds = device.getDeviceExtension(XdsRepository.class);
                     // mandatory
                     xds.setApplicationName(xdsApplicationNameModel.getObject());
-                    xds.setRegistryURLs(xdsRegistryURLModel.getArray());
                     xds.setRepositoryUID(xdsRepositoryUIDModel.getObject());
+                    xds.setProvideUrl(xdsProvideURLModel.getObject());
+                    xds.setRetrieveUrl(xdsRetrieveURLModel.getObject());
+                    
+                    try {
+                        xds.setSrcDevicebySrcIdMap(xdsSources.getModifiedConfigObj().getSrcDevicebySrcIdMap());
+                    } catch (NullPointerException e) {
+                        // thats fine, this means nothing has changed
+                    }
+                    
                     // optional
                     if (xdsAcceptedMimeTypesModel.getArray().length > 0)
                         xds.setAcceptedMimeTypes(xdsAcceptedMimeTypesModel.getArray());

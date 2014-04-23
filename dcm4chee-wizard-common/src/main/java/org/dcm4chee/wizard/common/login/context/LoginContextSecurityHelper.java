@@ -64,7 +64,7 @@ import net.sf.json.JSONObject;
 
 import org.apache.wicket.Application;
 import org.apache.wicket.protocol.http.WebApplication;
-import org.dcm4che.util.StringUtils;
+import org.dcm4che3.util.StringUtils;
 import org.dcm4chee.wizard.common.component.secure.SecureWebApplication;
 import org.dcm4chee.wizard.common.login.secure.SecureSession;
 import org.jboss.security.SecurityContextAssociation;

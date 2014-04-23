@@ -44,8 +44,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import org.dcm4che.conf.api.ConfigurationException;
-import org.dcm4che.net.ApplicationEntity;
+import org.dcm4che3.conf.api.ConfigurationException;
+import org.dcm4che3.net.ApplicationEntity;
 import org.dcm4chee.proxy.conf.ForwardOption;
 import org.dcm4chee.proxy.conf.ForwardRule;
 import org.dcm4chee.proxy.conf.ProxyAEExtension;

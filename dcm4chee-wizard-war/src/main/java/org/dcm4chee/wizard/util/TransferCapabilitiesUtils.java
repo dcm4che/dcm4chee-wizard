@@ -40,11 +40,11 @@ package org.dcm4chee.wizard.util;
 
 import java.util.EnumSet;
 
-import org.dcm4che.data.UID;
-import org.dcm4che.net.ApplicationEntity;
-import org.dcm4che.net.QueryOption;
-import org.dcm4che.net.TransferCapability;
-import org.dcm4che.net.TransferCapability.Role;
+import org.dcm4che3.data.UID;
+import org.dcm4che3.net.ApplicationEntity;
+import org.dcm4che3.net.QueryOption;
+import org.dcm4che3.net.TransferCapability;
+import org.dcm4che3.net.TransferCapability.Role;
 
 public class TransferCapabilitiesUtils {
 

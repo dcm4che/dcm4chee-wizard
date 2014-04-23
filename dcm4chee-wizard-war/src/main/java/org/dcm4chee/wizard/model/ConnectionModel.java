@@ -40,8 +40,8 @@ package org.dcm4chee.wizard.model;
 
 import java.io.Serializable;
 
-import org.dcm4che.conf.api.ConfigurationException;
-import org.dcm4che.net.Connection;
+import org.dcm4che3.conf.api.ConfigurationException;
+import org.dcm4che3.net.Connection;
 
 /**
  * @author Robert David <robert.david@agfa.com>

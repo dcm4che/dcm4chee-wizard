@@ -17,9 +17,9 @@
     <wicket.version>6.9.0</wicket.version>
     <wicket.security.version>6.9.0</wicket.security.version>
     <dcm4chee.proxy.version>1.1.0-SNAPSHOT</dcm4chee.proxy.version>
-    <dcm4che.version>3.2.1</dcm4che.version>
+    <dcm4che.version>3.3.2</dcm4che.version>
     <device-name>dcm4chee-proxy</device-name>
-    <dcm4chee.xds2.version>2.0.0</dcm4chee.xds2.version>
+    <dcm4chee.xds2.version>2.0.3</dcm4chee.xds2.version>
   </properties>
   <build>
     <defaultGoal>package</defaultGoal>

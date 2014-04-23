@@ -38,6 +38,8 @@
 
 package org.dcm4chee.wizard.edit.xds;
 
+import java.util.Map;
+
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormSubmitBehavior;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
@@ -52,16 +54,19 @@ import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
-import org.dcm4che.conf.api.ConfigurationException;
-import org.dcm4che.net.Device;
+import org.dcm4che3.conf.api.ConfigurationException;
+import org.dcm4che3.net.Device;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
 import org.dcm4chee.wizard.common.component.ModalWindowRuntimeException;
 import org.dcm4chee.wizard.common.component.secure.SecureSessionCheckPage;
 import org.dcm4chee.wizard.model.DeviceModel;
+import org.dcm4chee.wizard.model.GenericConfigNodeModel;
 import org.dcm4chee.wizard.model.StringArrayModel;
 import org.dcm4chee.wizard.model.xds.XCAiRespondingGatewayModel;
 import org.dcm4chee.wizard.tree.ConfigTreeNode;
 import org.dcm4chee.wizard.tree.ConfigTreeProvider;
+import org.dcm4chee.wizard.util.FormUtils;
+import org.dcm4chee.xds2.conf.XCAiInitiatingGWCfg;
 import org.dcm4chee.xds2.conf.XCAiRespondingGWCfg;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,8 +83,10 @@ public class XCAiRespondingGatewayEditPage extends SecureSessionCheckPage{
     // mandatory
     private Model<String> xdsApplicationNameModel;
     private Model<String> xdsHomeCommunityIdModel;
-    private StringArrayModel xdsiSrcUrlMappingModel;
+    private GenericConfigNodeModel<XCAiRespondingGWCfg> xdsImagingSources;
+    private Model<String> xdsRetrieveURLModel;
 
+    
     // optional
     private Model<String> xdsSoapMsgLogDirModel;
 
@@ -167,24 +174,34 @@ public class XCAiRespondingGatewayEditPage extends SecureSessionCheckPage{
         homeCommunityIdTextField.setRequired(true);
         form.add(homeCommunityIdTextField);
 
-        form.add(new Label("xdsiSrcUrlMapping.label", new ResourceModel(
-                "dicom.edit.xds.xdsiSrcUrlMapping.label")));
-        form.add(new TextArea<String>("xdsiSrcUrlMapping", xdsiSrcUrlMappingModel)
-                .setType(String.class)
-                .setRequired(true));
+        FormUtils.addGenericField(form, "xdsImagingSources", xdsImagingSources, true, true);
+        
+        form.add(new Label("xdsRetrieveURL.label", new ResourceModel("dicom.edit.xds.xdsRetrieveURL.label")));
+        FormComponent<String> xdsRetrieveURLField = new TextField<String>("xdsRetrieveURL",
+                xdsRetrieveURLModel);
+        xdsRetrieveURLField.setType(String.class);
+        xdsRetrieveURLField.setRequired(true);
+        form.add(xdsRetrieveURLField);
     }
 
     private void initAttributes(XCAiRespondingGWCfg xcai) {
         if (xcai == null) {
             xdsApplicationNameModel = Model.of();
             xdsHomeCommunityIdModel = Model.of();
-            xdsiSrcUrlMappingModel = new StringArrayModel(null);
             xdsSoapMsgLogDirModel = Model.of();
+
+            xdsImagingSources = new GenericConfigNodeModel<XCAiRespondingGWCfg>(new XCAiRespondingGWCfg(), "xdsImagingSource", Map.class);
+            
+            xdsRetrieveURLModel = Model.of();
+
         } else {
             xdsApplicationNameModel = Model.of(xcai.getApplicationName());
             xdsHomeCommunityIdModel = Model.of(xcai.getHomeCommunityID());
-            xdsiSrcUrlMappingModel = new StringArrayModel(xcai.getXDSiSourceURLs());
             xdsSoapMsgLogDirModel = Model.of(xcai.getSoapLogDir());
+
+            xdsImagingSources = new GenericConfigNodeModel<XCAiRespondingGWCfg>(xcai, "xdsImagingSource", Map.class);
+            
+            xdsRetrieveURLModel = Model.of(xcai.getRetrieveUrl());
         }
     }
 
@@ -217,7 +234,13 @@ public class XCAiRespondingGatewayEditPage extends SecureSessionCheckPage{
                     // mandatory
                     xcai.setApplicationName(xdsApplicationNameModel.getObject());
                     xcai.setHomeCommunityID(xdsHomeCommunityIdModel.getObject());
-                    xcai.setXDSiSourceURLs(xdsiSrcUrlMappingModel.getArray());
+
+                    try {
+                        xcai.setSrcDevicebySrcIdMap(xdsImagingSources.getModifiedConfigObj().getSrcDevicebySrcIdMap());
+                    } catch (NullPointerException e) { /* thats fine, this means nothing has changed */ }
+
+                    xcai.setRetrieveUrl(xdsRetrieveURLModel.getObject());
+                    
                     // optional
                     if (xdsSoapMsgLogDirModel.getObject() != null)
                         xcai.setSoapLogDir(xdsSoapMsgLogDirModel.getObject());

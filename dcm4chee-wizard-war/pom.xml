@@ -168,12 +168,18 @@
       <version>1.0.2.Final</version>
       <scope>provided</scope>
     </dependency>
-    <dependency>
+    <!-- <dependency>
       <groupId>net.sf.json-lib</groupId>
       <artifactId>json-lib</artifactId>
       <version>2.4</version>
       <classifier>jdk15</classifier>
-    </dependency>
+    </dependency> -->
+	<dependency>
+		<!-- for de/serializing generic config nodes -->
+		<groupId>com.fasterxml.jackson.core</groupId>
+		<artifactId>jackson-databind</artifactId>
+		<version>2.3.1</version>
+	</dependency>    
     <dependency>
       <groupId>org.apache.tomcat</groupId>
       <artifactId>catalina</artifactId>
@@ -195,6 +201,12 @@
       <artifactId>dcm4chee-xds2-infoset</artifactId>
       <version>${dcm4chee.xds2.version}</version>
     </dependency>
+	<dependency>
+		<groupId>junit</groupId>
+		<artifactId>junit</artifactId>
+		<version>4.11</version>
+		<scope>test</scope>
+	</dependency>    
   </dependencies>
   <build>
     <finalName>dcm4chee-wizard-war-${project.version}-${project-classifier}</finalName>

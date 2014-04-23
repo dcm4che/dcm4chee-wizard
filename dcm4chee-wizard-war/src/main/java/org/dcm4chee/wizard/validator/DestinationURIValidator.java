@@ -44,7 +44,7 @@ import java.util.Set;
 import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.ValidationError;
 import org.apache.wicket.validation.validator.StringValidator;
-import org.dcm4che.conf.api.ConfigurationException;
+import org.dcm4che3.conf.api.ConfigurationException;
 import org.dcm4chee.wizard.tree.ConfigTreeProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

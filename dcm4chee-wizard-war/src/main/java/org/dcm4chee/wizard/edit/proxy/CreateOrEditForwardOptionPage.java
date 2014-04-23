@@ -56,7 +56,7 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
-import org.dcm4che.conf.api.ConfigurationException;
+import org.dcm4che3.conf.api.ConfigurationException;
 import org.dcm4chee.proxy.conf.ForwardOption;
 import org.dcm4chee.proxy.conf.ProxyAEExtension;
 import org.dcm4chee.proxy.conf.Schedule;
