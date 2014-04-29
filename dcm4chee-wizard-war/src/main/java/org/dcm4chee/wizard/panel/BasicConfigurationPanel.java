@@ -118,6 +118,7 @@ import org.dcm4chee.wizard.edit.xds.XCAiInitiatingGatewayEditPage;
 import org.dcm4chee.wizard.edit.xds.XCAiRespondingGatewayEditPage;
 import org.dcm4chee.wizard.edit.xds.XDSRegistryEditPage;
 import org.dcm4chee.wizard.edit.xds.XDSRepositoryEditPage;
+import org.dcm4chee.wizard.edit.xds.XDSSourceEditPage;
 import org.dcm4chee.wizard.icons.ImageManager;
 import org.dcm4chee.wizard.icons.behaviour.ImageSizeBehaviour;
 import org.dcm4chee.wizard.model.ApplicationEntityModel;
@@ -136,6 +137,7 @@ import org.dcm4chee.wizard.model.xds.XCAiInitiatingGatewayModel;
 import org.dcm4chee.wizard.model.xds.XCAiRespondingGatewayModel;
 import org.dcm4chee.wizard.model.xds.XDSRegistryModel;
 import org.dcm4chee.wizard.model.xds.XDSRepositoryModel;
+import org.dcm4chee.wizard.model.xds.XDSSourceModel;
 import org.dcm4chee.wizard.page.ApplyTransferCapabilityProfilePage;
 import org.dcm4chee.wizard.page.DicomEchoPage;
 import org.dcm4chee.wizard.tree.ConfigTableTree;
@@ -150,6 +152,7 @@ import org.dcm4chee.xds2.conf.XCAiInitiatingGWCfg;
 import org.dcm4chee.xds2.conf.XCAiRespondingGWCfg;
 import org.dcm4chee.xds2.conf.XdsRegistry;
 import org.dcm4chee.xds2.conf.XdsRepository;
+import org.dcm4chee.xds2.conf.XdsSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -437,6 +440,10 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                             ((DeviceModel) deviceNode.getModel()).getDevice().removeDeviceExtension(
                                     ((DeviceModel) deviceNode.getModel()).getDevice().getDeviceExtension(
                                             XdsRegistry.class));
+                        } else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.XDSSource)) {
+                            ((DeviceModel) deviceNode.getModel()).getDevice().removeDeviceExtension(
+                                    ((DeviceModel) deviceNode.getModel()).getDevice().getDeviceExtension(
+                                            XdsSource.class));
                         } else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.XDSRepository)) {
                             ((DeviceModel) deviceNode.getModel()).getDevice().removeDeviceExtension(
                                     ((DeviceModel) deviceNode.getModel()).getDevice().getDeviceExtension(
@@ -558,6 +565,7 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                         || type.equals(ConfigTreeNode.TreeNodeType.XCAiRespondingGateway)
                         || type.equals(ConfigTreeNode.TreeNodeType.XCARespondingGateway)
                         || type.equals(ConfigTreeNode.TreeNodeType.XDSRegistry)
+                        || type.equals(ConfigTreeNode.TreeNodeType.XDSSource)
                         || type.equals(ConfigTreeNode.TreeNodeType.XDSRepository)) {
                     cellItem.add(new Label(componentId));
                     return;
@@ -1139,6 +1147,9 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                             .getModel(), rowModel.getObject().getAncestor(1));
                 } else if (type.equals(ConfigTreeNode.TreeNodeType.XDSRepository)) {
                     return new XDSRepositoryEditPage(editWindow, (XDSRepositoryModel) rowModel.getObject()
+                            .getModel(), rowModel.getObject().getAncestor(1));
+                } else if (type.equals(ConfigTreeNode.TreeNodeType.XDSSource)) {
+                    return new XDSSourceEditPage(editWindow, (XDSSourceModel) rowModel.getObject()
                             .getModel(), rowModel.getObject().getAncestor(1));
                 } else
                     return null;

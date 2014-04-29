@@ -135,16 +135,16 @@ public class UnwrappingSerializationTest {
 
         XCAInitiatingGWCfg initgw = createInitGw();
         GenericConfigNodeModel<XCAInitiatingGWCfg> nm = new GenericConfigNodeModel<XCAInitiatingGWCfg>(initgw, "xdsRespondingGateways", Map.class);
-        System.out.println(nm.getObject());
+        //System.out.println(nm.getObject());
         nm.setObject("{\"1301\":{\"xdsAffinityDomain\":\"1.2.5\",\"xdsRespondingGateway\":\"repo_dDDD\"},\"2002\":{\"xdsAffinityDomain\":\"10.20.30.40.50\",\"xdsRespondingGateway\":\"rgw_device_2\"}}");
-        System.out.println(nm.getModifiedConfigObj().getRespondingGWByHomeCommunityIdMap());
+        //System.out.println(nm.getModifiedConfigObj().getRespondingGWByHomeCommunityIdMap());
 
         
         XdsRegistry reg = createRegistry();
         GenericConfigNodeModel<XdsRegistry> nm1 = new GenericConfigNodeModel<XdsRegistry>(reg, "xdsBrowser", Map.class);
-        System.out.println(nm1.getObject());
+        //System.out.println(nm1.getObject());
         nm1.setObject("{\"xdsControlledDevices\" : [ \"BOODev\", \"TheThirdanotherDev\", \"AlsoControlledDev\" ]}");
-        System.out.println(nm1.getModifiedConfigObj().getXdsBrowser().getControlledDevices());
+        //System.out.println(nm1.getModifiedConfigObj().getXdsBrowser().getControlledDevices());
         
 
     }
