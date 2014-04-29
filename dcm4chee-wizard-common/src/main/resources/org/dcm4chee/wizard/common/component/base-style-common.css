@@ -160,7 +160,7 @@ table.dicomobject { background: #FFFFFF; color: black; width: 100%; }
 div.edit-title {margin-bottom: 9px;}
 div.edit-content div.edit-table-panel { width: 100%; }
 div.edit-table-panel div.edit-table-row { float: left; width: 100%; background: #A0D8C4; padding-bottom: 10px;}
-div.edit-table-panel .edit-desc { border: none; float: left; text-align: right; vertical-align: middle; margin: 2px 6px 0px; width: 40%; }
+div.edit-table-panel .edit-desc { border: none; float: left; text-align: right; vertical-align: middle; margin: 2px 6px 0px; width: 35%; }
 div.edit-table-panel .edit-value { border: 1px solid; float: left; text-align: left; vertical-align: middle; margin: 2px 6px 0px; width: auto; }
 
 div.edit-table-panel textarea.edit-value, 
