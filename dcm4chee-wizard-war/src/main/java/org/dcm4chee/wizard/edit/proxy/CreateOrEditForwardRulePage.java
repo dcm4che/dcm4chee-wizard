@@ -183,8 +183,6 @@ public class CreateOrEditForwardRulePage extends SecureSessionCheckPage {
         dimseList.remove(Dimse.N_DELETE_RSP);
         dimseList.remove(Dimse.N_GET_RQ);
         dimseList.remove(Dimse.N_GET_RSP);
-        dimseList.remove(Dimse.C_ECHO_RQ);
-        dimseList.remove(Dimse.C_ECHO_RSP);
         dimseList.remove(Dimse.C_CANCEL_RQ);
 
         DropDownChoice<Dimse> dimseDropDown1 = new DropDownChoice<Dimse>("dimse1", dimsesModel.getDimseModel(0),
