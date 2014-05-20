@@ -20,6 +20,7 @@
     <dcm4che.version>3.3.3</dcm4che.version>
     <device-name>dcm4chee-proxy</device-name>
     <dcm4chee.xds2.version>2.0.4-SNAPSHOT</dcm4chee.xds2.version>
+    <jdbc-prefs.version>1.1.0-SNAPSHOT</jdbc-prefs.version>
   </properties>
   <build>
     <defaultGoal>package</defaultGoal>
