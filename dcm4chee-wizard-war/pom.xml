@@ -42,7 +42,7 @@
       </activation>
       <properties>
         <project-classifier>jdbc</project-classifier>
-        <profile.dependencies>org.jboss.logmanager,org.slf4j.impl,org.dcm4che.core,org.dcm4che.net,org.dcm4che.net-hl7,org.dcm4che.conf.api,org.dcm4che.conf.ldap,org.dcm4che.conf.ldap-hl7,org.dcm4che.conf.ldap-audit,org.dcm4che.conf.prefs,org.dcm4che.conf.prefs-hl7,org.dcm4che.conf.prefs-audit,org.dcm4che.emf,deployment.dcm4che-jdbc-prefs-ejb-${jdbc-prefs.version}-${jdbc-prefs.db}.jar</profile.dependencies>
+        <profile.dependencies>org.jboss.logmanager,org.slf4j.impl,org.dcm4che.core,org.dcm4che.net,org.dcm4che.net-hl7,org.dcm4che.conf.api,org.dcm4che.conf.ldap,org.dcm4che.conf.ldap-hl7,org.dcm4che.conf.ldap-audit,org.dcm4che.conf.prefs,org.dcm4che.conf.prefs-hl7,org.dcm4che.conf.prefs-audit,org.dcm4che.emf,deployment.dcm4che-jdbc-prefs-ejb.jar</profile.dependencies>
         <web.xml.path>webapp</web.xml.path>
       </properties>
     </profile>
@@ -50,7 +50,7 @@
       <id>jdbc-proxy</id>
       <properties>
         <project-classifier>jdbc-proxy</project-classifier>
-        <profile.dependencies>org.dcm4che.mime,org.jboss.logmanager,org.slf4j.impl,org.dcm4che.core,org.dcm4che.net,org.dcm4che.net-hl7,org.dcm4che.conf.api,org.dcm4che.conf.ldap,org.dcm4che.conf.ldap-hl7,org.dcm4che.conf.ldap-audit,org.dcm4che.conf.prefs,org.dcm4che.conf.prefs-hl7,org.dcm4che.conf.prefs-audit,org.dcm4che.emf,deployment.dcm4che-jdbc-prefs-ejb-${jdbc-prefs.version}-${jdbc-prefs.db}.jar</profile.dependencies>
+        <profile.dependencies>org.dcm4che.mime,org.jboss.logmanager,org.slf4j.impl,org.dcm4che.core,org.dcm4che.net,org.dcm4che.net-hl7,org.dcm4che.conf.api,org.dcm4che.conf.ldap,org.dcm4che.conf.ldap-hl7,org.dcm4che.conf.ldap-audit,org.dcm4che.conf.prefs,org.dcm4che.conf.prefs-hl7,org.dcm4che.conf.prefs-audit,org.dcm4che.emf,deployment.dcm4che-jdbc-prefs-ejb.jar</profile.dependencies>
         <web.xml.path>etc/proxy</web.xml.path>
       </properties>
       <dependencies>
