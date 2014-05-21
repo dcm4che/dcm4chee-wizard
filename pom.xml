@@ -21,6 +21,7 @@
     <device-name>dcm4chee-proxy</device-name>
     <dcm4chee.xds2.version>2.0.4-SNAPSHOT</dcm4chee.xds2.version>
     <jdbc-prefs.version>1.1.0-SNAPSHOT</jdbc-prefs.version>
+    <jdbc-prefs.db>oracle</jdbc-prefs.db>
   </properties>
   <build>
     <defaultGoal>package</defaultGoal>
