@@ -42,15 +42,23 @@
       </activation>
       <properties>
         <project-classifier>jdbc</project-classifier>
-        <profile.dependencies>org.jboss.logmanager,org.slf4j.impl,org.dcm4che.core,org.dcm4che.net,org.dcm4che.net-hl7,org.dcm4che.conf.api,org.dcm4che.conf.ldap,org.dcm4che.conf.ldap-hl7,org.dcm4che.conf.ldap-audit,org.dcm4che.conf.prefs,org.dcm4che.conf.prefs-hl7,org.dcm4che.conf.prefs-audit,org.dcm4che.emf,deployment.dcm4che-jdbc-prefs-ejb.jar</profile.dependencies>
+        <profile.dependencies>org.jboss.logmanager,org.slf4j.impl,org.dcm4che.core,org.dcm4che.net,org.dcm4che.net-hl7,org.dcm4che.conf.api,org.dcm4che.conf.ldap,org.dcm4che.conf.ldap-hl7,org.dcm4che.conf.ldap-audit,org.dcm4che.conf.prefs,org.dcm4che.conf.prefs-hl7,org.dcm4che.conf.prefs-audit,org.dcm4che.emf</profile.dependencies>
         <web.xml.path>webapp</web.xml.path>
       </properties>
+     <dependencies>      
+       <dependency>
+          <groupId>org.dcm4che.jdbc.prefs</groupId>
+          <artifactId>dcm4che-jdbc-prefs-ejb</artifactId>
+          <version>${jdbc-prefs.version}</version>
+          <classifier>${db}</classifier>
+        </dependency>
+     </dependencies> 
     </profile>
     <profile>
       <id>jdbc-proxy</id>
       <properties>
         <project-classifier>jdbc-proxy</project-classifier>
-        <profile.dependencies>org.dcm4che.mime,org.jboss.logmanager,org.slf4j.impl,org.dcm4che.core,org.dcm4che.net,org.dcm4che.net-hl7,org.dcm4che.conf.api,org.dcm4che.conf.ldap,org.dcm4che.conf.ldap-hl7,org.dcm4che.conf.ldap-audit,org.dcm4che.conf.prefs,org.dcm4che.conf.prefs-hl7,org.dcm4che.conf.prefs-audit,org.dcm4che.emf,deployment.dcm4che-jdbc-prefs-ejb.jar</profile.dependencies>
+        <profile.dependencies>org.dcm4che.mime,org.jboss.logmanager,org.slf4j.impl,org.dcm4che.core,org.dcm4che.net,org.dcm4che.net-hl7,org.dcm4che.conf.api,org.dcm4che.conf.ldap,org.dcm4che.conf.ldap-hl7,org.dcm4che.conf.ldap-audit,org.dcm4che.conf.prefs,org.dcm4che.conf.prefs-hl7,org.dcm4che.conf.prefs-audit,org.dcm4che.emf</profile.dependencies>
         <web.xml.path>etc/proxy</web.xml.path>
       </properties>
       <dependencies>
@@ -59,10 +67,22 @@
           <artifactId>dcm4chee-proxy-service</artifactId>
           <version>${dcm4chee.proxy.version}</version>
         </dependency>
-      </dependencies>
+       <dependency>
+          <groupId>org.dcm4che.jdbc.prefs</groupId>
+          <artifactId>dcm4che-jdbc-prefs-ejb</artifactId>
+          <version>${jdbc-prefs.version}</version>
+          <classifier>${db}</classifier>
+        </dependency>
+     </dependencies> 
     </profile>
   </profiles>
   <dependencies>
+    <dependency>
+	<groupId>org.jboss.spec.javax.ejb</groupId>
+	<artifactId>jboss-ejb-api_3.1_spec</artifactId>
+	<version>1.0.0.Final</version>
+	<scope>provided</scope>
+    </dependency>
     <dependency>
       <groupId>org.dcm4che.dcm4chee-proxy</groupId>
       <artifactId>dcm4chee-proxy-conf</artifactId>
@@ -137,6 +157,11 @@
       <artifactId>wicket-core</artifactId>
       <version>${wicket.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.wicket</groupId>
+      <artifactId>wicket-cdi</artifactId>
+      <version>${wicket.version}</version>
+    </dependency>    
     <dependency>
       <groupId>org.apache.wicket</groupId>
       <artifactId>wicket-extensions</artifactId>

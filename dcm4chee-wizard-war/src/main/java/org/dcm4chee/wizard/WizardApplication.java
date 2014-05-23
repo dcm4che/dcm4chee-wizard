@@ -41,6 +41,7 @@ package org.dcm4chee.wizard;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.inject.Inject;
 import javax.security.auth.Subject;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -52,6 +53,7 @@ import org.apache.wicket.request.Response;
 import org.apache.wicket.request.cycle.AbstractRequestCycleListener;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.settings.IExceptionSettings.AjaxErrorStrategy;
+import org.dcm4che3.conf.prefs.cdi.PrefsFactory;
 import org.dcm4chee.wizard.common.component.secure.SecureWebApplication;
 import org.dcm4chee.wizard.common.login.context.LoginContextSecurityHelper;
 import org.dcm4chee.wizard.common.login.context.SSOLoginContext;
@@ -69,6 +71,10 @@ public class WizardApplication extends SecureWebApplication {
 
     protected static Logger log = LoggerFactory.getLogger(WizardApplication.class);
 
+    /**
+     * Comes either from the library, or from a custom Preferences provider
+     */
+    
     private DicomConfigurationManager dicomConfigurationManager;
     private Root root;
 

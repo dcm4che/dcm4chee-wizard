@@ -51,6 +51,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.prefs.Preferences;
+
+import javax.enterprise.context.spi.CreationalContext;
+import javax.enterprise.inject.spi.Bean;
+import javax.enterprise.inject.spi.BeanManager;
+import javax.naming.InitialContext;
 
 import org.apache.wicket.request.Url;
 import org.apache.wicket.request.cycle.RequestCycle;
@@ -66,6 +72,7 @@ import org.dcm4che3.conf.ldap.hl7.LdapHL7Configuration;
 import org.dcm4che3.conf.prefs.PreferencesDicomConfiguration;
 import org.dcm4che3.conf.prefs.audit.PreferencesAuditLoggerConfiguration;
 import org.dcm4che3.conf.prefs.audit.PreferencesAuditRecordRepositoryConfiguration;
+import org.dcm4che3.conf.prefs.cdi.PrefsFactory;
 import org.dcm4che3.conf.prefs.generic.PreferencesGenericConfigExtension;
 import org.dcm4che3.conf.prefs.hl7.PreferencesHL7Configuration;
 import org.dcm4che3.net.ApplicationEntity;
@@ -131,7 +138,27 @@ public class DicomConfigurationManager implements Serializable {
                     log.info("Using JDBC Preferences as Configuration Backend");
                 else
                     log.info("Using Java Preferences as Configuration Backend");
-                PreferencesDicomConfiguration prefsConfig = new PreferencesDicomConfiguration();
+                
+                // manual cdi..
+                PrefsFactory prefsFactory = null;
+                try {
+                    BeanManager manager;
+                    manager = (BeanManager) new InitialContext().lookup("java:comp/BeanManager");
+                    Set<Bean<?>> beans = manager.getBeans(PrefsFactory.class);
+                    Bean<PrefsFactory> prefsFactoryBean = (Bean<PrefsFactory>) beans.iterator().next();
+                    CreationalContext cc = manager.createCreationalContext(prefsFactoryBean);
+                    prefsFactory = (PrefsFactory) manager.getReference(prefsFactoryBean, PrefsFactory.class, cc);
+                } catch (Exception cdie) {
+                    log.warn("Could not inject PrefsFacory",cdie); // noop, no prefsFactory
+                }
+                
+                PreferencesDicomConfiguration prefsConfig;
+                if (prefsFactory != null) 
+                    prefsConfig = new PreferencesDicomConfiguration(prefsFactory.getPreferences()); else
+                    prefsConfig = new PreferencesDicomConfiguration(); 
+                        
+                log.info("Preferences runtime class {}", prefsConfig.getRootPrefs().getClass().toString());
+
                 PreferencesHL7Configuration hl7Config = new PreferencesHL7Configuration();
                 prefsConfig.addDicomConfigurationExtension(hl7Config);
                 prefsConfig.addDicomConfigurationExtension(new PreferencesProxyConfigurationExtension());
