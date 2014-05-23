@@ -39,27 +39,16 @@
 package org.dcm4chee.wizard.common.component.secure;
 
 import java.net.MalformedURLException;
-import java.util.NoSuchElementException;
-import java.util.Set;
-
-import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-
 import org.apache.wicket.Page;
 import org.apache.wicket.WicketRuntimeException;
 import org.apache.wicket.markup.html.pages.AccessDeniedPage;
 import org.apache.wicket.request.Request;
 import org.apache.wicket.request.Response;
 import org.apache.wicket.settings.IExceptionSettings;
-import org.dcm4che3.conf.prefs.cdi.PrefsFactory;
 import org.dcm4chee.wizard.common.component.InternalErrorPage;
 import org.dcm4chee.wizard.common.login.LoginPage;
 import org.dcm4chee.wizard.common.login.secure.ExtendedSwarmStrategy;
 import org.dcm4chee.wizard.common.login.secure.SecureSession;
-import org.jboss.weld.environment.servlet.Listener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wicketstuff.security.components.SecureWebPage;
