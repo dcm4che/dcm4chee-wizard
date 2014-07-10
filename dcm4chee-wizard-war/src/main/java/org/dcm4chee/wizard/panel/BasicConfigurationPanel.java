@@ -139,6 +139,8 @@ import org.dcm4chee.wizard.model.xds.XDSRegistryModel;
 import org.dcm4chee.wizard.model.xds.XDSRepositoryModel;
 import org.dcm4chee.wizard.model.xds.XDSSourceModel;
 import org.dcm4chee.wizard.page.ApplyTransferCapabilityProfilePage;
+import org.dcm4chee.wizard.page.AutoDetectTransferCapabilities;
+import org.dcm4chee.wizard.page.AutoDetectTransferCapabilities;
 import org.dcm4chee.wizard.page.DicomEchoPage;
 import org.dcm4chee.wizard.tree.ConfigTableTree;
 import org.dcm4chee.wizard.tree.ConfigTreeNode;
@@ -624,36 +626,88 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                 final TreeNodeType type = rowModel.getObject().getNodeType();
                 if (type == null)
                     throw new RuntimeException("Error: Unknown node type, cannot create profile modal window");
-                else if (!type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_TRANSFER_CAPABILITIES)) {
+
+                if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_TRANSFER_CAPABILITIES)) {
+
+                    AjaxLink<Object> ajaxLink = new AjaxLink<Object>("wickettree.link") {
+
+                        private static final long serialVersionUID = 1L;
+
+                        @Override
+                        public void onClick(AjaxRequestTarget target) {
+                            editWindow.setTitle("Device " + ((DeviceModel) rowModel.getObject().getRoot().getModel()).getDeviceName())
+                                    .setPageCreator(new ModalWindow.PageCreator() {
+
+                                        private static final long serialVersionUID = 1L;
+
+                                        @Override
+                                        public Page createPage() {
+                                            return new ApplyTransferCapabilityProfilePage(editWindow, null, rowModel.getObject()
+                                                    .getParent());
+                                        }
+                                    });
+                            editWindow.setWindowClosedCallback(windowClosedCallback).show(target);
+                        }
+                    };
+                    cellItem.add(new LinkPanel(componentId, ajaxLink, ImageManager.IMAGE_WIZARD_COMMON_PROFILE, removeConfirmation)).add(
+                            new AttributeAppender("style", Model.of("width: 50px; text-align: center;")));
+                } else
+                //
+                // for proxy devices, that are under our control - add button to open dialog for launching auto-detection of transfer capabilities
+                //
+                if (    // if it is AE level
+                        type.equals(ConfigTreeNode.TreeNodeType.APPLICATION_ENTITY) && 
+                        
+                        // if it is a Proxy device
+                        rowModel.getObject().getConfigurationType().equals(ConfigTreeProvider.ConfigurationType.Proxy) &&
+
+                        // if this device is 'connected'
+                        getDicomConfigurationManager().getConnectedDeviceUrls().get( rowModel.getObject().getRoot().getName()) != null 
+                    ) {
+                    
+                    final String deviceName = rowModel.getObject().getRoot().getName();
+                    
+                    AjaxLink<Object> ajaxLink = new AjaxLink<Object>("wickettree.link") {
+
+                        private static final long serialVersionUID = 1L;
+                        
+                        @Override
+                        public void onClick(AjaxRequestTarget target) {
+                            editWindow.setTitle("Auto detect transfer capabilities for all related devices of " + deviceName)
+                                    .setPageCreator(new ModalWindow.PageCreator() {
+
+                                        private static final long serialVersionUID = 1L;
+
+                                        @Override
+                                        public Page createPage() {
+                                            
+                                            IModel<ConfigTreeNode> arowModel = rowModel;
+                                            final String connectedDeviceUrl = getDicomConfigurationManager().getConnectedDeviceUrls().get(deviceName);
+                                            
+                                            
+                                            ApplicationEntity ae = null;
+                                            try {
+                                                ae = ((ApplicationEntityModel) rowModel.getObject().getModel()).getApplicationEntity();
+                                            } catch (ConfigurationException e) {
+                                                throw new RuntimeException("Cannot get the AE",e);
+                                            }
+                                                
+                                            return new AutoDetectTransferCapabilities(editWindow,connectedDeviceUrl, ae.getAETitle(), deviceName);
+                                        }
+                                    });
+                            editWindow.setWindowClosedCallback(windowClosedCallback).show(target);
+                        }
+                    };
+                    cellItem.add(new LinkPanel(componentId, ajaxLink, ImageManager.IMAGE_WIZARD_FOLDER_TRANSFER_CAPABILITY_TYPE, removeConfirmation)).add(
+                            new AttributeAppender("style", Model.of("width: 50px; text-align: center;")));
+                    
+                    
+                } else
+                {
                     cellItem.add(new Label(componentId));
                     return;
                 }
-
-                AjaxLink<Object> ajaxLink = new AjaxLink<Object>("wickettree.link") {
-
-                    private static final long serialVersionUID = 1L;
-
-                    @Override
-                    public void onClick(AjaxRequestTarget target) {
-                        editWindow.setTitle(
-                                "Device " + ((DeviceModel) rowModel.getObject().getRoot().getModel()).getDeviceName())
-                                .setPageCreator(new ModalWindow.PageCreator() {
-
-                                    private static final long serialVersionUID = 1L;
-
-                                    @Override
-                                    public Page createPage() {
-                                        return new ApplyTransferCapabilityProfilePage(editWindow, null, rowModel
-                                                .getObject().getParent());
-                                    }
-                                });
-                        editWindow.setWindowClosedCallback(windowClosedCallback).show(target);
-                    }
-                };
-                cellItem.add(
-                        new LinkPanel(componentId, ajaxLink, ImageManager.IMAGE_WIZARD_COMMON_PROFILE,
-                                removeConfirmation)).add(
-                        new AttributeAppender("style", Model.of("width: 50px; text-align: center;")));
+                   
             }
         };
     }

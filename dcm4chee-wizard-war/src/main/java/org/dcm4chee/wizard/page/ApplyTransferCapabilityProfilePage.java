@@ -82,7 +82,7 @@ public class ApplyTransferCapabilityProfilePage extends SecureSessionCheckPage {
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger log = LoggerFactory.getLogger(ApplyTransferCapabilityProfilePage.class);
+    private static Logger log = LoggerFactory.getLogger(AutoDetectTransferCapabilities.class);
 
     // mandatory
     private Model<Boolean> scuModel;
