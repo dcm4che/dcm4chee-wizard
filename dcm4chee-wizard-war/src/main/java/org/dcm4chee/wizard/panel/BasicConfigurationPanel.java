@@ -339,6 +339,7 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
             public void onOk(AjaxRequestTarget target) {
                 try {
                     log.warn("Reloading device list from configuration");
+                    ((WizardApplication) getApplication()).getDicomConfigurationManager().getDicomConfiguration().sync();
                     ConfigTreeProvider.get().loadDeviceList();
                     for (Iterator<ConfigTreeNode> i = configTree.getModel().getObject().iterator(); i.hasNext();) {
                         ConfigTreeNode root = i.next().getRoot();

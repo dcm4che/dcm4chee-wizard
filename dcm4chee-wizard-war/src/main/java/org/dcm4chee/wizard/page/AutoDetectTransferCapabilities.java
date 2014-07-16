@@ -60,11 +60,15 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.util.io.IOUtils;
 import org.apache.wicket.util.time.Duration;
+import org.dcm4chee.wizard.DicomConfigurationManager;
+import org.dcm4chee.wizard.WizardApplication;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
 import org.dcm4chee.wizard.common.component.ModalWindowRuntimeException;
+import org.dcm4chee.wizard.common.component.secure.MessageWindow;
 import org.dcm4chee.wizard.common.component.secure.SecureSessionCheckPage;
 import org.dcm4chee.wizard.tcxml.Group;
 import org.dcm4chee.wizard.tcxml.Profile;
+import org.dcm4chee.wizard.tree.ConfigTreeProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -145,15 +149,22 @@ public class AutoDetectTransferCapabilities extends SecureSessionCheckPage {
                             feedbackProgressModel.setObject(returnedMessage + " % completed");
                             target.add(feedbackProgressLabel);
                             
-                            // if 100 reached, show 'close' button and stop updating
+                            // if 100 reached
                             if (Math.abs(Float.parseFloat(returnedMessage)-100.0)< 0.0001) {
-                                
+
+                                log.info("Autodetection finished");
+
+                                // show 'close' button
                                 noBtn.setVisible(true);
                                 target.add(noBtn);
                                 
-                                log.info("Autodetection finished");
-                                
+                                // stop updating
                                 isStarted.set(false);
+                                
+                                // reload the config
+                                ((WizardApplication) getApplication()).getDicomConfigurationManager().getDicomConfiguration().sync();
+                                ((WizardApplication) getApplication()).getDicomConfigurationManager().resetDeviceMap();
+                                ConfigTreeProvider.get().loadDeviceList();
                             }
 
                         } else
@@ -205,12 +216,14 @@ public class AutoDetectTransferCapabilities extends SecureSessionCheckPage {
                             this.setVisible(false);
                             isStarted.set(true);
                             
+                            feedbackProgressModel.setObject("0.0 % completed");
+                            target.add(feedbackProgressLabel);
+
+                            
                             noBtn.setVisible(false);
                             target.add(feedbackSuccessLabel);
                             target.add(noBtn);
                             target.add(this);
-                            //target.add();
-                            
                           
                         } else if (responseCode == 404) {
                                 String msg = "The server has not found anything matching the Request-URI "
@@ -220,9 +233,6 @@ public class AutoDetectTransferCapabilities extends SecureSessionCheckPage {
                            
                         } else throw new Exception(returnedMessage);
 
-                        /*
-                        ((WizardApplication) getApplication()).getDicomConfigurationManager().clearReload(
-                                rowModel.getObject().getName());*/
                     } catch (Exception e) {
                         log.error("Error launching auto detection of TCs",e);
 
@@ -231,7 +241,6 @@ public class AutoDetectTransferCapabilities extends SecureSessionCheckPage {
                         target.add(feedbackErrorLabel);
                     }                    
                     
-                    //window.close(target);
                 } catch (Exception e) {
                     throw new ModalWindowRuntimeException(e.getLocalizedMessage());
                 }
