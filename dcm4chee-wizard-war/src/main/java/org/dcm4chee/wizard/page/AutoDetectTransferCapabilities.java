@@ -38,22 +38,28 @@
 
 package org.dcm4chee.wizard.page;
 
+import java.io.IOException;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.wicket.ajax.AbstractAjaxTimerBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxFallbackButton;
 import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxButton;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.util.io.IOUtils;
+import org.apache.wicket.util.time.Duration;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
 import org.dcm4chee.wizard.common.component.ModalWindowRuntimeException;
 import org.dcm4chee.wizard.common.component.secure.SecureSessionCheckPage;
@@ -70,7 +76,7 @@ public class AutoDetectTransferCapabilities extends SecureSessionCheckPage {
     private static final long serialVersionUID = 1L;
 
     private static Logger log = LoggerFactory.getLogger(AutoDetectTransferCapabilities.class);
-
+    private final AtomicBoolean isStarted = new AtomicBoolean(false);
 
     public AutoDetectTransferCapabilities(final ModalWindow window, final String connectedDeviceUrl, final String aeTitle, final String deviceName) {
         super();
@@ -80,18 +86,91 @@ public class AutoDetectTransferCapabilities extends SecureSessionCheckPage {
 
         add(form);
 
-        final Model feedbackErrorModel = new Model<String>();
+        final Model<String> feedbackErrorModel = new Model<String>();
         final Label feedbackErrorLabel = new Label("feedback.error", feedbackErrorModel);
         
-        final Model feedbackSuccessModel = new Model<String>();
+        final Model<String> feedbackSuccessModel = new Model<String>();
         final Label feedbackSuccessLabel = new Label("feedback.success", feedbackSuccessModel);
-        
 
+        final Model<String> feedbackProgressModel = new Model<String>();
+        final Label feedbackProgressLabel = new Label("feedback.progress", feedbackProgressModel);
+        
+        isStarted.set(false);
+        
         form.add(new Label("dicom.autoDetectTC.device", new Model<String>(deviceName)));
         form.add(new Label("dicom.autoDetectTC.ae", new Model<String>(aeTitle)));
         
         feedbackSuccessLabel.setOutputMarkupId(true);
         feedbackErrorLabel.setOutputMarkupId(true);
+        feedbackProgressLabel.setOutputMarkupId(true);
+        
+        final Button noBtn = new AjaxFallbackButton("no", new Model<String>("Close"), form) {
+
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
+                window.close(target);
+            }
+
+            @Override
+            protected void onError(AjaxRequestTarget arg0, Form<?> arg1) {
+            }
+        }.setDefaultFormProcessing(false);
+        form.add(noBtn.setOutputMarkupPlaceholderTag(true));
+        
+        AbstractAjaxTimerBehavior atb = new AbstractAjaxTimerBehavior(Duration.seconds(2)) {
+
+            @Override
+            protected void onTimer(AjaxRequestTarget target) {
+                // if process was launched, do update the progress
+                if (isStarted.get()) {
+
+                    String req = "getAutoConfigProgress";
+                    HttpURLConnection connection;
+                    try {
+                        connection = (HttpURLConnection) new URL(connectedDeviceUrl + (connectedDeviceUrl.endsWith("/") ? req : "/" + req))
+                                .openConnection();
+
+                        connection.setRequestMethod("GET");
+                        connection.setDoInput(true);
+
+                        StringWriter writer = new StringWriter();
+                        IOUtils.copy(connection.getInputStream(), writer);
+                        String returnedMessage = writer.toString();
+                        int responseCode = connection.getResponseCode();
+
+                        if (responseCode == 200) {
+
+                            feedbackProgressModel.setObject(returnedMessage + " % completed");
+                            target.add(feedbackProgressLabel);
+                            
+                            // if 100 reached, show 'close' button and stop updating
+                            if (Math.abs(Float.parseFloat(returnedMessage)-100.0)< 0.0001) {
+                                
+                                noBtn.setVisible(true);
+                                target.add(noBtn);
+                                
+                                log.info("Autodetection finished");
+                                
+                                isStarted.set(false);
+                            }
+
+                        } else
+                            throw new Exception("Unexpected response from the server (" + responseCode + ")");
+
+                    } catch (Exception e) {
+                        feedbackErrorModel.setObject("Error while trying to request current status: " + e.getMessage());
+                        target.add(feedbackErrorLabel);
+                    }
+                }
+            }
+            
+        };
+        
+        form.add(atb);
+        
+       
         
         form.add(new IndicatingAjaxButton("yes", new ResourceModel("yesBtn"), form) {
 
@@ -123,7 +202,15 @@ public class AutoDetectTransferCapabilities extends SecureSessionCheckPage {
                         if (responseCode == 200) {
                             // show error message to user
                             feedbackSuccessModel.setObject(returnedMessage);
+                            this.setVisible(false);
+                            isStarted.set(true);
+                            
+                            noBtn.setVisible(false);
                             target.add(feedbackSuccessLabel);
+                            target.add(noBtn);
+                            target.add(this);
+                            //target.add();
+                            
                           
                         } else if (responseCode == 404) {
                                 String msg = "The server has not found anything matching the Request-URI "
@@ -156,31 +243,12 @@ public class AutoDetectTransferCapabilities extends SecureSessionCheckPage {
                     target.add(form);
             }
         });
-        form.add(new AjaxFallbackButton("no", new ResourceModel("noBtn"), form) {
 
-            private static final long serialVersionUID = 1L;
 
-            @Override
-            protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
-                window.close(target);
-            }
-
-            @Override
-            protected void onError(AjaxRequestTarget arg0, Form<?> arg1) {
-            }
-        }.setDefaultFormProcessing(false));
+        
         
         form.add(feedbackErrorLabel);
         form.add(feedbackSuccessLabel);
-    }
-
-    private List<Profile> orderedProfiles(Group group) {
-        List<Profile> profiles = group.getTransferCapabilityProfiles();
-        Collections.sort(profiles, new Comparator<Profile>() {
-            public int compare(Profile profile1, Profile profile2) {
-                return profile1.name.compareToIgnoreCase(profile2.name);
-            }
-        });
-        return profiles;
+        form.add(feedbackProgressLabel);
     }
 }
