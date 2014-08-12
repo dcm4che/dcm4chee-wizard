@@ -38,20 +38,6 @@
 
 package org.dcm4chee.wizard.panel;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
-import java.util.zip.ZipOutputStream;
-
 import org.apache.catalina.connector.ClientAbortException;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
@@ -91,6 +77,7 @@ import org.dcm4che3.conf.api.DicomConfiguration;
 import org.dcm4che3.conf.prefs.PreferencesDicomConfiguration;
 import org.dcm4che3.net.ApplicationEntity;
 import org.dcm4che3.net.Connection;
+import org.dcm4che3.net.DeviceExtension;
 import org.dcm4che3.net.TransferCapability;
 import org.dcm4che3.net.audit.AuditLogger;
 import org.dcm4che3.net.hl7.HL7Application;
@@ -102,44 +89,20 @@ import org.dcm4chee.wizard.common.component.ExtendedForm;
 import org.dcm4chee.wizard.common.component.ModalWindowRuntimeException;
 import org.dcm4chee.wizard.common.component.secure.ConfirmationWindow;
 import org.dcm4chee.wizard.common.component.secure.MessageWindow;
-import org.dcm4chee.wizard.edit.CreateOrEditApplicationEntityPage;
-import org.dcm4chee.wizard.edit.CreateOrEditAuditLoggerPage;
-import org.dcm4chee.wizard.edit.CreateOrEditCoercionPage;
-import org.dcm4chee.wizard.edit.CreateOrEditConnectionPage;
-import org.dcm4chee.wizard.edit.CreateOrEditDevicePage;
-import org.dcm4chee.wizard.edit.CreateOrEditHL7ApplicationPage;
-import org.dcm4chee.wizard.edit.CreateOrEditTransferCapabilityPage;
+import org.dcm4chee.wizard.edit.*;
 import org.dcm4chee.wizard.edit.proxy.CreateOrEditForwardOptionPage;
 import org.dcm4chee.wizard.edit.proxy.CreateOrEditForwardRulePage;
 import org.dcm4chee.wizard.edit.proxy.CreateOrEditRetryPage;
-import org.dcm4chee.wizard.edit.xds.XCAInitiatingGatewayEditPage;
-import org.dcm4chee.wizard.edit.xds.XCARespondingGatewayEditPage;
-import org.dcm4chee.wizard.edit.xds.XCAiInitiatingGatewayEditPage;
-import org.dcm4chee.wizard.edit.xds.XCAiRespondingGatewayEditPage;
-import org.dcm4chee.wizard.edit.xds.XDSRegistryEditPage;
-import org.dcm4chee.wizard.edit.xds.XDSRepositoryEditPage;
-import org.dcm4chee.wizard.edit.xds.XDSSourceEditPage;
+import org.dcm4chee.wizard.edit.xds.*;
 import org.dcm4chee.wizard.icons.ImageManager;
 import org.dcm4chee.wizard.icons.behaviour.ImageSizeBehaviour;
-import org.dcm4chee.wizard.model.ApplicationEntityModel;
-import org.dcm4chee.wizard.model.AuditLoggerModel;
-import org.dcm4chee.wizard.model.CoercionModel;
-import org.dcm4chee.wizard.model.ConnectionModel;
-import org.dcm4chee.wizard.model.DeviceModel;
-import org.dcm4chee.wizard.model.TransferCapabilityModel;
+import org.dcm4chee.wizard.model.*;
 import org.dcm4chee.wizard.model.hl7.HL7ApplicationModel;
 import org.dcm4chee.wizard.model.proxy.ForwardOptionModel;
 import org.dcm4chee.wizard.model.proxy.ForwardRuleModel;
 import org.dcm4chee.wizard.model.proxy.RetryModel;
-import org.dcm4chee.wizard.model.xds.XCAInitiatingGatewayModel;
-import org.dcm4chee.wizard.model.xds.XCARespondingGatewayModel;
-import org.dcm4chee.wizard.model.xds.XCAiInitiatingGatewayModel;
-import org.dcm4chee.wizard.model.xds.XCAiRespondingGatewayModel;
-import org.dcm4chee.wizard.model.xds.XDSRegistryModel;
-import org.dcm4chee.wizard.model.xds.XDSRepositoryModel;
-import org.dcm4chee.wizard.model.xds.XDSSourceModel;
+import org.dcm4chee.wizard.model.xds.*;
 import org.dcm4chee.wizard.page.ApplyTransferCapabilityProfilePage;
-import org.dcm4chee.wizard.page.AutoDetectTransferCapabilities;
 import org.dcm4chee.wizard.page.AutoDetectTransferCapabilities;
 import org.dcm4chee.wizard.page.DicomEchoPage;
 import org.dcm4chee.wizard.tree.ConfigTableTree;
@@ -148,15 +111,21 @@ import org.dcm4chee.wizard.tree.ConfigTreeNode.TreeNodeType;
 import org.dcm4chee.wizard.tree.ConfigTreeProvider;
 import org.dcm4chee.wizard.tree.ConfigTreeProvider.ConfigurationType;
 import org.dcm4chee.wizard.tree.CustomTreeColumn;
-import org.dcm4chee.xds2.conf.XCAInitiatingGWCfg;
-import org.dcm4chee.xds2.conf.XCARespondingGWCfg;
-import org.dcm4chee.xds2.conf.XCAiInitiatingGWCfg;
-import org.dcm4chee.xds2.conf.XCAiRespondingGWCfg;
-import org.dcm4chee.xds2.conf.XdsRegistry;
-import org.dcm4chee.xds2.conf.XdsRepository;
-import org.dcm4chee.xds2.conf.XdsSource;
+import org.dcm4chee.xds2.common.deactivatable.Deactivateable;
+import org.dcm4chee.xds2.conf.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
+import java.util.zip.ZipOutputStream;
 
 /**
  * @author Robert David <robert.david@agfa.com>
@@ -341,7 +310,7 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                     log.warn("Reloading device list from configuration");
                     ((WizardApplication) getApplication()).getDicomConfigurationManager().getDicomConfiguration().sync();
                     ConfigTreeProvider.get().loadDeviceList();
-                    for (Iterator<ConfigTreeNode> i = configTree.getModel().getObject().iterator(); i.hasNext();) {
+                    for (Iterator<ConfigTreeNode> i = configTree.getModel().getObject().iterator(); i.hasNext(); ) {
                         ConfigTreeNode root = i.next().getRoot();
                         for (ConfigTreeNode deviceNode : ConfigTreeProvider.get().getNodeList())
                             if (deviceNode.equals(root) && (((DeviceModel) deviceNode.getModel()).getDevice() == null))
@@ -547,7 +516,7 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
             private static final long serialVersionUID = 1L;
 
             public void populateItem(Item<ICellPopulator<ConfigTreeNode>> cellItem, String componentId,
-                    final IModel<ConfigTreeNode> rowModel) {
+                                     final IModel<ConfigTreeNode> rowModel) {
 
                 final TreeNodeType type = rowModel.getObject().getNodeType();
                 if (type == null)
@@ -622,7 +591,7 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
             private static final long serialVersionUID = 1L;
 
             public void populateItem(Item<ICellPopulator<ConfigTreeNode>> cellItem, String componentId,
-                    final IModel<ConfigTreeNode> rowModel) {
+                                     final IModel<ConfigTreeNode> rowModel) {
 
                 final TreeNodeType type = rowModel.getObject().getNodeType();
                 if (type == null)
@@ -653,62 +622,61 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                     cellItem.add(new LinkPanel(componentId, ajaxLink, ImageManager.IMAGE_WIZARD_COMMON_PROFILE, removeConfirmation)).add(
                             new AttributeAppender("style", Model.of("width: 50px; text-align: center;")));
                 } else
-                //
-                // for proxy devices, that are under our control - add button to open dialog for launching auto-detection of transfer capabilities
-                //
-                if (    // if it is AE level
-                        type.equals(ConfigTreeNode.TreeNodeType.APPLICATION_ENTITY) && 
-                        
-                        // if it is a Proxy device
-                        rowModel.getObject().getConfigurationType().equals(ConfigTreeProvider.ConfigurationType.Proxy) &&
+                    //
+                    // for proxy devices, that are under our control - add button to open dialog for launching auto-detection of transfer capabilities
+                    //
+                    if (    // if it is AE level
+                            type.equals(ConfigTreeNode.TreeNodeType.APPLICATION_ENTITY) &&
 
-                        // if this device is 'connected'
-                        getDicomConfigurationManager().getConnectedDeviceUrls().get( rowModel.getObject().getRoot().getName()) != null 
-                    ) {
-                    
-                    final String deviceName = rowModel.getObject().getRoot().getName();
-                    
-                    AjaxLink<Object> ajaxLink = new AjaxLink<Object>("wickettree.link") {
+                                    // if it is a Proxy device
+                                    rowModel.getObject().getConfigurationType().equals(ConfigTreeProvider.ConfigurationType.Proxy) &&
 
-                        private static final long serialVersionUID = 1L;
-                        
-                        @Override
-                        public void onClick(AjaxRequestTarget target) {
-                            editWindow.setTitle("Auto detect transfer capabilities for all related devices of " + deviceName)
-                                    .setPageCreator(new ModalWindow.PageCreator() {
+                                    // if this device is 'connected'
+                                    getDicomConfigurationManager().getConnectedDeviceUrls().get(rowModel.getObject().getRoot().getName()) != null
+                            ) {
 
-                                        private static final long serialVersionUID = 1L;
+                        final String deviceName = rowModel.getObject().getRoot().getName();
 
-                                        @Override
-                                        public Page createPage() {
-                                            
-                                            IModel<ConfigTreeNode> arowModel = rowModel;
-                                            final String connectedDeviceUrl = getDicomConfigurationManager().getConnectedDeviceUrls().get(deviceName);
-                                            
-                                            
-                                            ApplicationEntity ae = null;
-                                            try {
-                                                ae = ((ApplicationEntityModel) rowModel.getObject().getModel()).getApplicationEntity();
-                                            } catch (ConfigurationException e) {
-                                                throw new RuntimeException("Cannot get the AE",e);
+                        AjaxLink<Object> ajaxLink = new AjaxLink<Object>("wickettree.link") {
+
+                            private static final long serialVersionUID = 1L;
+
+                            @Override
+                            public void onClick(AjaxRequestTarget target) {
+                                editWindow.setTitle("Auto detect transfer capabilities for all related devices of " + deviceName)
+                                        .setPageCreator(new ModalWindow.PageCreator() {
+
+                                            private static final long serialVersionUID = 1L;
+
+                                            @Override
+                                            public Page createPage() {
+
+                                                IModel<ConfigTreeNode> arowModel = rowModel;
+                                                final String connectedDeviceUrl = getDicomConfigurationManager().getConnectedDeviceUrls().get(deviceName);
+
+
+                                                ApplicationEntity ae = null;
+                                                try {
+                                                    ae = ((ApplicationEntityModel) rowModel.getObject().getModel()).getApplicationEntity();
+                                                } catch (ConfigurationException e) {
+                                                    throw new RuntimeException("Cannot get the AE", e);
+                                                }
+
+                                                return new AutoDetectTransferCapabilities(editWindow, connectedDeviceUrl, ae.getAETitle(), deviceName);
                                             }
-                                                
-                                            return new AutoDetectTransferCapabilities(editWindow,connectedDeviceUrl, ae.getAETitle(), deviceName);
-                                        }
-                                    });
-                            editWindow.setWindowClosedCallback(windowClosedCallback).show(target);
-                        }
-                    };
-                    cellItem.add(new LinkPanel(componentId, ajaxLink, ImageManager.IMAGE_WIZARD_FOLDER_TRANSFER_CAPABILITY_TYPE, removeConfirmation)).add(
-                            new AttributeAppender("style", Model.of("width: 50px; text-align: center;")));
-                    
-                    
-                } else
-                {
-                    cellItem.add(new Label(componentId));
-                    return;
-                }
-                   
+                                        });
+                                editWindow.setWindowClosedCallback(windowClosedCallback).show(target);
+                            }
+                        };
+                        cellItem.add(new LinkPanel(componentId, ajaxLink, ImageManager.IMAGE_WIZARD_FOLDER_TRANSFER_CAPABILITY_TYPE, removeConfirmation)).add(
+                                new AttributeAppender("style", Model.of("width: 50px; text-align: center;")));
+
+
+                    } else {
+                        cellItem.add(new Label(componentId));
+                        return;
+                    }
+
             }
         };
     }
@@ -719,7 +687,7 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
             private static final long serialVersionUID = 1L;
 
             public void populateItem(final Item<ICellPopulator<ConfigTreeNode>> cellItem, final String componentId,
-                    final IModel<ConfigTreeNode> rowModel) {
+                                     final IModel<ConfigTreeNode> rowModel) {
 
                 final TreeNodeType type = rowModel.getObject().getNodeType();
                 if (type == null)
@@ -740,7 +708,7 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
 
                 ajaxLink.setVisible((!type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_APPLICATION_ENTITIES)
                         && !type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_HL7_APPLICATIONS) && !type
-                            .equals(ConfigTreeNode.TreeNodeType.CONTAINER_AUDIT_LOGGERS))
+                        .equals(ConfigTreeNode.TreeNodeType.CONTAINER_AUDIT_LOGGERS))
                         || rowModel.getObject().getParent().getChildren().get(0).hasChildren());
 
                 try {
@@ -755,7 +723,7 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                 try {
                     if (type.equals(ConfigTreeNode.TreeNodeType.CONTAINER_AUDIT_LOGGERS)
                             && ((DeviceModel) rowModel.getObject().getParent().getModel()).getDevice()
-                                    .getDeviceExtension(AuditLogger.class) != null)
+                            .getDeviceExtension(AuditLogger.class) != null)
                         ajaxLink.setVisible(false);
                 } catch (ConfigurationException ce) {
                     log.error("Error accessing Audit Logger", ce);
@@ -790,7 +758,7 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
             private static final long serialVersionUID = 1L;
 
             public void populateItem(final Item<ICellPopulator<ConfigTreeNode>> cellItem, final String componentId,
-                    final IModel<ConfigTreeNode> rowModel) {
+                                     final IModel<ConfigTreeNode> rowModel) {
 
                 final TreeNodeType type = rowModel.getObject().getNodeType();
                 if (type == null)
@@ -841,7 +809,7 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
             private static final long serialVersionUID = 1L;
 
             public void populateItem(final Item<ICellPopulator<ConfigTreeNode>> cellItem, final String componentId,
-                    final IModel<ConfigTreeNode> rowModel) {
+                                     final IModel<ConfigTreeNode> rowModel) {
 
                 final TreeNodeType type = rowModel.getObject().getNodeType();
                 if (type == null)
@@ -849,9 +817,9 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
 
                 if (!type.equals(ConfigTreeNode.TreeNodeType.DEVICE)
                         || !getDicomConfigurationManager().getConnectedDeviceUrls().containsKey(
-                                rowModel.getObject().getName())
+                        rowModel.getObject().getName())
                         || !((WizardApplication) getApplication()).getDicomConfigurationManager().isReload(
-                                rowModel.getObject().getName())) {
+                        rowModel.getObject().getName())) {
                     cellItem.add(new Label(componentId));
                     return;
                 }
@@ -884,7 +852,7 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
             private static final long serialVersionUID = 1L;
 
             public void populateItem(final Item<ICellPopulator<ConfigTreeNode>> cellItem, final String componentId,
-                    final IModel<ConfigTreeNode> rowModel) {
+                                     final IModel<ConfigTreeNode> rowModel) {
 
                 final TreeNodeType type = rowModel.getObject().getNodeType();
                 if (type == null)
@@ -892,7 +860,7 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
 
                 if (!type.equals(ConfigTreeNode.TreeNodeType.DEVICE)
                         || !getDicomConfigurationManager().getConnectedDeviceUrls().containsKey(
-                                rowModel.getObject().getName())) {
+                        rowModel.getObject().getName())) {
                     cellItem.add(new Label(componentId));
                     return;
                 }
@@ -929,8 +897,7 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                                             + connection.getURL().toString() + ", HTTP Status "
                                             + connection.getResponseCode() + ": " + connection.getResponseMessage();
                                     throw new Exception(msg);
-                                }
-                                else
+                                } else
                                     throw new Exception("</br>Expected response 204, but was "
                                             + connection.getResponseCode() + ": " + connection.getResponseMessage());
                             }
@@ -942,7 +909,7 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                             if (log.isDebugEnabled())
                                 e.printStackTrace();
                             resultMessage = new StringResourceModel("dicom.reload.message.failed", this, null,
-                                    new Object[] { e.getMessage() });
+                                    new Object[]{e.getMessage()});
 
                             reloadMessage = new MessageWindow("reload-message", resultMessage) {
 
@@ -971,75 +938,74 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
             private static final long serialVersionUID = 1L;
 
             public void populateItem(final Item<ICellPopulator<ConfigTreeNode>> cellItem, final String componentId,
-                    final IModel<ConfigTreeNode> rowModel) {
+                                     final IModel<ConfigTreeNode> rowModel) {
 
                 final TreeNodeType type = rowModel.getObject().getNodeType();
                 if (type == null)
                     throw new RuntimeException("Error: Unknown node type, cannot create edit modal window");
 
-                if (!type.equals(ConfigTreeNode.TreeNodeType.DEVICE)
-                        || !getDicomConfigurationManager().getConnectedDeviceUrls().containsKey(
-                                rowModel.getObject().getName())) {
-                    cellItem.add(new Label(componentId));
+
+                Map<TreeNodeType, String> xdsRestPath = new HashMap<>();
+                xdsRestPath.put(TreeNodeType.XDSRegistry, "xds-reg-rs/ctrl/");
+                xdsRestPath.put(TreeNodeType.XDSRepository, "xds-rep-rs/ctrl/");
+                xdsRestPath.put(TreeNodeType.XCAiInitiatingGateway, "xds-xcai-rs/ctrl/");
+                xdsRestPath.put(TreeNodeType.XCAiRespondingGateway, "xds-xcai-rs/ctrl/");
+                xdsRestPath.put(TreeNodeType.XCAInitiatingGateway, "xds-xca-rs/ctrl/");
+                xdsRestPath.put(TreeNodeType.XCARespondingGateway, "xds-xca-rs/ctrl/");
+
+                Map<TreeNodeType, Class<? extends DeviceExtension>> xdsExtensions = new HashMap<>();
+                xdsExtensions.put(TreeNodeType.XDSRegistry, XdsRegistry.class);
+                xdsExtensions.put(TreeNodeType.XDSRepository, XdsRepository.class);
+                xdsExtensions.put(TreeNodeType.XCAiInitiatingGateway, XCAiInitiatingGWCfg.class);
+                xdsExtensions.put(TreeNodeType.XCAiRespondingGateway, XCAiRespondingGWCfg.class);
+                xdsExtensions.put(TreeNodeType.XCAInitiatingGateway, XCAInitiatingGWCfg.class);
+                xdsExtensions.put(TreeNodeType.XCARespondingGateway, XCARespondingGWCfg.class);
+
+
+                String connectedDeviceUrl = null;
+                DeviceExtension devExt = null;
+                // for device-level status indicator
+                if (type.equals(TreeNodeType.DEVICE) && !rowModel.getObject().getConfigurationType().equals(ConfigurationType.XDS) ) {
+
+                    connectedDeviceUrl = getDicomConfigurationManager().getConnectedDeviceUrls().get(
+                            rowModel.getObject().getName());
+                // for extension-level status indicator
+                } else if (xdsExtensions.containsKey(type)) {
+
+                    String deviceName = rowModel.getObject().getRoot().getName();
+                    connectedDeviceUrl = getDicomConfigurationManager().getConnectedDeviceUrls().get(deviceName);
+                    if (connectedDeviceUrl != null) {
+                        connectedDeviceUrl+=xdsExtensions.get(type);
+
+                        try {
+                            devExt = ((WizardApplication) getApplication()).getDicomConfigurationManager().getDicomConfiguration().findDevice(deviceName).getDeviceExtension(xdsExtensions.get(type));
+                        } catch (ConfigurationException e) {
+                            log.warn("Could not get a device extension",e);
+                        }
+
+                    }
+                }
+
+
+                if (connectedDeviceUrl != null) {
+
+
+
+                    StatusAjaxLink ajaxLink = new StatusAjaxLink(connectedDeviceUrl, devExt);
+                    StatusAjaxLink.StatusResponse statusResponse = ajaxLink.getStatusResponse().invoke(BasicConfigurationPanel.this);
+
+                    cellItem.add(
+                            new LinkPanel(componentId, ajaxLink, statusResponse.getImage(), null)
+                                    .setImage(null, statusResponse.getResultMessage())
+                                    .setOutputMarkupId(true)).add(
+                            new AttributeAppender("style", Model.of("width: 50px; text-align: center;")));
+
                     return;
                 }
 
-                final String connectedDeviceUrl = getDicomConfigurationManager().getConnectedDeviceUrls().get(
-                        rowModel.getObject().getName());
+                cellItem.add(new Label(componentId));
+                return;
 
-                IndicatingAjaxLink<Object> ajaxLink = new IndicatingAjaxLink<Object>("wickettree.link") {
-
-                    private static final long serialVersionUID = 1L;
-
-                    @Override
-                    public void onClick(AjaxRequestTarget target) {
-
-                        if (connectedDeviceUrl == null) {
-                            log.warn("Service endpoint for status is not configured correctly");
-                            return;
-                        } else
-                            log.info("Attempting to retrieve status using service endpoint " + connectedDeviceUrl);
-
-                        StringResourceModel resultMessage;
-                        ResourceReference image;
-                        try {
-                            boolean result = getStatus(connectedDeviceUrl);
-                            resultMessage = new StringResourceModel(result ? "dicom.status.message.success"
-                                    : "dicom.status.message.warning", this, null);
-                            image = result ? ImageManager.IMAGE_WIZARD_RUNNING : ImageManager.IMAGE_WIZARD_NOT_RUNNING;
-                        } catch (Exception e) {
-                            log.error("Error retrieving status of connected device: " + e.getMessage());
-                            if (log.isDebugEnabled())
-                                e.printStackTrace();
-                            resultMessage = new StringResourceModel("dicom.status.message.failed", this, null,
-                                    new Object[] { e.getMessage() });
-                            image = ImageManager.IMAGE_WIZARD_NOT_RUNNING;
-                        }
-                        ((LinkPanel) this.getParent()).setImage(image, resultMessage);
-                        target.add(getParent());
-                    }
-                };
-
-                StringResourceModel resultMessage;
-                ResourceReference image;
-                try {
-                    boolean result = getStatus(connectedDeviceUrl);
-                    resultMessage = new StringResourceModel(result ? "dicom.status.message.success"
-                            : "dicom.status.message.warning", BasicConfigurationPanel.this, null);
-                    image = result ? ImageManager.IMAGE_WIZARD_RUNNING : ImageManager.IMAGE_WIZARD_NOT_RUNNING;
-                } catch (Exception e) {
-                    log.error("Error retrieving status of connected device: " + e.getMessage());
-                    if (log.isDebugEnabled())
-                        e.printStackTrace();
-                    resultMessage = new StringResourceModel("dicom.status.message.failed",
-                            BasicConfigurationPanel.this, null, new Object[] { e.getMessage() });
-                    image = ImageManager.IMAGE_WIZARD_NOT_RUNNING;
-                }
-
-                cellItem.add(
-                        new LinkPanel(componentId, ajaxLink, image, null).setImage(null, resultMessage)
-                                .setOutputMarkupId(true)).add(
-                        new AttributeAppender("style", Model.of("width: 50px; text-align: center;")));
             }
         };
     }
@@ -1050,7 +1016,7 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
             private static final long serialVersionUID = 1L;
 
             public void populateItem(Item<ICellPopulator<ConfigTreeNode>> cellItem, String componentId,
-                    IModel<ConfigTreeNode> rowModel) {
+                                     IModel<ConfigTreeNode> rowModel) {
                 ConfigTreeNode configTreeNode = (ConfigTreeNode) rowModel.getObject();
                 RepeatingView connectionsView = new RepeatingView(componentId);
                 cellItem.add(connectionsView);
@@ -1064,7 +1030,7 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                                         ImageManager.IMAGE_WIZARD_CONNECTION,
                                         Model.of(connection.getCommonName() == null ? connection.getHostname() + ":"
                                                 + connection.getPort() : connection.getCommonName()), Model
-                                                .of(connection.toString())));
+                                        .of(connection.toString())));
                     }
                 } catch (ConfigurationException ce) {
                     log.error(this.getClass().toString() + ": " + "Error listing connections for application entity: "
@@ -1082,7 +1048,7 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
             private static final long serialVersionUID = 1L;
 
             public void populateItem(final Item<ICellPopulator<ConfigTreeNode>> cellItem, final String componentId,
-                    final IModel<ConfigTreeNode> rowModel) {
+                                     final IModel<ConfigTreeNode> rowModel) {
 
                 ConfigTreeNode configTreeNode = (ConfigTreeNode) rowModel.getObject();
                 String protocol = "";
@@ -1106,7 +1072,7 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
             private static final long serialVersionUID = 1L;
 
             public void populateItem(final Item<ICellPopulator<ConfigTreeNode>> cellItem, final String componentId,
-                    final IModel<ConfigTreeNode> rowModel) {
+                                     final IModel<ConfigTreeNode> rowModel) {
 
                 final ConfigurationType configurationType = rowModel.getObject().getConfigurationType();
                 cellItem.add(new Label(componentId, Model.of(configurationType == null ? "" : configurationType
@@ -1316,9 +1282,81 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
             @Override
             public void onClick(AjaxRequestTarget target) {
                 removeConfirmation.confirm(target, new StringResourceModel("dicom.confirmDelete", this, null,
-                        new Object[] { rowModel.getObject().getNodeType(), rowModel.getObject().getName() }), rowModel
+                        new Object[]{rowModel.getObject().getNodeType(), rowModel.getObject().getName()}), rowModel
                         .getObject());
             }
         };
+    }
+
+    public class StatusAjaxLink extends IndicatingAjaxLink<Object> {
+
+        private static final long serialVersionUID = 1L;
+        private final String connectedDeviceUrl;
+        private DeviceExtension devExt;
+
+
+        public StatusAjaxLink(String connectedDeviceUrl, DeviceExtension devExt) {
+            super("wickettree.link");
+            this.connectedDeviceUrl = connectedDeviceUrl;
+            this.devExt = devExt;
+        }
+
+        public StatusResponse getStatusResponse() {
+            return new StatusResponse();
+        }
+
+        @Override
+        public void onClick(AjaxRequestTarget target) {
+
+            if (connectedDeviceUrl == null) {
+                log.warn("Service endpoint for status is not configured correctly");
+                return;
+            } else
+                log.info("Attempting to retrieve status using service endpoint " + connectedDeviceUrl);
+
+            StatusResponse statusResponse = new StatusResponse().invoke(StatusAjaxLink.this);
+            ResourceReference image = statusResponse.getImage();
+            StringResourceModel resultMessage = statusResponse.getResultMessage();
+            ((LinkPanel) this.getParent()).setImage(image, resultMessage);
+            target.add(getParent());
+        }
+
+        public class StatusResponse {
+            private StringResourceModel resultMessage;
+            private ResourceReference image;
+
+            public StringResourceModel getResultMessage() {
+                return resultMessage;
+            }
+
+            public ResourceReference getImage() {
+                return image;
+            }
+
+            public StatusResponse invoke(Component component) {
+                try {
+                    boolean result = getStatus(connectedDeviceUrl);
+                    resultMessage = new StringResourceModel(result ? "dicom.status.message.success"
+                            : "dicom.status.message.warning", component, null);
+                    image = result ? ImageManager.IMAGE_WIZARD_RUNNING : ImageManager.IMAGE_WIZARD_NOT_RUNNING;
+
+                    // if extension is deactivated
+                    if (devExt != null) {
+                        if (((Deactivateable) devExt).isDeactivated()) {
+                            image = ImageManager.IMAGE_WIZARD_COMMON_REMOVE;
+                            resultMessage = new StringResourceModel("dicom.status.message.warning", component, null, new Object[]{"Extension is deactivated"});
+                        }
+                    }
+                } catch (Exception e) {
+                    log.error("Error retrieving status of connected device: " + e.getMessage());
+                    if (log.isDebugEnabled())
+                        e.printStackTrace();
+                    resultMessage = new StringResourceModel("dicom.status.message.failed", component, null,
+                            new Object[]{e.getMessage()});
+                    image = ImageManager.IMAGE_WIZARD_NOT_RUNNING;
+                }
+                return this;
+            }
+        }
     }
 }
