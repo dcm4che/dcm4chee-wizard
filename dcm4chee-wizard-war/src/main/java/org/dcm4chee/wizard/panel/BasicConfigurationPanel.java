@@ -151,6 +151,27 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
     List<IColumn<ConfigTreeNode, String>> deviceColumns = new ArrayList<IColumn<ConfigTreeNode, String>>();
     TableTree<ConfigTreeNode, String> configTree;
 
+    public static final Map<TreeNodeType, Class<? extends DeviceExtension>> XDS_EXTENSIONS = new HashMap<>();
+    public static final Map<TreeNodeType, String> XDS_REST_PATH = new HashMap<>();
+
+    static {
+
+        XDS_EXTENSIONS.put(TreeNodeType.XDSRegistry, XdsRegistry.class);
+        XDS_EXTENSIONS.put(TreeNodeType.XDSRepository, XdsRepository.class);
+        XDS_EXTENSIONS.put(TreeNodeType.XCAiInitiatingGateway, XCAiInitiatingGWCfg.class);
+        XDS_EXTENSIONS.put(TreeNodeType.XCAiRespondingGateway, XCAiRespondingGWCfg.class);
+        XDS_EXTENSIONS.put(TreeNodeType.XCAInitiatingGateway, XCAInitiatingGWCfg.class);
+        XDS_EXTENSIONS.put(TreeNodeType.XCARespondingGateway, XCARespondingGWCfg.class);
+
+        XDS_REST_PATH.put(TreeNodeType.XDSRegistry, "xds-reg-rs/ctrl/");
+        XDS_REST_PATH.put(TreeNodeType.XDSRepository, "xds-rep-rs/ctrl/");
+        XDS_REST_PATH.put(TreeNodeType.XCAiInitiatingGateway, "xds-xcai-rs/ctrl/");
+        XDS_REST_PATH.put(TreeNodeType.XCAiRespondingGateway, "xds-xcai-rs/ctrl/");
+        XDS_REST_PATH.put(TreeNodeType.XCAInitiatingGateway, "xds-xca-rs/ctrl/");
+        XDS_REST_PATH.put(TreeNodeType.XCARespondingGateway, "xds-xca-rs/ctrl/");
+
+    }
+
     public BasicConfigurationPanel(final String id) {
         super(id);
         add(new Label("reload-message"));
@@ -858,79 +879,34 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                 if (type == null)
                     throw new RuntimeException("Error: Unknown node type, cannot create edit modal window");
 
-                if (!type.equals(ConfigTreeNode.TreeNodeType.DEVICE)
-                        || !getDicomConfigurationManager().getConnectedDeviceUrls().containsKey(
-                        rowModel.getObject().getName())) {
-                    cellItem.add(new Label(componentId));
+                String connectedDeviceUrl = null;
+                String restOperation = "restart";
+                String deviceName = "";
+
+                if (type.equals(TreeNodeType.DEVICE) && !rowModel.getObject().getConfigurationType().equals(ConfigurationType.XDS)) {
+                    deviceName = rowModel.getObject().getName();
+                    connectedDeviceUrl = getDicomConfigurationManager().getConnectedDeviceUrls().get(deviceName);
+                } else if (XDS_EXTENSIONS.containsKey(type)) {
+                    deviceName = rowModel.getObject().getRoot().getName();
+                    connectedDeviceUrl = getDicomConfigurationManager().getConnectedDeviceUrls().get(deviceName);
+                    restOperation = "reload";
+                    if (connectedDeviceUrl != null)
+                        connectedDeviceUrl += XDS_REST_PATH.get(type);
+                }
+
+                if (connectedDeviceUrl != null) {
+                    IndicatingAjaxLink<Object> ajaxLink = new ReloadAjaxLink(connectedDeviceUrl, restOperation, deviceName);
+                    cellItem.add(new LinkPanel(componentId, ajaxLink, ImageManager.IMAGE_WIZARD_RELOAD, reloadMessage))
+                            .add(new AttributeAppender("style", Model.of("width: 50px; text-align: center;")));
                     return;
                 }
 
-                final String connectedDeviceUrl = getDicomConfigurationManager().getConnectedDeviceUrls().get(
-                        rowModel.getObject().getName());
-
-                IndicatingAjaxLink<Object> ajaxLink = new IndicatingAjaxLink<Object>("wickettree.link") {
-
-                    private static final long serialVersionUID = 1L;
-
-                    @Override
-                    public void onClick(AjaxRequestTarget target) {
-
-                        if (connectedDeviceUrl == null) {
-                            log.warn("Service endpoint for reload is not configured correctly");
-                            return;
-                        } else
-                            log.info("Attempting to reload configuration using service endpoint " + connectedDeviceUrl);
-
-                        HttpURLConnection connection;
-                        StringResourceModel resultMessage;
-
-                        try {
-                            connection = (HttpURLConnection) new URL(connectedDeviceUrl
-                                    + (connectedDeviceUrl.endsWith("/") ? "restart" : "/restart")).openConnection();
-                            connection.setRequestMethod("GET");
-                            int responseCode = connection.getResponseCode();
-                            connection.disconnect();
-
-                            if (responseCode != 204) {
-                                if (responseCode == 404) {
-                                    String msg = "The server has not found anything matching the Request-URI "
-                                            + connection.getURL().toString() + ", HTTP Status "
-                                            + connection.getResponseCode() + ": " + connection.getResponseMessage();
-                                    throw new Exception(msg);
-                                } else
-                                    throw new Exception("</br>Expected response 204, but was "
-                                            + connection.getResponseCode() + ": " + connection.getResponseMessage());
-                            }
-
-                            ((WizardApplication) getApplication()).getDicomConfigurationManager().clearReload(
-                                    rowModel.getObject().getName());
-                        } catch (Exception e) {
-                            log.error("Error reloading configuration of connected device: " + e.getMessage());
-                            if (log.isDebugEnabled())
-                                e.printStackTrace();
-                            resultMessage = new StringResourceModel("dicom.reload.message.failed", this, null,
-                                    new Object[]{e.getMessage()});
-
-                            reloadMessage = new MessageWindow("reload-message", resultMessage) {
-
-                                private static final long serialVersionUID = 1L;
-
-                                @Override
-                                public void onOk(AjaxRequestTarget target) {
-                                }
-                            };
-
-                            BasicConfigurationPanel.this.addOrReplace(reloadMessage);
-                            reloadMessage.setWindowClosedCallback(windowClosedCallback).show(target);
-                        }
-                        target.add(form);
-                    }
-                };
-                cellItem.add(new LinkPanel(componentId, ajaxLink, ImageManager.IMAGE_WIZARD_RELOAD, reloadMessage))
-                        .add(new AttributeAppender("style", Model.of("width: 50px; text-align: center;")));
+                // in case there is nothing to show
+                cellItem.add(new Label(componentId));
             }
         };
     }
+
 
     private AbstractColumn<ConfigTreeNode, String> getStatusColumn() {
         return new AbstractColumn<ConfigTreeNode, String>(Model.of("Status")) {
@@ -945,42 +921,25 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                     throw new RuntimeException("Error: Unknown node type, cannot create edit modal window");
 
 
-                Map<TreeNodeType, String> xdsRestPath = new HashMap<>();
-                xdsRestPath.put(TreeNodeType.XDSRegistry, "xds-reg-rs/ctrl/");
-                xdsRestPath.put(TreeNodeType.XDSRepository, "xds-rep-rs/ctrl/");
-                xdsRestPath.put(TreeNodeType.XCAiInitiatingGateway, "xds-xcai-rs/ctrl/");
-                xdsRestPath.put(TreeNodeType.XCAiRespondingGateway, "xds-xcai-rs/ctrl/");
-                xdsRestPath.put(TreeNodeType.XCAInitiatingGateway, "xds-xca-rs/ctrl/");
-                xdsRestPath.put(TreeNodeType.XCARespondingGateway, "xds-xca-rs/ctrl/");
-
-                Map<TreeNodeType, Class<? extends DeviceExtension>> xdsExtensions = new HashMap<>();
-                xdsExtensions.put(TreeNodeType.XDSRegistry, XdsRegistry.class);
-                xdsExtensions.put(TreeNodeType.XDSRepository, XdsRepository.class);
-                xdsExtensions.put(TreeNodeType.XCAiInitiatingGateway, XCAiInitiatingGWCfg.class);
-                xdsExtensions.put(TreeNodeType.XCAiRespondingGateway, XCAiRespondingGWCfg.class);
-                xdsExtensions.put(TreeNodeType.XCAInitiatingGateway, XCAInitiatingGWCfg.class);
-                xdsExtensions.put(TreeNodeType.XCARespondingGateway, XCARespondingGWCfg.class);
-
-
                 String connectedDeviceUrl = null;
                 DeviceExtension devExt = null;
                 // for device-level status indicator
-                if (type.equals(TreeNodeType.DEVICE) && !rowModel.getObject().getConfigurationType().equals(ConfigurationType.XDS) ) {
+                if (type.equals(TreeNodeType.DEVICE) && !rowModel.getObject().getConfigurationType().equals(ConfigurationType.XDS)) {
 
                     connectedDeviceUrl = getDicomConfigurationManager().getConnectedDeviceUrls().get(
                             rowModel.getObject().getName());
-                // for extension-level status indicator
-                } else if (xdsExtensions.containsKey(type)) {
+                    // for extension-level status indicator
+                } else if (XDS_EXTENSIONS.containsKey(type)) {
 
                     String deviceName = rowModel.getObject().getRoot().getName();
                     connectedDeviceUrl = getDicomConfigurationManager().getConnectedDeviceUrls().get(deviceName);
                     if (connectedDeviceUrl != null) {
-                        connectedDeviceUrl+=xdsRestPath.get(type);
+                        connectedDeviceUrl += XDS_REST_PATH.get(type);
 
                         try {
-                            devExt = ((WizardApplication) getApplication()).getDicomConfigurationManager().getDicomConfiguration().findDevice(deviceName).getDeviceExtension(xdsExtensions.get(type));
+                            devExt = ((WizardApplication) getApplication()).getDicomConfigurationManager().getDicomConfiguration().findDevice(deviceName).getDeviceExtension(XDS_EXTENSIONS.get(type));
                         } catch (ConfigurationException e) {
-                            log.warn("Could not get a device extension",e);
+                            log.warn("Could not get a device extension", e);
                         }
 
                     }
@@ -1003,8 +962,6 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                 }
 
                 cellItem.add(new Label(componentId));
-                return;
-
             }
         };
     }
@@ -1359,6 +1316,76 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                 }
                 return this;
             }
+        }
+    }
+
+    private class ReloadAjaxLink extends IndicatingAjaxLink<Object> {
+
+        private static final long serialVersionUID = 1L;
+        private final String connectedDeviceUrl;
+        private final String restOperation;
+        private final String deviceName;
+
+        public ReloadAjaxLink(String connectedDeviceUrl, String restOperation, String deviceName) {
+            super("wickettree.link");
+            this.connectedDeviceUrl = connectedDeviceUrl;
+            this.restOperation = restOperation;
+            this.deviceName = deviceName;
+        }
+
+        @Override
+        public void onClick(AjaxRequestTarget target) {
+
+            if (connectedDeviceUrl == null) {
+                log.warn("Service endpoint for reload is not configured correctly");
+                return;
+            } else {
+                log.info("Attempting to reload configuration using service endpoint " + connectedDeviceUrl);
+            }
+
+            HttpURLConnection connection;
+            StringResourceModel resultMessage;
+
+            try {
+                connection = (HttpURLConnection) new URL(connectedDeviceUrl
+                        + (connectedDeviceUrl.endsWith("/") ? restOperation : "/" + restOperation)).openConnection();
+                connection.setRequestMethod("GET");
+                int responseCode = connection.getResponseCode();
+                connection.disconnect();
+
+                if (responseCode != 204) {
+                    if (responseCode == 404) {
+                        String msg = "The server has not found anything matching the Request-URI "
+                                + connection.getURL().toString() + ", HTTP Status "
+                                + connection.getResponseCode() + ": " + connection.getResponseMessage();
+                        throw new Exception(msg);
+                    } else
+                        throw new Exception("</br>Expected response 204, but was "
+                                + connection.getResponseCode() + ": " + connection.getResponseMessage());
+                }
+
+                ((WizardApplication) getApplication()).getDicomConfigurationManager().clearReload(
+                        deviceName);
+            } catch (Exception e) {
+                log.error("Error reloading configuration of connected device: " + e.getMessage());
+                if (log.isDebugEnabled())
+                    e.printStackTrace();
+                resultMessage = new StringResourceModel("dicom.reload.message.failed", this, null,
+                        new Object[]{e.getMessage()});
+
+                reloadMessage = new MessageWindow("reload-message", resultMessage) {
+
+                    private static final long serialVersionUID = 1L;
+
+                    @Override
+                    public void onOk(AjaxRequestTarget target) {
+                    }
+                };
+
+                BasicConfigurationPanel.this.addOrReplace(reloadMessage);
+                reloadMessage.setWindowClosedCallback(windowClosedCallback).show(target);
+            }
+            target.add(form);
         }
     }
 }
