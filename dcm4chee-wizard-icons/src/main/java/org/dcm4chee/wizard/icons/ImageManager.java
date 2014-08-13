@@ -111,6 +111,8 @@ public class ImageManager {
             "functions/running.png");
     public static final ResourceReference IMAGE_WIZARD_NOT_RUNNING = new PackageResourceReference(ImageManager.class,
             "functions/not_running.png");
+    public static final ResourceReference IMAGE_WIZARD_RUNNING_DEACTIVATED = new PackageResourceReference(ImageManager.class,
+            "functions/running_deactivated.png");
     public static final ResourceReference IMAGE_WIZARD_RELOAD = new PackageResourceReference(ImageManager.class,
             "functions/reload.png");
     public static final ResourceReference IMAGE_WIZARD_RELOAD_WARNING = new PackageResourceReference(

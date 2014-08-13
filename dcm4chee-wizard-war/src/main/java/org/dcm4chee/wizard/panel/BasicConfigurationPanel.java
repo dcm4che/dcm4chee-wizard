@@ -975,7 +975,7 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                     String deviceName = rowModel.getObject().getRoot().getName();
                     connectedDeviceUrl = getDicomConfigurationManager().getConnectedDeviceUrls().get(deviceName);
                     if (connectedDeviceUrl != null) {
-                        connectedDeviceUrl+=xdsExtensions.get(type);
+                        connectedDeviceUrl+=xdsRestPath.get(type);
 
                         try {
                             devExt = ((WizardApplication) getApplication()).getDicomConfigurationManager().getDicomConfiguration().findDevice(deviceName).getDeviceExtension(xdsExtensions.get(type));
@@ -988,7 +988,6 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
 
 
                 if (connectedDeviceUrl != null) {
-
 
 
                     StatusAjaxLink ajaxLink = new StatusAjaxLink(connectedDeviceUrl, devExt);
@@ -1336,19 +1335,22 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
             public StatusResponse invoke(Component component) {
                 try {
                     boolean result = getStatus(connectedDeviceUrl);
-                    resultMessage = new StringResourceModel(result ? "dicom.status.message.success"
-                            : "dicom.status.message.warning", component, null);
-                    image = result ? ImageManager.IMAGE_WIZARD_RUNNING : ImageManager.IMAGE_WIZARD_NOT_RUNNING;
 
                     // if extension is deactivated
                     if (devExt != null) {
                         if (((Deactivateable) devExt).isDeactivated()) {
-                            image = ImageManager.IMAGE_WIZARD_COMMON_REMOVE;
-                            resultMessage = new StringResourceModel("dicom.status.message.warning", component, null, new Object[]{"Extension is deactivated"});
+                            image = ImageManager.IMAGE_WIZARD_RUNNING_DEACTIVATED;
+                            resultMessage = new StringResourceModel("dicom.status.message.failed", component, null, new Object[]{"Extension is running but deactivated"});
+                            return this;
                         }
                     }
+
+                    resultMessage = new StringResourceModel(result ? "dicom.status.message.success"
+                            : "dicom.status.message.warning", component, null);
+                    image = result ? ImageManager.IMAGE_WIZARD_RUNNING : ImageManager.IMAGE_WIZARD_NOT_RUNNING;
+
                 } catch (Exception e) {
-                    log.error("Error retrieving status of connected device: " + e.getMessage());
+                    log.error("Error retrieving status of connected device (@ {}): {}", connectedDeviceUrl, e.getMessage());
                     if (log.isDebugEnabled())
                         e.printStackTrace();
                     resultMessage = new StringResourceModel("dicom.status.message.failed", component, null,

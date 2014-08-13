@@ -87,6 +87,7 @@ public class XCAiInitiatingGatewayEditPage extends SecureSessionCheckPage{
     // mandatory
     private Model<String> xdsApplicationNameModel;
     private Model<String> xdsHomeCommunityIdModel;
+    private Model<Boolean> xdsDeactivatedModel;
     private GenericConfigNodeModel<XCAiInitiatingGWCfg> xdsImagingSources;
     private GenericConfigNodeModel<XCAiInitiatingGWCfg> xdsRepondingGWs;
     //private StringArrayModel xdsRespondingGatewayUrlModel;
@@ -187,6 +188,14 @@ public class XCAiInitiatingGatewayEditPage extends SecureSessionCheckPage{
         applicationNameTextField.setRequired(true);
         form.add(applicationNameTextField);
 
+        form.addComponent(
+        new Label("xdsDeactivated.label",
+                new ResourceModel("dicom.edit.xds.xdsDeactivated.label"))
+                .setOutputMarkupPlaceholderTag(true));
+        form.add(
+                new DropDownChoice<>("xdsDeactivated", xdsDeactivatedModel, booleanChoice).setNullValid(false));
+
+
         Label homeCommunityIdLabel = new Label("homeCommunityId.label", new ResourceModel(
                 "dicom.edit.xds.homeCommunityId.label"));
         form.add(homeCommunityIdLabel);
@@ -228,6 +237,7 @@ public class XCAiInitiatingGatewayEditPage extends SecureSessionCheckPage{
             xdsSoapMsgLogDirModel = Model.of();
             xdsAsyncModel = Model.of();
             xdsAsyncHandlerModel = Model.of();
+            xdsDeactivatedModel = Model.of();
         } else {
             xdsApplicationNameModel = Model.of(xcaiInit.getApplicationName());
             xdsHomeCommunityIdModel = Model.of(xcaiInit.getHomeCommunityID());
@@ -236,6 +246,7 @@ public class XCAiInitiatingGatewayEditPage extends SecureSessionCheckPage{
             xdsSoapMsgLogDirModel = Model.of(xcaiInit.getSoapLogDir());
             xdsAsyncModel = Model.of(xcaiInit.isAsync());
             xdsAsyncHandlerModel = Model.of(xcaiInit.isAsyncHandler());
+            xdsDeactivatedModel = Model.of(xcaiInit.isDeactivated());
         }
     }
 
@@ -268,6 +279,7 @@ public class XCAiInitiatingGatewayEditPage extends SecureSessionCheckPage{
                     // mandatory
                     xcai.setApplicationName(xdsApplicationNameModel.getObject());
                     xcai.setHomeCommunityID(xdsHomeCommunityIdModel.getObject());
+                    xcai.setDeactivated(xdsDeactivatedModel.getObject());
                     
                     try {
                         xcai.setSrcDevicebySrcIdMap(xdsImagingSources.getModifiedConfigObj().getSrcDevicebySrcIdMap());

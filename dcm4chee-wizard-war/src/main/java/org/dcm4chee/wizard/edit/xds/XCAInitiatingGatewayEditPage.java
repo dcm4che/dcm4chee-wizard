@@ -91,7 +91,8 @@ public class XCAInitiatingGatewayEditPage extends SecureSessionCheckPage{
     private GenericConfigNodeModel<XCAInitiatingGWCfg> xdsRegistry;
     private GenericConfigNodeModel<XCAInitiatingGWCfg> xdsRespondingGWs;
     private GenericConfigNodeModel<XCAInitiatingGWCfg> xdsRepositories;
-    
+    private Model<Boolean> xdsDeactivatedModel;
+
     // optional
     private Model<String> xdsSoapMsgLogDirModel;
     private Model<Boolean> xdsAsyncModel;
@@ -197,6 +198,13 @@ public class XCAInitiatingGatewayEditPage extends SecureSessionCheckPage{
         applicationNameTextField.setRequired(true);
         form.add(applicationNameTextField);
 
+        form.addComponent(
+                new Label("xdsDeactivated.label",
+                        new ResourceModel("dicom.edit.xds.xdsDeactivated.label"))
+                        .setOutputMarkupPlaceholderTag(true));
+        form.add(
+                new DropDownChoice<>("xdsDeactivated", xdsDeactivatedModel, booleanChoice).setNullValid(false));
+
         Label homeCommunityIdLabel = new Label("homeCommunityId.label", new ResourceModel(
                 "dicom.edit.xds.homeCommunityId.label"));
         form.add(homeCommunityIdLabel);
@@ -226,6 +234,7 @@ public class XCAInitiatingGatewayEditPage extends SecureSessionCheckPage{
             xdsPIXConsumerApplicationModel = Model.of();
             xdsPIXManagerApplicationModel = Model.of();
             xdsSoapMsgLogDirModel = Model.of();
+            xdsDeactivatedModel = Model.of();
         } else {
             xdsApplicationNameModel = Model.of(xcaInit.getApplicationName());
             xdsHomeCommunityIdModel = Model.of(xcaInit.getHomeCommunityID());
@@ -245,6 +254,7 @@ public class XCAInitiatingGatewayEditPage extends SecureSessionCheckPage{
             xdsPIXManagerApplicationModel = Model.of(xcaInit.getRemotePIXManagerApplication());
             //xdsAssigningAuthorityModel = new StringArrayModel(xcaInit.getAssigningAuthorities());
             xdsSoapMsgLogDirModel = Model.of(xcaInit.getSoapLogDir());
+            xdsDeactivatedModel = Model.of(xcaInit.isDeactivated());
         }
     }
 
@@ -277,6 +287,7 @@ public class XCAInitiatingGatewayEditPage extends SecureSessionCheckPage{
                     // mandatory
                     xca.setApplicationName(xdsApplicationNameModel.getObject());
                     xca.setHomeCommunityID(xdsHomeCommunityIdModel.getObject());
+                    xca.setDeactivated(xdsDeactivatedModel.getObject());
 
                     
                     try {

@@ -90,6 +90,7 @@ public class XDSRepositoryEditPage extends SecureSessionCheckPage{
     private Model<String> xdsRepositoryUIDModel;
     private Model<String> xdsRetrieveURLModel;
     private Model<String> xdsProvideURLModel;
+    private Model<Boolean> xdsDeactivatedModel;
     // optional
     private StringArrayModel xdsAcceptedMimeTypesModel;
     private Model<Boolean> xdsCheckMimetypeModel;
@@ -197,6 +198,13 @@ public class XDSRepositoryEditPage extends SecureSessionCheckPage{
         applicationNameTextField.setRequired(true);
         form.add(applicationNameTextField);
 
+        form.addComponent(
+                new Label("xdsDeactivated.label",
+                        new ResourceModel("dicom.edit.xds.xdsDeactivated.label"))
+                        .setOutputMarkupPlaceholderTag(true));
+        form.add(
+                new DropDownChoice<>("xdsDeactivated", xdsDeactivatedModel, booleanChoice).setNullValid(false));
+
         Label xdsRepositoryUIDLabel = new Label("xdsRepositoryUID.label", new ResourceModel(
                 "dicom.edit.xds.xdsRepositoryUID.label"));
         form.add(xdsRepositoryUIDLabel);
@@ -242,6 +250,7 @@ public class XDSRepositoryEditPage extends SecureSessionCheckPage{
             xdsRetrieveURLModel = Model.of();
             xdsProvideURLModel = Model.of();
             xdsSources = new GenericConfigNodeModel<XdsRepository>(new XdsRepository(), "xdsSource", Map.class);
+            xdsDeactivatedModel = Model.of();
         } else {
             xdsApplicationNameModel = Model.of(xds.getApplicationName());
             xdsRepositoryUIDModel = Model.of(xds.getRepositoryUID());
@@ -254,6 +263,7 @@ public class XDSRepositoryEditPage extends SecureSessionCheckPage{
             xdsRetrieveURLModel = Model.of(xds.getRetrieveUrl());
             xdsProvideURLModel = Model.of(xds.getProvideUrl());
             xdsSources = new GenericConfigNodeModel<XdsRepository>(xds, "xdsSource", Map.class);
+            xdsDeactivatedModel = Model.of(xds.isDeactivated());
         }
     }
 
@@ -288,7 +298,8 @@ public class XDSRepositoryEditPage extends SecureSessionCheckPage{
                     xds.setRepositoryUID(xdsRepositoryUIDModel.getObject());
                     xds.setProvideUrl(xdsProvideURLModel.getObject());
                     xds.setRetrieveUrl(xdsRetrieveURLModel.getObject());
-                    
+                    xds.setDeactivated(xdsDeactivatedModel.getObject());
+
                     try {
                         xds.setSrcDevicebySrcIdMap(xdsSources.getModifiedConfigObj().getSrcDevicebySrcIdMap());
                     } catch (NullPointerException e) {

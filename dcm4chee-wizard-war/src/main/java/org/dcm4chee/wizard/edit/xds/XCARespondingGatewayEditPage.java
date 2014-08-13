@@ -38,6 +38,8 @@
 
 package org.dcm4chee.wizard.edit.xds;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -48,10 +50,7 @@ import org.apache.wicket.extensions.ajax.markup.html.IndicatingAjaxButton;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.FormComponent;
-import org.apache.wicket.markup.html.form.TextArea;
-import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.markup.html.form.*;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.dcm4che3.conf.api.ConfigurationException;
@@ -85,12 +84,15 @@ public class XCARespondingGatewayEditPage extends SecureSessionCheckPage{
     private Model<String> xdsHomeCommunityIdModel;
     private Model<String> xdsRetrieveURLModel;
     private Model<String> xdsQueryURLModel;
-    
+    private Model<Boolean> xdsDeactivatedModel;
+
     private GenericConfigNodeModel<XCARespondingGWCfg> xdsRepositories;
     private GenericConfigNodeModel<XCARespondingGWCfg> xdsRegistry;
     
     // optional
     private Model<String> xdsSoapMsgLogDirModel;
+
+    private List<Boolean> booleanChoice = Arrays.asList(new Boolean[]{true, false});
 
     public XCARespondingGatewayEditPage(final ModalWindow window, XCARespondingGatewayModel model, 
             final ConfigTreeNode deviceNode) {
@@ -167,6 +169,13 @@ public class XCARespondingGatewayEditPage extends SecureSessionCheckPage{
         applicationNameTextField.setRequired(true);
         form.add(applicationNameTextField);
 
+        form.addComponent(
+                new Label("xdsDeactivated.label",
+                        new ResourceModel("dicom.edit.xds.xdsDeactivated.label"))
+                        .setOutputMarkupPlaceholderTag(true));
+        form.add(
+                new DropDownChoice<>("xdsDeactivated", xdsDeactivatedModel, booleanChoice).setNullValid(false));
+
         Label homeCommunityIdLabel = new Label("homeCommunityId.label", new ResourceModel(
                 "dicom.edit.xds.homeCommunityId.label"));
         form.add(homeCommunityIdLabel);
@@ -204,7 +213,8 @@ public class XCARespondingGatewayEditPage extends SecureSessionCheckPage{
             xdsSoapMsgLogDirModel = Model.of();
             xdsRepositories = new GenericConfigNodeModel<XCARespondingGWCfg>(new XCARespondingGWCfg(), "xdsRepository", Map.class);
             xdsRegistry = new GenericConfigNodeModel<XCARespondingGWCfg>(new XCARespondingGWCfg(), "xdsRegistry", String.class);
-                    
+            xdsDeactivatedModel = Model.of();
+
         } else {
             xdsApplicationNameModel = Model.of(xca.getApplicationName());
             xdsHomeCommunityIdModel = Model.of(xca.getHomeCommunityID());
@@ -213,6 +223,7 @@ public class XCARespondingGatewayEditPage extends SecureSessionCheckPage{
             xdsSoapMsgLogDirModel = Model.of(xca.getSoapLogDir());
             xdsRepositories = new GenericConfigNodeModel<XCARespondingGWCfg>(xca, "xdsRepository", Map.class);
             xdsRegistry = new GenericConfigNodeModel<XCARespondingGWCfg>(xca, "xdsRegistry", String.class);
+            xdsDeactivatedModel = Model.of(xca.isDeactivated());
         }
     }
 
@@ -245,7 +256,8 @@ public class XCARespondingGatewayEditPage extends SecureSessionCheckPage{
                     // mandatory
                     xca.setApplicationName(xdsApplicationNameModel.getObject());
                     xca.setHomeCommunityID(xdsHomeCommunityIdModel.getObject());
-                    
+                    xca.setDeactivated(xdsDeactivatedModel.getObject());
+
                     xca.setQueryUrl(xdsQueryURLModel.getObject());
                     xca.setRetrieveUrl(xdsRetrieveURLModel.getObject());
                     

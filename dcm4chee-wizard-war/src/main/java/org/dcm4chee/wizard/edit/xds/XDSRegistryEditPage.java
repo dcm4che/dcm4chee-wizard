@@ -86,7 +86,8 @@ public class XDSRegistryEditPage extends SecureSessionCheckPage{
     private StringArrayModel xdsAffinityDomainModel;
     private Model<String> xdsAffinityDomainConfigDirModel;
     private Model<String> xdsQueryURLModel;
-    private Model<String> xdsRegisterURLModel;    
+    private Model<String> xdsRegisterURLModel;
+    private Model<Boolean> xdsDeactivatedModel;
 
     // optional
     private StringArrayModel xdsAcceptedMimeTypesModel;
@@ -206,6 +207,13 @@ public class XDSRegistryEditPage extends SecureSessionCheckPage{
         applicationNameTextField.setRequired(true);
         form.add(applicationNameTextField);
 
+        form.addComponent(
+                new Label("xdsDeactivated.label",
+                        new ResourceModel("dicom.edit.xds.xdsDeactivated.label"))
+                        .setOutputMarkupPlaceholderTag(true));
+        form.add(
+                new DropDownChoice<>("xdsDeactivated", xdsDeactivatedModel, booleanChoice).setNullValid(false));
+
         Label affinityDomainLabel = new Label("xdsAffinityDomain.label", new ResourceModel(
                 "dicom.edit.xds.xdsAffinityDomain.label"));
         form.add(affinityDomainLabel);
@@ -256,6 +264,7 @@ public class XDSRegistryEditPage extends SecureSessionCheckPage{
             xdsPreMetadataCheckModel = Model.of();
             xdsQueryURLModel = Model.of();
             xdsRegisterURLModel = Model.of();
+            xdsDeactivatedModel = Model.of();
         } else {
             xdsApplicationNameModel = Model.of(xds.getApplicationName());
             xdsAffinityDomainModel = new StringArrayModel(xds.getAffinityDomain());
@@ -269,7 +278,8 @@ public class XDSRegistryEditPage extends SecureSessionCheckPage{
             xdsCheckMimetypeModel = Model.of(xds.isCheckMimetype());
             xdsPreMetadataCheckModel = Model.of(xds.isPreMetadataCheck());
             xdsQueryURLModel = Model.of(xds.getQueryUrl());
-            xdsRegisterURLModel = Model.of(xds.getRegisterUrl());            
+            xdsRegisterURLModel = Model.of(xds.getRegisterUrl());
+            xdsDeactivatedModel = Model.of(xds.isDeactivated());
         }
     }
 
@@ -303,7 +313,8 @@ public class XDSRegistryEditPage extends SecureSessionCheckPage{
                     xds.setApplicationName(xdsApplicationNameModel.getObject());
                     xds.setAffinityDomain(xdsAffinityDomainModel.getArray());
                     xds.setAffinityDomainConfigDir(xdsAffinityDomainConfigDirModel.getObject());
-                    
+                    xds.setDeactivated(xdsDeactivatedModel.getObject());
+
                     xds.setQueryUrl(xdsQueryURLModel.getObject());
                     xds.setRegisterUrl(xdsRegisterURLModel.getObject());
                     
