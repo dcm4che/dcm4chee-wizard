@@ -43,6 +43,7 @@ import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -146,7 +147,7 @@ public class AutoDetectTransferCapabilities extends SecureSessionCheckPage {
 
                         if (responseCode == 200) {
 
-                            feedbackProgressModel.setObject(returnedMessage + " % completed");
+                            feedbackProgressModel.setObject(new DecimalFormat("#.##").format(Float.parseFloat(returnedMessage)) + " % completed");
                             target.add(feedbackProgressLabel);
                             
                             // if 100 reached
