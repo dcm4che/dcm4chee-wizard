@@ -99,7 +99,8 @@ public class XDSRepositoryEditPage extends SecureSessionCheckPage{
     private Model<Boolean> xdsForceMTOMModel;
     private StringArrayModel xdsLogFullMessageHostsModel;
     private GenericConfigNodeModel<XdsRepository> xdsSources;
-    
+    private GenericConfigNodeModel<XdsRepository> xdsFileSystemGroupIDs;
+
 
     public XDSRepositoryEditPage(final ModalWindow window, XDSRepositoryModel model,
             final ConfigTreeNode deviceNode) {
@@ -234,7 +235,15 @@ public class XDSRepositoryEditPage extends SecureSessionCheckPage{
         sources.setType(String.class);
         sources.setRequired(true);
         sources.add((IValidator<String>) xdsSources);
-        form.add(sources);        
+        form.add(sources);
+
+        form.add(new Label("xdsFileSystemGroupIds.label", new ResourceModel("dicom.edit.xds.xdsFileSystemGroupIds.label")));
+        FormComponent<String> fileGroups = new TextArea<String>("xdsFileSystemGroupIds",
+                xdsFileSystemGroupIDs);
+        fileGroups.setType(String.class);
+        fileGroups.setRequired(true);
+        fileGroups.add((IValidator<String>) xdsFileSystemGroupIDs);
+        form.add(fileGroups);
     }
 
     private void initAttributes(XdsRepository xds) {
@@ -250,6 +259,7 @@ public class XDSRepositoryEditPage extends SecureSessionCheckPage{
             xdsRetrieveURLModel = Model.of();
             xdsProvideURLModel = Model.of();
             xdsSources = new GenericConfigNodeModel<XdsRepository>(new XdsRepository(), "xdsSource", Map.class);
+            xdsFileSystemGroupIDs = new GenericConfigNodeModel<XdsRepository>(new XdsRepository(), "xdsFileSystemGroupID", Map.class);
             xdsDeactivatedModel = Model.of();
         } else {
             xdsApplicationNameModel = Model.of(xds.getApplicationName());
@@ -263,6 +273,7 @@ public class XDSRepositoryEditPage extends SecureSessionCheckPage{
             xdsRetrieveURLModel = Model.of(xds.getRetrieveUrl());
             xdsProvideURLModel = Model.of(xds.getProvideUrl());
             xdsSources = new GenericConfigNodeModel<XdsRepository>(xds, "xdsSource", Map.class);
+            xdsFileSystemGroupIDs = new GenericConfigNodeModel<XdsRepository>(xds, "xdsFileSystemGroupID", Map.class);
             xdsDeactivatedModel = Model.of(xds.isDeactivated());
         }
     }
@@ -305,7 +316,13 @@ public class XDSRepositoryEditPage extends SecureSessionCheckPage{
                     } catch (NullPointerException e) {
                         // thats fine, this means nothing has changed
                     }
-                    
+
+                    try {
+                        xds.setFsGroupIDbyAffinity(xdsFileSystemGroupIDs.getModifiedConfigObj().getFsGroupIDbyAffinity());
+                    } catch (NullPointerException e) {
+                        // thats fine, this means nothing has changed
+                    }
+
                     // optional
                     if (xdsAcceptedMimeTypesModel.getArray().length > 0)
                         xds.setAcceptedMimeTypes(xdsAcceptedMimeTypesModel.getArray());

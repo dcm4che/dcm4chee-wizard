@@ -65,6 +65,7 @@ import org.dcm4che3.net.audit.AuditRecordRepository;
 import org.dcm4che3.net.hl7.HL7DeviceExtension;
 import org.dcm4chee.proxy.conf.ProxyAEExtension;
 import org.dcm4chee.proxy.conf.ProxyDeviceExtension;
+import org.dcm4chee.storage.conf.StorageConfiguration;
 import org.dcm4chee.wizard.DicomConfigurationManager;
 import org.dcm4chee.wizard.WizardApplication;
 import org.dcm4chee.wizard.model.ApplicationEntityModel;
@@ -417,9 +418,14 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode, Str
                     ConfigTreeNode.TreeNodeType.XDSRegistry, null);
         }
         else if (ext instanceof XdsSource) {
-                new ConfigTreeNode(deviceNode,
-                        new StringResourceModel("dicom.list.xdsSource.label", forComponent, null),
-                        ConfigTreeNode.TreeNodeType.XDSSource, null);
+            new ConfigTreeNode(deviceNode,
+                    new StringResourceModel("dicom.list.xdsSource.label", forComponent, null),
+                    ConfigTreeNode.TreeNodeType.XDSSource, null);
+        }
+        else if (ext instanceof StorageConfiguration) {
+            new ConfigTreeNode(deviceNode,
+                    new StringResourceModel("dicom.list.xdsStorage.label", forComponent, null),
+                    ConfigTreeNode.TreeNodeType.XDSStorage, null);
         }
         else if (ext instanceof XdsRepository) {
             new ConfigTreeNode(deviceNode,

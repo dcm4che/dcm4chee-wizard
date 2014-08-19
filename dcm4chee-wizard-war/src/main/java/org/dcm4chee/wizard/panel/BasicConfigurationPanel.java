@@ -83,6 +83,7 @@ import org.dcm4che3.net.audit.AuditLogger;
 import org.dcm4che3.net.hl7.HL7Application;
 import org.dcm4che3.net.hl7.HL7DeviceExtension;
 import org.dcm4chee.proxy.conf.ProxyAEExtension;
+import org.dcm4chee.storage.conf.StorageConfiguration;
 import org.dcm4chee.wizard.WizardApplication;
 import org.dcm4chee.wizard.common.behavior.TooltipBehavior;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
@@ -437,6 +438,10 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                             ((DeviceModel) deviceNode.getModel()).getDevice().removeDeviceExtension(
                                     ((DeviceModel) deviceNode.getModel()).getDevice().getDeviceExtension(
                                             XdsSource.class));
+                        } else if (node.getNodeType().equals(TreeNodeType.XDSStorage)) {
+                            ((DeviceModel) deviceNode.getModel()).getDevice().removeDeviceExtension(
+                                    ((DeviceModel) deviceNode.getModel()).getDevice().getDeviceExtension(
+                                            StorageConfiguration.class));
                         } else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.XDSRepository)) {
                             ((DeviceModel) deviceNode.getModel()).getDevice().removeDeviceExtension(
                                     ((DeviceModel) deviceNode.getModel()).getDevice().getDeviceExtension(
@@ -559,6 +564,7 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                         || type.equals(ConfigTreeNode.TreeNodeType.XCARespondingGateway)
                         || type.equals(ConfigTreeNode.TreeNodeType.XDSRegistry)
                         || type.equals(ConfigTreeNode.TreeNodeType.XDSSource)
+                        || type.equals(TreeNodeType.XDSStorage)
                         || type.equals(ConfigTreeNode.TreeNodeType.XDSRepository)) {
                     cellItem.add(new Label(componentId));
                     return;
@@ -776,11 +782,11 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
     private AbstractColumn<ConfigTreeNode, String> getEchoColum() {
         return new AbstractColumn<ConfigTreeNode, String>(Model.of("Echo")) {
 
+
             private static final long serialVersionUID = 1L;
 
             public void populateItem(final Item<ICellPopulator<ConfigTreeNode>> cellItem, final String componentId,
                                      final IModel<ConfigTreeNode> rowModel) {
-
                 final TreeNodeType type = rowModel.getObject().getNodeType();
                 if (type == null)
                     throw new RuntimeException("Error: Unknown node type, cannot create edit modal window");
@@ -1127,6 +1133,9 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                             .getModel(), rowModel.getObject().getAncestor(1));
                 } else if (type.equals(ConfigTreeNode.TreeNodeType.XDSSource)) {
                     return new XDSSourceEditPage(editWindow, (XDSSourceModel) rowModel.getObject()
+                            .getModel(), rowModel.getObject().getAncestor(1));
+                } else if (type.equals(TreeNodeType.XDSStorage)) {
+                    return new XDSStorageEditPage(editWindow, (XdsStorageModel) rowModel.getObject()
                             .getModel(), rowModel.getObject().getAncestor(1));
                 } else
                     return null;

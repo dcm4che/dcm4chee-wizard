@@ -71,6 +71,7 @@ import org.dcm4che3.net.DeviceExtension;
 import org.dcm4che3.net.audit.AuditRecordRepository;
 import org.dcm4che3.net.hl7.HL7DeviceExtension;
 import org.dcm4chee.proxy.conf.ProxyDeviceExtension;
+import org.dcm4chee.storage.conf.StorageConfiguration;
 import org.dcm4chee.wizard.common.behavior.FocusOnLoadBehavior;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
 import org.dcm4chee.wizard.common.component.ModalWindowRuntimeException;
@@ -158,6 +159,7 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
     private IModel<Boolean> xdsRegistryModel;
     private IModel<Boolean> xdsRepositoryModel;
     private IModel<Boolean> xdsSourceModel;
+    private IModel<Boolean> xdsStorageModel;
 
     public CreateOrEditDevicePage(final ModalWindow window, final DeviceModel deviceModel) {
         super();
@@ -474,6 +476,38 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         addXdsRegistryCheckBox(xdsWMC, form);
         addXdsRepositoryCheckBox(xdsWMC, form);
         addXdsSourceCheckBox(xdsWMC, form);
+        addXdsStorageCheckBox(xdsWMC, form);
+    }
+
+    private void addXdsStorageCheckBox(final WebMarkupContainer xdsWMC, ExtendedForm form) {
+        xdsWMC.add(new Label("xdsStorage.label", new ResourceModel("dicom.edit.xds.xdsStorage.label")));
+        AjaxCheckBox xdsStorageCheckBox = new AjaxCheckBox("xdsStorage", xdsStorageModel) {
+
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            protected void onUpdate(AjaxRequestTarget target) {
+                if (xdsStorageModel.getObject().booleanValue())
+                    return;
+
+                if (!isXdsExtensionSelected()) {
+                    log.error("{}: Need to select at least one XDS Extension", this);
+                    xdsStorageModel.setObject(true);
+                    this.error(new ValidationError("Need to select at least one XDS Extension"));
+                    target.add(this);
+                }
+            }
+        };
+        AjaxFormSubmitBehavior onClick = new AjaxFormSubmitBehavior(form, "change") {
+
+            private static final long serialVersionUID = 1L;
+
+            protected void onEvent(final AjaxRequestTarget target) {
+                super.onEvent(target);
+            }
+        };
+        xdsStorageCheckBox.add(onClick);
+        xdsWMC.add(xdsStorageCheckBox.setOutputMarkupId(true));
     }
 
     private void addXdsSourceCheckBox(final WebMarkupContainer xdsWMC, ExtendedForm form) {
@@ -496,9 +530,9 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
             }
         };
         AjaxFormSubmitBehavior onClick = new AjaxFormSubmitBehavior(form, "change") {
-            
+
             private static final long serialVersionUID = 1L;
-            
+
             protected void onEvent(final AjaxRequestTarget target) {
                 super.onEvent(target);
             }
@@ -506,7 +540,7 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         xdsSourceCheckBox.add(onClick);
         xdsWMC.add(xdsSourceCheckBox.setOutputMarkupId(true));
     }
-    
+
     private void addXdsRegistryCheckBox(final WebMarkupContainer xdsWMC, ExtendedForm form) {
         xdsWMC.add(new Label("xdsRegistry.label", new ResourceModel("dicom.edit.xds.xdsRegistry.label")));
         AjaxCheckBox xdsRegistryCheckBox = new AjaxCheckBox("xdsRegistry", xdsRegistryModel) {
@@ -701,6 +735,7 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
                 || xcaRespondingGatewayModel.getObject().booleanValue()
                 || xdsRegistryModel.getObject().booleanValue()
                 || xdsSourceModel.getObject().booleanValue()
+                || xdsStorageModel.getObject().booleanValue()
                 || xdsRepositoryModel.getObject().booleanValue();
     }
 
@@ -769,7 +804,8 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
                     || ext instanceof XCAiRespondingGWCfg 
                     || ext instanceof XCARespondingGWCfg
                     || ext instanceof XdsRegistry 
-                    || ext instanceof XdsSource 
+                    || ext instanceof XdsSource
+                    || ext instanceof StorageConfiguration
                     || ext instanceof XdsRepository) {
                 typeModel = Model.of(ConfigTreeProvider.ConfigurationType.XDS);
                 break;
@@ -790,6 +826,7 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         xdsRegistryModel = Model.of(deviceModel.getDevice().getDeviceExtension(XdsRegistry.class) != null);
         xdsRepositoryModel = Model.of(deviceModel.getDevice().getDeviceExtension(XdsRepository.class) != null);
         xdsSourceModel = Model.of(deviceModel.getDevice().getDeviceExtension(XdsSource.class) != null);
+        xdsStorageModel = Model.of(deviceModel.getDevice().getDeviceExtension(StorageConfiguration.class) != null);
     }
 
     private void setDeviceConfiguration(final DeviceModel deviceModel) throws ConfigurationException {
@@ -876,6 +913,7 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         xdsRegistryModel = Model.of(true);
         xdsRepositoryModel = Model.of(true);
         xdsSourceModel = Model.of(true);
+        xdsStorageModel = Model.of(true);
     }
 
     private void initBasicDeviceConfigurationTypeModel() {
@@ -1066,7 +1104,17 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         }
         else if (xdsSrc != null && !xdsSrcCheck)
                 device.removeDeviceExtension(xdsSrc);
-    
+
+
+        StorageConfiguration xdsStorage = device.getDeviceExtension(StorageConfiguration.class);
+        Boolean xdsStorageCheck = xdsStorageModel.getObject();
+        if (xdsStorageCheck && xdsStorage == null) {
+            StorageConfiguration xds = new StorageConfiguration();
+            device.addDeviceExtension(xds);
+        }
+        else if (xdsStorage != null && !xdsStorageCheck)
+            device.removeDeviceExtension(xdsStorage);        
+        
     }
 
     private Device initDeviceExtensions() {

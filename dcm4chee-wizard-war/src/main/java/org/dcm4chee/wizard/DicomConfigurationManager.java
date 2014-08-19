@@ -81,6 +81,7 @@ import org.dcm4che3.util.SafeClose;
 import org.dcm4che3.util.StringUtils;
 import org.dcm4chee.proxy.conf.ldap.LdapProxyConfigurationExtension;
 import org.dcm4chee.proxy.conf.prefs.PreferencesProxyConfigurationExtension;
+import org.dcm4chee.storage.conf.StorageConfiguration;
 import org.dcm4chee.xds2.conf.XCAInitiatingGWCfg;
 import org.dcm4chee.xds2.conf.XCARespondingGWCfg;
 import org.dcm4chee.xds2.conf.XCAiInitiatingGWCfg;
@@ -129,7 +130,8 @@ public class DicomConfigurationManager implements Serializable {
                 ldapConfig.addDicomConfigurationExtension(new LdapGenericConfigExtension<XCAInitiatingGWCfg>(XCAInitiatingGWCfg.class));
                 ldapConfig.addDicomConfigurationExtension(new LdapGenericConfigExtension<XCAiRespondingGWCfg>(XCAiRespondingGWCfg.class));
                 ldapConfig.addDicomConfigurationExtension(new LdapGenericConfigExtension<XCAiInitiatingGWCfg>(XCAiInitiatingGWCfg.class));
-                ldapConfig.addDicomConfigurationExtension(new LdapGenericConfigExtension<XdsSource>(XdsSource.class));                
+                ldapConfig.addDicomConfigurationExtension(new LdapGenericConfigExtension<XdsSource>(XdsSource.class));
+                ldapConfig.addDicomConfigurationExtension(new LdapGenericConfigExtension<StorageConfiguration>(StorageConfiguration.class));
                 dicomConfiguration = ldapConfig;
                 hl7Configuration = hl7Config;
             } catch (FileNotFoundException e) {
@@ -170,7 +172,8 @@ public class DicomConfigurationManager implements Serializable {
                 prefsConfig.addDicomConfigurationExtension(new PreferencesGenericConfigExtension<XCAInitiatingGWCfg>(XCAInitiatingGWCfg.class));
                 prefsConfig.addDicomConfigurationExtension(new PreferencesGenericConfigExtension<XCAiRespondingGWCfg>(XCAiRespondingGWCfg.class));
                 prefsConfig.addDicomConfigurationExtension(new PreferencesGenericConfigExtension<XCAiInitiatingGWCfg>(XCAiInitiatingGWCfg.class));
-                prefsConfig.addDicomConfigurationExtension(new PreferencesGenericConfigExtension<XdsSource>(XdsSource.class));   
+                prefsConfig.addDicomConfigurationExtension(new PreferencesGenericConfigExtension<XdsSource>(XdsSource.class));
+                prefsConfig.addDicomConfigurationExtension(new PreferencesGenericConfigExtension<StorageConfiguration>(StorageConfiguration.class));
                 dicomConfiguration = prefsConfig;
                 hl7Configuration = hl7Config;
             } finally {
