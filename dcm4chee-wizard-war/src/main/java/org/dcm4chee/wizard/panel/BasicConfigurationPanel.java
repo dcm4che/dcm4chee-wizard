@@ -166,10 +166,10 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
 
         XDS_REST_PATH.put(TreeNodeType.XDSRegistry, "xds-reg-rs/ctrl/");
         XDS_REST_PATH.put(TreeNodeType.XDSRepository, "xds-rep-rs/ctrl/");
-        XDS_REST_PATH.put(TreeNodeType.XCAiInitiatingGateway, "xds-xcai-rs/ctrl/");
-        XDS_REST_PATH.put(TreeNodeType.XCAiRespondingGateway, "xds-xcai-rs/ctrl/");
-        XDS_REST_PATH.put(TreeNodeType.XCAInitiatingGateway, "xds-xca-rs/ctrl/");
-        XDS_REST_PATH.put(TreeNodeType.XCARespondingGateway, "xds-xca-rs/ctrl/");
+        XDS_REST_PATH.put(TreeNodeType.XCAiInitiatingGateway, "xcai-rs/ctrl/");
+        XDS_REST_PATH.put(TreeNodeType.XCAiRespondingGateway, "xcai-rs/ctrl/");
+        XDS_REST_PATH.put(TreeNodeType.XCAInitiatingGateway, "xca-rs/ctrl/");
+        XDS_REST_PATH.put(TreeNodeType.XCARespondingGateway, "xca-rs/ctrl/");
 
     }
 
