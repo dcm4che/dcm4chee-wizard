@@ -58,13 +58,9 @@ public class ProxyManifest {
 
     protected static Logger log = LoggerFactory.getLogger(ProxyManifest.class);
 
-    private static Map<String, String> properties = null;
-
     public static Map<String, String> get(String proxyJarNameProperty) {
-        if (properties != null)
-            return properties;
 
-        properties = new HashMap<String, String>();
+        Map<String, String> properties = new HashMap<String, String>();
         String wizardWarName = null;
         String proxyJarName = null;
         String manifestPath = null;
