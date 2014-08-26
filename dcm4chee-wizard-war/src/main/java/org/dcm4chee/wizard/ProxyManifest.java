@@ -60,7 +60,7 @@ public class ProxyManifest {
 
     private static Map<String, String> properties = null;
 
-    public static Map<String, String> get() {
+    public static Map<String, String> get(String proxyJarNameProperty) {
         if (properties != null)
             return properties;
 
@@ -70,7 +70,7 @@ public class ProxyManifest {
         String manifestPath = null;
         try {
             wizardWarName = ((WebApplication) Application.get()).getInitParameter("wizardWarName");
-            proxyJarName = ((WebApplication) Application.get()).getInitParameter("proxyJarName");
+            proxyJarName = ((WebApplication) Application.get()).getInitParameter(proxyJarNameProperty);
 
             if (wizardWarName == null)
                 throw new RuntimeException("Can't get InitParameter 'wizardWarName' from Wicket Application!");

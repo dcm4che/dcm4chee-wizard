@@ -119,9 +119,12 @@ public class MainPage extends SecureMainWebPage {
                     wizardProperties.getProperty("Implementation-Version"),
                     wizardProperties.getProperty("Implementation-Vendor-Id"),
                     wizardProperties.getProperty("Implementation-Build"),
-                    ProxyManifest.get().get("Implementation-Title"), ProxyManifest.get().get("Implementation-Version"),
-                    ProxyManifest.get().get("Implementation-Vendor-Id"),
-                    ProxyManifest.get().get("Proxy-Implementation-Build") })).setEscapeModelStrings(false));
+                    ProxyManifest.get("proxyJarName").get("Implementation-Title"),
+                    ProxyManifest.get("proxyJarName").get("Implementation-Version"),
+                    ProxyManifest.get("proxyJarName").get("Implementation-Vendor-Id"),
+                    ProxyManifest.get("proxyJarName").get("Proxy-Implementation-Build"),
+                    ProxyManifest.get("xdsConfigJarName").get("Implementation-Build")
+            })).setEscapeModelStrings(false));
         }
     }
 }
