@@ -94,10 +94,8 @@ public class XDSRegistryEditPage extends SecureSessionCheckPage{
     private Model<String> xdsSoapMsgLogDirModel;
     private Model<Boolean> xdsCreateMissingPIDsModel;
     private Model<Boolean> xdsCreateMissingCodesModel;
-    private Model<Boolean> xdsDontSaveCodeClassificationsModel;
     private Model<Boolean> xdsCheckAffinityDomainModel;
     private Model<Boolean> xdsCheckMimetypeModel;
-    private Model<Boolean> xdsPreMetadataCheckModel;
 
     public XDSRegistryEditPage(final ModalWindow window, XDSRegistryModel model,
             final ConfigTreeNode deviceNode) {
@@ -149,11 +147,6 @@ public class XDSRegistryEditPage extends SecureSessionCheckPage{
         optionalContainer.add(new DropDownChoice<>("xdsCreateMissingCodes", xdsCreateMissingCodesModel, booleanChoice)
                 .setNullValid(false));
 
-        optionalContainer.add(new Label("xdsDontSaveCodeClassifications.label", new ResourceModel(
-                "dicom.edit.xds.optional.xdsDontSaveCodeClassifications.label")).setOutputMarkupPlaceholderTag(true));
-        optionalContainer.add(new DropDownChoice<>("xdsDontSaveCodeClassifications",
-                xdsDontSaveCodeClassificationsModel, booleanChoice).setNullValid(false));
-
         optionalContainer.add(new Label("xdsCheckAffinityDomain.label", new ResourceModel(
                 "dicom.edit.xds.optional.xdsCheckAffinityDomain.label")).setOutputMarkupPlaceholderTag(true));
         optionalContainer
@@ -165,10 +158,6 @@ public class XDSRegistryEditPage extends SecureSessionCheckPage{
         optionalContainer.add(new DropDownChoice<>("xdsCheckMimetype", xdsCheckMimetypeModel, booleanChoice)
                 .setNullValid(false));
 
-        optionalContainer.add(new Label("xdsPreMetadataCheck.label", new ResourceModel(
-                "dicom.edit.xds.optional.xdsPreMetadataCheck.label")).setOutputMarkupPlaceholderTag(true));
-        optionalContainer.add(new DropDownChoice<>("xdsPreMetadataCheck", xdsPreMetadataCheckModel, booleanChoice)
-                .setNullValid(false));
     }
 
     private void addToggleOptionalCheckBox(final ExtendedForm form, final Form<?> optionalContainer) {
@@ -258,10 +247,8 @@ public class XDSRegistryEditPage extends SecureSessionCheckPage{
             xdsSoapMsgLogDirModel = Model.of();
             xdsCreateMissingPIDsModel = Model.of();
             xdsCreateMissingCodesModel = Model.of();
-            xdsDontSaveCodeClassificationsModel = Model.of();
             xdsCheckAffinityDomainModel = Model.of();
             xdsCheckMimetypeModel = Model.of();
-            xdsPreMetadataCheckModel = Model.of();
             xdsQueryURLModel = Model.of();
             xdsRegisterURLModel = Model.of();
             xdsDeactivatedModel = Model.of();
@@ -273,10 +260,8 @@ public class XDSRegistryEditPage extends SecureSessionCheckPage{
             xdsSoapMsgLogDirModel = Model.of(xds.getSoapLogDir());
             xdsCreateMissingPIDsModel = Model.of(xds.isCreateMissingPIDs());
             xdsCreateMissingCodesModel = Model.of(xds.isCreateMissingCodes());
-            xdsDontSaveCodeClassificationsModel = Model.of(xds.isDontSaveCodeClassifications());
             xdsCheckAffinityDomainModel = Model.of(xds.isCheckAffinityDomain());
             xdsCheckMimetypeModel = Model.of(xds.isCheckMimetype());
-            xdsPreMetadataCheckModel = Model.of(xds.isPreMetadataCheck());
             xdsQueryURLModel = Model.of(xds.getQueryUrl());
             xdsRegisterURLModel = Model.of(xds.getRegisterUrl());
             xdsDeactivatedModel = Model.of(xds.isDeactivated());
@@ -327,14 +312,10 @@ public class XDSRegistryEditPage extends SecureSessionCheckPage{
                         xds.setCreateMissingPIDs(xdsCreateMissingPIDsModel.getObject());
                     if (xdsCreateMissingCodesModel.getObject() != null)
                         xds.setCreateMissingCodes(xdsCreateMissingCodesModel.getObject());
-                    if (xdsDontSaveCodeClassificationsModel.getObject() != null)
-                        xds.setDontSaveCodeClassifications(xdsDontSaveCodeClassificationsModel.getObject());
                     if (xdsCheckAffinityDomainModel.getObject() != null)
                         xds.setCheckAffinityDomain(xdsCheckAffinityDomainModel.getObject());
                     if (xdsCheckMimetypeModel.getObject() != null)
                         xds.setCheckMimetype(xdsCheckMimetypeModel.getObject());
-                    if (xdsPreMetadataCheckModel.getObject() != null)
-                        xds.setPreMetadataCheck(xdsPreMetadataCheckModel.getObject());
                     ConfigTreeProvider.get().mergeDevice(device);
                     window.close(target);
                 } catch (Exception e) {

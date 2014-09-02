@@ -39,7 +39,6 @@ public class UnwrappingSerializationTest {
         rep.setLogFullMessageHosts(new String[] {});
         rep.setRetrieveUrl("http://retrieve");
         rep.setProvideUrl("http://provide");
-        rep.setForceMTOM(true);
 
         // reference registry
         Map<String, Device> deviceBySrcUid = new HashMap<String, Device>();
@@ -110,7 +109,6 @@ public class UnwrappingSerializationTest {
         registry.setCreateMissingCodes(false);
         registry.setCheckAffinityDomain(true);
         registry.setCheckMimetype(true);
-        registry.setPreMetadataCheck(false);
         registry.setRegisterUrl("http://localhost/registryregister");
         registry.setQueryUrl("http://localhost/registryquery");
         
