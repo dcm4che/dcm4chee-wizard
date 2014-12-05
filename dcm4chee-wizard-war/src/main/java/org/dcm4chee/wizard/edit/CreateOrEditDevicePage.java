@@ -88,6 +88,7 @@ import org.dcm4chee.xds2.conf.XCAInitiatingGWCfg;
 import org.dcm4chee.xds2.conf.XCARespondingGWCfg;
 import org.dcm4chee.xds2.conf.XCAiInitiatingGWCfg;
 import org.dcm4chee.xds2.conf.XCAiRespondingGWCfg;
+import org.dcm4chee.xds2.conf.XDSiSourceCfg;
 import org.dcm4chee.xds2.conf.XdsRegistry;
 import org.dcm4chee.xds2.conf.XdsRepository;
 import org.dcm4chee.xds2.conf.XdsSource;
@@ -160,6 +161,7 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
     private IModel<Boolean> xdsRepositoryModel;
     private IModel<Boolean> xdsSourceModel;
     private IModel<Boolean> xdsStorageModel;
+    private IModel<Boolean> xdsiSourceModel;
 
     public CreateOrEditDevicePage(final ModalWindow window, final DeviceModel deviceModel) {
         super();
@@ -541,6 +543,37 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         xdsWMC.add(xdsSourceCheckBox.setOutputMarkupId(true));
     }
 
+    private void addXdsiSourceCheckBox(final WebMarkupContainer xdsWMC, ExtendedForm form) {
+        xdsWMC.add(new Label("xdsSource.label", new ResourceModel("dicom.edit.xds.xdsSource.label")));
+        AjaxCheckBox xdsiSourceCheckBox = new AjaxCheckBox("xdsiSource", xdsiSourceModel) {
+
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            protected void onUpdate(AjaxRequestTarget target) {
+                if (xdsiSourceModel.getObject().booleanValue())
+                    return;
+
+                if (!isXdsExtensionSelected()) {
+                    log.error("{}: Need to select at least one XDS Extension", this);
+                    xdsiSourceModel.setObject(true);
+                    this.error(new ValidationError("Need to select at least one XDS Extension"));
+                    target.add(this);
+                }
+            }
+        };
+        AjaxFormSubmitBehavior onClick = new AjaxFormSubmitBehavior(form, "change") {
+
+            private static final long serialVersionUID = 1L;
+
+            protected void onEvent(final AjaxRequestTarget target) {
+                super.onEvent(target);
+            }
+        };
+        xdsiSourceCheckBox.add(onClick);
+        xdsWMC.add(xdsiSourceCheckBox.setOutputMarkupId(true));
+    }
+
     private void addXdsRegistryCheckBox(final WebMarkupContainer xdsWMC, ExtendedForm form) {
         xdsWMC.add(new Label("xdsRegistry.label", new ResourceModel("dicom.edit.xds.xdsRegistry.label")));
         AjaxCheckBox xdsRegistryCheckBox = new AjaxCheckBox("xdsRegistry", xdsRegistryModel) {
@@ -735,6 +768,7 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
                 || xcaRespondingGatewayModel.getObject().booleanValue()
                 || xdsRegistryModel.getObject().booleanValue()
                 || xdsSourceModel.getObject().booleanValue()
+                || xdsiSourceModel.getObject().booleanValue()
                 || xdsStorageModel.getObject().booleanValue()
                 || xdsRepositoryModel.getObject().booleanValue();
     }
@@ -827,6 +861,7 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         xdsRepositoryModel = Model.of(deviceModel.getDevice().getDeviceExtension(XdsRepository.class) != null);
         xdsSourceModel = Model.of(deviceModel.getDevice().getDeviceExtension(XdsSource.class) != null);
         xdsStorageModel = Model.of(deviceModel.getDevice().getDeviceExtension(StorageConfiguration.class) != null);
+        xdsiSourceModel = Model.of(deviceModel.getDevice().getDeviceExtension(XDSiSourceCfg.class) != null);
     }
 
     private void setDeviceConfiguration(final DeviceModel deviceModel) throws ConfigurationException {
@@ -914,6 +949,7 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         xdsRepositoryModel = Model.of(true);
         xdsSourceModel = Model.of(true);
         xdsStorageModel = Model.of(true);
+        xdsiSourceModel = Model.of(true);
     }
 
     private void initBasicDeviceConfigurationTypeModel() {
@@ -1115,6 +1151,14 @@ public class CreateOrEditDevicePage extends DicomConfigurationWebPage {
         else if (xdsStorage != null && !xdsStorageCheck)
             device.removeDeviceExtension(xdsStorage);        
         
+        XDSiSourceCfg xdsiSrc = device.getDeviceExtension(XDSiSourceCfg.class);
+        Boolean xdsiSrcCheck = xdsiSourceModel.getObject();
+        if (xdsiSrcCheck && xdsiSrc == null) {
+            XDSiSourceCfg xds = new XDSiSourceCfg();
+            device.addDeviceExtension(xds);
+        }
+        else if (xdsiSrc != null && !xdsiSrcCheck)
+                device.removeDeviceExtension(xdsiSrc);
     }
 
     private Device initDeviceExtensions() {

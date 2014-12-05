@@ -84,7 +84,8 @@ public class ConfigTreeNode implements Serializable, Comparable<ConfigTreeNode> 
         XDSRegistry,
         XDSRepository,
         XDSSource,
-        XDSStorage
+        XDSStorage,
+        XDSiSource
     };
 
     // device containers

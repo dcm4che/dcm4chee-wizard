@@ -32,6 +32,7 @@ grant principal org.wicketstuff.security.hive.authorization.SimplePrincipal "Sim
 	permission ${ComponentPermission} "org.dcm4chee.wizard.edit.xds.XDSRegistryEditPage", "render, enable";
     permission ${ComponentPermission} "org.dcm4chee.wizard.edit.xds.XDSRepositoryEditPage", "render, enable";
     permission ${ComponentPermission} "org.dcm4chee.wizard.edit.xds.XDSSourceEditPage", "render, enable";
+    permission ${ComponentPermission} "org.dcm4chee.wizard.edit.xds.XDSiSourceEditPage", "render, enable";
     permission ${ComponentPermission} "org.dcm4chee.wizard.edit.xds.XDSStorageEditPage", "render, enable";
 };
 

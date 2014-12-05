@@ -271,8 +271,7 @@ public class XCARespondingGatewayEditPage extends SecureSessionCheckPage{
                     
 
                     // optional
-                    if (xdsSoapMsgLogDirModel.getObject() != null)
-                        xca.setSoapLogDir(xdsSoapMsgLogDirModel.getObject());
+                    xca.setSoapLogDir(xdsSoapMsgLogDirModel.getObject());
                     ConfigTreeProvider.get().mergeDevice(device);
                     window.close(target);
                 } catch (Exception e) {

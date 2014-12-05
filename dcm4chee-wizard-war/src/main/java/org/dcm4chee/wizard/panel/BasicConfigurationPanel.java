@@ -163,6 +163,7 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
         XDS_EXTENSIONS.put(TreeNodeType.XCAiRespondingGateway, XCAiRespondingGWCfg.class);
         XDS_EXTENSIONS.put(TreeNodeType.XCAInitiatingGateway, XCAInitiatingGWCfg.class);
         XDS_EXTENSIONS.put(TreeNodeType.XCARespondingGateway, XCARespondingGWCfg.class);
+        XDS_EXTENSIONS.put(TreeNodeType.XDSiSource, XDSiSourceCfg.class);
 
         XDS_REST_PATH.put(TreeNodeType.XDSRegistry, "xds-reg-rs/ctrl/");
         XDS_REST_PATH.put(TreeNodeType.XDSRepository, "xds-rep-rs/ctrl/");
@@ -170,6 +171,7 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
         XDS_REST_PATH.put(TreeNodeType.XCAiRespondingGateway, "xcai-rs/ctrl/");
         XDS_REST_PATH.put(TreeNodeType.XCAInitiatingGateway, "xca-rs/ctrl/");
         XDS_REST_PATH.put(TreeNodeType.XCARespondingGateway, "xca-rs/ctrl/");
+        XDS_REST_PATH.put(TreeNodeType.XDSiSource, "imgsrc-rs/ctrl/");
 
     }
 
@@ -438,6 +440,10 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                             ((DeviceModel) deviceNode.getModel()).getDevice().removeDeviceExtension(
                                     ((DeviceModel) deviceNode.getModel()).getDevice().getDeviceExtension(
                                             XdsSource.class));
+                        } else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.XDSiSource)) {
+                            ((DeviceModel) deviceNode.getModel()).getDevice().removeDeviceExtension(
+                                    ((DeviceModel) deviceNode.getModel()).getDevice().getDeviceExtension(
+                                            XDSiSourceCfg.class));
                         } else if (node.getNodeType().equals(TreeNodeType.XDSStorage)) {
                             ((DeviceModel) deviceNode.getModel()).getDevice().removeDeviceExtension(
                                     ((DeviceModel) deviceNode.getModel()).getDevice().getDeviceExtension(
@@ -564,6 +570,7 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                         || type.equals(ConfigTreeNode.TreeNodeType.XCARespondingGateway)
                         || type.equals(ConfigTreeNode.TreeNodeType.XDSRegistry)
                         || type.equals(ConfigTreeNode.TreeNodeType.XDSSource)
+                        || type.equals(ConfigTreeNode.TreeNodeType.XDSiSource)
                         || type.equals(TreeNodeType.XDSStorage)
                         || type.equals(ConfigTreeNode.TreeNodeType.XDSRepository)) {
                     cellItem.add(new Label(componentId));
@@ -1133,6 +1140,9 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                             .getModel(), rowModel.getObject().getAncestor(1));
                 } else if (type.equals(ConfigTreeNode.TreeNodeType.XDSSource)) {
                     return new XDSSourceEditPage(editWindow, (XDSSourceModel) rowModel.getObject()
+                            .getModel(), rowModel.getObject().getAncestor(1));
+                } else if (type.equals(ConfigTreeNode.TreeNodeType.XDSiSource)) {
+                    return new XDSiSourceEditPage(editWindow, (XDSiSourceModel) rowModel.getObject()
                             .getModel(), rowModel.getObject().getAncestor(1));
                 } else if (type.equals(TreeNodeType.XDSStorage)) {
                     return new XDSStorageEditPage(editWindow, (XdsStorageModel) rowModel.getObject()

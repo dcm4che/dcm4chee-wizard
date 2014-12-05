@@ -87,6 +87,7 @@ import org.dcm4chee.xds2.conf.XCAInitiatingGWCfg;
 import org.dcm4chee.xds2.conf.XCARespondingGWCfg;
 import org.dcm4chee.xds2.conf.XCAiInitiatingGWCfg;
 import org.dcm4chee.xds2.conf.XCAiRespondingGWCfg;
+import org.dcm4chee.xds2.conf.XDSiSourceCfg;
 import org.dcm4chee.xds2.conf.XdsRegistry;
 import org.dcm4chee.xds2.conf.XdsRepository;
 import org.dcm4chee.xds2.conf.XdsSource;
@@ -421,6 +422,11 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode, Str
             new ConfigTreeNode(deviceNode,
                     new StringResourceModel("dicom.list.xdsSource.label", forComponent, null),
                     ConfigTreeNode.TreeNodeType.XDSSource, null);
+        }
+        else if (ext instanceof XDSiSourceCfg) {
+            new ConfigTreeNode(deviceNode,
+                    new StringResourceModel("dicom.list.xdsiSource.label", forComponent, null),
+                    ConfigTreeNode.TreeNodeType.XDSiSource, null);
         }
         else if (ext instanceof StorageConfiguration) {
             new ConfigTreeNode(deviceNode,

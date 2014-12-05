@@ -306,8 +306,7 @@ public class XDSRegistryEditPage extends SecureSessionCheckPage{
                     // optional
                     if (xdsAcceptedMimeTypesModel.getArray().length > 0)
                         xds.setAcceptedMimeTypes(xdsAcceptedMimeTypesModel.getArray());
-                    if (xdsSoapMsgLogDirModel.getObject() != null)
-                        xds.setSoapLogDir(xdsSoapMsgLogDirModel.getObject());
+                    xds.setSoapLogDir(xdsSoapMsgLogDirModel.getObject());
                     if (xdsCreateMissingPIDsModel.getObject() != null)
                         xds.setCreateMissingPIDs(xdsCreateMissingPIDsModel.getObject());
                     if (xdsCreateMissingCodesModel.getObject() != null)

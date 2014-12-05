@@ -308,12 +308,9 @@ public class XCAInitiatingGatewayEditPage extends SecureSessionCheckPage{
                         xca.setAsync(xdsAsyncModel.getObject());
                     if (xdsAsyncHandlerModel.getObject() != null)
                         xca.setAsyncHandler(xdsAsyncHandlerModel.getObject());
-                    if (xdsPIXConsumerApplicationModel.getObject() != null)
-                        xca.setLocalPIXConsumerApplication(xdsPIXConsumerApplicationModel.getObject());
-                    if (xdsPIXManagerApplicationModel.getObject() != null)
-                        xca.setRemotePIXManagerApplication(xdsPIXManagerApplicationModel.getObject());
-                    if (xdsSoapMsgLogDirModel.getObject() != null)
-                        xca.setSoapLogDir(xdsSoapMsgLogDirModel.getObject());
+                    xca.setLocalPIXConsumerApplication(xdsPIXConsumerApplicationModel.getObject());
+                    xca.setRemotePIXManagerApplication(xdsPIXManagerApplicationModel.getObject());
+                    xca.setSoapLogDir(xdsSoapMsgLogDirModel.getObject());
                     ConfigTreeProvider.get().mergeDevice(device);
                     window.close(target);
                 } catch (Exception e) {

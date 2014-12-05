@@ -320,10 +320,8 @@ public class XDSRepositoryEditPage extends SecureSessionCheckPage{
                         xds.setAcceptedMimeTypes(xdsAcceptedMimeTypesModel.getArray());
                     if (xdsCheckMimetypeModel.getObject() != null)
                         xds.setCheckMimetype(xdsCheckMimetypeModel.getObject());
-                    if (xdsSoapMsgLogDirModel.getObject() != null)
-                        xds.setSoapLogDir(xdsSoapMsgLogDirModel.getObject());
-                    if (xdsAllowedCipherHostnameModel.getObject() != null)
-                        xds.setAllowedCipherHostname(xdsAllowedCipherHostnameModel.getObject());
+                    xds.setSoapLogDir(xdsSoapMsgLogDirModel.getObject());
+                    xds.setAllowedCipherHostname(xdsAllowedCipherHostnameModel.getObject());
                     if (xdsLogFullMessageHostsModel.getArray().length > 0)
                         xds.setLogFullMessageHosts(xdsLogFullMessageHostsModel.getArray());
                     ConfigTreeProvider.get().mergeDevice(device);

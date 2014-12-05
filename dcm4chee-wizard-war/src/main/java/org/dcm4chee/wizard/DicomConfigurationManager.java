@@ -86,6 +86,7 @@ import org.dcm4chee.xds2.conf.XCAInitiatingGWCfg;
 import org.dcm4chee.xds2.conf.XCARespondingGWCfg;
 import org.dcm4chee.xds2.conf.XCAiInitiatingGWCfg;
 import org.dcm4chee.xds2.conf.XCAiRespondingGWCfg;
+import org.dcm4chee.xds2.conf.XDSiSourceCfg;
 import org.dcm4chee.xds2.conf.XdsRegistry;
 import org.dcm4chee.xds2.conf.XdsRepository;
 import org.dcm4chee.xds2.conf.XdsSource;
@@ -132,6 +133,7 @@ public class DicomConfigurationManager implements Serializable {
                 ldapConfig.addDicomConfigurationExtension(new LdapGenericConfigExtension<XCAiInitiatingGWCfg>(XCAiInitiatingGWCfg.class));
                 ldapConfig.addDicomConfigurationExtension(new LdapGenericConfigExtension<XdsSource>(XdsSource.class));
                 ldapConfig.addDicomConfigurationExtension(new LdapGenericConfigExtension<StorageConfiguration>(StorageConfiguration.class));
+                ldapConfig.addDicomConfigurationExtension(new LdapGenericConfigExtension<XDSiSourceCfg>(XDSiSourceCfg.class));
                 dicomConfiguration = ldapConfig;
                 hl7Configuration = hl7Config;
             } catch (FileNotFoundException e) {
@@ -174,6 +176,7 @@ public class DicomConfigurationManager implements Serializable {
                 prefsConfig.addDicomConfigurationExtension(new PreferencesGenericConfigExtension<XCAiInitiatingGWCfg>(XCAiInitiatingGWCfg.class));
                 prefsConfig.addDicomConfigurationExtension(new PreferencesGenericConfigExtension<XdsSource>(XdsSource.class));
                 prefsConfig.addDicomConfigurationExtension(new PreferencesGenericConfigExtension<StorageConfiguration>(StorageConfiguration.class));
+                prefsConfig.addDicomConfigurationExtension(new PreferencesGenericConfigExtension<XDSiSourceCfg>(XDSiSourceCfg.class));
                 dicomConfiguration = prefsConfig;
                 hl7Configuration = hl7Config;
             } finally {
