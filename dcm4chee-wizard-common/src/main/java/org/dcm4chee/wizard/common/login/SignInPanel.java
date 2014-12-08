@@ -38,6 +38,8 @@
 
 package org.dcm4chee.wizard.common.login;
 
+import java.lang.reflect.Field;
+
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.authentication.IAuthenticationStrategy;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -48,7 +50,10 @@ import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.CompoundPropertyModel;
+import org.apache.wicket.request.http.WebRequest;
 import org.dcm4chee.wizard.common.login.context.WebLoginContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wicketstuff.security.WaspSession;
 import org.wicketstuff.security.authentication.LoginException;
 
@@ -69,6 +74,8 @@ public class SignInPanel extends Panel {
     /** user name. */
     private String username;
 
+    private static Logger log = LoggerFactory.getLogger(SignInPanel.class);
+    
     /**
      * @see org.apache.wicket.Component#Component(String)
      */
@@ -115,7 +122,9 @@ public class SignInPanel extends Panel {
                     .getAuthenticationStrategy();
             // get username and password from persistence store
             String[] data = authenticationStrategy.load();
-
+            if (data == null) {
+                data = jaasLoggedIn(this.getWebRequest());
+            }
             if ((data != null) && (data.length > 1)) {
                 // try to sign in the user
                 if (signIn(data[0], data[1])) {
@@ -136,6 +145,30 @@ public class SignInPanel extends Panel {
 
         // don't forget
         super.onBeforeRender();
+    }
+
+    @SuppressWarnings("rawtypes")
+    private String[] jaasLoggedIn(WebRequest webRequest) {
+        Object cr = getWebRequest().getContainerRequest();
+        Class crClass = cr.getClass();
+        try {
+            Field f = crClass.getDeclaredField("request");
+            f.setAccessible(true);
+            org.apache.catalina.connector.Request req = (org.apache.catalina.connector.Request) f.get(cr);
+            log.info("request:"+req.getClass().getName());
+            Object pr = req.getPrincipal();
+            if (pr == null) {
+                log.info("No JAAS login principal!");
+                return null;
+            }
+            Field credField = pr.getClass().getDeclaredField("credentials");
+            credField.setAccessible(true);
+            Object cred = credField.get(pr);        
+            return new String[]{req.getRemoteUser(), cred.toString()};
+        } catch (Exception x) {
+            log.error("Failed to get login info of JAAS login!", x);
+        }
+        return null;
     }
 
     /**
