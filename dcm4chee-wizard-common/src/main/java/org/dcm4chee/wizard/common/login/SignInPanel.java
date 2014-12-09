@@ -121,9 +121,9 @@ public class SignInPanel extends Panel {
             IAuthenticationStrategy authenticationStrategy = getApplication().getSecuritySettings()
                     .getAuthenticationStrategy();
             // get username and password from persistence store
-            String[] data = authenticationStrategy.load();
+            String[] data = jaasLoggedIn(this.getWebRequest());
             if (data == null) {
-                data = jaasLoggedIn(this.getWebRequest());
+                data = authenticationStrategy.load();
             }
             if ((data != null) && (data.length > 1)) {
                 // try to sign in the user
