@@ -95,8 +95,6 @@ public class XDSRepositoryEditPage extends SecureSessionCheckPage{
     private StringArrayModel xdsAcceptedMimeTypesModel;
     private Model<Boolean> xdsCheckMimetypeModel;
     private Model<String> xdsSoapMsgLogDirModel;
-    private Model<String> xdsAllowedCipherHostnameModel;
-    private StringArrayModel xdsLogFullMessageHostsModel;
     private GenericConfigNodeModel<XdsRepository> xdsSources;
     private GenericConfigNodeModel<XdsRepository> xdsFileSystemGroupIDs;
 
@@ -146,15 +144,6 @@ public class XDSRepositoryEditPage extends SecureSessionCheckPage{
                 "dicom.edit.xds.optional.xdsSoapMsgLogDir.label")).setOutputMarkupPlaceholderTag(true));
         optionalContainer.add(new TextField<String>("xdsSoapMsgLogDir", xdsSoapMsgLogDirModel).setType(String.class));
 
-        optionalContainer.add(new Label("xdsAllowedCipherHostname.label", new ResourceModel(
-                "dicom.edit.xds.optional.xdsAllowedCipherHostname.label")).setOutputMarkupPlaceholderTag(true));
-        optionalContainer.add(new TextField<String>("xdsAllowedCipherHostname", xdsAllowedCipherHostnameModel)
-                .setType(String.class));
-
-        optionalContainer.add(new Label("xdsLogFullMessageHosts.label", new ResourceModel(
-                "dicom.edit.xds.optional.xdsLogFullMessageHosts.label")).setOutputMarkupPlaceholderTag(true));
-        optionalContainer.add(new TextArea<String>("xdsLogFullMessageHosts", xdsLogFullMessageHostsModel)
-                .setType(String.class));
     }
 
     private void addToggleOptionalCheckBox(final ExtendedForm form, final Form<?> optionalContainer) {
@@ -247,8 +236,6 @@ public class XDSRepositoryEditPage extends SecureSessionCheckPage{
             xdsAcceptedMimeTypesModel = new StringArrayModel(null);
             xdsCheckMimetypeModel = Model.of();
             xdsSoapMsgLogDirModel = Model.of();
-            xdsAllowedCipherHostnameModel = Model.of();
-            xdsLogFullMessageHostsModel = new StringArrayModel(null);
             xdsRetrieveURLModel = Model.of();
             xdsProvideURLModel = Model.of();
             xdsSources = new GenericConfigNodeModel<XdsRepository>(new XdsRepository(), "xdsSource", Map.class);
@@ -260,8 +247,6 @@ public class XDSRepositoryEditPage extends SecureSessionCheckPage{
             xdsAcceptedMimeTypesModel = new StringArrayModel(xds.getAcceptedMimeTypes());
             xdsCheckMimetypeModel = Model.of(xds.isCheckMimetype());
             xdsSoapMsgLogDirModel = Model.of(xds.getSoapLogDir());
-            xdsAllowedCipherHostnameModel = Model.of(xds.getAllowedCipherHostname());
-            xdsLogFullMessageHostsModel = new StringArrayModel(xds.getLogFullMessageHosts());
             xdsRetrieveURLModel = Model.of(xds.getRetrieveUrl());
             xdsProvideURLModel = Model.of(xds.getProvideUrl());
             xdsSources = new GenericConfigNodeModel<XdsRepository>(xds, "xdsSource", Map.class);
@@ -321,9 +306,6 @@ public class XDSRepositoryEditPage extends SecureSessionCheckPage{
                     if (xdsCheckMimetypeModel.getObject() != null)
                         xds.setCheckMimetype(xdsCheckMimetypeModel.getObject());
                     xds.setSoapLogDir(xdsSoapMsgLogDirModel.getObject());
-                    xds.setAllowedCipherHostname(xdsAllowedCipherHostnameModel.getObject());
-                    if (xdsLogFullMessageHostsModel.getArray().length > 0)
-                        xds.setLogFullMessageHosts(xdsLogFullMessageHostsModel.getArray());
                     ConfigTreeProvider.get().mergeDevice(device);
                     window.close(target);
                 } catch (Exception e) {
