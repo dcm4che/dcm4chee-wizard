@@ -83,6 +83,7 @@ import org.dcm4chee.wizard.model.proxy.ProxyDeviceModel;
 import org.dcm4chee.wizard.model.proxy.RetryModel;
 import org.dcm4chee.wizard.model.xds.XdsDeviceModel;
 import org.dcm4chee.wizard.tcxml.Group;
+import org.dcm4chee.wizard.tree.ConfigTreeNode.TreeNodeType;
 import org.dcm4chee.xds2.conf.XCAInitiatingGWCfg;
 import org.dcm4chee.xds2.conf.XCARespondingGWCfg;
 import org.dcm4chee.xds2.conf.XCAiInitiatingGWCfg;
@@ -497,18 +498,23 @@ public class ConfigTreeProvider extends SortableTreeProvider<ConfigTreeNode, Str
         addDeviceSubnodes(deviceNode, device);
         Session.get().setAttribute("configTreeProvider", this);
         ((WizardApplication) Session.get().getApplication()).getDicomConfigurationManager().setReload(
-                device.getDeviceName());
+                device.getDeviceName(), new String[0]);
     }
 
     public void mergeDevice(Device device) throws IOException, ConfigurationException {
+        mergeDevice(device, (TreeNodeType)null);
+    }
+    public void mergeDevice(Device device, TreeNodeType type) throws IOException, ConfigurationException {
+        mergeDevice(device, getDicomConfigurationManager().getConnectedDeviceURL(device, type));
+    }
+    public void mergeDevice(Device device, String... reloadURLs) throws IOException, ConfigurationException {
         deviceNodeList = ((ConfigTreeProvider) Session.get().getAttribute("configTreeProvider")).getNodeList();
         getDicomConfigurationManager().save(device, (lastModificationTime = new Date()));
         for (ConfigTreeNode node : deviceNodeList)
             if (node.getName().equals(device.getDeviceName()))
                 node.setModel(null);
         Session.get().setAttribute("configTreeProvider", this);
-        ((WizardApplication) Session.get().getApplication()).getDicomConfigurationManager().setReload(
-                device.getDeviceName());
+        getDicomConfigurationManager().setReload(device.getDeviceName(), reloadURLs);
     }
 
     public void removeDevice(ConfigTreeNode deviceNode) throws ConfigurationException {

@@ -67,6 +67,7 @@ import org.dcm4chee.wizard.model.StringArrayModel;
 import org.dcm4chee.wizard.model.xds.XDSRegistryModel;
 import org.dcm4chee.wizard.model.xds.XDSSourceModel;
 import org.dcm4chee.wizard.tree.ConfigTreeNode;
+import org.dcm4chee.wizard.tree.ConfigTreeNode.TreeNodeType;
 import org.dcm4chee.wizard.tree.ConfigTreeProvider;
 import org.dcm4chee.wizard.util.FormUtils;
 import org.dcm4chee.xds2.conf.XCAInitiatingGWCfg;
@@ -229,7 +230,7 @@ public class XDSSourceEditPage extends SecureSessionCheckPage{
                     xds.setUrl(xdsSourceUrlModel.getObject());
                     
 
-                    ConfigTreeProvider.get().mergeDevice(device);
+                    ConfigTreeProvider.get().mergeDevice(device, TreeNodeType.XDSSource);
                     window.close(target);
                 } catch (Exception e) {
                     log.error("{}: Error modifying XDS Registry: {}", this, e);

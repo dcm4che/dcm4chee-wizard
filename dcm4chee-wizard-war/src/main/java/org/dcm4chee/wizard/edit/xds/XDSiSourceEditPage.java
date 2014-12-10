@@ -68,6 +68,7 @@ import org.dcm4chee.wizard.model.xds.XDSRegistryModel;
 import org.dcm4chee.wizard.model.xds.XDSSourceModel;
 import org.dcm4chee.wizard.model.xds.XDSiSourceModel;
 import org.dcm4chee.wizard.tree.ConfigTreeNode;
+import org.dcm4chee.wizard.tree.ConfigTreeNode.TreeNodeType;
 import org.dcm4chee.wizard.tree.ConfigTreeProvider;
 import org.dcm4chee.wizard.util.FormUtils;
 import org.dcm4chee.xds2.conf.XCAInitiatingGWCfg;
@@ -238,7 +239,7 @@ public class XDSiSourceEditPage extends SecureSessionCheckPage{
                     xds.setSoapLogDir(xdsSoapMsgLogDirModel.getObject());
                     
 
-                    ConfigTreeProvider.get().mergeDevice(device);
+                    ConfigTreeProvider.get().mergeDevice(device, TreeNodeType.XDSiSource);
                     window.close(target);
                 } catch (Exception e) {
                     log.error("{}: Error modifying XDS-I Source: {}", this, e);

@@ -82,6 +82,9 @@ import org.dcm4che3.util.StringUtils;
 import org.dcm4chee.proxy.conf.ldap.LdapProxyConfigurationExtension;
 import org.dcm4chee.proxy.conf.prefs.PreferencesProxyConfigurationExtension;
 import org.dcm4chee.storage.conf.StorageConfiguration;
+import org.dcm4chee.wizard.panel.BasicConfigurationPanel;
+import org.dcm4chee.wizard.tree.ConfigTreeNode;
+import org.dcm4chee.wizard.tree.ConfigTreeNode.TreeNodeType;
 import org.dcm4chee.xds2.conf.XCAInitiatingGWCfg;
 import org.dcm4chee.xds2.conf.XCARespondingGWCfg;
 import org.dcm4chee.xds2.conf.XCAiInitiatingGWCfg;
@@ -106,7 +109,7 @@ public class DicomConfigurationManager implements Serializable {
     private DicomConfiguration dicomConfiguration;
     private HashMap<String, Device> deviceMap;
     private Date lastModificationTime;
-    private Set<String> reloadList;
+    private Map<String, Set<String>> reloadList;
     private HL7Configuration hl7Configuration;
     private HashMap<String, String> connectedDeviceUrls;
 
@@ -185,7 +188,7 @@ public class DicomConfigurationManager implements Serializable {
                 for (String deviceName : getDeviceMap().keySet())
                     getDevice(deviceName);
             lastModificationTime = new Date();
-            reloadList = new HashSet<String>();
+            reloadList = new HashMap<String, Set<String>>();
         } catch (Exception e) {
             if (dicomConfiguration != null)
                 dicomConfiguration.close();
@@ -283,6 +286,14 @@ public class DicomConfigurationManager implements Serializable {
         }
         return connectedDeviceUrls;
     }
+    
+    public String getConnectedDeviceURL(Device d, TreeNodeType treeNodeType) {
+        String url = getConnectedDeviceUrls().get(d.getDeviceName());
+        if (url == null)
+            return null;
+        String restPath = treeNodeType == null ? null : BasicConfigurationPanel.XDS_REST_PATH.get(treeNodeType);
+        return restPath == null ? url : url+restPath;
+    }
 
     public ApplicationEntity getApplicationEntity(String aet) throws ConfigurationException {
         return dicomConfiguration.findApplicationEntity(aet);
@@ -293,14 +304,36 @@ public class DicomConfigurationManager implements Serializable {
     }
 
     public synchronized boolean isReload(String deviceName) {
-        return reloadList.contains(deviceName);
+        Set<String> urls = reloadList.get(deviceName);
+        return urls != null && urls.size() > 0;
     }
 
-    public synchronized void setReload(String deviceName) {
-        reloadList.add(deviceName);
+    public synchronized boolean isReload(String deviceName, String reloadURL) {
+        Set<String> urls = reloadList.get(deviceName);
+        return urls != null && urls.contains(reloadURL);
     }
 
-    public synchronized void clearReload(String deviceName) {
-        reloadList.remove(deviceName);
+    public synchronized void setReload(String deviceName, String... reloadURLs) {
+        Set<String> urls = reloadList.get(deviceName);
+        if (urls == null) {
+            urls = new HashSet<String>();
+            reloadList.put(deviceName,  urls);
+        }
+        for (String url : reloadURLs) {
+            if (url != null)
+                urls.add(url);
+        }
+    }
+
+    public synchronized void clearReload(String deviceName, String... reloadURLs) {
+        Set<String> urls = reloadList.get(deviceName);
+        if (urls != null) {
+            for (String url : reloadURLs) {
+                if (url != null)
+                    urls.remove(url);
+            }
+            if (urls.isEmpty())
+                reloadList.remove(deviceName);
+        }
     }
 }

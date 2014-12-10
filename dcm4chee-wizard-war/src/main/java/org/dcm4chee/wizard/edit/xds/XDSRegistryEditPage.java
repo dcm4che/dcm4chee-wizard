@@ -65,6 +65,7 @@ import org.dcm4chee.wizard.model.DeviceModel;
 import org.dcm4chee.wizard.model.StringArrayModel;
 import org.dcm4chee.wizard.model.xds.XDSRegistryModel;
 import org.dcm4chee.wizard.tree.ConfigTreeNode;
+import org.dcm4chee.wizard.tree.ConfigTreeNode.TreeNodeType;
 import org.dcm4chee.wizard.tree.ConfigTreeProvider;
 import org.dcm4chee.xds2.conf.XdsRegistry;
 import org.slf4j.Logger;
@@ -315,7 +316,7 @@ public class XDSRegistryEditPage extends SecureSessionCheckPage{
                         xds.setCheckAffinityDomain(xdsCheckAffinityDomainModel.getObject());
                     if (xdsCheckMimetypeModel.getObject() != null)
                         xds.setCheckMimetype(xdsCheckMimetypeModel.getObject());
-                    ConfigTreeProvider.get().mergeDevice(device);
+                    ConfigTreeProvider.get().mergeDevice(device, TreeNodeType.XDSRegistry);
                     window.close(target);
                 } catch (Exception e) {
                     log.error("{}: Error modifying XDS Registry: {}", this, e);

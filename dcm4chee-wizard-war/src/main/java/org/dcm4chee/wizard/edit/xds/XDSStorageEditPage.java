@@ -52,6 +52,8 @@ import org.apache.wicket.validation.IValidator;
 import org.dcm4che3.conf.api.ConfigurationException;
 import org.dcm4che3.net.Device;
 import org.dcm4chee.storage.conf.StorageConfiguration;
+import org.dcm4chee.wizard.DicomConfigurationManager;
+import org.dcm4chee.wizard.WizardApplication;
 import org.dcm4chee.wizard.common.component.ExtendedForm;
 import org.dcm4chee.wizard.common.component.ModalWindowRuntimeException;
 import org.dcm4chee.wizard.common.component.secure.SecureSessionCheckPage;
@@ -59,6 +61,7 @@ import org.dcm4chee.wizard.model.DeviceModel;
 import org.dcm4chee.wizard.model.GenericConfigClassModel;
 import org.dcm4chee.wizard.model.xds.XdsStorageModel;
 import org.dcm4chee.wizard.tree.ConfigTreeNode;
+import org.dcm4chee.wizard.tree.ConfigTreeNode.TreeNodeType;
 import org.dcm4chee.wizard.tree.ConfigTreeProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -148,7 +151,8 @@ public class XDSStorageEditPage extends SecureSessionCheckPage{
                     if (ext != null) {
                         device.removeDeviceExtension(ext);
                         device.addDeviceExtension(ext);
-                        ConfigTreeProvider.get().mergeDevice(device);
+                        DicomConfigurationManager mgr = ((WizardApplication) getApplication()).getDicomConfigurationManager();
+                        ConfigTreeProvider.get().mergeDevice(device, TreeNodeType.XDSRepository);
                     }
 
                     window.close(target);

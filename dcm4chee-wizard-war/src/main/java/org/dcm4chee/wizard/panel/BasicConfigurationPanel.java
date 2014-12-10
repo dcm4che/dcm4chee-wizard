@@ -77,6 +77,7 @@ import org.dcm4che3.conf.api.DicomConfiguration;
 import org.dcm4che3.conf.prefs.PreferencesDicomConfiguration;
 import org.dcm4che3.net.ApplicationEntity;
 import org.dcm4che3.net.Connection;
+import org.dcm4che3.net.Device;
 import org.dcm4che3.net.DeviceExtension;
 import org.dcm4che3.net.TransferCapability;
 import org.dcm4che3.net.audit.AuditLogger;
@@ -367,28 +368,24 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                         ConfigTreeProvider.get().removeDevice(node);
                     } else {
                         ConfigTreeNode deviceNode = node.getRoot();
-
+                        Device device = ((DeviceModel) deviceNode.getModel()).getDevice();
                         if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.CONNECTION)) {
-                            ((DeviceModel) deviceNode.getModel()).getDevice().removeConnection(
-                                    ((ConnectionModel) node.getModel()).getConnection());
+                            device.removeConnection(((ConnectionModel) node.getModel()).getConnection());
 
                         } else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.APPLICATION_ENTITY)) {
                             ApplicationEntity applicationEntity = ((ApplicationEntityModel) node.getModel())
                                     .getApplicationEntity();
-                            ((DeviceModel) deviceNode.getModel()).getDevice()
-                                    .removeApplicationEntity(applicationEntity);
+                            device.removeApplicationEntity(applicationEntity);
                             ConfigTreeProvider.get().unregisterAETitle(applicationEntity.getAETitle());
 
                         } else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.HL7_APPLICATION)) {
                             HL7Application hl7Application = ((HL7ApplicationModel) node.getModel()).getHL7Application();
-                            ((DeviceModel) deviceNode.getModel()).getDevice()
-                                    .getDeviceExtension(HL7DeviceExtension.class).removeHL7Application(hl7Application);
+                            device.getDeviceExtension(HL7DeviceExtension.class).removeHL7Application(hl7Application);
                             ConfigTreeProvider.get().unregisterHL7Application(hl7Application.getApplicationName());
 
                         } else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.AUDIT_LOGGER)) {
-                            ((DeviceModel) deviceNode.getModel()).getDevice().removeDeviceExtension(
-                                    ((DeviceModel) deviceNode.getModel()).getDevice().getDeviceExtension(
-                                            AuditLogger.class));
+                            device.removeDeviceExtension(
+                                    device.getDeviceExtension(AuditLogger.class));
 
                         } else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.TRANSFER_CAPABILITY)) {
                             TransferCapability transferCapability = ((TransferCapabilityModel) node.getModel())
@@ -417,46 +414,38 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                                     .getAEExtension(ProxyAEExtension.class).getAttributeCoercions()
                                     .remove(((CoercionModel) node.getModel()).getCoercion());
                         } else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.XCAiInitiatingGateway)) {
-                            ((DeviceModel) deviceNode.getModel()).getDevice().removeDeviceExtension(
-                                    ((DeviceModel) deviceNode.getModel()).getDevice().getDeviceExtension(
-                                            XCAiInitiatingGWCfg.class));
+                            device.removeDeviceExtension(
+                                    device.getDeviceExtension(XCAiInitiatingGWCfg.class));
                         } else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.XCAInitiatingGateway)) {
-                            ((DeviceModel) deviceNode.getModel()).getDevice().removeDeviceExtension(
-                                    ((DeviceModel) deviceNode.getModel()).getDevice().getDeviceExtension(
+                            device.removeDeviceExtension(
+                                    device.getDeviceExtension(
                                             XCAInitiatingGWCfg.class));
                         } else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.XCAiRespondingGateway)) {
-                            ((DeviceModel) deviceNode.getModel()).getDevice().removeDeviceExtension(
-                                    ((DeviceModel) deviceNode.getModel()).getDevice().getDeviceExtension(
-                                            XCAiRespondingGWCfg.class));
+                            device.removeDeviceExtension(
+                                    device.getDeviceExtension(XCAiRespondingGWCfg.class));
                         } else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.XCARespondingGateway)) {
-                            ((DeviceModel) deviceNode.getModel()).getDevice().removeDeviceExtension(
-                                    ((DeviceModel) deviceNode.getModel()).getDevice().getDeviceExtension(
-                                            XCARespondingGWCfg.class));
+                            device.removeDeviceExtension(
+                                    device.getDeviceExtension(XCARespondingGWCfg.class));
                         } else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.XDSRegistry)) {
-                            ((DeviceModel) deviceNode.getModel()).getDevice().removeDeviceExtension(
-                                    ((DeviceModel) deviceNode.getModel()).getDevice().getDeviceExtension(
-                                            XdsRegistry.class));
+                            device.removeDeviceExtension(
+                                    device.getDeviceExtension(XdsRegistry.class));
                         } else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.XDSSource)) {
-                            ((DeviceModel) deviceNode.getModel()).getDevice().removeDeviceExtension(
-                                    ((DeviceModel) deviceNode.getModel()).getDevice().getDeviceExtension(
-                                            XdsSource.class));
+                            device.removeDeviceExtension(
+                                    device.getDeviceExtension(XdsSource.class));
                         } else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.XDSiSource)) {
-                            ((DeviceModel) deviceNode.getModel()).getDevice().removeDeviceExtension(
-                                    ((DeviceModel) deviceNode.getModel()).getDevice().getDeviceExtension(
-                                            XDSiSourceCfg.class));
+                            device.removeDeviceExtension(
+                                    device.getDeviceExtension(XDSiSourceCfg.class));
                         } else if (node.getNodeType().equals(TreeNodeType.XDSStorage)) {
-                            ((DeviceModel) deviceNode.getModel()).getDevice().removeDeviceExtension(
-                                    ((DeviceModel) deviceNode.getModel()).getDevice().getDeviceExtension(
-                                            StorageConfiguration.class));
+                            device.removeDeviceExtension(
+                                    device.getDeviceExtension(StorageConfiguration.class));
                         } else if (node.getNodeType().equals(ConfigTreeNode.TreeNodeType.XDSRepository)) {
-                            ((DeviceModel) deviceNode.getModel()).getDevice().removeDeviceExtension(
-                                    ((DeviceModel) deviceNode.getModel()).getDevice().getDeviceExtension(
-                                            XdsRepository.class));
+                            device.removeDeviceExtension(
+                                    device.getDeviceExtension(XdsRepository.class));
                         } else {
                             log.error("Missing type of ConfigurationTreeNode");
                             return;
                         }
-                        ConfigTreeProvider.get().mergeDevice(((DeviceModel) deviceNode.getModel()).getDevice());
+                        ConfigTreeProvider.get().mergeDevice(device);
                     }
                 } catch (Exception e) {
                     log.error(this.getClass().toString() + ": " + "Error deleting configuration object: "
@@ -909,8 +898,11 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
 
                 if (connectedDeviceUrl != null) {
                     IndicatingAjaxLink<Object> ajaxLink = new ReloadAjaxLink(connectedDeviceUrl, restOperation, deviceName);
+                    String styleAttr = "width: 50px; text-align: center;";
+                    if (getDicomConfigurationManager().isReload(deviceName, connectedDeviceUrl)) 
+                        styleAttr += " background-color: red;";
                     cellItem.add(new LinkPanel(componentId, ajaxLink, ImageManager.IMAGE_WIZARD_RELOAD, reloadMessage))
-                            .add(new AttributeAppender("style", Model.of("width: 50px; text-align: center;")));
+                            .add(new AttributeAppender("style", Model.of(styleAttr)));
                     return;
                 }
 
@@ -1383,8 +1375,7 @@ public class BasicConfigurationPanel extends DicomConfigurationPanel {
                                 + connection.getResponseCode() + ": " + connection.getResponseMessage());
                 }
 
-                ((WizardApplication) getApplication()).getDicomConfigurationManager().clearReload(
-                        deviceName);
+                ((WizardApplication) getApplication()).getDicomConfigurationManager().clearReload(deviceName, connectedDeviceUrl);
             } catch (Exception e) {
                 log.error("Error reloading configuration of connected device: " + e.getMessage());
                 if (log.isDebugEnabled())

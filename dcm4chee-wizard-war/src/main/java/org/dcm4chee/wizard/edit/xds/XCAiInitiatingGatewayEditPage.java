@@ -68,6 +68,7 @@ import org.dcm4chee.wizard.model.GenericConfigNodeModel;
 import org.dcm4chee.wizard.model.StringArrayModel;
 import org.dcm4chee.wizard.model.xds.XCAiInitiatingGatewayModel;
 import org.dcm4chee.wizard.tree.ConfigTreeNode;
+import org.dcm4chee.wizard.tree.ConfigTreeNode.TreeNodeType;
 import org.dcm4chee.wizard.tree.ConfigTreeProvider;
 import org.dcm4chee.xds2.conf.XCAiInitiatingGWCfg;
 import org.slf4j.Logger;
@@ -297,7 +298,7 @@ public class XCAiInitiatingGatewayEditPage extends SecureSessionCheckPage{
                         xcai.setAsync(xdsAsyncModel.getObject());
                     if (xdsAsyncHandlerModel.getObject() != null)
                         xcai.setAsyncHandler(xdsAsyncHandlerModel.getObject());
-                    ConfigTreeProvider.get().mergeDevice(device);
+                    ConfigTreeProvider.get().mergeDevice(device, TreeNodeType.XCAiInitiatingGateway);
                     window.close(target);
                 } catch (Exception e) {
                     log.error("Error modifying XCAi Initating Gateway: "+this.toString(), e);

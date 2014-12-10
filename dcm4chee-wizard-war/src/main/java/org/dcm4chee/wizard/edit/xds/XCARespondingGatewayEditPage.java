@@ -63,6 +63,7 @@ import org.dcm4chee.wizard.model.GenericConfigNodeModel;
 import org.dcm4chee.wizard.model.StringArrayModel;
 import org.dcm4chee.wizard.model.xds.XCARespondingGatewayModel;
 import org.dcm4chee.wizard.tree.ConfigTreeNode;
+import org.dcm4chee.wizard.tree.ConfigTreeNode.TreeNodeType;
 import org.dcm4chee.wizard.tree.ConfigTreeProvider;
 import org.dcm4chee.wizard.util.FormUtils;
 import org.dcm4chee.xds2.conf.XCAInitiatingGWCfg;
@@ -272,7 +273,7 @@ public class XCARespondingGatewayEditPage extends SecureSessionCheckPage{
 
                     // optional
                     xca.setSoapLogDir(xdsSoapMsgLogDirModel.getObject());
-                    ConfigTreeProvider.get().mergeDevice(device);
+                    ConfigTreeProvider.get().mergeDevice(device, TreeNodeType.XCARespondingGateway);
                     window.close(target);
                 } catch (Exception e) {
                     log.error("{}: Error modifying XCA Responding Gateway: {}", this, e);

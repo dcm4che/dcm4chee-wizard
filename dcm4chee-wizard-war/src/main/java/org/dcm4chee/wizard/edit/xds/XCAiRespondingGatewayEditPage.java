@@ -63,6 +63,7 @@ import org.dcm4chee.wizard.model.GenericConfigNodeModel;
 import org.dcm4chee.wizard.model.StringArrayModel;
 import org.dcm4chee.wizard.model.xds.XCAiRespondingGatewayModel;
 import org.dcm4chee.wizard.tree.ConfigTreeNode;
+import org.dcm4chee.wizard.tree.ConfigTreeNode.TreeNodeType;
 import org.dcm4chee.wizard.tree.ConfigTreeProvider;
 import org.dcm4chee.wizard.util.FormUtils;
 import org.dcm4chee.xds2.conf.XCAiInitiatingGWCfg;
@@ -256,7 +257,7 @@ public class XCAiRespondingGatewayEditPage extends SecureSessionCheckPage{
                     
                     // optional
                     xcai.setSoapLogDir(xdsSoapMsgLogDirModel.getObject());
-                    ConfigTreeProvider.get().mergeDevice(device);
+                    ConfigTreeProvider.get().mergeDevice(device, TreeNodeType.XCAiRespondingGateway);
                     window.close(target);
                 } catch (Exception e) {
                     log.error("{}: Error modifying XCAi Responding Gateway: {}", this, e);
