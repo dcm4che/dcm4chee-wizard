@@ -16,7 +16,7 @@
   <properties>
     <wicket.version>6.15.0</wicket.version>
     <wicket.security.version>6.9.0</wicket.security.version>
-    <dcm4chee.proxy.version>2.0.2</dcm4chee.proxy.version>
+    <dcm4chee.proxy.version>2.0.4</dcm4chee.proxy.version>
     <jdbc-prefs.version>1.1.1</jdbc-prefs.version>
     <db>oracle</db>
     <dcm4che.version>3.3.4</dcm4che.version>
@@ -34,14 +34,6 @@
     </plugins>
   </build>
   <repositories>
-    <repository>
-      <id>codehaus-snapshots</id>
-      <name>codehaus snapshots</name>
-      <url>http://snapshots.repository.codehaus.org</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
     <repository>
       <id>wicketstuff</id>
       <name>wicketstuff</name>
@@ -90,14 +82,6 @@
     </repository>
   </repositories>
   <pluginRepositories>
-    <pluginRepository>
-      <id>codehaus-snapshots</id>
-      <name>codehaus snapshots</name>
-      <url>http://snapshots.repository.codehaus.org</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </pluginRepository>
     <pluginRepository>
       <id>Maven Central</id>
       <url>http://repo1.maven.org/maven2</url>
